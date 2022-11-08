@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_contacts_import_additional_fields_contacts_import_additional_fields,contacts_import_additional_fields.contacts_import_additional_fields,model_contacts_import_additional_fields_contacts_import_additional_fields,base.group_user,1,1,1,1
