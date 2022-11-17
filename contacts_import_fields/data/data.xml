@@ -6,9 +6,6 @@
             <field name="binding_model_id" ref="sale.model_sale_order"/>
             <field name="binding_view_types">list</field>
             <field name="state">code</field>
-            <field name="code">
-                if records:
-                    action = records.action_confirm()
-            </field>
+            <field name="code">records.action_confirm()</field>
     </record>
 </odoo>
