@@ -9,6 +9,14 @@
                        position="replace">
                     <field name="journal_id" domain="[]"/>
                 </xpath>
+                <xpath expr="//field[@name='invoice_user_id']"
+                       position="after">
+                    <field name="deal_ref" invisible="0"/>
+                    <field name="bill_date"/>
+                    <field name="vessel_name" invisible="0"/>
+                    <field name="delivery_location" invisible="0"/>
+                    <field name="picking_id"/>
+                </xpath>
             </field>
         </record>
     </data>

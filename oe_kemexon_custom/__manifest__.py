@@ -10,10 +10,13 @@ OdooERP Sales
     'category': 'Sales/Sales',
     'author': 'OdooERP.ae, tou-odoo',
     'website': 'https://odooerp.ae/',
-    'depends': ['account', 'base'],
+    'depends': ['account', 'base','sale'],
     'data': [
+        'security/ir.model.access.csv',
         'report/invoice_report_template.xml',
-        'views/account_move_views.xml'
+        'views/account_move_views.xml',
+        'views/sale_order_view.xml',
+        'views/stock_picking_view.xml'
     ],
     'installable': True,
     'application': True,
