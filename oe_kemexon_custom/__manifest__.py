@@ -13,6 +13,7 @@ OdooERP Sales
     'depends': ['account', 'base'],
     'data': [
         'report/invoice_report_template.xml',
+        'views/account_move_views.xml'
     ],
     'installable': True,
     'application': True,
