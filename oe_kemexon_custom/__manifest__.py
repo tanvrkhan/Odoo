@@ -14,6 +14,7 @@ OdooERP Sales
     'data': [
         'security/ir.model.access.csv',
         'report/invoice_report_template.xml',
+        'report/pro-forma_invoice_template.xml',
         'views/account_move_views.xml',
         'views/sale_order_view.xml',
         'views/stock_picking_view.xml'

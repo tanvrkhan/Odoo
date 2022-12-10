@@ -4,7 +4,7 @@
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-call="web.external_layout">
                 <hr style="height:2px; border:none; background-color:black;"/>
-                <h1 class="text-center">INVOICE</h1>
+                <h3 class="text-center">INVOICE</h3>
                 <hr style="height:2px; border:none; background-color:black;"/>
                 <div class="row">
                     <div class="col-4">
@@ -48,24 +48,47 @@
                 </t>
                 <br/>
                 <strong>Delivery To</strong>
-                <br/>
-                <span t-field="o.partner_id"></span>
-                <t t-if="o.partner_id.street">
+                <t t-if="o.partner_id.child_ids">
                     <br/>
-                    <span t-field="o.partner_id.street"></span>
+                    <span t-field="o.partner_id.child_ids[0].street"></span>
+                    <t t-if="o.partner_id.child_ids[0].street">
+                        <br/>
+                        <span t-field="o.partner_id.child_ids[0].street"></span>
+                    </t>
+                    <t t-if="o.partner_id.child_ids[0].street2">
+                        <br/>
+                        <span t-field="o.partner_id.child_ids[0].street2"></span>
+                    </t>
+                    <t t-if="o.partner_id.child_ids[0].city">
+                        <br/>
+                        <span t-field="o.partner_id.child_ids[0].city"></span>
+                    </t>
+                    <t t-if="o.partner_id.child_ids[0].state_id">
+                        <br/>
+                        <span t-field="o.partner_id.child_ids[0].state_id.name"></span>
+                    </t>
                 </t>
-                <t t-if="o.partner_id.street2">
+                <t t-else="">
                     <br/>
-                    <span t-field="o.partner_id.street2"></span>
+                    <span t-field="o.partner_id"></span>
+                    <t t-if="o.partner_id.street">
+                        <br/>
+                        <span t-field="o.partner_id.street"></span>
+                    </t>
+                    <t t-if="o.partner_id.street2">
+                        <br/>
+                        <span t-field="o.partner_id.street2"></span>
+                    </t>
+                    <t t-if="o.partner_id.city">
+                        <br/>
+                        <span t-field="o.partner_id.city"></span>
+                    </t>
+                    <t t-if="o.partner_id.state_id">
+                        <br/>
+                        <span t-field="o.partner_id.state_id.name"></span>
+                    </t>
                 </t>
-                <t t-if="o.partner_id.city">
-                    <br/>
-                    <span t-field="o.partner_id.city"></span>
-                </t>
-                <t t-if="o.partner_id.state_id">
-                    <br/>
-                    <span t-field="o.partner_id.state_id.name"></span>
-                </t>
+
                 <table class="table table-sm o_main_table" name="invoice_line_table">
                     <thead>
                         <tr>
@@ -77,16 +100,16 @@
                             </th>
                             <th name="th_priceunit"
                                 t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
-                                <span>Unit Price</span>
+                                <span>Rate</span>
                             </th>
                             <th name="th_price_unit" t-if="display_discount"
                                 t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
                                 <span>Disc.%</span>
                             </th>
-                            <th name="th_taxes"
-                                t-attf-class="text-start {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
-                                <span>Taxes</span>
-                            </th>
+                            <!--                            <th name="th_taxes"-->
+                            <!--                                t-attf-class="text-start {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">-->
+                            <!--                                <span>Taxes</span>-->
+                            <!--                            </th>-->
                             <th name="th_subtotal" class="text-end">
                                 <span groups="account.group_show_line_subtotals_tax_excluded">Amount</span>
                                 <span groups="account.group_show_line_subtotals_tax_included">Total Price</span>
@@ -120,10 +143,10 @@
                                         t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
                                         <span class="text-nowrap" t-field="line.discount"/>
                                     </td>
-                                    <td t-attf-class="text-start {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
-                                        <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_ids))"
-                                              id="line_tax_ids"/>
-                                    </td>
+                                    <!--                                    <td t-attf-class="text-start {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">-->
+                                    <!--                                        <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_ids))"-->
+                                    <!--                                              id="line_tax_ids"/>-->
+                                    <!--                                    </td>-->
                                     <td class="text-end o_price_total">
                                         <span class="text-nowrap" t-field="line.price_subtotal"
                                               groups="account.group_show_line_subtotals_tax_excluded"/>
@@ -207,7 +230,8 @@
                     </div>
                     <div class="col-2"/>
                     <div class="col-5">
-                    <img t-att-src="'oe_kemexon_custom/static/src/img/kemexon_seal.jpeg'" style="max-height: 2cm; max-width: 4cm;" />
+                        <img t-att-src="'oe_kemexon_custom/static/src/img/kemexon_seal.jpeg'"
+                             style="max-height: 2cm; max-width: 4cm;"/>
                     </div>
                 </div>
 
@@ -271,14 +295,14 @@
         </xpath>
     </template>
     <template id="web.external_layout_standard">
-        <div class="header">
+        <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
             <div class="row">
                 <!-- <div class="">
                     <img t-att-src="'cdx_custom_reports/static/src/img/barajeel_final.png'" width="500px"/>
                 </div> -->
                 <div class="col-12">
-                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" width="500px" alt="Logo"
-                         height="125px" style="margin-left:0px;margin-right:50px;"/>
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" width="250px" alt="Logo"
+                         height="62px" style="margin-left:0px;margin-right:50px;"/>
                 </div>
             </div>
             <!--            <hr style="height:5px; border:none; background-color:#5AA2F9;margin-left:-1px;margin-top:4px;"/>-->
@@ -324,6 +348,24 @@
             </div>
         </div>
     </template>
+    <record id="paperformat_invoice_portrait" model="report.paperformat">
+        <field name="name">Invoice Format</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="page_height">297</field>
+        <field name="page_width">210</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">8</field>
+        <field name="margin_left">3</field>
+        <field name="margin_right">3</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">6</field>
+        <field name="dpi">110</field>
+    </record>
+    <record id="account.account_invoices" model="ir.actions.report">
+        <field name="paperformat_id" ref="paperformat_invoice_portrait"/>
+    </record>
 </odoo>
 
 
