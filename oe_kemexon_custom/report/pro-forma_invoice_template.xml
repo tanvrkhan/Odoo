@@ -140,14 +140,19 @@
                             <tr>
                                 <th>Delivery Period</th>
                                 <td width="50%">
-                                    <span class="m-0" t-field="doc.incoterm"/>
+                                    <t t-if="doc.picking_ids">
+                                        <span class="m-0" t-field="doc.picking_ids.delivery_from"/>
+                                        To
+                                        <span class="m-0" t-field="doc.picking_ids.delivery_to"/>
+
+                                    </t>
                                 </td>
                             </tr>
                             <tr>
                                 <th>Delivery Location</th>
                                 <td width="50%">
                                     <t t-if="doc.picking_ids">
-                                         <span class="m-0" t-field="doc.picking_ids.delivery_location"/>
+                                        <span class="m-0" t-field="doc.picking_ids.delivery_location"/>
 
                                     </t>
                                     <!--                                    <span class="m-0" t-field="o.delivery_location"/>-->
@@ -158,7 +163,7 @@
                                 <th>Incoterms</th>
                                 <td width="50%">
                                     <!--                                    <span class="m-0" t-field="o.invoice_incoterm_id"/>-->
-                                   <span class="m-0" t-field="doc.incoterm"/>
+                                    <span class="m-0" t-field="doc.incoterm"/>
                                 </td>
                             </tr>
                         </table>
@@ -229,6 +234,11 @@
                     </li>
                     <li>Kemexon terms and conditions apply.</li>
                 </ul>
+                <br/>
+                <center>
+                    <img t-att-src="'oe_kemexon_custom/static/src/img/kemexon_seal.jpeg'"
+                             style="max-height: 4cm; max-width: 8cm;"/>
+                </center>
             </t>
         </xpath>
     </template>

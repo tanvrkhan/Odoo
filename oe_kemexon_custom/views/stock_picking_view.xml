@@ -8,6 +8,15 @@
                 <xpath expr="//field[@name='origin']"
                        position="after">
                     <field name="delivery_location"/>
+                    <label for="delivery_from" string="Period"/>
+                    <div name="date_edit_only" class="o_row oe_edit_only">
+                        <span>From
+                            <field name="delivery_from" class='oe_inline'/>
+                        </span>
+                        <span>To
+                            <field name="delivery_to" class='oe_inline'/>
+                        </span>
+                    </div>
                 </xpath>
                 <xpath expr="//notebook"
                        position="inside">

@@ -12,3 +12,5 @@ class StockPicking(models.Model):
     vessel_name = fields.Char("Vessel Name")
     delivery_location = fields.Many2one('delivery.location', "Delivery Location")
     imo_number = fields.Char("IMO Number")
+    delivery_from = fields.Date("Delivery From")
+    delivery_to = fields.Date('Delivry To')
