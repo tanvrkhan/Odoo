@@ -10,7 +10,7 @@ OdooERP Sales
     'category': 'Sales/Sales',
     'author': 'OdooERP.ae, tou-odoo',
     'website': 'https://odooerp.ae/',
-    'depends': ['account', 'base','sale'],
+    'depends': ['account', 'base','sale','sale_stock'],
     'data': [
         'security/ir.model.access.csv',
         'report/invoice_report_template.xml',

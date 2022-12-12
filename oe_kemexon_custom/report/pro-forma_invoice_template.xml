@@ -140,21 +140,25 @@
                             <tr>
                                 <th>Delivery Period</th>
                                 <td width="50%">
-                                    <span class="m-0" t-field="doc.date_order"/>
+                                    <span class="m-0" t-field="doc.incoterm"/>
                                 </td>
                             </tr>
                             <tr>
                                 <th>Delivery Location</th>
                                 <td width="50%">
+                                    <t t-if="doc.picking_ids">
+                                         <span class="m-0" t-field="doc.picking_ids.delivery_location"/>
+
+                                    </t>
                                     <!--                                    <span class="m-0" t-field="o.delivery_location"/>-->
-                                    <span>Dar Es Salaam</span>
+
                                 </td>
                             </tr>
                             <tr>
                                 <th>Incoterms</th>
                                 <td width="50%">
                                     <!--                                    <span class="m-0" t-field="o.invoice_incoterm_id"/>-->
-                                    FCA
+                                   <span class="m-0" t-field="doc.incoterm"/>
                                 </td>
                             </tr>
                         </table>
