@@ -29,6 +29,9 @@
                             </group>
                         </group>
                     </page>
+                    <page name="truck_details" string="Truck Details">
+                        <field name="truck_transport_details_ids"/>
+                    </page>
                 </xpath>
             </field>
         </record>

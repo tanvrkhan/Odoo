@@ -14,3 +14,4 @@ class StockPicking(models.Model):
     imo_number = fields.Char("IMO Number")
     delivery_from = fields.Date("Delivery From")
     delivery_to = fields.Date('Delivry To')
+    truck_transport_details_ids = fields.One2many('truck.transport.details', 'picking_id', "Truck Details")
