@@ -17,6 +17,14 @@
                             <field name="delivery_to" class='oe_inline'/>
                         </span>
                     </div>
+                    <field name="rate"/>
+                    <field name="transport_tolerance"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']"
+                       position="after">
+                    <field name="transporter"/>
+                    <field name="consignee"/>
+                    <field name="transporter_payment_terms"/>
                 </xpath>
                 <xpath expr="//notebook"
                        position="inside">
