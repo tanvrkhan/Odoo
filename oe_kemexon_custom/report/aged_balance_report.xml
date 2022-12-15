@@ -1,0 +1,127 @@
+<odoo>
+    <data>
+
+
+        <template id="report_aged_balance_report">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <t t-foreach="docs" t-as="o">
+                        <div class="page">
+                            <table class="table table-sm o_main_table" name="invoice_line_table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Reference</th>
+                                        <th>Currency</th>
+                                        <th>Due Date</th>
+                                        <th>Due Days</th>
+                                        <th>Total Amount</th>
+                                        <th>Balance</th>
+                                        <th>0-30 Days</th>
+                                        <th>31-60 Days</th>
+                                        <th>61-90 Days</th>
+                                        <th>Over 90 Days</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t set="total_total_amount" t-value="0"/>
+                                    <t set="total_amount_due" t-value="0"/>
+                                    <t set="total_thirtyone_sixty" t-value="0"/>
+                                    <t set="total_zero_thirty" t-value="0"/>
+                                    <t set="total_sixteeone_nineteen" t-value="0"/>
+                                    <t set="total_nineteen_above" t-value="0"/>
+                                    <t t-foreach="o.get_invoice_details()" t-as="invoice">
+                                        <tr>
+                                            <td>
+                                                <span t-esc="invoice.get('short_name')"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="invoice.get('reference')"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="invoice.get('currency')"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="invoice.get('due_date')"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="invoice.get('due_days')"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="invoice.get('amount_total')"/>
+                                                <t set="total_total_amount"
+                                                   t-value="total_total_amount +invoice.get('amount_total')"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="invoice.get('amount_due')"/>
+                                                <t set="total_amount_due"
+                                                   t-value="total_amount_due+invoice.get('amount_due')"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="invoice.get('zero_thirty')"/>
+                                                <t set="total_zero_thirty"
+                                                   t-value="total_zero_thirty+invoice.get('zero_thirty')"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="invoice.get('thirtyone_sixty')"/>
+                                                <t set="total_thirtyone_sixty"
+                                                   t-value="total_thirtyone_sixty+invoice.get('thirtyone_sixty')"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="invoice.get('sixteeone_nineteen')"/>
+                                                <t set="total_sixteeone_nineteen"
+                                                   t-value="total_sixteeone_nineteen+invoice.get('sixteeone_nineteen')"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="invoice.get('nineteen_above')"/>
+                                                <t set="total_nineteen_above"
+                                                   t-value="total_nineteen_above+invoice.get('nineteen_above')"/>
+                                            </td>
+
+                                        </tr>
+
+                                    </t>
+                                    <tr>
+                                        <th>Total</th>
+                                        <td/>
+                                        <td/>
+                                        <td/>
+                                        <td/>
+
+                                        <td>
+                                            <span t-esc="total_total_amount"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="total_amount_due"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="total_zero_thirty"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="total_thirtyone_sixty"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="total_sixteeone_nineteen"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="total_nineteen_above"/>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <record id="action_report_aged_balance" model="ir.actions.report">
+            <field name="name">Aged Balance Report</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="binding_model_id" ref="model_account_move"/>
+            <field name="report_name">oe_kemexon_custom.report_aged_balance_report</field>
+            <field name="report_file">oe_kemexon_custom.report_aged_balance_report</field>
+        </record>
+    </data>
+</odoo>

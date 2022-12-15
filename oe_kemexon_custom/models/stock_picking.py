@@ -16,7 +16,23 @@ class StockPicking(models.Model):
     delivery_to = fields.Date('Delivry To')
     truck_transport_details_ids = fields.One2many('truck.transport.details', 'picking_id', "Truck Details")
     transporter = fields.Many2one('res.partner', 'Transporter')
-    consignee = fields.Many2one('res.partner', 'Transporter')
+    consignee = fields.Many2one('res.partner', 'Consignee')
     transporter_payment_terms = fields.Many2one('account.payment.term', 'Transporter Payment Terms')
     rate = fields.Float('Rate')
     transport_tolerance = fields.Float('Transport Tolerance')
+
+    @api.onchange('consignee')
+    def _domain_change(self):
+        print('_domain_change_domain_change')
+        domain = []
+        if self.partner_id:
+            if self.partner_id.child_ids:
+                domain = self.partner_id.child_ids.ids
+                domain.append(self.partner_id.id)
+            else:
+                domain.append(self.partner_id.id)
+        print(domain,'domaindomain')
+        return {
+            'domain': {
+                'consignee': [('id', 'in', domain)]}
+        }

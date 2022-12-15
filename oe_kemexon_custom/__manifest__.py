@@ -13,6 +13,9 @@ OdooERP Sales
     'depends': ['account', 'base','sale','sale_stock','purchase'],
     'data': [
         'security/ir.model.access.csv',
+        'report/aged_balance_report.xml',
+        'data/mail_template_data.xml',
+        'data/crone.xml',
         'report/invoice_report_template.xml',
         'report/pro-forma_invoice_template.xml',
         'views/account_move_views.xml',
