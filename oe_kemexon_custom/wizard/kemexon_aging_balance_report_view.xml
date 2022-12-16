@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!--Wizard Form View-->
+    <record id="kemexon_aging_balance_report_form_view" model="ir.ui.view">
+        <field name="name">kemexon.aging.balance.report.form.view</field>
+        <field name="model">kemexon.aging.balance.report</field>
+        <field name="arch" type="xml">
+            <form string="Aging Balance Report">
+                <group>
+                    <group>
+<!--                        <field name="partner_id" widget="res_partner_many2one" context="{'res_partner_search_mode': 'supplier', 'show_vat': True}"-->
+<!--                                placeholder="Name, TIN, Email, or Reference" required="True"-->
+<!--                            />-->
+                    </group>
+                </group>
+                <footer>
+                                        <button name="action_print_report" string="Print" type="object" class="oe_highlight, btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="kemexon_aging_balance_report_action_id" model="ir.actions.act_window">
+        <field name="name">Aging Balance Report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">kemexon.aging.balance.report</field>
+<!--        <field name="view_type">form</field>-->
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="kemexon_aging_balance_report_form_view"/>
+        <field name="target">new</field>
+    </record>
+        <!-- Menu item for Pending Sale Order Items-->
+    <menuitem name="Aging Balance Report"
+    action="kemexon_aging_balance_report_action_id"
+    id="menu_kemexon_aging_balance_report_act" parent="account.menu_finance_reports"  sequence="235"/>
+
+
+</odoo>
