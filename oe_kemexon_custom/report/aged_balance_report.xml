@@ -7,10 +7,6 @@
                 <t t-call="web.external_layout">
                     <t t-foreach="docs" t-as="o">
                         <div class="page">
-                            <h6>Customer Aging Balance Report</h6>
-                            As at
-                            <span t-esc="datetime.date.today()"/>
-                            <br/>
                             <table class="table table-sm o_main_table" name="invoice_line_table">
                                 <thead>
                                     <tr>
@@ -34,7 +30,7 @@
                                     <t set="total_zero_thirty" t-value="0"/>
                                     <t set="total_sixteeone_nineteen" t-value="0"/>
                                     <t set="total_nineteen_above" t-value="0"/>
-                                    <t t-foreach="o.get_invoice_details().get('result')" t-as="invoice">
+                                    <t t-foreach="o.get_invoice_details()" t-as="invoice">
                                         <tr>
                                             <td>
                                                 <span t-esc="invoice.get('short_name')"/>
@@ -93,22 +89,22 @@
                                         <td/>
 
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_amount_total')"/>
+                                            <span t-esc="total_total_amount"/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_amount_due')"/>
+                                            <span t-esc="total_amount_due"/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_zero_thirty')"/>
+                                            <span t-esc="total_zero_thirty"/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_thirtyone_sixty')"/>
+                                            <span t-esc="total_thirtyone_sixty"/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_sixteeone_nineteen')"/>
+                                            <span t-esc="total_sixteeone_nineteen"/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_nineteen_above')"/>
+                                            <span t-esc="total_nineteen_above"/>
                                         </td>
                                     </tr>
 

@@ -1,19 +1,9 @@
 <odoo noupdate="1">
-    <record id="ir_cron_aged_balance_invoice_report" model="ir.cron">
-        <field name="name">Aged Balance Invoice Report</field>
+    <record id="ir_cron_edi_network" model="ir.cron">
+        <field name="name">Aged Balance Report</field>
         <field name="model_id" ref="model_account_move"/>
         <field name="state">code</field>
-        <field name="code">model.action_send_aged_balance_invoice_report(move_type='out_invoice')</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">days</field>
-        <field name="numbercall">-1</field>
-        <field name="active">False</field>
-    </record>
-     <record id="ir_cron_aged_balance_bill_report" model="ir.cron">
-        <field name="name">Aged Balance Bill Report</field>
-        <field name="model_id" ref="model_account_move"/>
-        <field name="state">code</field>
-        <field name="code">model.action_send_aged_balance_invoice_report(move_type='in_invoice')</field>
+        <field name="code">model.action_send_aged_balance_report()</field>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>

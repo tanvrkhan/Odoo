@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-import datetime
 
 from odoo import api, fields, models, _
 from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessError
 import base64
-
 
 class AccountMove(models.Model):
     _inherit = "account.move"
@@ -22,16 +20,10 @@ class AccountMove(models.Model):
                                  check_company=True)
 
     def get_invoice_details(self):
-        invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', self.move_type)])
+        invoices = self.env['account.move'].search([('amount_residual', '>', 0)])
         today_date = fields.Date.today()
         'short_name'
         result = []
-        total_amount_total = 0
-        total_amount_due = 0
-        total_zero_thirty = 0
-        total_thirtyone_sixty = 0
-        total_sixteeone_nineteen = 0
-        total_nineteen_above = 0
         for invoice in invoices:
             if invoice.invoice_date_due and invoice.invoice_date_due < today_date:
                 due_days = (today_date - invoice.invoice_date_due).days
@@ -47,12 +39,6 @@ class AccountMove(models.Model):
                     sixteeone_nineteen = invoice.amount_residual
                 else:
                     nineteen_above = invoice.amount_residual
-                total_amount_total += invoice.amount_total
-                total_amount_due += invoice.amount_residual
-                total_zero_thirty += zero_thirty
-                total_thirtyone_sixty += thirtyone_sixty
-                total_sixteeone_nineteen += sixteeone_nineteen
-                total_nineteen_above += nineteen_above
 
                 data_dict = {
                     'short_name': invoice.partner_id.name,
@@ -67,102 +53,25 @@ class AccountMove(models.Model):
                     'sixteeone_nineteen': sixteeone_nineteen,
                     'nineteen_above': nineteen_above
                 }
+                print(data_dict)
                 result.append(data_dict)
-        data = {
-            'result': result,
-            'total_amount_total': total_amount_total,
-            'total_amount_due': total_amount_due,
-            'total_zero_thirty': total_zero_thirty,
-            'total_thirtyone_sixty': total_thirtyone_sixty,
-            'total_sixteeone_nineteen': total_sixteeone_nineteen,
-            'total_nineteen_above': total_nineteen_above
+        return result
+
+    def action_send_aged_balance_report(self):
+        sow_template_id = self.env.ref('oe_kemexon_custom.email_template_aged_balance_report')
+        sow_report_id = self.env.ref('oe_kemexon_custom.action_report_aged_balance')
+        generated_report = self.env['ir.actions.report']._render_qweb_pdf("oe_kemexon_custom.action_report_aged_balance", self.id)[0]
+        data_record = base64.b64encode(generated_report)
+        ir_values = {
+            'name': 'Aged Balance',
+            'type': 'binary',
+            'datas': data_record,
+            'store_fname': data_record,
+            'mimetype': 'application/pdf',
+            'res_model': 'account.move',
         }
-        return data
-
-    def action_send_aged_balance_invoice_report(self, move_type):
-        if move_type == 'out_invoice':
-            sow_template_id = self.env.ref('oe_kemexon_custom.email_template_aged_balance_invoice_report')
-            invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', 'out_invoice')])
-        else:
-            sow_template_id = self.env.ref('oe_kemexon_custom.email_template_aged_balance_bill_report')
-            invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', 'in_invoice')])
-        # sow_report_id = self.env.ref('oe_kemexon_custom.action_report_aged_balance')
-        # generated_report = \
-        #     self.env['ir.actions.report']._render_qweb_pdf("oe_kemexon_custom.action_report_aged_balance", self.id)[0]
-        # data_record = base64.b64encode(generated_report)
-        # ir_values = {
-        #     'name': 'Aged Balance',
-        #     'type': 'binary',
-        #     'datas': data_record,
-        #     'store_fname': data_record,
-        #     'mimetype': 'application/pdf',
-        #     'res_model': 'account.move',
-        # }
-        # report_attachment = self.env['ir.attachment'].sudo().create(ir_values)
-        # sow_template_id.attachment_ids = [(6, 0, [report_attachment.id])]
-
-        body_html = '''<h6>Customer Aging Balance Report</h6>
-         As at &#160; %s
-                            <br/>
-                                                                                   <table class="table table-sm o_main_table" name="invoice_line_table">
-                                                                               <thead>
-                                    <tr>
-                                        <th>Customer</th>
-                                        <th>Reference</th>
-                                        <th>Currency</th>
-                                        <th>Due Date</th>
-                                        <th>Due Days</th>
-                                        <th>Total Amount</th>
-                                        <th>Balance</th>
-                                        <th>0-30 Days</th>
-                                        <th>31-60 Days</th>
-                                        <th>61-90 Days</th>
-                                        <th>Over 90 Days</th>
-                                    </tr>
-                                </thead>
-                                                                              <tbody>
-                                                                               ''' % (datetime.date.today(),)
-
-        today_date = fields.Date.today()
-        'short_name'
-        result = []
-        total_amount_total = 0
-        total_amount_due = 0
-        total_zero_thirty = 0
-        total_thirtyone_sixty = 0
-        total_sixteeone_nineteen = 0
-        total_nineteen_above = 0
-        for invoice in invoices:
-            if invoice.invoice_date_due and invoice.invoice_date_due < today_date:
-                due_days = (today_date - invoice.invoice_date_due).days
-                zero_thirty = 0
-                thirtyone_sixty = 0
-                sixteeone_nineteen = 0
-                nineteen_above = 0
-                if 0 <= due_days >= 30:
-                    zero_thirty = invoice.amount_residual
-                elif 31 <= due_days >= 60:
-                    thirtyone_sixty = invoice.amount_residual
-                elif 61 <= due_days >= 90:
-                    sixteeone_nineteen = invoice.amount_residual
-                else:
-                    nineteen_above = invoice.amount_residual
-                total_amount_total += invoice.amount_total
-                total_amount_due += invoice.amount_residual
-                total_zero_thirty += zero_thirty
-                total_thirtyone_sixty += thirtyone_sixty
-                total_sixteeone_nineteen += sixteeone_nineteen
-                total_nineteen_above += nineteen_above
-
-                body_html += '''<tr><td>''' + str(invoice.partner_id.short_name) + '''</td> <td>''' + str(
-                    invoice.name) + '''</td><td>''' + str(
-                    invoice.currency_id.name) + '''</td><td>''' + str(invoice.invoice_date_due) + '''</td><td>''' + str(
-                    due_days) + '''</td><td>''' + str(invoice.amount_total) + '''</td><td>''' + str(
-                    invoice.amount_residual) + '''</td><td>''' + str(
-                    zero_thirty) + '''</td><td>''' + str(thirtyone_sixty) + '''</td><td>''' + str(
-                    sixteeone_nineteen) + '''</td><td>''' + str(nineteen_above) + '''</td></tr>'''
-
-        sow_template_id.body_html = body_html
+        report_attachment = self.env['ir.attachment'].sudo().create(ir_values)
+        sow_template_id.attachment_ids = [(6, 0, [report_attachment.id])]
         sow_template_id.send_mail(self.id, force_send=True)
 
 
