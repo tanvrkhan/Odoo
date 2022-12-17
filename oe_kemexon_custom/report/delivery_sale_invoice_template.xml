@@ -1,0 +1,312 @@
+<odoo>
+    <data>
+        <template id="report_delivery_sale_invoice">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <t t-foreach="docs" t-as="o">
+                        <hr style="height:2px; border:none; background-color:black;"/>
+                        <h3 class="text-center">Delivery Sales INVOICE</h3>
+                        <hr style="height:2px; border:none; background-color:black;"/>
+
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="row">
+                                    Reference:
+                                    <span t-field="o.name"/>
+                                </div>
+                            </div>
+                            <div class="col-4"/>
+                            <div class="col-4">
+                                <div class="row">
+                                    Date :
+                                    <span class="m-0" t-field="o.scheduled_date"/>
+
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+                        <strong>Customer</strong>
+                        <br/>
+                        <span t-field="o.partner_id"></span>
+                        <t t-if="o.partner_id.street">
+                            <br/>
+                            <span t-field="o.partner_id.street"></span>
+                        </t>
+                        <t t-if="o.partner_id.street2">
+                            <br/>
+                            <span t-field="o.partner_id.street2"></span>
+                        </t>
+                        <t t-if="o.partner_id.city">
+                            <br/>
+                            <span t-field="o.partner_id.city"></span>
+                        </t>
+                        <t t-if="o.partner_id.state_id">
+                            <br/>
+                            <span t-field="o.partner_id.state_id.name"></span>
+                        </t>
+                        <br/>
+                        <strong>Consignee</strong>
+                        <br/>
+                        <span t-field="o.consignee"></span>
+                        <t t-if="o.consignee.street">
+                            <br/>
+                            <span t-field="o.consignee.street"></span>
+                        </t>
+                        <t t-if="o.consignee.street2">
+                            <br/>
+                            <span t-field="o.consignee.street2"></span>
+                        </t>
+                        <t t-if="o.consignee.city">
+                            <br/>
+                            <span t-field="o.consignee.city"></span>
+                        </t>
+                        <t t-if="o.consignee.state_id">
+                            <br/>
+                            <span t-field="o.consignee.state_id.name"></span>
+                        </t>
+                        <!--                        <div class="row">-->
+                        <!--                            <div class="col-4"/>-->
+                        <!--                            <div class="col-4"/>-->
+                        <!--                            <div class="col-2">-->
+                        <!--                                <div class="row">-->
+                        <!--                                    Date :-->
+                        <!--                                    <span class="m-0" t-field="o.scheduled_date"/>-->
+
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
+                        <table class="table table-sm o_main_table mt-4">
+                            <!-- In case we want to repeat the header, remove "display: table-row-group" -->
+                            <thead style="display: table-row-group">
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Quantity</th>
+                                    <th>Rate</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.move_ids" t-as="move">
+                                    <tr>
+                                        <td>
+                                            <span t-field="move.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="move.product_uom_qty"/>
+                                        </td>
+                                        <td>
+                                            <t t-if="move.sale_line_id">
+                                                <span t-field="move.sale_line_id.price_unit"/>
+                                            </t>
+                                        </td>
+                                        <td>
+                                            <t t-if="move.sale_line_id">
+                                                <span t-field="move.sale_line_id.price_subtotal"/>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <br/>
+                        <h3 class="text-left">Truck Information</h3>
+                        <hr style="height:2px; border:none; background-color:black;"/>
+                        <br/>
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="row">
+                                    Truck No:
+
+                                     <t t-if="o.truck_transport_details_ids">
+                                       <span t-field="o.truck_transport_details_ids[0].truck"/>
+                                    </t>
+                                </div>
+                                <div class="row">
+                                    Transporter :
+                                   <span t-field="o.transporter"/>
+
+                                </div>
+                            </div>
+                            <div class="col-8"/>
+                        </div>
+                        <br/>
+                        <h3 class="text-left">Delivery Information</h3>
+                        <hr style="height:2px; border:none; background-color:black;"/>
+                        <br/>
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="row">
+                                    Incotems:
+                                    <t t-if="o.sale_id">
+                                         <span t-field="o.sale_id.incoterm"/>
+                                    </t>
+
+                                </div>
+                                <div class="row">
+                                    Delivery Location:
+                                    <span t-field="o.delivery_location"/>
+                                </div>
+                                <div class="row">
+                                    Loading Point:
+                                    <span t-field="o.name"/>
+                                </div>
+                            </div>
+                            <div class="col-8"/>
+
+                        </div>
+
+
+                        <p style="page-break-before:always;"></p>
+                        <hr style="height:2px; border:none; background-color:black;"/>
+                        <h3 class="text-center">Delivery Note</h3>
+                        <hr style="height:2px; border:none; background-color:black;"/>
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="row">
+                                    Reference:
+                                    <span t-field="o.name"/>
+                                </div>
+                            </div>
+                            <div class="col-4"/>
+                            <div class="col-4">
+                                <div class="row">
+                                    Date :
+                                    <span class="m-0" t-field="o.scheduled_date"/>
+
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+                        <strong>Customer</strong>
+                        <br/>
+                        <span t-field="o.partner_id"></span>
+                        <t t-if="o.partner_id.street">
+                            <br/>
+                            <span t-field="o.partner_id.street"></span>
+                        </t>
+                        <t t-if="o.partner_id.street2">
+                            <br/>
+                            <span t-field="o.partner_id.street2"></span>
+                        </t>
+                        <t t-if="o.partner_id.city">
+                            <br/>
+                            <span t-field="o.partner_id.city"></span>
+                        </t>
+                        <t t-if="o.partner_id.state_id">
+                            <br/>
+                            <span t-field="o.partner_id.state_id.name"></span>
+                        </t>
+                        <br/>
+                        <strong>Consignee</strong>
+                        <br/>
+                        <span t-field="o.consignee"></span>
+                        <t t-if="o.consignee.street">
+                            <br/>
+                            <span t-field="o.consignee.street"></span>
+                        </t>
+                        <t t-if="o.consignee.street2">
+                            <br/>
+                            <span t-field="o.consignee.street2"></span>
+                        </t>
+                        <t t-if="o.consignee.city">
+                            <br/>
+                            <span t-field="o.consignee.city"></span>
+                        </t>
+                        <t t-if="o.consignee.state_id">
+                            <br/>
+                            <span t-field="o.consignee.state_id.name"></span>
+                        </t>
+                        <br/>
+                        <table class="table table-sm o_main_table mt-4">
+                            <!-- In case we want to repeat the header, remove "display: table-row-group" -->
+                            <thead style="display: table-row-group">
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Uom</th>
+                                    <th>Order Qty</th>
+                                    <th>Actual Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.move_ids" t-as="move">
+                                    <tr>
+                                        <td>
+                                            <span t-field="move.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="move.product_id.uom_id"/>
+                                        </td>
+                                        <td> <span t-field="move.product_uom_qty"/></td>
+                                        <td> <span t-field="move.forecast_availability"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                   <br/>
+                        <h3 class="text-left">Truck Information</h3>
+                        <hr style="height:2px; border:none; background-color:black;"/>
+                        <br/>
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="row">
+                                    Truck No:
+
+                                    <t t-if="o.truck_transport_details_ids">
+                                       <span t-field="o.truck_transport_details_ids[0].truck"/>
+                                    </t>
+                                </div>
+                                <div class="row">
+                                    Transporter :
+                                    <span t-field="o.transporter"/>
+
+                                </div>
+                                  <div class="row">
+                                    Driver Passport :
+                                    <t t-if="o.truck_transport_details_ids">
+                                       <span t-field="o.truck_transport_details_ids[0].passport"/>
+                                    </t>
+
+                                </div>
+                                 <div class="row">
+                                    Driver Name :
+                                    <t t-if="o.truck_transport_details_ids">
+                                       <span t-field="o.truck_transport_details_ids[0].driver"/>
+                                    </t>
+
+                                </div>
+                            </div>
+                            <div class="col-8"/>
+                        </div>
+                        <br/>
+                        <h3 class="text-left">Delivery Information</h3>
+                        <hr style="height:2px; border:none; background-color:black;"/>
+                        <br/>
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="row">
+                                    Incotems:
+                                    <t t-if="o.sale_id">
+                                         <span t-field="o.sale_id.incoterm"/>
+                                    </t>
+
+                                </div>
+                                <div class="row">
+                                    Delivery Location:
+                                    <span t-field="o.delivery_location"/>
+                                </div>
+                                <div class="row">
+                                    Loading Point:
+                                    <span t-field="o.name"/>
+                                </div>
+                            </div>
+                            <div class="col-8"/>
+
+                        </div>
+
+
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

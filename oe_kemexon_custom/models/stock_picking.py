@@ -14,7 +14,7 @@ class StockPicking(models.Model):
     imo_number = fields.Char("IMO Number")
     delivery_from = fields.Date("Delivery From")
     delivery_to = fields.Date('Delivry To')
-    truck_transport_details_ids = fields.One2many('truck.transport.details', 'picking_id', "Truck Details")
+    truck_transport_details_ids = fields.One2many('truck.transport.details', 'stock_pick_ids', "Truck Details")
     transporter = fields.Many2one('res.partner', 'Transporter')
     consignee = fields.Many2one('res.partner', 'Consignee')
     transporter_payment_terms = fields.Many2one('account.payment.term', 'Transporter Payment Terms')

@@ -14,6 +14,8 @@ OdooERP Sales
     'data': [
         'security/ir.model.access.csv',
         'report/aged_balance_report.xml',
+        'report/delivery_sale_invoice_template.xml',
+        'report/report.xml',
         'data/mail_template_data.xml',
         'data/crone.xml',
         'report/invoice_report_template.xml',
@@ -21,7 +23,8 @@ OdooERP Sales
         'views/account_move_views.xml',
         'views/sale_order_view.xml',
         'views/stock_picking_view.xml',
-        'views/trucktransportdetails.xml'
+        'views/trucktransportdetails.xml',
+        'wizard/kemexon_aging_balance_report_view.xml'
     ],
     'installable': True,
     'application': True,
