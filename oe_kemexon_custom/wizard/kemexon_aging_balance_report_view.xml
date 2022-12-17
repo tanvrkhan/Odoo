@@ -14,7 +14,8 @@
                     </group>
                 </group>
                 <footer>
-                                        <button name="action_print_report" string="Print" type="object" class="oe_highlight, btn-primary"/>
+                                        <button name="action_print_invoice_report" string="Invoice Report" type="object" class="oe_highlight, btn-primary"/>
+                    <button name="action_print_bill_report" string="Bill Report" type="object" class="oe_highlight, btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
