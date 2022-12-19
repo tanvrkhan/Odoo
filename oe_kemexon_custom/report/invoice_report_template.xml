@@ -302,7 +302,7 @@
                 </div> -->
                 <div class="col-12">
                     <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" width="300px" alt="Logo"
-                         height="62px" style="margin-left:0px;margin-right:50px;"/>
+                         height="52px" style="margin-left:0px;margin-right:50px;"/>
                 </div>
             </div>
             <!--            <hr style="height:5px; border:none; background-color:#5AA2F9;margin-left:-1px;margin-top:4px;"/>-->

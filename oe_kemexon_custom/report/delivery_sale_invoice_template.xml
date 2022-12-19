@@ -5,7 +5,7 @@
                 <t t-call="web.external_layout">
                     <t t-foreach="docs" t-as="o">
                         <hr style="height:2px;border-width:3;color:black;background-color:black"/>
-                        <h2 class="text-center">Delivery Sales INVOICE</h2>
+                        <h2 style="text-color: black" class="text-center">Delivery Sales INVOICE</h2>
                         <hr style="height:2px;border-width:3;color:black;background-color:black"/>
                         <t t-set="truck_transport_details_ids" t-value="False"/>
                         <t t-if="o.truck_transport_details_ids">
@@ -166,7 +166,7 @@
 
                         <p style="page-break-before:always;"></p>
                         <hr style="height:2px; border: 1px solid black; background-color:black;"/>
-                        <h2 class="text-center">Delivery Note</h2>
+                        <h2  style="text-color: black"  class="text-center">Delivery Note</h2>
                         <hr style="height:2px; border: 1px solid black; background-color:black;"/>
                         <div class="row">
                             <div class="col-4">
