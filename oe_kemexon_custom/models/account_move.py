@@ -55,7 +55,7 @@ class AccountMove(models.Model):
                 total_nineteen_above += nineteen_above
 
                 data_dict = {
-                    'short_name': invoice.partner_id.name,
+                    'short_name': invoice.partner_id.short_name,
                     'reference': invoice.name,
                     'currency': invoice.currency_id.name,
                     'due_date': invoice.invoice_date_due,
