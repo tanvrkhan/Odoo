@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="truck_transport_details_view_tree" model="ir.ui.view">
+        <field name="name">truck.transport.details</field>
+        <field name="model">truck.transport.details</field>
+        <field name="arch" type="xml">
+            <tree  multi_edit="1">
+                <field name="truck" />
+                <field name="trailer"/>
+                <field name="driver"/>
+                <field name="passport"/>
+                <field name="nominated"/>
+                <field name="loaded"/>
+                <field name="offloaded"/>
+                <field name="status"/>
+                <field name="statusdate"/>
+                <field name="is_add_report"/>
+            </tree>
+        </field>
+    </record>
+    <record id="truck_transport_details_form" model="ir.ui.view">
+        <field name="name">truck.transport.details</field>
+        <field name="model">truck.transport.details</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                        <group>
+                            <field name="truck" />
+                            <field name="trailer"/>
+                            <field name="driver"/>
+                            <field name="passport"/>
+                            <field name="nominated"/>
+                            <field name="loaded"/>
+                            <field name="offloaded"/>
+                            <field name="status"/>
+                            <field name="statusdate"/>
+                            <field name="is_add_report"/>
+                        </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
