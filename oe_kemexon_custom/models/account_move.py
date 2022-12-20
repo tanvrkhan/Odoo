@@ -22,7 +22,8 @@ class AccountMove(models.Model):
                                  check_company=True)
 
     def get_invoice_details(self):
-        invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', self.move_type),('state','=','posted')])
+        invoices = self.env['account.move'].search(
+            [('amount_residual', '>', 0), ('move_type', '=', self.move_type), ('state', '=', 'posted')])
         today_date = fields.Date.today()
         'short_name'
         result = []
@@ -72,22 +73,26 @@ class AccountMove(models.Model):
         base_currency = self.env.company.currency_id
         data = {
             'result': result,
-            'total_amount_total': base_currency.compute(total_amount_total, USD),
-            'total_amount_due': base_currency.compute(total_amount_due, USD),
-            'total_zero_thirty': base_currency.compute(total_zero_thirty, USD),
-            'total_thirtyone_sixty': base_currency.compute(total_thirtyone_sixty, USD),
-            'total_sixteeone_nineteen': base_currency.compute(total_sixteeone_nineteen, USD),
-            'total_nineteen_above': base_currency.compute(total_nineteen_above, USD)
+            'total_amount_total': round(base_currency.compute(total_amount_total, USD), 2),
+            'total_amount_due': round(base_currency.compute(total_amount_due, USD), 2),
+            'total_zero_thirty': round(base_currency.compute(total_zero_thirty, USD), 2),
+            'total_thirtyone_sixty': round(base_currency.compute(total_thirtyone_sixty, USD), 2),
+            'total_sixteeone_nineteen': round(base_currency.compute(total_sixteeone_nineteen, USD), 2),
+            'total_nineteen_above': round(base_currency.compute(total_nineteen_above, USD), 2),
+            'usd_currency': USD,
+            'partner': 'Customer' if self.move_type == 'out_invoice' else "Vendor"
         }
         return data
 
     def action_send_aged_balance_invoice_report(self, move_type):
         if move_type == 'out_invoice':
             sow_template_id = self.env.ref('oe_kemexon_custom.email_template_aged_balance_invoice_report')
-            invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'),('state','=','posted')])
+            invoices = self.env['account.move'].search(
+                [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted')])
         else:
             sow_template_id = self.env.ref('oe_kemexon_custom.email_template_aged_balance_bill_report')
-            invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', 'in_invoice'),('state','=','posted')])
+            invoices = self.env['account.move'].search(
+                [('amount_residual', '>', 0), ('move_type', '=', 'in_invoice'), ('state', '=', 'posted')])
         # sow_report_id = self.env.ref('oe_kemexon_custom.action_report_aged_balance')
         # generated_report = \
         #     self.env['ir.actions.report']._render_qweb_pdf("oe_kemexon_custom.action_report_aged_balance", self.id)[0]
