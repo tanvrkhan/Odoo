@@ -55,7 +55,7 @@ class AccountMove(models.Model):
                 total_nineteen_above += nineteen_above
 
                 data_dict = {
-                    'short_name': invoice.partner_id.short_name,
+                    'short_name': invoice.partner_id.name,
                     'reference': invoice.name,
                     'currency': invoice.currency_id.name,
                     'due_date': invoice.invoice_date_due,
@@ -68,14 +68,16 @@ class AccountMove(models.Model):
                     'nineteen_above': nineteen_above
                 }
                 result.append(data_dict)
+        USD = self.env['res.currency'].search([('name', '=', 'USD')])
+        base_currency = self.env.company.currency_id
         data = {
             'result': result,
-            'total_amount_total': total_amount_total,
-            'total_amount_due': total_amount_due,
-            'total_zero_thirty': total_zero_thirty,
-            'total_thirtyone_sixty': total_thirtyone_sixty,
-            'total_sixteeone_nineteen': total_sixteeone_nineteen,
-            'total_nineteen_above': total_nineteen_above
+            'total_amount_total': base_currency.compute(total_amount_total, USD),
+            'total_amount_due': base_currency.compute(total_amount_due, USD),
+            'total_zero_thirty': base_currency.compute(total_zero_thirty, USD),
+            'total_thirtyone_sixty': base_currency.compute(total_thirtyone_sixty, USD),
+            'total_sixteeone_nineteen': base_currency.compute(total_sixteeone_nineteen, USD),
+            'total_nineteen_above': base_currency.compute(total_nineteen_above, USD)
         }
         return data
 
