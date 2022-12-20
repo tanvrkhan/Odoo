@@ -26,3 +26,6 @@ class Truck_Transport_Details(models.Model):
     _sql_constraints = [
         ('checkPrices', 'CHECK(nominated >= 0 AND loaded >=0 AND offloaded>=0 )', 'Quantities cannot be less than 0')
     ]
+
+    def action_print_report(self):
+        return self.env.ref('oe_kemexon_custom.action_report_delivery_sale_invoice').report_action(self)

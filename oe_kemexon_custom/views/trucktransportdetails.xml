@@ -4,7 +4,7 @@
         <field name="name">truck.transport.details</field>
         <field name="model">truck.transport.details</field>
         <field name="arch" type="xml">
-            <tree  multi_edit="1">
+            <tree  editable="bottom">
                 <field name="truck" />
                 <field name="trailer"/>
                 <field name="driver"/>
@@ -15,6 +15,7 @@
                 <field name="status"/>
                 <field name="statusdate"/>
                 <field name="is_add_report"/>
+                <button name="action_print_report" type="object" string="Print"/>
             </tree>
         </field>
     </record>

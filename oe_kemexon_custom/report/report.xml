@@ -27,9 +27,9 @@
         </record>
         <record id="action_report_delivery_sale_invoice" model="ir.actions.report">
             <field name="name">Delivery Sale Invoice</field>
-            <field name="model">stock.picking</field>
+            <field name="model">truck.transport.details</field>
             <field name="report_type">qweb-pdf</field>
-            <field name="binding_model_id" ref="model_stock_picking"/>
+<!--            <field name="binding_model_id" ref="model_stock_picking"/>-->
             <field name="report_name">oe_kemexon_custom.report_delivery_sale_invoice</field>
             <field name="report_file">oe_kemexon_custom.report_delivery_sale_invoice</field>
             <field name="paperformat_id" ref="paperformat_delivery_sale_invoice_portrait"/>
