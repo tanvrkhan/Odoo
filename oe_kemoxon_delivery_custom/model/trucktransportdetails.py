@@ -1,9 +1,4 @@
-from copy import copy
-from email.policy import default
-from operator import truediv
-from typing_extensions import Required
-from odoo import models, fields, api, exceptions
-from odoo.exceptions import ValidationError
+from odoo import models, fields
 
 
 class Truck_Transport_Details(models.Model):
