@@ -22,7 +22,7 @@ class AccountMove(models.Model):
                                  check_company=True)
 
     def get_invoice_details(self):
-        invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', self.move_type)])
+        invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', self.move_type),('state','=','posted')])
         today_date = fields.Date.today()
         'short_name'
         result = []
@@ -55,7 +55,7 @@ class AccountMove(models.Model):
                 total_nineteen_above += nineteen_above
 
                 data_dict = {
-                    'short_name': invoice.partner_id.name,
+                    'short_name': invoice.partner_id.short_name,
                     'reference': invoice.name,
                     'currency': invoice.currency_id.name,
                     'due_date': invoice.invoice_date_due,
@@ -82,10 +82,10 @@ class AccountMove(models.Model):
     def action_send_aged_balance_invoice_report(self, move_type):
         if move_type == 'out_invoice':
             sow_template_id = self.env.ref('oe_kemexon_custom.email_template_aged_balance_invoice_report')
-            invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', 'out_invoice')])
+            invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'),('state','=','posted')])
         else:
             sow_template_id = self.env.ref('oe_kemexon_custom.email_template_aged_balance_bill_report')
-            invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', 'in_invoice')])
+            invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', 'in_invoice'),('state','=','posted')])
         # sow_report_id = self.env.ref('oe_kemexon_custom.action_report_aged_balance')
         # generated_report = \
         #     self.env['ir.actions.report']._render_qweb_pdf("oe_kemexon_custom.action_report_aged_balance", self.id)[0]

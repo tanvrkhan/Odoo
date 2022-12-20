@@ -9,6 +9,8 @@
                             As at
                             <span t-esc="datetime.date.today()"/>
                             <br/>
+                            <br/>
+                            <br/>
                             <table class="table table-sm o_main_table" name="invoice_line_table">
                                 <thead>
                                     <tr>
@@ -84,7 +86,7 @@
 
                                     </t>
                                     <tr>
-                                        <th>Total</th>
+                                        <th style="text-align: left;">Total</th>
                                         <td/>
                                         <td/>
                                         <td/>

@@ -23,6 +23,7 @@
             <field name="binding_model_id" ref="model_account_move"/>
             <field name="report_name">oe_kemexon_custom.report_aged_balance_report</field>
             <field name="report_file">oe_kemexon_custom.report_aged_balance_report</field>
+            <field name="paperformat_id" ref="paperformat_delivery_sale_invoice_portrait"/>
         </record>
         <record id="action_report_delivery_sale_invoice" model="ir.actions.report">
             <field name="name">Delivery Sale Invoice</field>
