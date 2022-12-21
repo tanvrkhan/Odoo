@@ -4,8 +4,8 @@
         <field name="name">truck.transport.details</field>
         <field name="model">truck.transport.details</field>
         <field name="arch" type="xml">
-            <tree  editable="bottom">
-                <field name="truck" />
+            <tree editable="bottom">
+                <field name="truck"/>
                 <field name="trailer"/>
                 <field name="driver"/>
                 <field name="passport"/>
@@ -14,6 +14,8 @@
                 <field name="offloaded"/>
                 <field name="status"/>
                 <field name="statusdate"/>
+                <field name="is_updated"/>
+                <button name="action_update_qty" type="object" string="Update Qty"/>
                 <button name="action_print_report" type="object" string="Print"/>
             </tree>
         </field>
@@ -24,17 +26,17 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                        <group>
-                            <field name="truck" />
-                            <field name="trailer"/>
-                            <field name="driver"/>
-                            <field name="passport"/>
-                            <field name="nominated"/>
-                            <field name="loaded"/>
-                            <field name="offloaded"/>
-                            <field name="status"/>
-                            <field name="statusdate"/>
-                        </group>
+                    <group>
+                        <field name="truck"/>
+                        <field name="trailer"/>
+                        <field name="driver"/>
+                        <field name="passport"/>
+                        <field name="nominated"/>
+                        <field name="loaded"/>
+                        <field name="offloaded"/>
+                        <field name="status"/>
+                        <field name="statusdate"/>
+                    </group>
                 </sheet>
             </form>
         </field>
