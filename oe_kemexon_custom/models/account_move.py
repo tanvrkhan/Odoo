@@ -66,7 +66,8 @@ class AccountMove(models.Model):
                     'zero_thirty': zero_thirty,
                     'thirtyone_sixty': thirtyone_sixty,
                     'sixteeone_nineteen': sixteeone_nineteen,
-                    'nineteen_above': nineteen_above
+                    'nineteen_above': nineteen_above,
+                    'currency_id': invoice.currency_id
                 }
                 result.append(data_dict)
         USD = self.env['res.currency'].search([('name', '=', 'USD')])

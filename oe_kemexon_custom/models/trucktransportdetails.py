@@ -15,7 +15,6 @@ class Truck_Transport_Details(models.Model):
     passport = fields.Char()
     nominated = fields.Float()
     loaded = fields.Float()
-    is_add_report = fields.Boolean('Add Report')
     offloaded = fields.Float()
     status = fields.Selection(
         [("Nominated", "Nominated"), ("Waiting to load", "Waiting to load"), ("In transit", "In transit"),

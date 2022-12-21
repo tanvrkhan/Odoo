@@ -14,7 +14,6 @@
                 <field name="offloaded"/>
                 <field name="status"/>
                 <field name="statusdate"/>
-                <field name="is_add_report"/>
                 <button name="action_print_report" type="object" string="Print"/>
             </tree>
         </field>
@@ -35,7 +34,6 @@
                             <field name="offloaded"/>
                             <field name="status"/>
                             <field name="statusdate"/>
-                            <field name="is_add_report"/>
                         </group>
                 </sheet>
             </form>

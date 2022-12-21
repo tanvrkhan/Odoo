@@ -46,22 +46,22 @@
                                                 <span t-esc="invoice.get('due_days')"/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('amount_total')"  t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                <span t-esc="invoice.get('amount_total')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('amount_due')"  t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                <span t-esc="invoice.get('amount_due')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('zero_thirty')"  t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                <span t-esc="invoice.get('zero_thirty')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('thirtyone_sixty')"  t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                <span t-esc="invoice.get('thirtyone_sixty')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('sixteeone_nineteen')"  t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                <span t-esc="invoice.get('sixteeone_nineteen')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('nineteen_above')"  t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                <span t-esc="invoice.get('nineteen_above')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
 
                                         </tr>
