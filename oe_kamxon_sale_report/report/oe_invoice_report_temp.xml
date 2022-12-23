@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="sale_report_format_id" model="report.paperformat">
+            <field name="name">Custom Paper Format</field>
+            <field name="format">custom</field>
+            <field name="page_height">220</field>
+            <field name="page_width">360</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">5</field>
+            <field name="margin_bottom">25</field>
+            <field name="margin_left">5</field>
+            <field name="margin_right">5</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">3</field>
+            <field name="dpi">87</field>
+        </record>
+
+        <record id="sale_invoice_proforma_action_id" model="ir.actions.report">
+            <field name="name">PRO-FORMA Invoice</field>
+            <field name="model">sale.order</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">oe_kamxon_sale_report.sale_report_temp_id</field>
+            <field name="report_file">oe_kamxon_sale_report.sale_report_temp_id</field>
+            <field name="binding_model_id" ref="sale.model_sale_order"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="oe_kamxon_sale_report.sale_report_format_id"/>
+        </record>
+
+        <template id="sale_report_temp_id">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="total_qty" t-value="0"/>
+                    <t t-foreach="docs" t-as="o">
+                        <t t-foreach="o.order_line" t-as="line">
+                            <t t-set="total_qty" t-value="total_qty + line.product_uom_qty"/>
+                            <t/>
+                        </t>
+                        <div t-attf-class="article o_report_layout_standard o_company_#{o.id}_layout"
+                             t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+                             t-att-data-oe-lang="o and o.env.context.get('lang')">
+                            <div>
+                                <style>
+                                    .margin{margin-top: -5px;}
+                                    .company_name {font-size: 20px!important; font-weight:bold;}
+                                    .company_info h6{font-size: 13px;}
+                                    .company_info{padding-left:50px; padding-top:8px;}
+                                    table{border:1px solid white}
+
+                                </style>
+                                <div class="col-12">
+                                    <div class="row p-1">
+                                        <div class="col-2">
+                                            <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)"
+                                                 style="max-height: 280px; max-width:350px;"
+                                                 alt="Logo" class="mt-2"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="footer text-center"
+                                 style="margin-left: 20px; margin-right: 20px;border-top: 1px solid black">
+                                <t t-foreach="docs" t-as="o">
+                                    <p style="color:black">
+                                        <t t-esc="o.company_id.name"/>
+                                        <br/>
+                                        <span>
+                                            <t t-esc="o.company_id.street"/>
+                                        </span>
+                                        <span>
+                                            <t t-esc="o.company_id.street2"/>
+                                        </span>
+                                        <span>
+                                            <t t-esc="o.company_id.zip"/>
+                                        </span>
+                                        <span>
+                                            <t t-esc="o.company_id.city"/>
+                                        </span>
+                                        <span>
+                                            <t t-esc="o.company_id.state_id.name"/>
+                                        </span>
+                                        <span>
+                                            <t t-esc="o.company_id.country_id.name"/>
+                                        </span>
+                                    </p>
+                                    <p style="margin-top:-10px">
+                                        <span>
+                                            <t t-esc="o.company_id.phone"/>
+                                        </span>
+                                        <span>
+                                            <t t-esc="o.company_id.website"/>
+                                        </span>
+                                    </p>
+                                </t>
+                            </div>
+
+                            <div class="row mt-4" style="margin-left: 20px; margin-right: 20px">
+                                <div class="col-12" style="border-top:2px solid black;border-bottom:2px solid black">
+                                    <h3 class="text-center" style="margin-top:2px">
+                                        <strong>PROFORMA INVOICE</strong>
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3" style="margin-left: 20px; margin-right: 20px;">
+                                <div class="col-4">
+                                    <table width="100%">
+                                        <tr>
+                                            <td class="p-1">
+                                                <b>PFI No.</b>
+                                            </td>
+                                            <td class="p-1">
+                                                <t t-esc="o.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-1">
+                                                <b>Deal Ref.</b>
+                                            </td>
+                                            <td class="p-1">
+                                                <t t-esc="o.deal_ref"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-4 offset-4 text-right">
+                                    <table width="100%" style="text-align:right">
+                                        <tr>
+                                            <td class="text-right">
+                                                <b>Date</b>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-if="o.date_order">
+                                                    <t t-esc="o.date_order.date()"/>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="row mt-5" style="margin-left: 20px; margin-right: 20px;">
+                                <div class="col-4">
+                                    <strong>Customer</strong>
+                                    <br/>
+                                    <span t-field="o.partner_id"></span>
+                                    <t t-if="o.partner_id.street">
+                                        <br/>
+                                        <span t-field="o.partner_id.street"></span>
+                                    </t>
+                                    <t t-if="o.partner_id.street2">
+                                        <br/>
+                                        <span t-field="o.partner_id.street2"></span>
+                                    </t>
+                                    <t t-if="o.partner_id.city">
+                                        <br/>
+                                        <span t-field="o.partner_id.city"></span>
+                                    </t>
+                                    <t t-if="o.partner_id.state_id">
+                                        <br/>
+                                        <span t-field="o.partner_id.state_id.name"></span>
+                                    </t>
+                                    <br/>
+                                </div>
+                            </div>
+
+
+                            <div class="page mt-2">
+                                <div class="row mt-5" style="margin-left: 20px; margin-right: 20px;">
+                                    <div class="col-12">
+                                        <table width="100%">
+                                            <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
+                                                <td class="p-2">
+                                                    <strong>Description</strong>
+                                                </td>
+                                                <td class="p-2">
+                                                    <strong>Quantity</strong>
+                                                </td>
+                                                <td class="p-2">
+                                                    <strong>Rate</strong>
+                                                </td>
+                                                <td class="p-2" style="text-align:right">
+                                                    <strong>Amount</strong>
+                                                </td>
+                                            </tr>
+                                            <t t-set="subtotal" t-value="0"/>
+                                            <t t-foreach="o.order_line" t-as="order">
+                                                <t t-set="subtotal" t-value="subtotal + order.price_subtotal"/>
+                                                <tr style="border-bottom:2px solid #d4d6d9">
+                                                    <td class="p-2">
+                                                        <t t-esc="order.product_id.name"/>
+                                                    </td>
+                                                    <td class="p-2">
+                                                        <t t-esc="order.product_uom_qty"/>
+                                                    </td>
+                                                    <td class="p-2">
+                                                        <t t-esc="order.price_unit"/>
+                                                    </td>
+                                                    <td class="p-2" style="text-align:right">
+                                                        <t t-esc="order.price_subtotal"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+
+                                            <tr>
+                                                <td class="p-2" colspan="3">
+                                                    <b>Total</b>
+                                                </td>
+                                                <td class="p-2" style="text-align:right">
+                                                    <b>
+                                                        <t t-esc="subtotal"/>
+                                                    </b>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row mt-4" style="margin-left: 20px; margin-right: 20px">
+                                    <div class="col-12 mt-2" style="border-bottom:2px solid black">
+                                        <h5 style="margin-bottom: -2px">
+                                            <strong>Delivery Information</strong>
+                                        </h5>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-4" style="margin-left: 20px; margin-right: 20px">
+                                    <div class="col-12 mt-2">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <table width="100%">
+                                                    <tr>
+                                                        <td class="text-left">
+                                                            <strong>Delivery Period</strong>
+                                                        </td>
+                                                        <td width="50%">
+                                                            <t t-if="o.picking_ids">
+                                                                <span class="m-0"
+                                                                      t-field="o.picking_ids.delivery_from"/>
+                                                                To
+                                                                <span class="m-0"
+                                                                      t-field="o.picking_ids.delivery_to"/>
+
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-left p-1">
+                                                            <strong>Delivery Location</strong>
+                                                        </td>
+                                                        <td width="50%" class="p-1">
+                                                            <t t-if="o.picking_ids">
+                                                                <span class="m-0"
+                                                                      t-field="o.picking_ids.delivery_location"/>
+                                                            </t>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-left p-1">
+                                                            <strong>Incoterms</strong>
+                                                        </td>
+                                                        <td width="50%" class="p-1">
+                                                            <span class="m-0" t-field="o.incoterm"/>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-5" style="margin-left: 20px; margin-right: 20px">
+                                    <div class="col-12 mt-2" style="border-bottom:2px solid black">
+                                        <h5 style="margin-bottom: -2px">
+                                            <strong>Fiscal Information</strong>
+                                        </h5>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-4 p-3" style="margin-left: 20px; margin-right: 20px">
+                                    <div class="col-4">
+                                        <table width="100%">
+                                            <tr>
+                                                <td class="text-left p-1">Currency</td>
+                                                <td class="p-1">
+                                                    <t t-if="o.partner_id.bank_ids">
+                                                        <span class="m-0"
+                                                              t-field="o.partner_id.bank_ids[0].currency_id"/>
+                                                    </t>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left">Payment Terms</td>
+                                                <td>
+                                                    <t t-esc="o.payment_term_id.name"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-4 offset-4 text-right">
+                                        <table width="100%">
+                                            <tr>
+                                                <td class="text-left">
+                                                    <strong>Bank</strong>
+                                                </td>
+                                                <td>
+                                                    <t t-if="o.partner_id.bank_ids">
+                                                        <span class="m-0"
+                                                              t-field="o.partner_id.bank_ids[0].bank_id.name"/>
+                                                    </t>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left">
+                                                    <strong>In Favour Of</strong>
+                                                </td>
+                                                <td>
+                                                    <t t-if="o.partner_id.bank_ids">
+                                                        <span class="m-0"
+                                                              t-field="o.partner_id.bank_ids[0].acc_holder_name"/>
+                                                    </t>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-left">
+                                                    <strong>A/C No</strong>
+                                                </td>
+                                                <td>
+                                                    <t t-if="o.partner_id.bank_ids">
+                                                        <span class="m-0"
+                                                              t-field="o.partner_id.bank_ids[0].acc_number"/>
+                                                    </t>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-4" style="margin-left: 20px; margin-right: 20px">
+                                    <div class="col-12 mt-2" style="border-bottom:2px solid black">
+                                        <h5 style="margin-bottom: -2px">
+                                            <strong>Terms &amp; Conditions</strong>
+                                        </h5>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-2" style="margin-left: 20px; margin-right: 20px">
+                                    <div class="col-12 mt-2" style="border-bottom:2px solid black">
+                                        <ul>
+                                            <li>Kemexon Ltd. follows a detailed process as per the company policy for
+                                                informing
+                                                any change in
+                                                bank account/ remittance process. We request you to not rely on any
+                                                isolated
+                                                email communication
+                                                informing the change of bank account etc. If you do so, the same shall
+                                                be at
+                                                your risk and
+                                                consequences.
+                                            </li>
+                                            <li>Kemexon terms and conditions apply.</li>
+                                        </ul>
+                                        <div class="row mb-2">
+                                            <div class="col-4 offset-4">
+                                                <p class="text-align:center">
+                                                    <img t-att-src="'oe_kemexon_custom/static/src/img/kemexon_seal.jpeg'"
+                                                         style="max-height: 4cm; max-width: 8cm;"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+
+    </data>
+</odoo>

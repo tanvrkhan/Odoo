@@ -5,29 +5,31 @@
                 <t t-call="web.external_layout">
                     <t t-foreach="docs" t-as="o">
                         <hr style="height:2px;border-width:3;color:black;background-color:black"/>
-                        <h2 class="text-center">Delivery Sales INVOICE</h2>
+                        <strong style="font-size:30px;" class="text-center"><center>Delivery Sales INVOICE</center></strong>
                         <hr style="height:2px;border-width:3;color:black;background-color:black"/>
-                        <t t-set="truck_transport_details_ids" t-value="False"/>
-                        <t t-if="o.truck_transport_details_ids">
-                            <t t-foreach="o.truck_transport_details_ids" t-as="item">
-                                <t t-if="item.is_add_report">
-                                   <t t-set="truck_transport_details_ids" t-value="item"/>
-                                </t>
-                            </t>
-                        </t>
+                        <t t-set="truck_transport_details_ids" t-value="o"/>
+<!--                        <t t-if="o.truck_transport_details_ids">-->
+<!--                            <t t-foreach="o.truck_transport_details_ids" t-as="item">-->
+<!--                                <t t-if="item.is_add_report">-->
+<!--                                   <t t-set="truck_transport_details_ids" t-value="item"/>-->
+<!--                                </t>-->
+<!--                            </t>-->
+<!--                        </t>-->
+                        <t t-set="picking" t-value="o.stock_pick_ids"/>
+                        <br/>
 
                         <div class="row">
                             <div class="col-4">
                                 <div class="row">
                                     <b>Reference:</b>
-                                    <span t-field="o.name"/>
+                                    <span t-field="picking.name"/>
                                 </div>
                             </div>
                             <div class="col-4"/>
                             <div class="col-4">
                                 <div class="row">
                                     <b>Date :</b>
-                                    <span class="m-0" t-field="o.scheduled_date"/>
+                                    <span class="m-0" t-field="picking.scheduled_date"/>
 
                                 </div>
                             </div>
@@ -35,42 +37,42 @@
                         <br/>
                         <strong>Customer</strong>
                         <br/>
-                        <span t-field="o.partner_id"></span>
-                        <t t-if="o.partner_id.street">
+                        <span t-field="picking.partner_id"></span>
+                        <t t-if="picking.partner_id.street">
                             <br/>
-                            <span t-field="o.partner_id.street"></span>
+                            <span t-field="picking.partner_id.street"></span>
                         </t>
-                        <t t-if="o.partner_id.street2">
+                        <t t-if="picking.partner_id.street2">
                             <br/>
-                            <span t-field="o.partner_id.street2"></span>
+                            <span t-field="picking.partner_id.street2"></span>
                         </t>
-                        <t t-if="o.partner_id.city">
+                        <t t-if="picking.partner_id.city">
                             <br/>
-                            <span t-field="o.partner_id.city"></span>
+                            <span t-field="picking.partner_id.city"></span>
                         </t>
-                        <t t-if="o.partner_id.state_id">
+                        <t t-if="picking.partner_id.state_id">
                             <br/>
-                            <span t-field="o.partner_id.state_id.name"></span>
+                            <span t-field="picking.partner_id.state_id.name"></span>
                         </t>
                         <br/>
                         <strong>Consignee</strong>
                         <br/>
-                        <span t-field="o.consignee"></span>
-                        <t t-if="o.consignee.street">
+                        <span t-field="picking.consignee"></span>
+                        <t t-if="picking.consignee.street">
                             <br/>
-                            <span t-field="o.consignee.street"></span>
+                            <span t-field="picking.consignee.street"></span>
                         </t>
-                        <t t-if="o.consignee.street2">
+                        <t t-if="picking.consignee.street2">
                             <br/>
-                            <span t-field="o.consignee.street2"></span>
+                            <span t-field="picking.consignee.street2"></span>
                         </t>
-                        <t t-if="o.consignee.city">
+                        <t t-if="picking.consignee.city">
                             <br/>
-                            <span t-field="o.consignee.city"></span>
+                            <span t-field="picking.consignee.city"></span>
                         </t>
-                        <t t-if="o.consignee.state_id">
+                        <t t-if="picking.consignee.state_id">
                             <br/>
-                            <span t-field="o.consignee.state_id.name"></span>
+                            <span t-field="picking.consignee.state_id.name"></span>
                         </t>
                         <!--                        <div class="row">-->
                         <!--                            <div class="col-4"/>-->
@@ -83,6 +85,7 @@
                         <!--                                </div>-->
                         <!--                            </div>-->
                         <!--                        </div>-->
+                        <br/>
                         <table class="table table-sm o_main_table mt-4">
                             <!-- In case we want to repeat the header, remove "display: table-row-group" -->
                             <thead style="display: table-row-group">
@@ -94,7 +97,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-foreach="o.move_ids" t-as="move">
+                                <t t-foreach="picking.move_ids" t-as="move">
                                     <tr>
                                         <td>
                                             <span t-field="move.name"/>
@@ -131,12 +134,13 @@
                                 </div>
                                 <div class="row">
                                     <b>Transporter :</b>
-                                    <span t-field="o.transporter"/>
+                                    <span t-field="picking.transporter"/>
 
                                 </div>
                             </div>
                             <div class="col-6"/>
                         </div>
+                        <br/>
                         <br/>
                         <b class="text-left">Delivery Information</b>
                         <hr style="height:2px; border:none; background-color:black;"/>
@@ -145,18 +149,18 @@
                             <div class="col-6">
                                 <div class="row">
                                     <b>Incotems:</b>
-                                    <t t-if="o.sale_id">
-                                        <span t-field="o.sale_id.incoterm"/>
+                                    <t t-if="picking.sale_id">
+                                        <span t-field="picking.sale_id.incoterm"/>
                                     </t>
 
                                 </div>
                                 <div class="row">
                                     <b>Delivery Location:</b>
-                                    <span t-field="o.delivery_location"/>
+                                    <span t-field="picking.delivery_location"/>
                                 </div>
                                 <div class="row">
                                     <b>Loading Point:</b>
-                                    <span t-field="o.name"/>
+                                    <span t-field="picking.name"/>
                                 </div>
                             </div>
                             <div class="col-6"/>
@@ -165,21 +169,24 @@
 
 
                         <p style="page-break-before:always;"></p>
+                        <br/>
+                        <br/>
                         <hr style="height:2px; border: 1px solid black; background-color:black;"/>
-                        <h2 class="text-center">Delivery Note</h2>
+                        <strong style="font-size:30px;" class="text-center"><center>Delivery Note</center></strong>
                         <hr style="height:2px; border: 1px solid black; background-color:black;"/>
+                        <br/>
                         <div class="row">
                             <div class="col-4">
                                 <div class="row">
                                     <b>Reference:</b>
-                                    <span t-field="o.name"/>
+                                    <span t-field="picking.name"/>
                                 </div>
                             </div>
                             <div class="col-4"/>
                             <div class="col-4">
                                 <div class="row">
                                     <b>Date :</b>
-                                    <span class="m-0" t-field="o.scheduled_date"/>
+                                    <span class="m-0" t-field="picking.scheduled_date"/>
 
                                 </div>
                             </div>
@@ -187,43 +194,44 @@
                         <br/>
                         <strong>Customer</strong>
                         <br/>
-                        <span t-field="o.partner_id"></span>
-                        <t t-if="o.partner_id.street">
+                        <span t-field="picking.partner_id"></span>
+                        <t t-if="picking.partner_id.street">
                             <br/>
-                            <span t-field="o.partner_id.street"></span>
+                            <span t-field="picking.partner_id.street"></span>
                         </t>
-                        <t t-if="o.partner_id.street2">
+                        <t t-if="picking.partner_id.street2">
                             <br/>
-                            <span t-field="o.partner_id.street2"></span>
+                            <span t-field="picking.partner_id.street2"></span>
                         </t>
-                        <t t-if="o.partner_id.city">
+                        <t t-if="picking.partner_id.city">
                             <br/>
-                            <span t-field="o.partner_id.city"></span>
+                            <span t-field="picking.partner_id.city"></span>
                         </t>
-                        <t t-if="o.partner_id.state_id">
+                        <t t-if="picking.partner_id.state_id">
                             <br/>
-                            <span t-field="o.partner_id.state_id.name"></span>
+                            <span t-field="picking.partner_id.state_id.name"></span>
                         </t>
                         <br/>
                         <strong>Consignee</strong>
                         <br/>
-                        <span t-field="o.consignee"></span>
-                        <t t-if="o.consignee.street">
+                        <span t-field="picking.consignee"></span>
+                        <t t-if="picking.consignee.street">
                             <br/>
-                            <span t-field="o.consignee.street"></span>
+                            <span t-field="picking.consignee.street"></span>
                         </t>
-                        <t t-if="o.consignee.street2">
+                        <t t-if="picking.consignee.street2">
                             <br/>
-                            <span t-field="o.consignee.street2"></span>
+                            <span t-field="picking.consignee.street2"></span>
                         </t>
-                        <t t-if="o.consignee.city">
+                        <t t-if="picking.consignee.city">
                             <br/>
-                            <span t-field="o.consignee.city"></span>
+                            <span t-field="picking.consignee.city"></span>
                         </t>
-                        <t t-if="o.consignee.state_id">
+                        <t t-if="picking.consignee.state_id">
                             <br/>
-                            <span t-field="o.consignee.state_id.name"></span>
+                            <span t-field="picking.consignee.state_id.name"></span>
                         </t>
+                        <br/>
                         <br/>
                         <table class="table table-sm o_main_table mt-4">
                             <!-- In case we want to repeat the header, remove "display: table-row-group" -->
@@ -236,7 +244,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-foreach="o.move_ids" t-as="move">
+                                <t t-foreach="picking.move_ids" t-as="move">
                                     <tr>
                                         <td>
                                             <span t-field="move.name"/>
@@ -269,7 +277,7 @@
                                 </div>
                                 <div class="row">
                                     <b>Transporter :</b>
-                                    <span t-field="o.transporter"/>
+                                    <span t-field="picking.transporter"/>
 
                                 </div>
                                 <div class="row">
@@ -290,6 +298,7 @@
                             <div class="col-6"/>
                         </div>
                         <br/>
+                        <br/>
                         <b class="text-left">Delivery Information</b>
                         <hr style="height:2px; border:none; background-color:black;"/>
                         <br/>
@@ -297,18 +306,18 @@
                             <div class="col-6">
                                 <div class="row">
                                     <b>Incotems:</b>
-                                    <t t-if="o.sale_id">
-                                        <span t-field="o.sale_id.incoterm"/>
+                                    <t t-if="picking.sale_id">
+                                        <span t-field="picking.sale_id.incoterm"/>
                                     </t>
 
                                 </div>
                                 <div class="row">
                                     <b>Delivery Location:</b>
-                                    <span t-field="o.delivery_location"/>
+                                    <span t-field="picking.delivery_location"/>
                                 </div>
                                 <div class="row">
                                     <b>Loading Point:</b>
-                                    <span t-field="o.name"/>
+                                    <span t-field="picking.name"/>
                                 </div>
                             </div>
                             <div class="col-6"/>

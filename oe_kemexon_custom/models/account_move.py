@@ -22,7 +22,8 @@ class AccountMove(models.Model):
                                  check_company=True)
 
     def get_invoice_details(self):
-        invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', self.move_type)])
+        invoices = self.env['account.move'].search(
+            [('amount_residual', '>', 0), ('move_type', '=', self.move_type), ('state', '=', 'posted')])
         today_date = fields.Date.today()
         'short_name'
         result = []
@@ -55,7 +56,7 @@ class AccountMove(models.Model):
                 total_nineteen_above += nineteen_above
 
                 data_dict = {
-                    'short_name': invoice.partner_id.name,
+                    'short_name': invoice.partner_id.short_name,
                     'reference': invoice.name,
                     'currency': invoice.currency_id.name,
                     'due_date': invoice.invoice_date_due,
@@ -65,27 +66,34 @@ class AccountMove(models.Model):
                     'zero_thirty': zero_thirty,
                     'thirtyone_sixty': thirtyone_sixty,
                     'sixteeone_nineteen': sixteeone_nineteen,
-                    'nineteen_above': nineteen_above
+                    'nineteen_above': nineteen_above,
+                    'currency_id': invoice.currency_id
                 }
                 result.append(data_dict)
+        USD = self.env['res.currency'].search([('name', '=', 'USD')])
+        base_currency = self.env.company.currency_id
         data = {
             'result': result,
-            'total_amount_total': total_amount_total,
-            'total_amount_due': total_amount_due,
-            'total_zero_thirty': total_zero_thirty,
-            'total_thirtyone_sixty': total_thirtyone_sixty,
-            'total_sixteeone_nineteen': total_sixteeone_nineteen,
-            'total_nineteen_above': total_nineteen_above
+            'total_amount_total': round(base_currency.compute(total_amount_total, USD), 2),
+            'total_amount_due': round(base_currency.compute(total_amount_due, USD), 2),
+            'total_zero_thirty': round(base_currency.compute(total_zero_thirty, USD), 2),
+            'total_thirtyone_sixty': round(base_currency.compute(total_thirtyone_sixty, USD), 2),
+            'total_sixteeone_nineteen': round(base_currency.compute(total_sixteeone_nineteen, USD), 2),
+            'total_nineteen_above': round(base_currency.compute(total_nineteen_above, USD), 2),
+            'usd_currency': USD,
+            'partner': 'Customer' if self.move_type == 'out_invoice' else "Vendor"
         }
         return data
 
     def action_send_aged_balance_invoice_report(self, move_type):
         if move_type == 'out_invoice':
             sow_template_id = self.env.ref('oe_kemexon_custom.email_template_aged_balance_invoice_report')
-            invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', 'out_invoice')])
+            invoices = self.env['account.move'].search(
+                [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted')])
         else:
             sow_template_id = self.env.ref('oe_kemexon_custom.email_template_aged_balance_bill_report')
-            invoices = self.env['account.move'].search([('amount_residual', '>', 0), ('move_type', '=', 'in_invoice')])
+            invoices = self.env['account.move'].search(
+                [('amount_residual', '>', 0), ('move_type', '=', 'in_invoice'), ('state', '=', 'posted')])
         # sow_report_id = self.env.ref('oe_kemexon_custom.action_report_aged_balance')
         # generated_report = \
         #     self.env['ir.actions.report']._render_qweb_pdf("oe_kemexon_custom.action_report_aged_balance", self.id)[0]

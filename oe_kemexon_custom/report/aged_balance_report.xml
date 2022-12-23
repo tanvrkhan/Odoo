@@ -5,14 +5,16 @@
                 <t t-call="web.external_layout">
                     <t t-foreach="docs" t-as="o">
                         <div class="page">
-                            <h6>Customer Aging Balance Report</h6>
+                            <h6><span t-esc="o.get_invoice_details().get('partner')"/>  Aging Balance Report</h6>
                             As at
                             <span t-esc="datetime.date.today()"/>
+                            <br/>
+                            <br/>
                             <br/>
                             <table class="table table-sm o_main_table" name="invoice_line_table">
                                 <thead>
                                     <tr>
-                                        <th>Customer</th>
+                                        <th t-esc="o.get_invoice_details().get('partner')"/>
                                         <th>Reference</th>
                                         <th>Currency</th>
                                         <th>Due Date</th>
@@ -26,12 +28,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <t set="total_total_amount" t-value="0"/>
-                                    <t set="total_amount_due" t-value="0"/>
-                                    <t set="total_thirtyone_sixty" t-value="0"/>
-                                    <t set="total_zero_thirty" t-value="0"/>
-                                    <t set="total_sixteeone_nineteen" t-value="0"/>
-                                    <t set="total_nineteen_above" t-value="0"/>
                                     <t t-foreach="o.get_invoice_details().get('result')" t-as="invoice">
                                         <tr>
                                             <td>
@@ -50,63 +46,52 @@
                                                 <span t-esc="invoice.get('due_days')"/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('amount_total')"/>
-                                                <t set="total_total_amount"
-                                                   t-value="total_total_amount +invoice.get('amount_total')"/>
+                                                <span t-esc="invoice.get('amount_total')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('amount_due')"/>
-                                                <t set="total_amount_due"
-                                                   t-value="total_amount_due+invoice.get('amount_due')"/>
+                                                <span t-esc="invoice.get('amount_due')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('zero_thirty')"/>
-                                                <t set="total_zero_thirty"
-                                                   t-value="total_zero_thirty+invoice.get('zero_thirty')"/>
+                                                <span t-esc="invoice.get('zero_thirty')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('thirtyone_sixty')"/>
-                                                <t set="total_thirtyone_sixty"
-                                                   t-value="total_thirtyone_sixty+invoice.get('thirtyone_sixty')"/>
+                                                <span t-esc="invoice.get('thirtyone_sixty')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('sixteeone_nineteen')"/>
-                                                <t set="total_sixteeone_nineteen"
-                                                   t-value="total_sixteeone_nineteen+invoice.get('sixteeone_nineteen')"/>
+                                                <span t-esc="invoice.get('sixteeone_nineteen')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('nineteen_above')"/>
-                                                <t set="total_nineteen_above"
-                                                   t-value="total_nineteen_above+invoice.get('nineteen_above')"/>
+                                                <span t-esc="invoice.get('nineteen_above')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
 
                                         </tr>
 
                                     </t>
                                     <tr>
-                                        <th>Total</th>
+                                        <th style="text-align: left;">Total (USD)</th>
                                         <td/>
                                         <td/>
                                         <td/>
                                         <td/>
 
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_amount_total')"/>
+                                            <span t-esc="o.get_invoice_details().get('total_amount_total')"
+                                                      t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_amount_due')"/>
+                                            <span t-esc="o.get_invoice_details().get('total_amount_due')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_zero_thirty')"/>
+                                            <span t-esc="o.get_invoice_details().get('total_zero_thirty')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_thirtyone_sixty')"/>
+                                            <span t-esc="o.get_invoice_details().get('total_thirtyone_sixty')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_sixteeone_nineteen')"/>
+                                            <span t-esc="o.get_invoice_details().get('total_sixteeone_nineteen')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_nineteen_above')"/>
+                                            <span t-esc="o.get_invoice_details().get('total_nineteen_above')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
                                         </td>
                                     </tr>
 
