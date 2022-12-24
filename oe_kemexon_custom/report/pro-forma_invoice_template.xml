@@ -7,20 +7,21 @@
                 <hr style="height:2px; border:none; background-color:black;"/>
                 <h3 class="text-center">Proforma INVOICE</h3>
                 <hr style="height:2px; border:none; background-color:black;"/>
+                <br/>
                 <div class="row">
                     <div class="col-4">
                         <div class="row">
-                            PFI No :
+                            <strong>PFI No :</strong>
                             <span t-field="doc.name"/>
                             <br/>
-                            Deal Ref :
+                            <strong>Deal Ref :</strong>
                             <span class="m-0" t-field="doc.deal_ref"/>
                         </div>
                     </div>
                     <div class="col-4"/>
                     <div class="col-4">
                         <div class="row">
-                            Date :
+                            <strong>Date :</strong>
                             <span class="m-0" t-field="doc.date_order"/>
                             <!--                            <br/>-->
                             <!--                            Due Date :-->
@@ -28,6 +29,8 @@
                         </div>
                     </div>
                 </div>
+                <br/>
+                <br/>
                 <strong>Customer</strong>
                 <br/>
                 <span t-field="doc.partner_id"></span>
@@ -47,6 +50,7 @@
                     <br/>
                     <span t-field="doc.partner_id.state_id.name"></span>
                 </t>
+                <br/>
                 <br/>
                 <t t-set="lines_to_report" t-value="doc._get_order_lines_to_report()"/>
                 <table class="table table-sm o_main_table mt-4">
@@ -132,98 +136,122 @@
                     </tbody>
                 </table>
                 <br/>
-                <h3>Delivery Information</h3>
+                <br/>
+                <strong>Delivery Information</strong>
                 <hr style="height:3px; border:none; background-color:black;"/>
                 <div class="row">
-                    <div class="col-5">
-                        <table width="100%">
-                            <tr>
-                                <th>Delivery Period</th>
-                                <td width="50%">
-                                    <t t-if="doc.picking_ids">
-                                        <span class="m-0" t-field="doc.picking_ids.delivery_from"/>
-                                        To
-                                        <span class="m-0" t-field="doc.picking_ids.delivery_to"/>
-
-                                    </t>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Delivery Location</th>
-                                <td width="50%">
-                                    <t t-if="doc.picking_ids">
-                                        <span class="m-0" t-field="doc.picking_ids.delivery_location"/>
-
-                                    </t>
-                                    <!--                                    <span class="m-0" t-field="o.delivery_location"/>-->
-
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Incoterms</th>
-                                <td width="50%">
-                                    <!--                                    <span class="m-0" t-field="o.invoice_incoterm_id"/>-->
-                                    <span class="m-0" t-field="doc.incoterm"/>
-                                </td>
-                            </tr>
-                        </table>
+                    <div class="col-1">
+                        <strong>Delivery Period</strong>
                     </div>
-                    <!--                    <div class="col-2"/>-->
-                    <!--                    <div class="col-5">-->
-                    <!--                        <img t-att-src="'oe_kemexon_custom/static/src/img/kemexon_seal.jpeg'"-->
-                    <!--                             style="max-height: 2cm; max-width: 4cm;"/>-->
-                    <!--                    </div>-->
+                    <div class="col-1"/>
+                    <div class="col-3">
+                        <t t-if="doc.picking_ids">
+                            <span class="m-0" t-field="doc.picking_ids.delivery_from"/>
+                            To
+                            <span class="m-0" t-field="doc.picking_ids.delivery_to"/>
+
+                        </t>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-1">
+                        <strong>Delivery Location</strong>
+                    </div>
+                    <div class="col-2"/>
+                    <div class="col-1">
+                        <t t-if="doc.picking_ids">
+                            <span class="m-0" t-field="doc.picking_ids.delivery_location"/>
+
+                        </t>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-1">
+                        <strong>Incoterms</strong>
+                    </div>
+                    <div class="col-2"/>
+                    <div class="col-1">
+                        <t t-if="doc.incoterm">
+                            <span class="m-0" t-field="doc.incoterm"/>
+
+                        </t>
+                    </div>
+                </div>
+
+                <br/>
+                <br/>
+                <strong>Financial Information</strong>
+                <hr style="height:3px; border:none; background-color:black;"/>
+                <!--                <table width="100%">-->
+                <div class="row">
+                    <div class="col-1">
+                        <strong>Currency</strong>
+                    </div>
+                    <div class="col-2"/>
+                    <div class="col-1">
+                        <t t-if="doc.partner_id.bank_ids">
+                            <span class="m-0" t-field="doc.partner_id.bank_ids[0].currency_id"/>
+                        </t>
+                    </div>
+                    <div class="col-2"/>
+                    <div class="col-2">
+                        <strong>BANK</strong>
+                    </div>
+                    <div class="col-1"/>
+                    <div class="col-3">
+                        <t t-if="doc.partner_id.bank_ids">
+                            <span class="m-0" t-field="doc.partner_id.bank_ids[0].bank_id"/>
+                        </t>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-1">
+                        <strong>Payment Terms</strong>
+                    </div>
+                    <div class="col-2"/>
+                    <div class="col-1">
+                        <span class="m-0" t-field="doc.payment_term_id"/>
+                    </div>
+                    <div class="col-2"/>
+                    <div class="col-7">
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>In favour of</strong>
+                            </div>
+                            <div class="col-2"/>
+                            <div class="col-6">
+                                <t t-if="doc.partner_id.bank_ids">
+                                    <span class="m-0" t-field="doc.partner_id.bank_ids[0].acc_holder_name"/>
+                                </t>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>A/C No</strong>
+                            </div>
+                            <div class="col-2"/>
+                            <div class="col-6">
+                                <t t-if="doc.partner_id.bank_ids">
+                                    <span class="m-0" t-field="doc.partner_id.bank_ids[0].acc_number"/>
+                                </t>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>Swift Code</strong>
+                            </div>
+                            <div class="col-2"/>
+                            <div class="col-6">
+                                <t t-if="doc.partner_id.bank_ids">
+                                    <span class="m-0" t-field="doc.partner_id.bank_ids[0].bank_id.bic"/>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <br/>
-                <h3>Financial Information</h3>
-                <hr style="height:3px; border:none; background-color:black;"/>
-                <table width="100%">
-                    <tr>
-                        <th>Currency</th>
-                        <td>
-                            <t t-if="doc.partner_id.bank_ids">
-                                <span class="m-0" t-field="doc.partner_id.bank_ids[0].currency_id"/>
-                            </t>
-                        </td>
-                        <th>BANK</th>
-                        <td>
-                            <t t-if="doc.partner_id.bank_ids">
-                                <span class="m-0" t-field="doc.partner_id.bank_ids[0].bank_id"/>
-                            </t>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th rowspan="3">Payment Terms</th>
-                        <td rowspan="3">
-                            <t t-if="doc.partner_id.bank_ids">
-                                <span class="m-0" t-field="doc.payment_term_id"/>
-                            </t>
-                        </td>
-                        <th>In favour of</th>
-                        <td>
-                            <t t-if="doc.partner_id.bank_ids">
-                                <span class="m-0" t-field="doc.partner_id.bank_ids[0].acc_holder_name"/>
-                            </t>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>A/C No</th>
-                        <td>
-                            <t t-if="doc.partner_id.bank_ids">
-                                <span class="m-0" t-field="doc.partner_id.bank_ids[0].acc_number"/>
-                            </t>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Swift Code</th>
-                        <td>
-                            <t t-if="doc.partner_id.bank_ids">
-                                <span class="m-0" t-field="doc.partner_id.bank_ids[0].bank_id.bic"/>
-                            </t>
-                        </td>
-                    </tr>
-                </table>
-                <h3>Terms And Conditions</h3>
+                <br/>
+                <strong>Terms And Conditions</strong>
                 <hr style="height:3px; border:none; background-color:black;"/>
                 <!--                <span class="m-0" t-field="o.narration"/>-->
                 <ul>
@@ -235,10 +263,10 @@
                     <li>Kemexon terms and conditions apply.</li>
                 </ul>
                 <br/>
-                <center>
-                    <img t-att-src="'oe_kemexon_custom/static/src/img/kemexon_seal.jpeg'"
-                             style="max-height: 4cm; max-width: 8cm;"/>
-                </center>
+                <!--                <center>-->
+                <!--                    <img t-att-src="'oe_kemexon_custom/static/src/img/kemexon_seal.jpeg'"-->
+                <!--                         style="max-height: 4cm; max-width: 8cm;"/>-->
+                <!--                </center>-->
             </t>
         </xpath>
     </template>
