@@ -3,30 +3,33 @@
     <template id="report_invoice_document" inherit_id="account.report_invoice_document">
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-call="web.external_layout">
-                <hr style="height:2px; border:none; background-color:black;"/>
+                <div style="border: 2px solid black;"/>
                 <h3 class="text-center">INVOICE</h3>
-                <hr style="height:2px; border:none; background-color:black;"/>
+                <div style="border: 2px solid black;"/>
+                <br/>
                 <div class="row">
                     <div class="col-4">
                         <div class="row">
-                            Invoice No :
+                            <strong>Invoice No :</strong>
                             <span t-field="o.name"/>
                             <br/>
-                            Deal Ref :
+                            <strong>Deal Ref :</strong>
                             <span class="m-0" t-field="o.deal_ref"/>
                         </div>
                     </div>
                     <div class="col-4"/>
                     <div class="col-4">
                         <div class="row">
-                            Date :
+                            <strong>Date :</strong>
                             <span class="m-0" t-field="o.invoice_date"/>
                             <br/>
-                            Due Date :
+                            <strong>Due Date :</strong>
                             <span class="m-0" t-field="o.invoice_date"/>
                         </div>
                     </div>
                 </div>
+                <br/>
+                <br/>
                 <strong>Customer</strong>
                 <br/>
                 <span t-field="o.partner_id"></span>
@@ -88,7 +91,8 @@
                         <span t-field="o.partner_id.state_id.name"></span>
                     </t>
                 </t>
-
+                <br/>
+                <br/>
                 <table class="table table-sm o_main_table" name="invoice_line_table">
                     <thead>
                         <tr>
@@ -196,37 +200,53 @@
 
                     </div>
                 </div>
-                <hr style="height:2px; border:none; background-color:black;"/>
-                <h3>Delivery Information</h3>
-                <hr style="height:3px; border:none; background-color:black;"/>
+                <br/>
+                <div style="border: 2px solid black;"/>
+                <strong>Delivery Information</strong>
+                <div style="border: 2px solid black;"/>
+                <br/>
                 <div class="row">
                     <div class="col-5">
-                        <table width="100%">
-                            <tr>
-                                <th>B/L Date</th>
-                                <td width="50%">
-                                    <span class="m-0" t-field="o.bill_date"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Vessel Name</th>
-                                <td width="50%">
-                                    <span class="m-0" t-field="o.vessel_name"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Delivery Location</th>
-                                <td width="50%">
-                                    <span class="m-0" t-field="o.delivery_location"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Incoterms</th>
-                                <td width="50%">
-                                    <span class="m-0" t-field="o.invoice_incoterm_id"/>
-                                </td>
-                            </tr>
-                        </table>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>B/L Date</strong>
+                            </div>
+                            <br/>
+                            <div class="col-2"/>
+                            <div class="col-4">
+                                <span class="m-0" t-field="o.bill_date"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>Vessel Name</strong>
+                            </div>
+                            <br/>
+                            <div class="col-2"/>
+                            <div class="col-4">
+                                <span class="m-0" t-field="o.vessel_name"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>Delivery Location</strong>
+                            </div>
+                            <br/>
+                            <div class="col-2"/>
+                            <div class="col-4">
+                                <span class="m-0" t-field="o.delivery_location"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>Incoterms</strong>
+                            </div>
+                            <br/>
+                            <div class="col-2"/>
+                            <div class="col-4">
+                                <span class="m-0" t-field="o.invoice_incoterm_id"/>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-2"/>
                     <div class="col-5">
@@ -235,52 +255,76 @@
                     </div>
                 </div>
 
+
                 <br/>
-                <h3>Financial Information</h3>
-                <hr style="height:3px; border:none; background-color:black;"/>
-                <table width="100%">
-                    <tr>
-                        <th rowspan="4">Currency</th>
-                        <td rowspan="4">
-                            <t t-if="o.partner_id.bank_ids">
-                                <span class="m-0" t-field="o.partner_id.bank_ids[0].currency_id"/>
-                            </t>
-                        </td>
-                        <th>BANK</th>
-                        <td>
-                            <t t-if="o.partner_id.bank_ids">
-                                <span class="m-0" t-field="o.partner_id.bank_ids[0].bank_id"/>
-                            </t>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>In favour of</th>
-                        <td>
-                            <t t-if="o.partner_id.bank_ids">
-                                <span class="m-0" t-field="o.partner_id.bank_ids[0].acc_holder_name"/>
-                            </t>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>A/C No</th>
-                        <td>
-                            <t t-if="o.partner_id.bank_ids">
-                                <span class="m-0" t-field="o.partner_id.bank_ids[0].acc_number"/>
-                            </t>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Swift Code</th>
-                        <td>
-                            <t t-if="o.partner_id.bank_ids">
-                                <span class="m-0" t-field="o.partner_id.bank_ids[0].bank_id.bic"/>
-                            </t>
-                        </td>
-                    </tr>
-                </table>
+                <strong>Financial Information</strong>
+                <div style="border: 2px solid black;"/>
+                <br/>
+                <div class="row">
+                    <div class="col-1">
+                        <strong>Currency</strong>
+                    </div>
+                    <div class="col-2"/>
+                    <div class="col-1">
+                        <t t-if="o.partner_id.bank_ids">
+                            <span class="m-0" t-field="o.partner_id.bank_ids[0].currency_id"/>
+                        </t>
+                    </div>
+                    <div class="col-2"/>
+                    <div class="col-7">
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>Bank</strong>
+                            </div>
+                            <div class="col-2"/>
+                            <div class="col-6">
+                                <t t-if="o.partner_id.bank_ids">
+                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].bank_id"/>
+                                </t>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>In favour of</strong>
+                            </div>
+                            <div class="col-2"/>
+                            <div class="col-6">
+                                <t t-if="o.partner_id.bank_ids">
+                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].acc_holder_name"/>
+                                </t>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>A/C No</strong>
+                            </div>
+                            <div class="col-2"/>
+                            <div class="col-6">
+                                <t t-if="o.partner_id.bank_ids">
+                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].acc_number"/>
+                                </t>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>Swift Code</strong>
+                            </div>
+                            <div class="col-2"/>
+                            <div class="col-6">
+                                <t t-if="o.partner_id.bank_ids">
+                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].bank_id.bic"/>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <b/>
-                <h3>Terms And Conditions</h3>
-                <hr style="height:3px; border:none; background-color:black;"/>
+                <br/>
+                <br/>
+                <br/>
+                <strong>Terms And Conditions</strong>
+                <div style="border: 2px solid black;"/>
+                <br/>
                 <!--                <span class="m-0" t-field="o.narration"/>-->
                 <ul>
                     <li>Kemexon Ltd. follows a detailed process as per the company policy for informing any change in

@@ -157,6 +157,7 @@
                     <div class="col-1">
                         <strong>Delivery Location</strong>
                     </div>
+                    <br/>
                     <div class="col-2"/>
                     <div class="col-1">
                         <t t-if="doc.picking_ids">
@@ -182,6 +183,7 @@
                 <br/>
                 <strong>Financial Information</strong>
                 <div style="border: 2px solid black;"/>
+                <br/>
                 <!--                <table width="100%">-->
                 <div class="row">
                     <div class="col-1">
@@ -255,6 +257,7 @@
                 <br/>
                 <strong>Terms And Conditions</strong>
                 <div style="border: 2px solid black;"/>
+                <br/>
                 <!--                <span class="m-0" t-field="o.narration"/>-->
                 <ul>
                     <li>Kemexon Ltd. follows a detailed process as per the company policy for informing any change in
