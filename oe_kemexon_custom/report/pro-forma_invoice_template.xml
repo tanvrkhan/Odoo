@@ -5,7 +5,9 @@
             <t t-call="web.external_layout">
                 <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
                 <div style="border: 2px solid black;"/>
-                <h3 class="text-center">Proforma INVOICE</h3>
+                <center>
+                    <b style="font-size:35px;" class="text-center">Proforma INVOICE</b>
+                </center>
                 <div style="border: 2px solid black;"/>
                 <br/>
                 <div class="row">
@@ -123,24 +125,36 @@
                                 </t>
                             </tr>
 
-                            <t t-if="current_section and (line_last or doc.order_line[line_index+1].display_type == 'line_section') and not line.is_downpayment">
-                                <tr class="is-subtotal text-end">
-                                    <td name="td_section_subtotal" colspan="99">
-                                        <strong class="mr16">Subtotal</strong>
-                                        <span t-out="current_subtotal"
-                                              t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
-                                    </td>
-                                </tr>
-                            </t>
+                            <!--                            <t t-if="current_section and (line_last or doc.order_line[line_index+1].display_type == 'line_section') and not line.is_downpayment">-->
+                            <!--                                <tr class="is-subtotal text-end">-->
+                            <!--                                    <td name="td_section_subtotal" colspan="99">-->
+                            <!--                                        <strong class="mr16">Subtotal</strong>-->
+                            <!--                                        <span t-out="current_subtotal"-->
+                            <!--                                              t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>-->
+                            <!--                                    </td>-->
+                            <!--                                </tr>-->
+                            <!--                            </t>-->
                         </t>
+                        <tr>
+                            <td name="td_section_subtotal">
+                                <strong class="mr16">Total</strong>
+
+                            </td>
+                            <td colspan="99" class="is-subtotal text-end">
+                                <span t-out="current_subtotal"
+                                      t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
                 <br/>
                 <br/>
                 <strong>Delivery Information</strong>
                 <div style="border: 2px solid black;"/>
+                <br/>
+                <br/>
                 <div class="row">
-                    <div class="col-1">
+                    <div class="col-2">
                         <strong>Delivery Period</strong>
                     </div>
                     <div class="col-1"/>
@@ -154,7 +168,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-1">
+                    <div class="col-2">
                         <strong>Delivery Location</strong>
                     </div>
                     <br/>
@@ -167,7 +181,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-1">
+                    <div class="col-2">
                         <strong>Incoterms</strong>
                     </div>
                     <div class="col-2"/>
