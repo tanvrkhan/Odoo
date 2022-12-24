@@ -4,9 +4,9 @@
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-call="web.external_layout">
                 <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
-                <hr style="height:2px; border:none; background-color:black;"/>
+                <div style="border: 2px solid black;"/>
                 <h3 class="text-center">Proforma INVOICE</h3>
-                <hr style="height:2px; border:none; background-color:black;"/>
+                <div style="border: 2px solid black;"/>
                 <br/>
                 <div class="row">
                     <div class="col-4">
@@ -138,7 +138,7 @@
                 <br/>
                 <br/>
                 <strong>Delivery Information</strong>
-                <hr style="height:3px; border:none; background-color:black;"/>
+                <div style="border: 2px solid black;"/>
                 <div class="row">
                     <div class="col-1">
                         <strong>Delivery Period</strong>
@@ -181,7 +181,7 @@
                 <br/>
                 <br/>
                 <strong>Financial Information</strong>
-                <hr style="height:3px; border:none; background-color:black;"/>
+                <div style="border: 2px solid black;"/>
                 <!--                <table width="100%">-->
                 <div class="row">
                     <div class="col-1">
@@ -254,7 +254,7 @@
                 <br/>
                 <br/>
                 <strong>Terms And Conditions</strong>
-                <hr style="height:3px; border:none; background-color:black;"/>
+                <div style="border: 2px solid black;"/>
                 <!--                <span class="m-0" t-field="o.narration"/>-->
                 <ul>
                     <li>Kemexon Ltd. follows a detailed process as per the company policy for informing any change in
