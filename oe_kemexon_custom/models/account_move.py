@@ -173,6 +173,19 @@ class AccountMove(models.Model):
         sow_template_id.body_html = body_html
         sow_template_id.send_mail(self.id, force_send=True)
 
+    def action_send_customer_reminder(self):
+        yesterday = fields.Date.today() - datetime.timedelta(days=1)
+        invoices = self.env['account.move'].search(
+            [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'),
+             ('invoice_date_due', '=', yesterday)])
+        over_due_template = self.env.ref('oe_kemexon_custom.email_template_customer_reminder')
+        print(invoices,'invoicesinvoicesinvoicesinvoices')
+        for invoice in invoices:
+            email_values = {
+                'email_to': invoice.partner_id.email or 'abcd@gmail.com'
+            }
+            over_due_template.send_mail(invoice.id, force_send=True, email_values=email_values)
+
 
 class DeliveryLocation(models.Model):
     _name = "delivery.location"

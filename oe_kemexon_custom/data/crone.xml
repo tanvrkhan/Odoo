@@ -9,7 +9,7 @@
         <field name="numbercall">-1</field>
         <field name="active">False</field>
     </record>
-     <record id="ir_cron_aged_balance_bill_report" model="ir.cron">
+    <record id="ir_cron_aged_balance_bill_report" model="ir.cron">
         <field name="name">Aged Balance Bill Report</field>
         <field name="model_id" ref="model_account_move"/>
         <field name="state">code</field>
@@ -18,5 +18,15 @@
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>
         <field name="active">False</field>
+    </record>
+    <record id="ir_cron_customer_reminder" model="ir.cron">
+        <field name="name">Customer Reminder</field>
+        <field name="model_id" ref="model_account_move"/>
+        <field name="state">code</field>
+        <field name="code">model.action_send_customer_reminder()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
     </record>
 </odoo>
