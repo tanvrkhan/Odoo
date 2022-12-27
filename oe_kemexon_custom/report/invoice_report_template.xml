@@ -66,6 +66,7 @@
                     <span t-field="o.partner_id.state_id.name"></span>
                 </t>
                 <br/>
+                <br/>
                 <strong>Delivery To</strong>
                 <t t-if="o.partner_id.child_ids">
                     <br/>
@@ -107,6 +108,8 @@
                         <span t-field="o.partner_id.state_id.name"></span>
                     </t>
                 </t>
+                <br/>
+                <br/>
                 <br/>
                 <br/>
                 <table class="table table-sm o_main_table" name="invoice_line_table">
@@ -214,7 +217,7 @@
                 <br/>
                 <div style="border: 2px solid black;"/>
                 <strong>Delivery Information</strong>
-                <div style="border: 2px solid black;"/>
+                <div style="border: 3px solid black;"/>
                 <br/>
                 <div class="row">
                     <div class="col-5">
@@ -356,8 +359,8 @@
                     <img t-att-src="'cdx_custom_reports/static/src/img/barajeel_final.png'" width="500px"/>
                 </div> -->
                 <div class="col-12">
-                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" width="300px" alt="Logo"
-                         height="52px" style="margin-left:0px;margin-right:50px;"/>
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" width="320px" alt="Logo"
+                         height="45px" style="margin-left:0px;margin-right:50px;"/>
                 </div>
             </div>
             <!--            <hr style="height:5px; border:none; background-color:#5AA2F9;margin-left:-1px;margin-top:4px;"/>-->
