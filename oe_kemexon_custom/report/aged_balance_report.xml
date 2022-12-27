@@ -46,22 +46,22 @@
                                                 <span t-esc="invoice.get('due_days')"/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('amount_total')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
+                                                <span style="text-align:right;" t-esc="invoice.get('amount_total')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('amount_due')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
+                                                <span style="text-align:right;" t-esc="invoice.get('amount_due')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
                                                 <span t-esc="invoice.get('zero_thirty')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('thirtyone_sixty')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
+                                                <span style="text-align:right;" t-esc="invoice.get('thirtyone_sixty')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('sixteeone_nineteen')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
+                                                <span style="text-align:right;" t-esc="invoice.get('sixteeone_nineteen')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
                                             <td>
-                                                <span t-esc="invoice.get('nineteen_above')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
+                                                <span  style="text-align:right;" t-esc="invoice.get('nineteen_above')"  t-options='{"widget": "monetary", "display_currency": invoice.get("currency_id")}'/>
                                             </td>
 
                                         </tr>
@@ -75,23 +75,23 @@
                                         <td/>
 
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_amount_total')"
+                                            <span style="text-align:right;" t-esc="o.get_invoice_details().get('total_amount_total')"
                                                       t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_amount_due')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
+                                            <span style="text-align:right;" t-esc="o.get_invoice_details().get('total_amount_due')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_zero_thirty')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
+                                            <span style="text-align:right;" t-esc="o.get_invoice_details().get('total_zero_thirty')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_thirtyone_sixty')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
+                                            <span style="text-align:right;" t-esc="o.get_invoice_details().get('total_thirtyone_sixty')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_sixteeone_nineteen')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
+                                            <span style="text-align:right;" t-esc="o.get_invoice_details().get('total_sixteeone_nineteen')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
                                         </td>
                                         <td>
-                                            <span t-esc="o.get_invoice_details().get('total_nineteen_above')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
+                                            <span style="text-align:right;" t-esc="o.get_invoice_details().get('total_nineteen_above')" t-options='{"widget": "monetary", "display_currency": o.get_invoice_details().get("usd_currency")}'/>
                                         </td>
                                     </tr>
 
