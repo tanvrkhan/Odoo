@@ -46,68 +46,73 @@
                 </div>
                 <br/>
                 <br/>
+                <br/>
                 <strong>Customer</strong>
                 <br/>
-                <span t-field="o.partner_id"></span>
+                <span t-field="o.partner_id"/>
                 <t t-if="o.partner_id.street">
                     <br/>
-                    <span t-field="o.partner_id.street"></span>
+                    <span t-field="o.partner_id.street"/>
                 </t>
                 <t t-if="o.partner_id.street2">
                     <br/>
-                    <span t-field="o.partner_id.street2"></span>
+                    <span t-field="o.partner_id.street2"/>
                 </t>
                 <t t-if="o.partner_id.city">
                     <br/>
-                    <span t-field="o.partner_id.city"></span>
+                    <span t-field="o.partner_id.city"/>
                 </t>
                 <t t-if="o.partner_id.state_id">
                     <br/>
-                    <span t-field="o.partner_id.state_id.name"></span>
+                    <span t-field="o.partner_id.state_id.name"/>
                 </t>
+                <br/>
                 <br/>
                 <br/>
                 <strong>Delivery To</strong>
                 <t t-if="o.partner_id.child_ids">
                     <br/>
-                    <span t-field="o.partner_id.child_ids[0].street"></span>
+                    <span t-field="o.partner_id.child_ids[0].street"/>
                     <t t-if="o.partner_id.child_ids[0].street">
                         <br/>
-                        <span t-field="o.partner_id.child_ids[0].street"></span>
+                        <span t-field="o.partner_id.child_ids[0].street"/>
                     </t>
                     <t t-if="o.partner_id.child_ids[0].street2">
                         <br/>
-                        <span t-field="o.partner_id.child_ids[0].street2"></span>
+                        <span t-field="o.partner_id.child_ids[0].street2"/>
                     </t>
                     <t t-if="o.partner_id.child_ids[0].city">
                         <br/>
-                        <span t-field="o.partner_id.child_ids[0].city"></span>
+                        <span t-field="o.partner_id.child_ids[0].city"/>
                     </t>
                     <t t-if="o.partner_id.child_ids[0].state_id">
                         <br/>
-                        <span t-field="o.partner_id.child_ids[0].state_id.name"></span>
+                        <span t-field="o.partner_id.child_ids[0].state_id.name"/>
                     </t>
                 </t>
                 <t t-else="">
                     <br/>
-                    <span t-field="o.partner_id"></span>
+                    <span t-field="o.partner_id"/>
                     <t t-if="o.partner_id.street">
                         <br/>
-                        <span t-field="o.partner_id.street"></span>
+                        <span t-field="o.partner_id.street"/>
                     </t>
                     <t t-if="o.partner_id.street2">
                         <br/>
-                        <span t-field="o.partner_id.street2"></span>
+                        <span t-field="o.partner_id.street2"/>
                     </t>
                     <t t-if="o.partner_id.city">
                         <br/>
-                        <span t-field="o.partner_id.city"></span>
+                        <span t-field="o.partner_id.city"/>
                     </t>
                     <t t-if="o.partner_id.state_id">
                         <br/>
-                        <span t-field="o.partner_id.state_id.name"></span>
+                        <span t-field="o.partner_id.state_id.name"/>
                     </t>
                 </t>
+                <br/>
+                <br/>
+                <br/>
                 <br/>
                 <br/>
                 <br/>
@@ -203,11 +208,12 @@
                         </t>
                         <tr>
                             <td name="td_section_subtotal">
-                                <strong class="mr16">Total (<span t-field="o.currency_id"/>)</strong>
+                                <strong class="mr16">Total (<span t-field="o.currency_id"/>)
+                                </strong>
 
                             </td>
                             <td colspan="99" class="is-subtotal text-end">
-                                <span  style="text-align:right;" class="m-0" t-field="o.amount_total"/>
+                                <span style="text-align:right;" class="m-0" t-field="o.amount_total"/>
                             </td>
                         </tr>
                     </tbody>
@@ -215,6 +221,10 @@
 
 
                 <br/>
+                <br/>
+                <br/>
+                <br/>
+
                 <div style="border: 2px solid black;"/>
                 <strong>Delivery Information</strong>
                 <div style="border: 3px solid black;"/>
@@ -269,7 +279,8 @@
                     <!--                    </div>-->
                 </div>
 
-
+                <br/>
+                <br/>
                 <br/>
                 <strong>Financial Information</strong>
                 <div style="border: 2px solid black;"/>
@@ -333,6 +344,9 @@
                     </div>
                 </div>
                 <b/>
+                <br/>
+                <br/>
+                <br/>
                 <br/>
                 <br/>
                 <br/>
