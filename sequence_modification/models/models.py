@@ -19,9 +19,9 @@ class AccountMoveInheritModel(models.Model):
         elif self.move_type == 'out_refund':
             self.generate_sequence('credit.sequence', 'credit')
 
-        # elif self.move_type == 'entry':
-        #     seq = self.env['ir.sequence'].next_by_code('journal.entry.sequence').split("-")
-        #     self.name = seq
+        elif self.move_type == 'entry':
+            seq = self.env['ir.sequence'].next_by_code('journal.entry.sequence')
+            self.name = seq
 
         res = super().action_post()
         return res
@@ -176,6 +176,7 @@ class SaleOrderInherit(models.Model):
                 self.sale_create_seq_name(vals_list)
             else:
                 vals_list['name'] = name
+                vals_list['deal_ref'] = name.split("-")[0] + "-" + name.split("-")[2]
                 return vals_list
 
     def get_new_name(self, seq=None, next_num=None, short_name=None):
