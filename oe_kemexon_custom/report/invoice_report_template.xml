@@ -363,6 +363,7 @@
                          height="45px" style="margin-left:0px;margin-right:50px;"/>
                 </div>
             </div>
+            <br/>
             <!--            <hr style="height:5px; border:none; background-color:#5AA2F9;margin-left:-1px;margin-top:4px;"/>-->
         </div>
         <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}"
