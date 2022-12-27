@@ -3,92 +3,120 @@
     <template id="report_invoice_document" inherit_id="account.report_invoice_document">
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-call="web.external_layout">
-                <hr style="height:2px; border:none; background-color:black;"/>
-                <h3 class="text-center">INVOICE</h3>
-                <hr style="height:2px; border:none; background-color:black;"/>
+                <div style="border: 2px solid black;"/>
+                <center>
+                    <b style="font-size:35px;" class="text-center">INVOICE</b>
+                </center>
+                <div style="border: 2px solid black;"/>
+                <br/>
                 <div class="row">
                     <div class="col-4">
                         <div class="row">
-                            Invoice No :
-                            <span t-field="o.name"/>
+                            <div class="col-4">
+                                <strong>Invoice No :</strong>
+                                <br/>
+                                <strong>Deal Ref :</strong>
+                            </div>
+                            <div class="col-2"/>
                             <br/>
-                            Deal Ref :
-                            <span class="m-0" t-field="o.deal_ref"/>
+                            <div class="col-6">
+                                <span t-field="o.name"/>
+                                <br/>
+                                <span class="m-0" t-field="o.deal_ref"/>
+                            </div>
                         </div>
                     </div>
                     <div class="col-4"/>
                     <div class="col-4">
                         <div class="row">
-                            Date :
-                            <span class="m-0" t-field="o.invoice_date"/>
+                            <div class="col-4">
+                                <strong>Date :</strong>
+                                <br/>
+                                <strong>Due Date :</strong>
+                            </div>
+                            <div class="col-2"/>
                             <br/>
-                            Due Date :
-                            <span class="m-0" t-field="o.invoice_date"/>
+                            <div class="col-4">
+                                <span class="m-0" t-field="o.invoice_date"/>
+                                <br/>
+                                <span class="m-0" t-field="o.invoice_date"/>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <br/>
+                <br/>
+                <br/>
                 <strong>Customer</strong>
                 <br/>
-                <span t-field="o.partner_id"></span>
+                <span t-field="o.partner_id"/>
                 <t t-if="o.partner_id.street">
                     <br/>
-                    <span t-field="o.partner_id.street"></span>
+                    <span t-field="o.partner_id.street"/>
                 </t>
                 <t t-if="o.partner_id.street2">
                     <br/>
-                    <span t-field="o.partner_id.street2"></span>
+                    <span t-field="o.partner_id.street2"/>
                 </t>
                 <t t-if="o.partner_id.city">
                     <br/>
-                    <span t-field="o.partner_id.city"></span>
+                    <span t-field="o.partner_id.city"/>
                 </t>
                 <t t-if="o.partner_id.state_id">
                     <br/>
-                    <span t-field="o.partner_id.state_id.name"></span>
+                    <span t-field="o.partner_id.state_id.name"/>
                 </t>
+                <br/>
+                <br/>
                 <br/>
                 <strong>Delivery To</strong>
                 <t t-if="o.partner_id.child_ids">
                     <br/>
-                    <span t-field="o.partner_id.child_ids[0].street"></span>
+                    <span t-field="o.partner_id.child_ids[0].street"/>
                     <t t-if="o.partner_id.child_ids[0].street">
                         <br/>
-                        <span t-field="o.partner_id.child_ids[0].street"></span>
+                        <span t-field="o.partner_id.child_ids[0].street"/>
                     </t>
                     <t t-if="o.partner_id.child_ids[0].street2">
                         <br/>
-                        <span t-field="o.partner_id.child_ids[0].street2"></span>
+                        <span t-field="o.partner_id.child_ids[0].street2"/>
                     </t>
                     <t t-if="o.partner_id.child_ids[0].city">
                         <br/>
-                        <span t-field="o.partner_id.child_ids[0].city"></span>
+                        <span t-field="o.partner_id.child_ids[0].city"/>
                     </t>
                     <t t-if="o.partner_id.child_ids[0].state_id">
                         <br/>
-                        <span t-field="o.partner_id.child_ids[0].state_id.name"></span>
+                        <span t-field="o.partner_id.child_ids[0].state_id.name"/>
                     </t>
                 </t>
                 <t t-else="">
                     <br/>
-                    <span t-field="o.partner_id"></span>
+                    <span t-field="o.partner_id"/>
                     <t t-if="o.partner_id.street">
                         <br/>
-                        <span t-field="o.partner_id.street"></span>
+                        <span t-field="o.partner_id.street"/>
                     </t>
                     <t t-if="o.partner_id.street2">
                         <br/>
-                        <span t-field="o.partner_id.street2"></span>
+                        <span t-field="o.partner_id.street2"/>
                     </t>
                     <t t-if="o.partner_id.city">
                         <br/>
-                        <span t-field="o.partner_id.city"></span>
+                        <span t-field="o.partner_id.city"/>
                     </t>
                     <t t-if="o.partner_id.state_id">
                         <br/>
-                        <span t-field="o.partner_id.state_id.name"></span>
+                        <span t-field="o.partner_id.state_id.name"/>
                     </t>
                 </t>
-
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
                 <table class="table table-sm o_main_table" name="invoice_line_table">
                     <thead>
                         <tr>
@@ -178,111 +206,155 @@
                                 </tr>
                             </t>
                         </t>
+                        <tr>
+                            <td name="td_section_subtotal">
+                                <strong class="mr16">Total (<span t-field="o.currency_id"/>)
+                                </strong>
+
+                            </td>
+                            <td colspan="99" class="is-subtotal text-end">
+                                <span style="text-align:right;" class="m-0" t-field="o.amount_total"/>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
 
-                <hr style="height:2px; border:none; background-color:black;"/>
-                <div class="row">
-                    <div class="col-4">
-                        <div class="row">
-                            Total (<span t-field="o.currency_id"/>)
-                        </div>
-                    </div>
-                    <div class="col-4"/>
-                    <div class="col-4">
-                        <div class="row">
-                            <span class="m-0" t-field="o.amount_total"/>
-                        </div>
 
-                    </div>
-                </div>
-                <hr style="height:2px; border:none; background-color:black;"/>
-                <h3>Delivery Information</h3>
-                <hr style="height:3px; border:none; background-color:black;"/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+
+                <div style="border: 2px solid black;"/>
+                <strong>Delivery Information</strong>
+                 <div style="border: 2px solid black;"/>
+                <br/>
                 <div class="row">
                     <div class="col-5">
-                        <table width="100%">
-                            <tr>
-                                <th>B/L Date</th>
-                                <td width="50%">
-                                    <span class="m-0" t-field="o.bill_date"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Vessel Name</th>
-                                <td width="50%">
-                                    <span class="m-0" t-field="o.vessel_name"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Delivery Location</th>
-                                <td width="50%">
-                                    <span class="m-0" t-field="o.delivery_location"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Incoterms</th>
-                                <td width="50%">
-                                    <span class="m-0" t-field="o.invoice_incoterm_id"/>
-                                </td>
-                            </tr>
-                        </table>
+                        <div class="row">
+                            <div class="col-5">
+                                <strong>B/L Date</strong>
+                            </div>
+                            <br/>
+                            <div class="col-1"/>
+                            <div class="col-4">
+                                <span class="m-0" t-field="o.bill_date"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5">
+                                <strong>Vessel Name</strong>
+                            </div>
+                            <br/>
+                            <div class="col-1"/>
+                            <div class="col-4">
+                                <span class="m-0" t-field="o.vessel_name"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5">
+                                <strong>Delivery Location</strong>
+                            </div>
+                            <br/>
+                            <div class="col-1"/>
+                            <div class="col-4">
+                                <span class="m-0" t-field="o.delivery_location"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5">
+                                <strong>Incoterms</strong>
+                            </div>
+                            <br/>
+                            <div class="col-1"/>
+                            <div class="col-4">
+                                <span class="m-0" t-field="o.invoice_incoterm_id"/>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-2"/>
-                    <div class="col-5">
-                        <img t-att-src="'oe_kemexon_custom/static/src/img/kemexon_seal.jpeg'"
-                             style="max-height: 2cm; max-width: 4cm;"/>
-                    </div>
+                    <!--                    <div class="col-2"/>-->
+                    <!--                    <div class="col-5">-->
+                    <!--                        <img t-att-src="'oe_kemexon_custom/static/src/img/kemexon_seal.jpeg'"-->
+                    <!--                             style="max-height: 2cm; max-width: 4cm;"/>-->
+                    <!--                    </div>-->
                 </div>
 
                 <br/>
-                <h3>Financial Information</h3>
-                <hr style="height:3px; border:none; background-color:black;"/>
-                <table width="100%">
-                    <tr>
-                        <th rowspan="4">Currency</th>
-                        <td rowspan="4">
-                            <t t-if="o.partner_id.bank_ids">
-                                <span class="m-0" t-field="o.partner_id.bank_ids[0].currency_id"/>
-                            </t>
-                        </td>
-                        <th>BANK</th>
-                        <td>
-                            <t t-if="o.partner_id.bank_ids">
-                                <span class="m-0" t-field="o.partner_id.bank_ids[0].bank_id"/>
-                            </t>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>In favour of</th>
-                        <td>
-                            <t t-if="o.partner_id.bank_ids">
-                                <span class="m-0" t-field="o.partner_id.bank_ids[0].acc_holder_name"/>
-                            </t>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>A/C No</th>
-                        <td>
-                            <t t-if="o.partner_id.bank_ids">
-                                <span class="m-0" t-field="o.partner_id.bank_ids[0].acc_number"/>
-                            </t>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Swift Code</th>
-                        <td>
-                            <t t-if="o.partner_id.bank_ids">
-                                <span class="m-0" t-field="o.partner_id.bank_ids[0].bank_id.bic"/>
-                            </t>
-                        </td>
-                    </tr>
-                </table>
+                <br/>
+                <br/>
+                <strong>Financial Information</strong>
+                <div style="border: 2px solid black;"/>
+                <br/>
+                <div class="row">
+                    <div class="col-1">
+                        <strong>Currency</strong>
+                    </div>
+                    <div class="col-1"/>
+                    <div class="col-1">
+                        <t t-if="o.partner_id.bank_ids">
+                            <span class="m-0" t-field="o.partner_id.bank_ids[0].currency_id"/>
+                        </t>
+                    </div>
+                    <div class="col-1"/>
+                    <div class="col-7">
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>Bank</strong>
+                            </div>
+                            <div class="col-1"/>
+                            <div class="col-6">
+                                <t t-if="o.partner_id.bank_ids">
+                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].bank_id"/>
+                                </t>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>In favour of</strong>
+                            </div>
+                            <div class="col-1"/>
+                            <div class="col-6">
+                                <t t-if="o.partner_id.bank_ids">
+                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].acc_holder_name"/>
+                                </t>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>A/C No</strong>
+                            </div>
+                            <div class="col-1"/>
+                            <div class="col-6">
+                                <t t-if="o.partner_id.bank_ids">
+                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].acc_number"/>
+                                </t>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>Swift Code</strong>
+                            </div>
+                            <div class="col-1"/>
+                            <div class="col-6">
+                                <t t-if="o.partner_id.bank_ids">
+                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].bank_id.bic"/>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <b/>
-                <h3>Terms And Conditions</h3>
-                <hr style="height:3px; border:none; background-color:black;"/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <strong>Terms And Conditions</strong>
+                <div style="border: 2px solid black;"/>
+                <br/>
                 <!--                <span class="m-0" t-field="o.narration"/>-->
-                <ul>
+                <ul style="font-size:18px;">
                     <li>Kemexon Ltd. follows a detailed process as per the company policy for informing any change in
                         bank account/ remittance process. We request you to not rely on any isolated email communication
                         informing the change of bank account etc. If you do so, the same shall be at your risk and
@@ -301,10 +373,11 @@
                     <img t-att-src="'cdx_custom_reports/static/src/img/barajeel_final.png'" width="500px"/>
                 </div> -->
                 <div class="col-12">
-                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" width="300px" alt="Logo"
-                         height="52px" style="margin-left:0px;margin-right:50px;"/>
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" width="320px" alt="Logo"
+                         height="45px" style="margin-left:0px;margin-right:50px;"/>
                 </div>
             </div>
+            <br/>
             <!--            <hr style="height:5px; border:none; background-color:#5AA2F9;margin-left:-1px;margin-top:4px;"/>-->
         </div>
         <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}"
@@ -319,24 +392,29 @@
         </div>
         <div class="footer">
             <div class="text-center" style="border-top: 1px solid black;">
-                <strong>
-                    <center>'This is a system generated document and does not require a signature'</center>
-                </strong>
-                <ul class="list-inline mb4">
+                <!--                <strong>-->
+                <!--                    <center>'This is a system generated document and does not require a signature'</center>-->
+                <!--                </strong>-->
+                <!--                <ul class="list-inline mb4">-->
 
-                    <li t-if="company.phone" class="list-inline-item d-inline">
-                        <span class="o_force_ltr" t-field="company.phone"/>
-                    </li>
-                    <li t-if="company.email" class="list-inline-item d-inline">
-                        <span t-field="company.email"/>
-                    </li>
-                    <li t-if="company.website" class="list-inline-item d-inline">
-                        <span t-field="company.website"/>
-                    </li>
-                    <li t-if="company.vat" class="list-inline-item d-inline"><t
-                            t-out="company.country_id.vat_label or 'Tax ID'"/>:
-                        <span t-field="company.vat"/>
-                    </li>
+                <!--                    <li t-if="company.phone" class="list-inline-item d-inline">-->
+                <!--                        <span class="o_force_ltr" t-field="company.phone"/>-->
+                <!--                    </li>-->
+                <!--                    <li t-if="company.email" class="list-inline-item d-inline">-->
+                <!--                        <span t-field="company.email"/>-->
+                <!--                    </li>-->
+                <!--                    <li t-if="company.website" class="list-inline-item d-inline">-->
+                <!--                        <span t-field="company.website"/>-->
+                <!--                    </li>-->
+                <!--                    <li t-if="company.vat" class="list-inline-item d-inline"><t-->
+                <!--                            t-out="company.country_id.vat_label or 'Tax ID'"/>:-->
+                <!--                        <span t-field="company.vat"/>-->
+                <!--                    </li>-->
+                <!--                </ul>-->
+                <ul class="list-inline mb4">
+                    <li>Kemexon Limited</li>
+                    <li>Office 1501, Prosperity tower 39 Queens Road, Hong Kong</li>
+                    <li>+852 3050 0344 - contact@kemexon.com</li>
                 </ul>
 
                 <div t-if="report_type == 'pdf'" class="text-muted">
@@ -356,7 +434,7 @@
         <field name="page_width">210</field>
         <field name="orientation">Portrait</field>
         <field name="margin_top">10</field>
-        <field name="margin_bottom">8</field>
+        <field name="margin_bottom">18</field>
         <field name="margin_left">3</field>
         <field name="margin_right">3</field>
         <field name="header_line" eval="False"/>

@@ -173,6 +173,31 @@ class AccountMove(models.Model):
         sow_template_id.body_html = body_html
         sow_template_id.send_mail(self.id, force_send=True)
 
+    def action_send_customer_reminder(self):
+        yesterday = fields.Date.today() - datetime.timedelta(days=1)
+        after_three_day = fields.Date.today() + datetime.timedelta(days=3)
+        invoices_1_day = self.env['account.move'].search(
+            [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'),
+             ('invoice_date_due', '=', yesterday)])
+        over_due_template = self.env.ref('oe_kemexon_custom.email_template_customer_reminder')
+        for invoice1 in invoices_1_day:
+            email_values = {
+                'email_to': invoice1.partner_id.email or 'abcd@gmail.com'
+            }
+            over_due_template.send_mail(invoice1.id, force_send=True, email_values=email_values)
+
+        # friendly_reminder
+
+        invoices_3_day = self.env['account.move'].search(
+            [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'),
+             ('invoice_date_due', '=', after_three_day)])
+        friendly_reminder_template = self.env.ref('oe_kemexon_custom.email_template_friendly_reminder_reminder')
+        for invoice3 in invoices_3_day:
+            email_values = {
+                'email_to': invoice3.partner_id.email or 'abcd@gmail.com'
+            }
+            friendly_reminder_template.send_mail(invoice3.id, force_send=True, email_values=email_values)
+
 
 class DeliveryLocation(models.Model):
     _name = "delivery.location"
