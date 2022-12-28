@@ -18,8 +18,7 @@
                             <span t-field="doc.name"/>
                             <br/>
                             <strong>Deal Ref :</strong>
-                            <span class="m-0" t-field="doc.deal_ref"
-                                  t-options="{&quot;format&quot;: &quot;MM/dd/yyyy&quot;}"/>
+                            <span class="m-0" t-field="doc.deal_ref"/>
                         </div>
                     </div>
                     <div class="col-4"/>

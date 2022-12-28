@@ -4,17 +4,21 @@
             <t t-call="web.html_container">
                 <t t-call="web.external_layout">
                     <t t-foreach="docs" t-as="o">
-                        <hr style="height:2px;border-width:3;color:black;background-color:black"/>
-                        <strong style="font-size:30px;" class="text-center"><center>Delivery Sales INVOICE</center></strong>
-                        <hr style="height:2px;border-width:3;color:black;background-color:black"/>
+                        <div style="border: 2px solid black;"/>
+                        <strong style="font-size:30px;" class="text-center">
+                            <center>Delivery Sales INVOICE</center>
+                        </strong>
+                        <div style="border: 2px solid black;"/>
+                        <br/>
+                        <br/>
                         <t t-set="truck_transport_details_ids" t-value="o"/>
-<!--                        <t t-if="o.truck_transport_details_ids">-->
-<!--                            <t t-foreach="o.truck_transport_details_ids" t-as="item">-->
-<!--                                <t t-if="item.is_add_report">-->
-<!--                                   <t t-set="truck_transport_details_ids" t-value="item"/>-->
-<!--                                </t>-->
-<!--                            </t>-->
-<!--                        </t>-->
+                        <!--                        <t t-if="o.truck_transport_details_ids">-->
+                        <!--                            <t t-foreach="o.truck_transport_details_ids" t-as="item">-->
+                        <!--                                <t t-if="item.is_add_report">-->
+                        <!--                                   <t t-set="truck_transport_details_ids" t-value="item"/>-->
+                        <!--                                </t>-->
+                        <!--                            </t>-->
+                        <!--                        </t>-->
                         <t t-set="picking" t-value="o.stock_pick_ids"/>
                         <br/>
 
@@ -29,11 +33,14 @@
                             <div class="col-4">
                                 <div class="row">
                                     <b>Date :</b>
-                                    <span class="m-0" t-field="picking.scheduled_date"/>
+                                    <span class="m-0" t-field="picking.scheduled_date"
+                                          t-options="{&quot;format&quot;: &quot;MM/dd/yyyy&quot;}"/>
 
                                 </div>
                             </div>
                         </div>
+                        <br/>
+                        <br/>
                         <br/>
                         <strong>Customer</strong>
                         <br/>
@@ -55,24 +62,28 @@
                             <span t-field="picking.partner_id.state_id.name"></span>
                         </t>
                         <br/>
-                        <strong>Consignee</strong>
                         <br/>
-                        <span t-field="picking.consignee"></span>
-                        <t t-if="picking.consignee.street">
+                        <br/>
+                        <t t-if="picking.consignee">
+                            <strong>Consignee</strong>
                             <br/>
-                            <span t-field="picking.consignee.street"></span>
-                        </t>
-                        <t t-if="picking.consignee.street2">
-                            <br/>
-                            <span t-field="picking.consignee.street2"></span>
-                        </t>
-                        <t t-if="picking.consignee.city">
-                            <br/>
-                            <span t-field="picking.consignee.city"></span>
-                        </t>
-                        <t t-if="picking.consignee.state_id">
-                            <br/>
-                            <span t-field="picking.consignee.state_id.name"></span>
+                            <span t-field="picking.consignee"></span>
+                            <t t-if="picking.consignee.street">
+                                <br/>
+                                <span t-field="picking.consignee.street"></span>
+                            </t>
+                            <t t-if="picking.consignee.street2">
+                                <br/>
+                                <span t-field="picking.consignee.street2"></span>
+                            </t>
+                            <t t-if="picking.consignee.city">
+                                <br/>
+                                <span t-field="picking.consignee.city"></span>
+                            </t>
+                            <t t-if="picking.consignee.state_id">
+                                <br/>
+                                <span t-field="picking.consignee.state_id.name"></span>
+                            </t>
                         </t>
                         <!--                        <div class="row">-->
                         <!--                            <div class="col-4"/>-->
@@ -85,6 +96,12 @@
                         <!--                                </div>-->
                         <!--                            </div>-->
                         <!--                        </div>-->
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
                         <br/>
                         <table class="table table-sm o_main_table mt-4">
                             <!-- In case we want to repeat the header, remove "display: table-row-group" -->
@@ -110,7 +127,7 @@
                                                 <span t-field="move.sale_line_id.price_unit"/>
                                             </t>
                                         </td>
-                                        <td>
+                                        <td style="text-align:right;">
                                             <t t-if="move.sale_line_id">
                                                 <span t-field="move.sale_line_id.price_subtotal"/>
                                             </t>
@@ -120,8 +137,12 @@
                             </tbody>
                         </table>
                         <br/>
-                        <b class="text-left">Truck Information</b>
-                        <hr style="height:2px; border:none; background-color:black;"/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <strong class="text-left">Truck Information</strong>
+                        <div style="border: 2px solid black;"/>
                         <br/>
                         <div class="row">
                             <div class="col-6">
@@ -142,8 +163,11 @@
                         </div>
                         <br/>
                         <br/>
-                        <b class="text-left">Delivery Information</b>
-                        <hr style="height:2px; border:none; background-color:black;"/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <strong class="text-left">Delivery Information</strong>
+                        <div style="border: 2px solid black;"/>
                         <br/>
                         <div class="row">
                             <div class="col-6">
@@ -171,9 +195,12 @@
                         <p style="page-break-before:always;"></p>
                         <br/>
                         <br/>
-                        <hr style="height:2px; border: 1px solid black; background-color:black;"/>
-                        <strong style="font-size:30px;" class="text-center"><center>Delivery Note</center></strong>
-                        <hr style="height:2px; border: 1px solid black; background-color:black;"/>
+                        <div style="border: 2px solid black;"/>
+                        <strong style="font-size:30px;" class="text-center">
+                            <center>Delivery Note</center>
+                        </strong>
+                        <div style="border: 2px solid black;"/>
+                        <br/>
                         <br/>
                         <div class="row">
                             <div class="col-4">
@@ -186,11 +213,14 @@
                             <div class="col-4">
                                 <div class="row">
                                     <b>Date :</b>
-                                    <span class="m-0" t-field="picking.scheduled_date"/>
+                                    <span class="m-0" t-field="picking.scheduled_date"
+                                          t-options="{&quot;format&quot;: &quot;MM/dd/yyyy&quot;}"/>
 
                                 </div>
                             </div>
                         </div>
+                        <br/>
+                        <br/>
                         <br/>
                         <strong>Customer</strong>
                         <br/>
@@ -212,24 +242,28 @@
                             <span t-field="picking.partner_id.state_id.name"></span>
                         </t>
                         <br/>
-                        <strong>Consignee</strong>
                         <br/>
-                        <span t-field="picking.consignee"></span>
-                        <t t-if="picking.consignee.street">
+                        <br/>
+                        <t t-if="picking.consignee">
+                            <strong>Consignee</strong>
                             <br/>
-                            <span t-field="picking.consignee.street"></span>
-                        </t>
-                        <t t-if="picking.consignee.street2">
-                            <br/>
-                            <span t-field="picking.consignee.street2"></span>
-                        </t>
-                        <t t-if="picking.consignee.city">
-                            <br/>
-                            <span t-field="picking.consignee.city"></span>
-                        </t>
-                        <t t-if="picking.consignee.state_id">
-                            <br/>
-                            <span t-field="picking.consignee.state_id.name"></span>
+                            <span t-field="picking.consignee"></span>
+                            <t t-if="picking.consignee.street">
+                                <br/>
+                                <span t-field="picking.consignee.street"></span>
+                            </t>
+                            <t t-if="picking.consignee.street2">
+                                <br/>
+                                <span t-field="picking.consignee.street2"></span>
+                            </t>
+                            <t t-if="picking.consignee.city">
+                                <br/>
+                                <span t-field="picking.consignee.city"></span>
+                            </t>
+                            <t t-if="picking.consignee.state_id">
+                                <br/>
+                                <span t-field="picking.consignee.state_id.name"></span>
+                            </t>
                         </t>
                         <br/>
                         <br/>
@@ -263,8 +297,12 @@
                             </tbody>
                         </table>
                         <br/>
-                        <b class="text-left">Truck Information</b>
-                        <hr style="height:2px; border:none; background-color:black;"/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <strong class="text-left">Truck Information</strong>
+                        <div style="border: 2px solid black;"/>
                         <br/>
                         <div class="row">
                             <div class="col-6">
@@ -299,8 +337,11 @@
                         </div>
                         <br/>
                         <br/>
-                        <b class="text-left">Delivery Information</b>
-                        <hr style="height:2px; border:none; background-color:black;"/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <strong class="text-left">Delivery Information</strong>
+                        <div style="border: 2px solid black;"/>
                         <br/>
                         <div class="row">
                             <div class="col-6">

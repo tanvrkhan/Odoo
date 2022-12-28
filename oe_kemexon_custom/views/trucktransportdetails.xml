@@ -14,7 +14,7 @@
                 <field name="offloaded"/>
                 <field name="status"/>
                 <field name="statusdate"/>
-                <field name="is_updated"/>
+                <field name="is_updated" invisible="1"/>
                 <button name="action_update_qty" type="object" string="Update Qty"/>
                 <button name="action_print_report" type="object" string="Print"/>
             </tree>
