@@ -119,10 +119,10 @@
                                         <td>
                                             <span t-field="move.name"/>
                                         </td>
-                                        <td>
+                                        <td style="text-align:right;">
                                             <span t-field="move.product_uom_qty"/>
                                         </td>
-                                        <td>
+                                        <td style="text-align:right;">
                                             <t t-if="move.sale_line_id">
                                                 <span t-field="move.sale_line_id.price_unit"/>
                                             </t>
@@ -286,10 +286,10 @@
                                         <td>
                                             <span t-field="move.product_id.uom_id"/>
                                         </td>
-                                        <td>
+                                        <td style="text-align:right;">
                                             <span t-field="move.product_uom_qty"/>
                                         </td>
-                                        <td>
+                                        <td style="text-align:right;">
                                             <span t-field="move.forecast_availability"/>
                                         </td>
                                     </tr>
