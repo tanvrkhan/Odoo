@@ -3,6 +3,7 @@
     <template id="report_invoice_document" inherit_id="account.report_invoice_document">
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-call="web.external_layout">
+                <br/>
                 <div style="border: 2px solid black;"/>
                 <center>
                     <b style="font-size:35px;" class="text-center">INVOICE</b>
@@ -338,6 +339,28 @@
                             <div class="col-6">
                                 <t t-if="o.partner_id.bank_ids">
                                     <span class="m-0" t-field="o.partner_id.bank_ids[0].bank_id.bic"/>
+                                </t>
+                            </div>
+                        </div>
+                         <div class="row">
+                            <div class="col-4">
+                                <strong>Inter Mediatory Bank</strong>
+                            </div>
+                            <div class="col-1"/>
+                            <div class="col-6">
+                                <t t-if="o.partner_id.bank_ids">
+                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].inter_mediatory_bank_id"/>
+                                </t>
+                            </div>
+                        </div>
+                         <div class="row">
+                            <div class="col-4">
+                                <strong>Inter Mediatory Swift</strong>
+                            </div>
+                            <div class="col-1"/>
+                            <div class="col-6">
+                                <t t-if="o.partner_id.bank_ids">
+                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].inter_mediatory_swift"/>
                                 </t>
                             </div>
                         </div>

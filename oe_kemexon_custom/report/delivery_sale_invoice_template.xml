@@ -4,6 +4,7 @@
             <t t-call="web.html_container">
                 <t t-call="web.external_layout">
                     <t t-foreach="docs" t-as="o">
+                        <br/>
                         <div style="border: 2px solid black;"/>
                         <strong style="font-size:30px;" class="text-center">
                             <center>Delivery Sales INVOICE</center>
@@ -107,10 +108,10 @@
                             <!-- In case we want to repeat the header, remove "display: table-row-group" -->
                             <thead style="display: table-row-group">
                                 <tr>
-                                    <th>Description</th>
-                                    <th>Quantity</th>
-                                    <th>Rate</th>
-                                    <th>Amount</th>
+                                    <th style="text-align:left;">Description</th>
+                                    <th style="text-align:right;">Quantity</th>
+                                    <th style="text-align:right;">Rate</th>
+                                    <th style="text-align:right;">Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -271,10 +272,10 @@
                             <!-- In case we want to repeat the header, remove "display: table-row-group" -->
                             <thead style="display: table-row-group">
                                 <tr>
-                                    <th>Description</th>
-                                    <th>Uom</th>
-                                    <th>Order Qty</th>
-                                    <th>Actual Qty</th>
+                                    <th style="text-align:left;">Description</th>
+                                    <th style="text-align:left;">Uom</th>
+                                    <th style="text-align:right;">Order Qty</th>
+                                    <th style="text-align:right;">Actual Qty</th>
                                 </tr>
                             </thead>
                             <tbody>

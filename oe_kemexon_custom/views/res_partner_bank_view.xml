@@ -1,0 +1,15 @@
+<odoo>
+    <data>
+        <record id="view_partner_bank_form_inherit_account" model="ir.ui.view">
+            <field name="name">res.partner.bank.form</field>
+            <field name="model">res.partner.bank</field>
+            <field name="inherit_id" ref="account.view_partner_bank_form_inherit_account"/>
+            <field name="arch" type="xml">
+                <field name="currency_id" position="after">
+                    <field name="inter_mediatory_bank_id"/>
+                    <field name="inter_mediatory_swift"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,4 +1,5 @@
-from odoo import models, fields, _
+from odoo import models, fields, _,api
+
 from odoo.exceptions import UserError
 
 
@@ -26,8 +27,9 @@ class Truck_Transport_Details(models.Model):
     def action_print_report(self):
         return self.env.ref('oe_kemexon_custom.action_report_delivery_sale_invoice').report_action(self)
 
-    def action_update_qty(self):
-        move = self.env['stock.move'].search([('picking_id', '=', self.stock_pick_ids.id)], limit=1)
+    @api.onchange('offloaded')
+    def _onchange_offloaded(self):
+        move = self.env['stock.move'].search([('picking_id', '=', self.stock_pick_ids._origin.id)], limit=1)
         if move and not self.is_updated:
             quantity_done = move.quantity_done
             product_uom_qty = move.product_uom_qty
