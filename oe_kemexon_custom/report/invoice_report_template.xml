@@ -118,9 +118,8 @@
                 <br/>
                 <br/>
                 <br/>
-                <table class="table table-sm o_main_table" name="invoice_line_table">
-                    <thead>
-                        <tr>
+                <table width="100%"  name="invoice_line_table">
+                        <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
                             <th name="th_description" class="text-start">
                                 <span>Description</span>
                             </th>
@@ -144,8 +143,6 @@
                                 <span groups="account.group_show_line_subtotals_tax_included">Total Price</span>
                             </th>
                         </tr>
-                    </thead>
-                    <tbody class="invoice_tbody">
                         <t t-set="current_subtotal" t-value="0"/>
                         <t t-set="lines"
                            t-value="o.invoice_line_ids.sorted(key=lambda l: (-l.sequence, l.date, l.move_name, -l.id), reverse=True)"/>
@@ -156,7 +153,7 @@
                             <t t-set="current_subtotal" t-value="current_subtotal + line.price_total"
                                groups="account.group_show_line_subtotals_tax_included"/>
 
-                            <tr t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
+                            <tr style="border-bottom:2px solid #d4d6d9" t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
                                 <t t-if="line.display_type == 'product'" name="account_invoice_line_accountable">
                                     <td name="account_invoice_line_name">
                                         <span t-field="line.name" t-options="{'widget': 'text'}"/>
@@ -207,7 +204,7 @@
                                 </tr>
                             </t>
                         </t>
-                        <tr>
+                        <tr style="border-bottom:2px solid #d4d6d9">
                             <td name="td_section_subtotal">
                                 <strong class="mr16">Total (<span t-field="o.currency_id"/>)
                                 </strong>
@@ -217,7 +214,6 @@
                                 <span style="text-align:right;" class="m-0" t-field="o.amount_total"/>
                             </td>
                         </tr>
-                    </tbody>
                 </table>
 
 

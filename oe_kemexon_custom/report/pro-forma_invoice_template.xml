@@ -64,10 +64,9 @@
                 <br/>
                 <br/>
                 <t t-set="lines_to_report" t-value="doc._get_order_lines_to_report()"/>
-                <table class="table table-sm o_main_table mt-4">
+                <table width="100%">
                     <!-- In case we want to repeat the header, remove "display: table-row-group" -->
-                    <thead style="display: table-row-group">
-                        <tr>
+                        <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
                             <th name="th_description" class="text-start">Description</th>
                             <th name="th_quantity" class="text-end">Quantity</th>
                             <th name="th_priceunit" class="text-end">Rate</th>
@@ -81,8 +80,6 @@
                                 <span groups="account.group_show_line_subtotals_tax_included">Total Price</span>
                             </th>
                         </tr>
-                    </thead>
-                    <tbody class="sale_tbody">
 
                         <t t-set="current_subtotal" t-value="0"/>
 
@@ -93,7 +90,7 @@
                             <t t-set="current_subtotal" t-value="current_subtotal + line.price_total"
                                groups="account.group_show_line_subtotals_tax_included"/>
 
-                            <tr t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
+                            <tr style="border-bottom:2px solid #d4d6d9" t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
                                 <t t-if="not line.display_type">
                                     <td name="td_name">
                                         <span t-field="line.name"/>
@@ -144,7 +141,7 @@
                             <!--                                </tr>-->
                             <!--                            </t>-->
                         </t>
-                        <tr>
+                        <tr style="border-bottom:2px solid #d4d6d9">
                             <td name="td_section_subtotal">
                                 <strong class="mr16">Total</strong>
 
@@ -154,7 +151,6 @@
                                       t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
                             </td>
                         </tr>
-                    </tbody>
                 </table>
                 <br/>
                 <br/>

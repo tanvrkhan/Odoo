@@ -104,19 +104,16 @@
                         <br/>
                         <br/>
                         <br/>
-                        <table class="table table-sm o_main_table mt-4">
+                        <table width="100%">
                             <!-- In case we want to repeat the header, remove "display: table-row-group" -->
-                            <thead style="display: table-row-group">
-                                <tr>
+                                <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
                                     <th style="text-align:left;">Description</th>
                                     <th style="text-align:right;">Quantity</th>
                                     <th style="text-align:right;">Rate</th>
                                     <th style="text-align:right;">Amount</th>
                                 </tr>
-                            </thead>
-                            <tbody>
                                 <t t-foreach="picking.move_ids" t-as="move">
-                                    <tr>
+                                    <tr style="border-bottom:2px solid #d4d6d9">
                                         <td>
                                             <span t-field="move.name"/>
                                         </td>
@@ -135,7 +132,6 @@
                                         </td>
                                     </tr>
                                 </t>
-                            </tbody>
                         </table>
                         <br/>
                         <br/>
@@ -268,19 +264,16 @@
                         </t>
                         <br/>
                         <br/>
-                        <table class="table table-sm o_main_table mt-4">
+                        <table width="100%">
                             <!-- In case we want to repeat the header, remove "display: table-row-group" -->
-                            <thead style="display: table-row-group">
-                                <tr>
+                                <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
                                     <th style="text-align:left;">Description</th>
                                     <th style="text-align:left;">Uom</th>
                                     <th style="text-align:right;">Order Qty</th>
                                     <th style="text-align:right;">Actual Qty</th>
                                 </tr>
-                            </thead>
-                            <tbody>
                                 <t t-foreach="picking.move_ids" t-as="move">
-                                    <tr>
+                                    <tr style="border-bottom:2px solid #d4d6d9">
                                         <td>
                                             <span t-field="move.name"/>
                                         </td>
@@ -295,7 +288,6 @@
                                         </td>
                                     </tr>
                                 </t>
-                            </tbody>
                         </table>
                         <br/>
                         <br/>
