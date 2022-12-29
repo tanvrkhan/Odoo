@@ -10,5 +10,5 @@ import base64
 class AccountMove(models.Model):
     _inherit = "res.partner.bank"
 
-    inter_mediatory_bank_id = fields.Many2one('res.bank', 'Inter Mediatory Bank')
-    inter_mediatory_swift = fields.Char(string='Inter Mediatory Swift', related='inter_mediatory_bank_id.bic')
+    inter_mediatory_bank_id = fields.Many2one('res.bank', 'Intermediary Bank')
+    inter_mediatory_swift = fields.Char(string='Intermediary Swift', related='inter_mediatory_bank_id.bic')

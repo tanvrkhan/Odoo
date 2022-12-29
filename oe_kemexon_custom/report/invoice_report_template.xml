@@ -27,15 +27,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-4"/>
-                    <div class="col-4">
+                    <div class="col-2"/>
+                    <div class="col-6">
                         <div class="row">
                             <div class="col-4">
                                 <strong>Date :</strong>
                                 <br/>
                                 <strong>Due Date :</strong>
                             </div>
-                            <div class="col-2"/>
+                            <div class="col-1"/>
                             <br/>
                             <div class="col-4">
                                 <span class="m-0" t-field="o.invoice_date"/>
@@ -292,8 +292,8 @@
                             <span class="m-0" t-field="o.partner_id.bank_ids[0].currency_id"/>
                         </t>
                     </div>
-                    <div class="col-1"/>
-                    <div class="col-7">
+                    <div class="col-3"/>
+                    <div class="col-6">
                         <div class="row">
                             <div class="col-4">
                                 <strong>Bank</strong>
@@ -340,7 +340,7 @@
                         </div>
                          <div class="row">
                             <div class="col-4">
-                                <strong>Inter Mediatory Bank</strong>
+                                <strong>Intermediary Bank</strong>
                             </div>
                             <div class="col-1"/>
                             <div class="col-6">
@@ -351,7 +351,7 @@
                         </div>
                          <div class="row">
                             <div class="col-4">
-                                <strong>Inter Mediatory Swift</strong>
+                                <strong>Intermediary Swift</strong>
                             </div>
                             <div class="col-1"/>
                             <div class="col-6">
@@ -414,27 +414,27 @@
                 <!--                <strong>-->
                 <!--                    <center>'This is a system generated document and does not require a signature'</center>-->
                 <!--                </strong>-->
-                <!--                <ul class="list-inline mb4">-->
+                                <ul class="list-inline mb4">
+                                     <li t-if="company.name">
+                                         <span class="o_force_ltr" t-field="company.name"/>
+                                     </li>
 
-                <!--                    <li t-if="company.phone" class="list-inline-item d-inline">-->
-                <!--                        <span class="o_force_ltr" t-field="company.phone"/>-->
-                <!--                    </li>-->
-                <!--                    <li t-if="company.email" class="list-inline-item d-inline">-->
-                <!--                        <span t-field="company.email"/>-->
-                <!--                    </li>-->
-                <!--                    <li t-if="company.website" class="list-inline-item d-inline">-->
-                <!--                        <span t-field="company.website"/>-->
-                <!--                    </li>-->
-                <!--                    <li t-if="company.vat" class="list-inline-item d-inline"><t-->
-                <!--                            t-out="company.country_id.vat_label or 'Tax ID'"/>:-->
-                <!--                        <span t-field="company.vat"/>-->
-                <!--                    </li>-->
-                <!--                </ul>-->
-                <ul class="list-inline mb4">
-                    <li>Kemexon Limited</li>
-                    <li>Office 1501, Prosperity tower 39 Queens Road, Hong Kong</li>
-                    <li>+852 3050 0344 - contact@kemexon.com</li>
-                </ul>
+                                    <li>
+                                        <span class="o_force_ltr" t-field="company.phone"/> -  <span t-field="company.email"/>
+                                    </li>
+<!--                                    <li t-if="company.website" >-->
+<!--                                        <span t-field="company.website"/>-->
+<!--                                    </li>-->
+                                    <li t-if="company.vat"><t
+                                            t-out="company.country_id.vat_label or 'Tax ID'"/>:
+                                        <span t-field="company.vat"/>
+                                    </li>
+                                </ul>
+<!--                <ul class="list-inline mb4">-->
+<!--                    <li>Kemexon Limited</li>-->
+<!--                    <li>Office 1501, Prosperity tower 39 Queens Road, Hong Kong</li>-->
+<!--                    <li>+852 3050 0344 - contact@kemexon.com</li>-->
+<!--                </ul>-->
 
                 <div t-if="report_type == 'pdf'" class="text-muted">
                     Page:
