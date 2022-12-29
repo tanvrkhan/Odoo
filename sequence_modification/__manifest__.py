@@ -26,6 +26,7 @@
         'data/bill_seq.xml',
         'data/delivery_seq.xml',
         'data/credit_note.xml',
+        'data/payment_receive.xml',
         'data/receitp_se.xml',
         'data/sale_order_seq.xml',
         'data/debit_seq.xml',

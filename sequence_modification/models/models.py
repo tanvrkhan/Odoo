@@ -188,16 +188,32 @@ class SaleOrderInherit(models.Model):
 class AccountPaymentInherit(models.Model):
     _inherit = 'account.payment'
 
+    pv_count = fields.Float("Pv Count")
+    rv_count = fields.Float("Pv Count")
+
     def action_post(self):
-        sequence = self.env.ref('sequence_modification.payment_voucher_sequence_id')
-        if sequence:
-            sequence.write({
-                'prefix': 'PV-' if self.payment_type == 'outbound' else "RV-"
-            })
-        seq = self.env['ir.sequence'].next_by_code('payment.voucher.sequence')
-        self.name = seq
+        self.generate_payment_sequence()
         res = super().action_post()
         return res
+
+    def generate_payment_sequence(self):
+        if self.payment_type != 'outbound':
+            seq = self.env['ir.sequence'].next_by_code('payment.receive.sequence')
+            check_name = self.check_exist(seq)
+            if check_name:
+                self.generate_payment_sequence()
+            else:
+                self.name = seq
+        else:
+            seq = self.env['ir.sequence'].next_by_code('payment.voucher.sequence')
+            check_name = self.check_exist(seq)
+            if check_name:
+                self.generate_payment_sequence()
+            else:
+                self.name = seq
+
+    def check_exist(self, seq=None):
+        return self.env['account.payment'].search([('name', '=', seq)])
 
 
 class InheritResCustomer(models.Model):
