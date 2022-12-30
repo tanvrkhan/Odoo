@@ -15,11 +15,18 @@
                 <div class="row">
                     <div class="col-4">
                         <div class="row">
-                            <strong>PFI No :</strong>
-                            <span t-field="doc.name"/>
+                            <div class="col-5">
+                                <strong>PFI No :</strong>
+                                <br/>
+                                <strong>Deal Ref :</strong>
+                            </div>
+                            <div class="col-4"/>
                             <br/>
-                            <strong>Deal Ref :</strong>
-                            <span class="m-0" t-field="doc.deal_ref"/>
+                            <div class="col-3">
+                                <span t-field="doc.name"/>
+                                <br/>
+                                <span class="m-0" t-field="doc.deal_ref"/>
+                            </div>
                         </div>
                     </div>
                     <div class="col-2"/>
@@ -28,7 +35,7 @@
                             <div class="col-4">
                                 <strong>Date :</strong>
                             </div>
-                            <div class="col-1"/>
+                            <div class="col-2"/>
                             <div class="col-4">
                                 <span class="m-0" t-field="doc.date_order"
                                       t-options="{&quot;format&quot;: &quot;MM/dd/yyyy&quot;}"/>
@@ -188,8 +195,8 @@
                         <strong>Delivery Location</strong>
                     </div>
                     <br/>
-                    <div class="col-2"/>
-                    <div class="col-1">
+                    <div class="col-1"/>
+                    <div class="col-3">
                         <t t-if="doc.picking_ids">
                             <span class="m-0" t-field="doc.picking_ids.delivery_location"/>
 
@@ -200,8 +207,8 @@
                     <div class="col-2">
                         <strong>Incoterms</strong>
                     </div>
-                    <div class="col-2"/>
-                    <div class="col-1">
+                    <div class="col-1"/>
+                    <div class="col-3">
                         <t t-if="doc.incoterm">
                             <span class="m-0" t-field="doc.incoterm"/>
 

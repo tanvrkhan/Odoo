@@ -227,44 +227,44 @@
                  <div style="border: 2px solid black;"/>
                 <br/>
                 <div class="row">
-                    <div class="col-5">
+                    <div class="col-4">
                         <div class="row">
-                            <div class="col-5">
+                            <div class="col-4">
                                 <strong>B/L Date</strong>
                             </div>
                             <br/>
-                            <div class="col-1"/>
-                            <div class="col-4">
+                            <div class="col-2"/>
+                            <div class="col-6">
                                 <span class="m-0" t-field="o.bill_date"/>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-5">
+                            <div class="col-4">
                                 <strong>Vessel Name</strong>
                             </div>
                             <br/>
-                            <div class="col-1"/>
-                            <div class="col-4">
+                            <div class="col-2"/>
+                            <div class="col-6">
                                 <span class="m-0" t-field="o.vessel_name"/>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-5">
+                            <div class="col-4">
                                 <strong>Delivery Location</strong>
                             </div>
                             <br/>
-                            <div class="col-1"/>
-                            <div class="col-4">
+                            <div class="col-2"/>
+                            <div class="col-6">
                                 <span class="m-0" t-field="o.delivery_location"/>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-5">
+                            <div class="col-4">
                                 <strong>Incoterms</strong>
                             </div>
                             <br/>
-                            <div class="col-1"/>
-                            <div class="col-4">
+                            <div class="col-2"/>
+                            <div class="col-6">
                                 <span class="m-0" t-field="o.invoice_incoterm_id"/>
                             </div>
                         </div>
