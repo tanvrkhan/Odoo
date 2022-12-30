@@ -5,7 +5,7 @@ import datetime
 from odoo import api, fields, models, _
 from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessError
 import base64
-
+from operator import itemgetter
 
 class AccountMove(models.Model):
     _inherit = "account.move"
@@ -72,6 +72,7 @@ class AccountMove(models.Model):
                 result.append(data_dict)
         USD = self.env['res.currency'].search([('name', '=', 'USD')])
         base_currency = self.env.company.currency_id
+        result = sorted(result, key=itemgetter('due_days'),reverse=True)
         data = {
             'result': result,
             'total_amount_total': round(base_currency.compute(total_amount_total, USD), 2),
