@@ -8,7 +8,7 @@
     'author': "odooErp.ae",
     'website': "https://www.yourcompany.com",
     'category': 'Uncategorized',
-    'version': '0.1',
+    'version': '16.0.0.1',
     'depends': ['base', 'sale', 'purchase'],
     'data': [
         'views/views.xml',
