@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="paperformat_delivery_sale_invoice_portrait" model="report.paperformat">
+            <field name="name">Delivery Sale Invoice Format</field>
+            <field name="default" eval="True"/>
+            <field name="format">custom</field>
+            <field name="page_height">297</field>
+            <field name="page_width">210</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">10</field>
+            <field name="margin_bottom">18</field>
+            <field name="margin_left">3</field>
+            <field name="margin_right">3</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">6</field>
+            <field name="dpi">110</field>
+        </record>
+        <record id="paperformat_aged_balance_report_portrait" model="report.paperformat">
+            <field name="name">Aged Balance Report</field>
+            <field name="default" eval="True"/>
+            <field name="format">custom</field>
+            <field name="page_height">297</field>
+            <field name="page_width">210</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">25</field>
+            <field name="margin_bottom">18</field>
+            <field name="margin_left">3</field>
+            <field name="margin_right">3</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">12</field>
+            <field name="dpi">110</field>
+        </record>
+        <record id="action_report_aged_balance" model="ir.actions.report">
+            <field name="name">Aged Balance Report</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="binding_model_id" ref="model_account_move"/>
+            <field name="report_name">oe_kemexon_custom.report_aged_balance_report</field>
+            <field name="report_file">oe_kemexon_custom.report_aged_balance_report</field>
+            <field name="paperformat_id" ref="paperformat_aged_balance_report_portrait"/>
+        </record>
+        <record id="action_report_delivery_sale_invoice" model="ir.actions.report">
+            <field name="name">Delivery Sale Invoice</field>
+            <field name="model">truck.transport.details</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="binding_model_id" ref="model_truck_transport_details"/>
+            <field name="report_name">oe_kemexon_custom.report_delivery_sale_invoice</field>
+            <field name="report_file">oe_kemexon_custom.report_delivery_sale_invoice</field>
+            <field name="paperformat_id" ref="paperformat_delivery_sale_invoice_portrait"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+       <record id="journal_entry_seq_id" model="ir.sequence">
+            <field name="name">Journal Entry Sequence</field>
+            <field name="code">journal.entry.sequence</field>
+            <field name="prefix">JV-</field>
+            <field name="padding">2</field>
+            <field name="number_next">2</field>
+            <field name="company_id" eval="0"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,381 @@
+<odoo>
+    <data>
+        <template id="report_delivery_sale_invoice">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <t t-foreach="docs" t-as="o">
+                        <br/>
+                        <div style="border: 1px solid black;"/>
+                        <strong style="font-size:30px;" class="text-center">
+                            <center>Delivery Sales INVOICE</center>
+                        </strong>
+                        <div style="border: 1px solid black;"/>
+                        <br/>
+                        <br/>
+                        <t t-set="truck_transport_details_ids" t-value="o"/>
+                        <!--                        <t t-if="o.truck_transport_details_ids">-->
+                        <!--                            <t t-foreach="o.truck_transport_details_ids" t-as="item">-->
+                        <!--                                <t t-if="item.is_add_report">-->
+                        <!--                                   <t t-set="truck_transport_details_ids" t-value="item"/>-->
+                        <!--                                </t>-->
+                        <!--                            </t>-->
+                        <!--                        </t>-->
+                        <t t-set="picking" t-value="o.stock_pick_ids"/>
+                        <br/>
+                        <style>
+                            .info_table th {text-align: left!important; padding-bottom: 15px!important;}
+                        </style>
+                        <div class="col-12 row">
+                            <div class="col-8">
+                                <table width="100%" class="info_table table-borderless">
+                                    <th width="30%">Reference :</th>
+                                    <td width="70%">
+                                      <span t-field="picking.name"/>
+                                    </td>
+                                </table>
+                            </div>
+                            <div class="col-4">
+                                 <table width="100%" class="info_table table-borderless">
+                                    <th width="40%">Date :</th>
+                                    <td width="60%">
+                                      <span class="m-0" t-field="picking.scheduled_date"
+                                          t-options="{&quot;format&quot;: &quot;MM/dd/yyyy&quot;}"/>
+                                    </td>
+                                </table>
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <strong>Customer</strong>
+                        <br/>
+                        <span t-field="picking.partner_id"></span>
+                        <t t-if="picking.partner_id.street">
+                            <br/>
+                            <span t-field="picking.partner_id.street"></span>
+                        </t>
+                        <t t-if="picking.partner_id.street2">
+                            <br/>
+                            <span t-field="picking.partner_id.street2"></span>
+                        </t>
+                        <t t-if="picking.partner_id.city">
+                            <br/>
+                            <span t-field="picking.partner_id.city"></span>
+                        </t>
+                        <t t-if="picking.partner_id.state_id">
+                            <br/>
+                            <span t-field="picking.partner_id.state_id.name"></span>
+                        </t>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <t t-if="picking.consignee">
+                            <strong>Consignee</strong>
+                            <br/>
+                            <span t-field="picking.consignee"></span>
+                            <t t-if="picking.consignee.street">
+                                <br/>
+                                <span t-field="picking.consignee.street"></span>
+                            </t>
+                            <t t-if="picking.consignee.street2">
+                                <br/>
+                                <span t-field="picking.consignee.street2"></span>
+                            </t>
+                            <t t-if="picking.consignee.city">
+                                <br/>
+                                <span t-field="picking.consignee.city"></span>
+                            </t>
+                            <t t-if="picking.consignee.state_id">
+                                <br/>
+                                <span t-field="picking.consignee.state_id.name"></span>
+                            </t>
+                        </t>
+                        <!--                        <div class="row">-->
+                        <!--                            <div class="col-4"/>-->
+                        <!--                            <div class="col-4"/>-->
+                        <!--                            <div class="col-2">-->
+                        <!--                                <div class="row">-->
+                        <!--                                    Date :-->
+                        <!--                                    <span class="m-0" t-field="o.scheduled_date"/>-->
+
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                         <style>
+                            .my_data_table th {border-right: 1px solid white;border-left: 1px solid white;padding-top: 5px;padding-bottom: 5px;}
+                            .my_data_table td {border-right: 1px solid white;border-left: 1px solid white;padding-top: 5px;padding-bottom: 5px;}
+                        </style>
+                        <table width="100%" class="my_data_table">
+                            <!-- In case we want to repeat the header, remove "display: table-row-group" -->
+                                <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
+                                    <th style="text-align:left;">Description</th>
+                                    <th style="text-align:right;">Quantity</th>
+                                    <th style="text-align:right;">Rate</th>
+                                    <th style="text-align:right;">Amount</th>
+                                </tr>
+                                <t t-foreach="picking.move_ids" t-as="move">
+                                    <tr style="border-bottom:2px solid #d4d6d9">
+                                        <td>
+                                            <span t-field="move.name"/>
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <span t-field="move.product_uom_qty"/>
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <t t-if="move.sale_line_id">
+                                                <span t-field="move.sale_line_id.price_unit"/>
+                                            </t>
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <t t-if="move.sale_line_id">
+                                                <span t-field="move.sale_line_id.price_subtotal"/>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                        </table>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <strong class="text-left">Truck Information</strong>
+                        <div style="border: 1px solid black;"/>
+                        <br/>
+                        <table width="100%" class="info_table table-borderless">
+                            <th width="20%">Truck No:</th>
+                            <td width="80%">
+                                <t t-if="truck_transport_details_ids">
+                                    <span t-field="truck_transport_details_ids.truck"/>
+                                </t>
+                            </td>
+                        </table>
+                        <table width="100%" class="info_table table-borderless">
+                            <th width="20%">Transporter :</th>
+                            <td width="80%">
+                                <span t-field="picking.transporter"/>
+                            </td>
+                        </table>                        
+                        
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <strong class="text-left">Delivery Information</strong>
+                        <div style="border-top: 2px solid black;"/>
+                        <br/>
+                        
+                        
+                        <table width="100%" class="info_table table-borderless">
+                            <th width="20%">Incotems :</th>
+                            <td width="80%">
+                               <t t-if="picking.sale_id">
+                                        <span t-field="picking.sale_id.incoterm"/>
+                                </t>
+                            </td>
+                        </table>
+                        <br/><br/>
+                        <table width="100%" class="info_table table-borderless">
+                            <th width="20%">Delivery Location :</th>
+                            <td width="80%">
+                                <span t-field="picking.delivery_location"/>
+                            </td>
+                        </table>
+                        <table width="100%" class="info_table table-borderless">
+                            <th width="20%">Loading Point :</th>
+                            <td width="80%">
+                                 <span t-field="picking.name"/>
+                            </td>
+                        </table>
+                        
+
+
+                        <p style="page-break-before:always;"></p>
+                        <br/>
+                        <br/>
+                        <div style="border-top: 2px solid black;"/>
+                        <strong style="font-size:30px;" class="text-center">
+                            <center>Delivery Note</center>
+                        </strong>
+                        <div style="border-top: 2px solid black;"/>
+                        <br/>
+                        <br/>
+                       <div class="col-12 row">
+                            <div class="col-8">
+                                <table width="100%" class="info_table table-borderless">
+                                    <th width="30%">Reference :</th>
+                                    <td width="70%">
+                                      <span t-field="picking.name"/>
+                                    </td>
+                                </table>
+                            </div>
+                            <div class="col-4">
+                                 <table width="100%" class="info_table table-borderless">
+                                    <th width="40%">Date :</th>
+                                    <td width="60%">
+                                      <span class="m-0" t-field="picking.scheduled_date"
+                                          t-options="{&quot;format&quot;: &quot;MM/dd/yyyy&quot;}"/>
+                                    </td>
+                                </table>
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <strong>Customer</strong>
+                        <br/>
+                        <span t-field="picking.partner_id"></span>
+                        <t t-if="picking.partner_id.street">
+                            <br/>
+                            <span t-field="picking.partner_id.street"></span>
+                        </t>
+                        <t t-if="picking.partner_id.street2">
+                            <br/>
+                            <span t-field="picking.partner_id.street2"></span>
+                        </t>
+                        <t t-if="picking.partner_id.city">
+                            <br/>
+                            <span t-field="picking.partner_id.city"></span>
+                        </t>
+                        <t t-if="picking.partner_id.state_id">
+                            <br/>
+                            <span t-field="picking.partner_id.state_id.name"></span>
+                        </t>
+                        <br/>
+                        <br/>
+                        <t t-if="picking.consignee">
+                            <strong>Consignee</strong>
+                            <br/>
+                            <span t-field="picking.consignee"></span>
+                            <t t-if="picking.consignee.street">
+                                <br/>
+                                <span t-field="picking.consignee.street"></span>
+                            </t>
+                            <t t-if="picking.consignee.street2">
+                                <br/>
+                                <span t-field="picking.consignee.street2"></span>
+                            </t>
+                            <t t-if="picking.consignee.city">
+                                <br/>
+                                <span t-field="picking.consignee.city"></span>
+                            </t>
+                            <t t-if="picking.consignee.state_id">
+                                <br/>
+                                <span t-field="picking.consignee.state_id.name"></span>
+                            </t>
+                        </t>
+                        <br/>
+                        <br/>
+                        <table width="100%"   class="my_data_table">
+                            <!-- In case we want to repeat the header, remove "display: table-row-group" -->
+                                <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
+                                    <th style="text-align:left;">Description</th>
+                                    <th style="text-align:left;">Uom</th>
+                                    <th style="text-align:right;">Order Qty</th>
+                                    <th style="text-align:right;">Actual Qty</th>
+                                </tr>
+                                <t t-foreach="picking.move_ids" t-as="move">
+                                    <tr style="border-bottom:2px solid #d4d6d9">
+                                        <td>
+                                            <span t-field="move.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="move.product_id.uom_id"/>
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <span t-field="move.product_uom_qty"/>
+                                        </td>
+                                        <td style="text-align:right;">
+                                            <span t-field="move.forecast_availability"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                        </table>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <strong class="text-left">Truck Information</strong>
+                        <div style="border: 1px solid black;"/>
+                        <br/>
+                        
+                        
+                        
+                        <table width="100%" class="info_table table-borderless">
+                            <th width="20%">Truck No :</th>
+                            <td width="80%">
+                                <t t-if="truck_transport_details_ids">
+                                    <span t-field="truck_transport_details_ids.truck"/>
+                                </t>
+                            </td>
+                        </table>
+                        <table width="100%" class="info_table table-borderless">
+                            <th width="20%">Transporter :</th>
+                            <td width="80%">
+                               <span t-field="picking.transporter"/>
+                            </td>
+                        </table>
+                        <table width="100%" class="info_table table-borderless">
+                            <th width="20%">Driver Passport :</th>
+                            <td width="80%">
+                                <t t-if="truck_transport_details_ids">
+                                        <span t-field="truck_transport_details_ids.passport"/>
+                                    </t>
+                            </td>
+                        </table>
+                        <table width="100%" class="info_table table-borderless">
+                            <th width="20%">Driver Name :</th>
+                            <td width="80%">
+                                <t t-if="truck_transport_details_ids">
+                                        <span t-field="truck_transport_details_ids.driver"/>
+                                    </t>
+                            </td>
+                        </table>
+                        
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <strong class="text-left">Delivery Information</strong>
+                        <div style="border-top: 2px solid black;"/>
+                        <br/>
+                        
+                        <table width="100%" class="info_table table-borderless">
+                            <th width="20%">Incotems :</th>
+                            <td width="80%">
+                               <t t-if="picking.sale_id">
+                                        <span t-field="picking.sale_id.incoterm"/>
+                                    </t>
+
+                            </td>
+                        </table>
+                        <br/><br/>
+                        <table width="100%" class="info_table table-borderless">
+                            <th width="20%">Delivery Location :</th>
+                            <td width="80%">
+                                <span t-field="picking.delivery_location"/>
+                            </td>
+                        </table>
+                        <table width="100%" class="info_table table-borderless">
+                            <th width="20%">Loading Point :</th>
+                            <td width="80%">
+                                <span t-field="picking.name"/>
+                            </td>
+                        </table>
+
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

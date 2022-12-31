@@ -1,0 +1,67 @@
+<odoo>
+    <data>
+        <record id="res_partner_view_kanban_inherit_approval" model="ir.ui.view">
+            <field name="name">res.partner.view.kanban.inherit.approval</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+            <field name="arch" type="xml">
+                <field name="type" position="after">
+                    <field name="status"/>
+                </field>
+                <xpath expr="//div[hasclass('ribbon')]" position="replace">
+                    <div class="ribbon ribbon-top-right" attrs="{'invisible': [('active', '=', True)]}">
+                        <span class="bg-info" attrs="{'invisible': [('status', 'in', ('approved', 'reject'))]}">Draft
+                        </span>
+                        <span class="bg-danger" attrs="{'invisible': [('status', 'in', ('approved', 'draft'))]}">
+                            Reject
+                        </span>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+        <record id="inherit_contact_form" model="ir.ui.view">
+            <field name="name">inherit_contact_form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form//sheet//widget[@name='web_ribbon']" position="replace">
+                    <widget name="web_ribbon" title="Reject" bg_color="bg-danger"
+                            attrs="{'invisible': [('status', 'in', ('approved', 'draft'))]}"/>
+                    <widget name="web_ribbon" title="Draft" bg_color="bg-info"
+                            attrs="{'invisible': [('status', 'in', ('approved', 'reject'))]}"/>
+                </xpath>
+                <xpath expr="//form//sheet" position="before">
+                    <header>
+                        <button name="approve" groups="contact_approval.contact_approve" string="Approve" type="object"
+                                class="oe_highlight"/>
+                        <button name="reject" groups="contact_approval.contact_approve" string="Reject" type="object"
+                                class="oe_highlight"/>
+                        <button name="draft" groups="contact_approval.contact_approve" string="Set to Draft"
+                                type="object"
+                                class="oe_highlight"/>
+                        <field name="status" widget="statusbar" statusbar_visible="draft,approved,reject"/>
+                    </header>
+                </xpath>
+            </field>
+        </record>
+        <!-- Approval Request -->
+        <act_window id="contact_approval_request_action"
+                    name="Contact Approval Requests"
+                    res_model="res.partner"
+                    view_mode="kanban,form"
+                    domain="['&amp;',('active', '=', False), ('status', '=', 'draft')]"/>
+        <menuitem id="contact_approval_request_id" name="Contact Approval Requests" parent="contacts.menu_contacts"
+                  action="contact_approval_request_action"
+                  sequence="11"/>
+
+        <!-- Approval Rejected -->
+        <act_window id="contact_approval_rejected_action"
+                    name="Contact Approval Reject"
+                    res_model="res.partner"
+                    view_mode="kanban,form"
+                    domain="['&amp;',('active', '=', False), ('status', '=', 'reject')]"/>
+        <menuitem id="contact_approval_rejected_id" name="Contact Approval Rejected" parent="contacts.menu_contacts"
+                  action="contact_approval_rejected_action"
+                  sequence="11"/>
+    </data>
+</odoo>

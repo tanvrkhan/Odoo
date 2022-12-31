@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="credit_note_sequence_id" model="ir.sequence">
+            <field name="name">Credit Note Sequence</field>
+            <field name="code">credit.sequence</field>
+            <field name="prefix">-CN-</field>
+            <field name="padding">2</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+             <field name="company_id" eval="0"/>
+        </record>
+
+    </data>
+</odoo>
