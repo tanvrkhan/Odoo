@@ -36,8 +36,8 @@
             <field name="model">account.move</field>
             <field name="report_type">qweb-pdf</field>
             <field name="binding_model_id" ref="model_account_move"/>
-            <field name="report_name">oe_kemexon_custom.report_aged_balance_report</field>
-            <field name="report_file">oe_kemexon_custom.report_aged_balance_report</field>
+            <field name="report_name">oe_kemoxon_delivery_custom.report_aged_balance_report</field>
+            <field name="report_file">oe_kemoxon_delivery_custom.report_aged_balance_report</field>
             <field name="paperformat_id" ref="paperformat_aged_balance_report_portrait"/>
         </record>
         <record id="action_report_delivery_sale_invoice" model="ir.actions.report">
@@ -45,8 +45,8 @@
             <field name="model">truck.transport.details</field>
             <field name="report_type">qweb-pdf</field>
             <field name="binding_model_id" ref="model_truck_transport_details"/>
-            <field name="report_name">oe_kemexon_custom.report_delivery_sale_invoice</field>
-            <field name="report_file">oe_kemexon_custom.report_delivery_sale_invoice</field>
+            <field name="report_name">oe_kemoxon_delivery_custom.report_delivery_sale_invoice</field>
+            <field name="report_file">oe_kemoxon_delivery_custom.report_delivery_sale_invoice</field>
             <field name="paperformat_id" ref="paperformat_delivery_sale_invoice_portrait"/>
         </record>
     </data>

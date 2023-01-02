@@ -25,7 +25,7 @@ class Truck_Transport_Details(models.Model):
     ]
 
     def action_print_report(self):
-        return self.env.ref('oe_kemexon_custom.action_report_delivery_sale_invoice').report_action(self)
+        return self.env.ref('oe_kemoxon_delivery_custom.action_report_delivery_sale_invoice').report_action(self)
 
     @api.onchange('offloaded')
     def _get_update_value(self):
