@@ -4,11 +4,11 @@
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-call="web.external_layout">
                 <br/>
-                <div style="border: 2px solid black;"/>
+                <div style="border: 1px solid black;"/>
                 <center>
                     <b style="font-size:35px;" class="text-center">INVOICE</b>
                 </center>
-                <div style="border: 2px solid black;"/>
+                <div style="border: 1px solid black;"/>
                 <br/>
                 <div class="row">
                     <div class="col-4">
@@ -118,7 +118,11 @@
                 <br/>
                 <br/>
                 <br/>
-                <table width="100%"  name="invoice_line_table">
+                <style>
+                    .my_data_table th {border-right: 1px solid white;border-left: 1px solid white;padding-top: 5px;padding-bottom: 5px;}
+                    .my_data_table td {border-right: 1px solid white;border-left: 1px solid white;padding-top: 5px;padding-bottom: 5px;}
+                </style>
+                <table width="100%"  class="my_data_table" name="invoice_line_table">
                         <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
                             <th name="th_description" class="text-start">
                                 <span>Description</span>
@@ -222,9 +226,9 @@
                 <br/>
                 <br/>
 
-                <div style="border: 2px solid black;"/>
+                <div style="border: 1px solid black;"/>
                 <strong>Delivery Information</strong>
-                 <div style="border: 2px solid black;"/>
+                 <div style="border: 1px solid black;"/>
                 <br/>
                 <div class="row">
                     <div class="col-4">
@@ -249,11 +253,11 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-5">
                                 <strong>Delivery Location</strong>
                             </div>
                             <br/>
-                            <div class="col-2"/>
+                            <div class="col-1"/>
                             <div class="col-6">
                                 <span class="m-0" t-field="o.delivery_location"/>
                             </div>
@@ -280,7 +284,7 @@
                 <br/>
                 <br/>
                 <strong>Financial Information</strong>
-                <div style="border: 2px solid black;"/>
+                <div style="border: 1px solid black;"/>
                 <br/>
                 <div class="row">
                     <div class="col-1">
@@ -370,7 +374,7 @@
                 <br/>
                 <br/>
                 <strong>Terms And Conditions</strong>
-                <div style="border: 2px solid black;"/>
+                <div style="border: 1px solid black;"/>
                 <br/>
                 <!--                <span class="m-0" t-field="o.narration"/>-->
                 <ul style="font-size:18px;">
@@ -410,7 +414,7 @@
             <t t-out="0"/>
         </div>
         <div class="footer">
-            <div class="text-center" style="border-top: 1px solid black;">
+            <div class="text-center" style="border-top: 2px solid black;">
                 <!--                <strong>-->
                 <!--                    <center>'This is a system generated document and does not require a signature'</center>-->
                 <!--                </strong>-->

@@ -13,7 +13,7 @@ class Truck_Transport_Details(models.Model):
     nominated = fields.Float()
     loaded = fields.Float()
     offloaded = fields.Float()
-    is_updated = fields.Boolean('Updated')
+    is_updated = fields.Boolean('Updated', copy=False)
     status = fields.Selection(
         [("Nominated", "Nominated"), ("Waiting to load", "Waiting to load"), ("In transit", "In transit"),
          ("Waiting to offload", "Waiting to offload"), ("Completed", "Completed")])
@@ -28,14 +28,15 @@ class Truck_Transport_Details(models.Model):
         return self.env.ref('oe_kemexon_custom.action_report_delivery_sale_invoice').report_action(self)
 
     @api.onchange('offloaded')
-    def _onchange_offloaded(self):
+    def _get_update_value(self):
         move = self.env['stock.move'].search([('picking_id', '=', self.stock_pick_ids._origin.id)], limit=1)
-        if move and not self.is_updated:
-            quantity_done = move.quantity_done
-            product_uom_qty = move.product_uom_qty
-            if product_uom_qty < self.offloaded + quantity_done:
-                raise UserError(_("You Can't Add Morethan Demand QTy."))
-            move.write({
-                'quantity_done': self.offloaded + quantity_done
-            })
-            self.is_updated = True
+        if self.offloaded:
+            if move and not self.is_updated:
+                quantity_done = move.quantity_done
+                product_uom_qty = move.product_uom_qty
+                if product_uom_qty < self.offloaded + quantity_done:
+                    raise UserError(_("You Can't Add Morethan Demand QTy."))
+                move.write({
+                    'quantity_done': self.offloaded + quantity_done
+                })
+                self.is_updated = True
