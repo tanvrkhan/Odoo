@@ -11,6 +11,5 @@
             <field name="number_increment">1</field>
             <field name="company_id" eval="0"/>
         </record>
-
     </data>
 </odoo>
