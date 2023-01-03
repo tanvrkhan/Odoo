@@ -7,6 +7,7 @@ class AccountMoveInheritModel(models.Model):
     _inherit = 'account.move'
 
     def action_post(self):
+        res = super().action_post()
         if self.move_type == 'out_invoice':
             self.generate_sequence('invoice.sequence', 'invoice')
 
@@ -22,8 +23,6 @@ class AccountMoveInheritModel(models.Model):
         elif self.move_type == 'entry':
             seq = self.env['ir.sequence'].next_by_code('journal.entry.sequence')
             self.name = seq
-
-        res = super().action_post()
         return res
 
     def generate_sequence(self, code=None, move_type=None):
@@ -81,21 +80,22 @@ class AccountMoveInheritModel(models.Model):
         short_name = str(self.partner_id.short_name) if self.partner_id.short_name else ''
         if next_num in list(range(10)):
             name = short_name + seq[0] + "-" + seq[
-                1] + "-" + str(datetime.datetime.now().year)[
+                1] + "-" + str(self.invoice_date.year)[
                            2:4] + "" + str(month) + "" + "0" + str(next_num)
         else:
             name = short_name + seq[0] + "-" + seq[
-                1] + "-" + str(datetime.datetime.now().year)[
+                1] + "-" + str(self.invoice_date.year)[
                            2:4] + "" + str(month) + "" + str(next_num)
 
         return name
 
-    @staticmethod
-    def get_month():
-        month = datetime.datetime.now().month
-        if month in list(range(10)):
-            return "0" + str(month)
-        return month
+    def get_month(self):
+        if self:
+            month = self.invoice_date.month
+            if month in list(range(10)):
+                return "0" + str(month)
+            return month
+        return None
 
     @api.model
     def default_get(self, fields_list):
@@ -169,18 +169,19 @@ class SaleOrderInherit(models.Model):
 
     @api.model
     def create(self, vals_list):
-        self.sale_create_seq_name(vals_list)
         res = super().create(vals_list)
+        name, deal_ref = self.sale_create_seq_name(vals_list, rec=res)
+        res.name = name
+        res.deal_ref = deal_ref
         return res
 
-    @staticmethod
-    def get_month():
-        month = datetime.datetime.now().month
+    def get_month(self, rec=None):
+        month = rec.date_order.month
         if month in list(range(10)):
             return "0" + str(month)
         return month
 
-    def sale_create_seq_name(self, vals_list=None):
+    def sale_create_seq_name(self, vals_list=None, rec=None):
         seq = self.env['ir.sequence'].next_by_code('sale.order.sequence').split("-")
         next_num = 0
         short_name = str(self.env['res.partner'].browse(vals_list.get('partner_id')).short_name) if self.env[
@@ -189,22 +190,22 @@ class SaleOrderInherit(models.Model):
             partner = self.env['res.partner'].browse(vals_list.get('partner_id'))
             partner.so_partner_seq += 1
             next_num = partner.so_partner_seq
-            name = self.get_new_name(seq, next_num, short_name)
+            name = self.get_new_name(seq, next_num, short_name, rec)
             is_exist = self.env['sale.order'].search([('name', '=', name)])
             if is_exist:
                 self.sale_create_seq_name(vals_list)
             else:
-                vals_list['name'] = name
-                vals_list['deal_ref'] = name.split("-")[0] + "-" + name.split("-")[2]
-                return vals_list
+                # vals_list['name'] = name
+                deal_ref = name.split("-")[0] + "-" + name.split("-")[2]
+                return name, deal_ref
 
-    def get_new_name(self, seq=None, next_num=None, short_name=None):
-        month = self.get_month()
+    def get_new_name(self, seq=None, next_num=None, short_name=None, rec=None):
+        month = self.get_month(rec)
         if next_num in list(range(10)):
-            name = short_name + seq[0] + "-" + seq[1] + "-" + str(datetime.datetime.now().year)[2:4] + "" + str(
+            name = short_name + seq[0] + "-" + seq[1] + "-" + str(rec.date_order.year) + "" + str(
                 month) + "" + "0" + str(next_num)
         else:
-            name = short_name + seq[0] + "-" + seq[1] + "-" + str(datetime.datetime.now().year)[2:4] + "" + str(
+            name = short_name + seq[0] + "-" + seq[1] + "-" + str(rec.date_order.year) + "" + str(
                 month) + "" + str(next_num)
         return name
 
