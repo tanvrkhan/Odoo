@@ -36,3 +36,9 @@ class StockPicking(models.Model):
             'domain': {
                 'consignee': [('id', 'in', domain)]}
         }
+
+
+class DeliveryLocation(models.Model):
+    _name = "delivery.location"
+
+    name = fields.Char("Name")

@@ -202,10 +202,10 @@ class SaleOrderInherit(models.Model):
     def get_new_name(self, seq=None, next_num=None, short_name=None, rec=None):
         month = self.get_month(rec)
         if next_num in list(range(10)):
-            name = short_name + seq[0] + "-" + seq[1] + "-" + str(rec.date_order.year)[-2:] + "" + str(
+            name = short_name + seq[0] + "-" + seq[1] + "-" + str(rec.date_order.year) + "" + str(
                 month) + "" + "0" + str(next_num)
         else:
-            name = short_name + seq[0] + "-" + seq[1] + "-" + str(rec.date_order.year)[-2:] + "" + str(
+            name = short_name + seq[0] + "-" + seq[1] + "-" + str(rec.date_order.year) + "" + str(
                 month) + "" + str(next_num)
         return name
 

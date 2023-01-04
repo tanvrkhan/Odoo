@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'OdooERP Custom',
+    'name': 'OdooERP Delivery Custom',
     'version': '15.0.1.0.0',
     'sequence': 1,
     'description': """

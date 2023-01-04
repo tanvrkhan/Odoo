@@ -88,16 +88,16 @@ class AccountMove(models.Model):
 
     def action_send_aged_balance_invoice_report(self, move_type):
         if move_type == 'out_invoice':
-            sow_template_id = self.env.ref('oe_kemexon_custom.email_template_aged_balance_invoice_report')
+            sow_template_id = self.env.ref('oe_kemoxon_delivery_custom.email_template_aged_balance_invoice_report')
             invoices = self.env['account.move'].search(
                 [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted')])
         else:
-            sow_template_id = self.env.ref('oe_kemexon_custom.email_template_aged_balance_bill_report')
+            sow_template_id = self.env.ref('oe_kemoxon_delivery_custom.email_template_aged_balance_bill_report')
             invoices = self.env['account.move'].search(
                 [('amount_residual', '>', 0), ('move_type', '=', 'in_invoice'), ('state', '=', 'posted')])
-        # sow_report_id = self.env.ref('oe_kemexon_custom.action_report_aged_balance')
+        # sow_report_id = self.env.ref('oe_kemoxon_delivery_custom.action_report_aged_balance')
         # generated_report = \
-        #     self.env['ir.actions.report']._render_qweb_pdf("oe_kemexon_custom.action_report_aged_balance", self.id)[0]
+        #     self.env['ir.actions.report']._render_qweb_pdf("oe_kemoxon_delivery_custom.action_report_aged_balance", self.id)[0]
         # data_record = base64.b64encode(generated_report)
         # ir_values = {
         #     'name': 'Aged Balance',
@@ -180,7 +180,7 @@ class AccountMove(models.Model):
         invoices_1_day = self.env['account.move'].search(
             [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'),
              ('invoice_date_due', '=', yesterday)])
-        over_due_template = self.env.ref('oe_kemexon_custom.email_template_customer_reminder')
+        over_due_template = self.env.ref('oe_kemoxon_delivery_custom.email_template_customer_reminder')
         for invoice1 in invoices_1_day:
             email_values = {
                 'email_to': invoice1.partner_id.email or 'abcd@gmail.com'
@@ -192,7 +192,7 @@ class AccountMove(models.Model):
         invoices_3_day = self.env['account.move'].search(
             [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'),
              ('invoice_date_due', '=', after_three_day)])
-        friendly_reminder_template = self.env.ref('oe_kemexon_custom.email_template_friendly_reminder_reminder')
+        friendly_reminder_template = self.env.ref('oe_kemoxon_delivery_custom.email_template_friendly_reminder_reminder')
         for invoice3 in invoices_3_day:
             email_values = {
                 'email_to': invoice3.partner_id.email or 'abcd@gmail.com'

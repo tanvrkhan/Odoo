@@ -26,7 +26,7 @@ class InheritPurchaseOrderLine(models.Model):
         if self.env.context.get('check_cost'):
             lines = self.env['purchase.order.line'].search([('product_id.id', '=', self.env.context.get('product_id'))])
             for rec in lines:
-                name = '%s' % rec.price_unit
+                name = '%s %s' % (rec.order_id.name, rec.price_unit)
                 result.append((rec.id, name))
             return result
         else:
