@@ -292,8 +292,8 @@
                     </div>
                     <div class="col-1"/>
                     <div class="col-1">
-                        <t t-if="o.partner_id.bank_ids">
-                            <span class="m-0" t-field="o.partner_id.bank_ids[0].currency_id"/>
+                        <t t-if="o.partner_id.company_bank_account_id">
+                            <span class="m-0" t-field="o.partner_id.company_bank_account_id.currency_id"/>
                         </t>
                     </div>
                     <div class="col-3"/>
@@ -304,8 +304,8 @@
                             </div>
                             <div class="col-1"/>
                             <div class="col-6">
-                                <t t-if="o.partner_id.bank_ids">
-                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].bank_id"/>
+                                <t t-if="o.partner_id.company_bank_account_id">
+                                    <span class="m-0" t-field="o.partner_id.company_bank_account_id.bank_id"/>
                                 </t>
                             </div>
                         </div>
@@ -315,8 +315,8 @@
                             </div>
                             <div class="col-1"/>
                             <div class="col-6">
-                                <t t-if="o.partner_id.bank_ids">
-                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].acc_holder_name"/>
+                                <t t-if="o.partner_id.company_bank_account_id">
+                                    <span class="m-0" t-field="o.partner_id.company_bank_account_id.acc_holder_name"/>
                                 </t>
                             </div>
                         </div>
@@ -326,8 +326,8 @@
                             </div>
                             <div class="col-1"/>
                             <div class="col-6">
-                                <t t-if="o.partner_id.bank_ids">
-                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].acc_number"/>
+                                <t t-if="o.partner_id.company_bank_account_id">
+                                    <span class="m-0" t-field="o.partner_id.company_bank_account_id.acc_number"/>
                                 </t>
                             </div>
                         </div>
@@ -337,8 +337,8 @@
                             </div>
                             <div class="col-1"/>
                             <div class="col-6">
-                                <t t-if="o.partner_id.bank_ids">
-                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].bank_id.bic"/>
+                                <t t-if="o.partner_id.company_bank_account_id">
+                                    <span class="m-0" t-field="o.partner_id.company_bank_account_id.bank_id.bic"/>
                                 </t>
                             </div>
                         </div>
@@ -348,8 +348,8 @@
                             </div>
                             <div class="col-1"/>
                             <div class="col-6">
-                                <t t-if="o.partner_id.bank_ids">
-                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].inter_mediatory_bank_id"/>
+                                <t t-if="o.partner_id.company_bank_account_id">
+                                    <span class="m-0" t-field="o.partner_id.company_bank_account_id.inter_mediatory_bank_id"/>
                                 </t>
                             </div>
                         </div>
@@ -359,8 +359,8 @@
                             </div>
                             <div class="col-1"/>
                             <div class="col-6">
-                                <t t-if="o.partner_id.bank_ids">
-                                    <span class="m-0" t-field="o.partner_id.bank_ids[0].inter_mediatory_swift"/>
+                                <t t-if="o.partner_id.company_bank_account_id">
+                                    <span class="m-0" t-field="o.partner_id.company_bank_account_id.inter_mediatory_swift"/>
                                 </t>
                             </div>
                         </div>
