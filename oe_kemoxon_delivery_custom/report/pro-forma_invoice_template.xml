@@ -4,12 +4,11 @@
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-call="web.external_layout">
                 <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
-                <br/>
-                <div style="border: 1px solid black;"/>
+                <div style="border-top: 2px solid black; margin-top: -12px;"/>
                 <center>
                     <b style="font-size:35px;" class="text-center">PROFORMA INVOICE</b>
                 </center>
-                <div style="border: 1px solid black;"/>
+                <div style="border-top: 2px solid black;"/>
                 <br/>
                 <br/>
                 <div class="row">
@@ -38,7 +37,7 @@
                             <div class="col-2"/>
                             <div class="col-4">
                                 <span class="m-0" t-field="doc.date_order"
-                                      t-options="{&quot;format&quot;: &quot;MM/dd/yyyy&quot;}"/>
+                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
                             </div>
 
                             <!--                            <br/>-->
@@ -178,8 +177,6 @@
                 <strong>Delivery Information</strong>
                 <div style="border: 1px solid black;"/>
                 <br/>
-                <br/>
-
                 <div class="row">
                     <div class="col-2">
                         <strong>Delivery Period</strong>
@@ -232,9 +229,7 @@
                     </div>
                     <div class="col-1"/>
                     <div class="col-2"  style="padding-left: 37px;">
-                        <t t-if="doc.partner_id.bank_ids">
-                            <span class="m-0" t-field="doc.partner_id.bank_ids[0].currency_id"/>
-                        </t>
+                            <span class="m-0" t-field="doc.pricelist_id.currency_id.name"/>
                     </div>
                     <div class="col-2"/>
                     <div class="col-2">
@@ -242,8 +237,8 @@
                     </div>
                     <div class="col-1"/>
                     <div class="col-3">
-                        <t t-if="doc.partner_id.bank_ids">
-                            <span style="text-align:left;" class="m-0" t-field="doc.partner_id.bank_ids[0].bank_id"/>
+                        <t t-if="doc.partner_id.company_bank_account_id">
+                            <span style="text-align:left;" class="m-0" t-field="doc.partner_id.company_bank_account_id.bank_id"/>
                         </t>
                     </div>
                 </div>
@@ -262,9 +257,9 @@
                             </div>
                             <div class="col-2"/>
                             <div class="col-6">
-                                <t t-if="doc.partner_id.bank_ids">
+                                <t t-if="doc.partner_id.company_bank_account_id">
                                     <span style="text-align:left;" class="m-0"
-                                          t-field="doc.partner_id.bank_ids[0].acc_holder_name"/>
+                                          t-field="doc.partner_id.company_bank_account_id.acc_holder_name"/>
                                 </t>
                             </div>
                         </div>
@@ -274,9 +269,9 @@
                             </div>
                             <div class="col-2"/>
                             <div class="col-6">
-                                <t t-if="doc.partner_id.bank_ids">
+                                <t t-if="doc.partner_id.company_bank_account_id">
                                     <span style="text-align:left;" class="m-0"
-                                          t-field="doc.partner_id.bank_ids[0].acc_number"/>
+                                          t-field="doc.partner_id.company_bank_account_id.acc_number"/>
                                 </t>
                             </div>
                         </div>
@@ -286,8 +281,8 @@
                             </div>
                             <div class="col-2"/>
                             <div class="col-6" style="text-align:left;">
-                                <t t-if="doc.partner_id.bank_ids">
-                                    <span class="m-0" t-field="doc.partner_id.bank_ids[0].bank_id.bic"/>
+                                <t t-if="doc.partner_id.company_bank_account_id">
+                                    <span class="m-0" t-field="doc.partner_id.company_bank_account_id.bank_id.bic"/>
                                 </t>
                             </div>
                         </div>
@@ -297,8 +292,8 @@
                             </div>
                             <div class="col-2"/>
                             <div class="col-6">
-                                <t t-if="doc.partner_id.bank_ids">
-                                    <span class="m-0" t-field="doc.partner_id.bank_ids[0].inter_mediatory_bank_id"/>
+                                <t t-if="doc.partner_id.company_bank_account_id">
+                                    <span class="m-0" t-field="doc.partner_id.company_bank_account_id.inter_mediatory_bank_id"/>
                                 </t>
                             </div>
                         </div>
@@ -308,8 +303,8 @@
                             </div>
                             <div class="col-2"/>
                             <div class="col-6">
-                                <t t-if="doc.partner_id.bank_ids">
-                                    <span class="m-0" t-field="doc.partner_id.bank_ids[0].inter_mediatory_swift"/>
+                                <t t-if="doc.partner_id.company_bank_account_id">
+                                    <span class="m-0" t-field="doc.partner_id.company_bank_account_id.inter_mediatory_swift"/>
                                 </t>
                             </div>
                         </div>
@@ -350,7 +345,7 @@
         <field name="page_height">297</field>
         <field name="page_width">210</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">10</field>
+        <field name="margin_top">11</field>
         <field name="margin_bottom">18</field>
         <field name="margin_left">3</field>
         <field name="margin_right">3</field>
