@@ -1,0 +1,15 @@
+<odoo>
+  <data>
+    <record id="truck_detail_tree_inherit" model="ir.ui.view">
+        <field name="name">truck_detail_tree_inherit</field>
+        <field name="model">truck.transport.details</field>
+        <field name="inherit_id" ref="oe_kemoxon_delivery_custom.truck_transport_details_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='truck']" position="after">
+                <field name="seq"/>
+            </xpath>
+        </field>
+    </record>
+
+  </data>
+</odoo>
