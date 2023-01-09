@@ -25,6 +25,10 @@ class Truck_Transport_Details(models.Model):
     ]
 
     def action_print_report(self):
+        seq = 0
+        for line in self.env['truck.transport.details'].search([('stock_pick_ids', '=', self.env.context.get('p_id'))]):
+            seq += 1
+            line.seq = "0" + str(seq) if seq < 10 else str(seq)
         return self.env.ref('oe_kemoxon_delivery_custom.action_report_delivery_sale_invoice').report_action(self)
 
     @api.onchange('offloaded')
