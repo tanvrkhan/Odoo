@@ -27,7 +27,8 @@
                                 <table width="100%" class="info_table table-borderless">
                                     <th width="30%">Reference :</th>
                                     <td width="70%">
-                                      <span t-field="picking.name"/>
+                                        <span t-field="picking.name"/>-<span t-field="truck_transport_details_ids.seq"/>
+
                                     </td>
                                 </table>
                             </div>
@@ -209,7 +210,7 @@
                                 <table width="100%" class="info_table table-borderless">
                                     <th width="30%">Reference :</th>
                                     <td width="70%">
-                                      <span t-field="picking.name"/>
+                                      <span t-field="picking.name"/>-<span t-field="truck_transport_details_ids.seq"/>
                                     </td>
                                 </table>
                             </div>
