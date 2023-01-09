@@ -116,13 +116,14 @@ class AccountMoveInheritModel(models.Model):
         partner_seq_obj = self.env['partner.sequence']
         is_exists = partner_seq_obj.search([('name', '=', name)])
         if is_exists:
-            next_number = "0" + str(is_exists.next_number) if is_exists.next_number < 10 else is_exists.next_number
-            new_name = is_exists.name + str(is_exists.next_number)
+            # new_name = is_exists.name + str(is_exists.next_number).zfill(2)
             is_exists.next_number += 1
+            new_name = is_exists.name + str(is_exists.next_number).zfill(2)
             return new_name
         else:
             num = 1
-            new_name = name + str(num)
+            # new_name = name + str(num).zfill(2)
+            new_name = name + str(num).zfill(2)
             num += 1
             partner_seq_obj.create({
                 'name': name,
@@ -232,12 +233,12 @@ class SaleOrderInherit(models.Model):
         partner_seq_obj = self.env['partner.sequence']
         is_exists = partner_seq_obj.search([('name', '=', name)])
         if is_exists:
-            new_name = is_exists.name + str(is_exists.next_number)
+            new_name = is_exists.name + str(is_exists.next_number).zfill(2)
             is_exists.next_number += 1
             return new_name
         else:
             num = 1
-            new_name = name + str(num)
+            new_name = name + str(num).zfill(2)
             num += 1
             partner_seq_obj.create({
                 'name': name,
