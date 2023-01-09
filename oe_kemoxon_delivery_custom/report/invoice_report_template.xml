@@ -3,8 +3,7 @@
     <template id="report_invoice_document" inherit_id="account.report_invoice_document">
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-call="web.external_layout">
-                <br/>
-                <div style="border: 1px solid black;"/>
+                 <div style="border-top: 2px solid black; margin-top: -12px;"/>
                 <center>
                     <b style="font-size:35px;" class="text-center">INVOICE</b>
                 </center>
@@ -38,9 +37,9 @@
                             <div class="col-1"/>
                             <br/>
                             <div class="col-4">
-                                <span class="m-0" t-field="o.invoice_date"/>
+                                <span class="m-0" t-field="o.invoice_date" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
                                 <br/>
-                                <span class="m-0" t-field="o.invoice_date"/>
+                                <span class="m-0" t-field="o.invoice_date" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
                             </div>
                         </div>
                     </div>
@@ -71,7 +70,13 @@
                 <br/>
                 <br/>
                 <strong>Delivery To</strong>
-                <t t-if="o.partner_id.child_ids">
+                <br/>
+                 <span t-field="o.partner_id.street"/>
+                <br t-if="o.partner_id.street2"/>
+                <span t-field="o.partner_id.street2"/>
+                <br/>
+                 <span t-field="o.partner_shipping_id.name"/>
+<!--                 <t t-if="o.partner_id.child_ids">
                     <br/>
                     <span t-field="o.partner_id.child_ids[0].street"/>
                     <t t-if="o.partner_id.child_ids[0].street">
@@ -90,8 +95,8 @@
                         <br/>
                         <span t-field="o.partner_id.child_ids[0].state_id.name"/>
                     </t>
-                </t>
-                <t t-else="">
+                </t> -->
+<!--                 <t t-else="">
                     <br/>
                     <span t-field="o.partner_id"/>
                     <t t-if="o.partner_id.street">
@@ -110,7 +115,7 @@
                         <br/>
                         <span t-field="o.partner_id.state_id.name"/>
                     </t>
-                </t>
+                </t> -->
                 <br/>
                 <br/>
                 <br/>
@@ -219,8 +224,6 @@
                             </td>
                         </tr>
                 </table>
-
-
                 <br/>
                 <br/>
                 <br/>
@@ -232,6 +235,34 @@
                 <br/>
                 <div class="row">
                     <div class="col-4">
+                        <t t-if="o.delivery_location">
+                         <div class="row">
+                            <div class="col-5">
+                                
+                                    <strong>Delivery Location</strong>
+                                
+                            </div>
+                            <br/>
+                            <div class="col-1"/>
+                            <div class="col-6">
+                                <span class="m-0" t-field="o.delivery_location"/>
+                            </div>
+                        </div>
+                        </t>
+                        <t t-if="o.invoice_incoterm_id">
+                        <div class="row">
+                            <div class="col-4">
+                                 
+                                    <strong>Incoterms</strong>
+                                
+                            </div>
+                            <br/>
+                            <div class="col-2"/>
+                            <div class="col-6">
+                                <span class="m-0" t-field="o.invoice_incoterm_id"/>
+                            </div>
+                        </div>
+                            </t>
                         <div class="row">
                             <div class="col-4">
                                 <strong>B/L Date</strong>
@@ -239,7 +270,7 @@
                             <br/>
                             <div class="col-2"/>
                             <div class="col-6">
-                                <span class="m-0" t-field="o.bill_date"/>
+                                <span class="m-0" t-field="o.bill_date" t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
                             </div>
                         </div>
                         <div class="row">
@@ -250,26 +281,6 @@
                             <div class="col-2"/>
                             <div class="col-6">
                                 <span class="m-0" t-field="o.vessel_name"/>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-5">
-                                <strong>Delivery Location</strong>
-                            </div>
-                            <br/>
-                            <div class="col-1"/>
-                            <div class="col-6">
-                                <span class="m-0" t-field="o.delivery_location"/>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4">
-                                <strong>Incoterms</strong>
-                            </div>
-                            <br/>
-                            <div class="col-2"/>
-                            <div class="col-6">
-                                <span class="m-0" t-field="o.invoice_incoterm_id"/>
                             </div>
                         </div>
                     </div>
@@ -292,9 +303,7 @@
                     </div>
                     <div class="col-1"/>
                     <div class="col-1">
-                        <t t-if="o.partner_id.company_bank_account_id">
-                            <span class="m-0" t-field="o.partner_id.company_bank_account_id.currency_id"/>
-                        </t>
+                      <span class="m-0" t-field="o.currency_id.name"/>
                     </div>
                     <div class="col-3"/>
                     <div class="col-6">

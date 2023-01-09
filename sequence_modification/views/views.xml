@@ -1,20 +1,15 @@
 <odoo>
     <data>
         <!-- Inherit Form View to Modify it -->
-<!--        <record id="partner_form_inherit" model="ir.ui.view">-->
-<!--            <field name="name">partner_form_inherit</field>-->
-<!--            <field name="model">res.partner</field>-->
-<!--            <field name="inherit_id" ref="base.view_partner_form"/>-->
-<!--            <field name="arch" type="xml">-->
-<!--                <xpath expr="//field[@name='vat']" position="before">-->
-<!--                    <field name="inv_partner_seq" />-->
-<!--                    <field name="bill_partner_seq" />-->
-<!--                    <field name="credit_partner_seq" />-->
-<!--                    <field name="refund_partner_seq" />-->
-<!--                    <field name="picking_partner_seq" />-->
-<!--                    <field name="so_partner_seq" />-->
-<!--                </xpath>-->
-<!--            </field>-->
-<!--        </record>-->
+        <record id="picking_form_inherit" model="ir.ui.view">
+            <field name="name">picking_form_inherit</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='origin']" position="after">
+                    <field name="deal_ref"/>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>
