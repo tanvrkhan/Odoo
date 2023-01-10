@@ -6,7 +6,6 @@ class AccountMoveInheritModel(models.Model):
     _inherit = 'account.move'
 
     def action_post(self):
-        res = super().action_post()
         if self.move_type == 'out_invoice':
             self.generate_sequence('invoice.sequence', 'invoice')
 
@@ -22,6 +21,7 @@ class AccountMoveInheritModel(models.Model):
         elif self.move_type == 'entry':
             seq = self.env['ir.sequence'].next_by_code('journal.entry.sequence')
             self.name = seq
+        res = super().action_post()
         return res
 
     def generate_sequence(self, code=None, move_type=None):
@@ -77,14 +77,21 @@ class AccountMoveInheritModel(models.Model):
 
     def get_new_name(self, seq=None, next_num=None):
         month = self.get_month()
+        year = self.get_year()
         short_name = str(self.partner_id.short_name) if self.partner_id.short_name else ''
-        name = short_name + "-" + seq[1] + "-" + str(self.invoice_date.year)[-2:] + "" + str(month)
+        name = short_name + "-" + seq[1] + "-" + str(year) + "" + str(month)
         get_name = self.check_in_partner_seq(name)
         return get_name
 
+    def get_year(self):
+        year = str(datetime.datetime.now().year)[2:4]
+        year = str(self.invoice_date.year)[-2:] if self.invoice_date else year
+        return year
+
     def get_month(self):
+        month = datetime.datetime.now().month
         if self:
-            month = self.invoice_date.month
+            month = self.invoice_date.month if self.invoice_date else '0' + str(month) if month < 10 else str(month)
             if month in list(range(10)):
                 return "0" + str(month)
             return month
