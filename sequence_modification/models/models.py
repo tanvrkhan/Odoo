@@ -180,21 +180,43 @@ class InheritStockPicking(models.Model):
     def get_new_name(self, seq=None, next_num=None, short_name=None, rec=None):
         if rec.origin:
             origin = "-".join(rec.origin.split('-')[0::2])
+            new_name = self.check_in_partner_seq(origin)
+            return new_name
         else:
             origin = rec.name
         name = origin + "-" + str(seq[1])
         return name
 
+    def check_in_partner_seq(self, name=None):
+        partner_seq_obj = self.env['partner.sequence']
+        is_exists = partner_seq_obj.search([('name', '=', name)])
+        if is_exists:
+            new_name = is_exists.name + '-' + str(is_exists.next_number).zfill(2)
+            is_exists.next_number += 1
+            return new_name
+        else:
+            num = 1
+            new_name = name + '-' + str(num).zfill(2)
+            num += 1
+            partner_seq_obj.create({
+                'name': name,
+                'next_number': num,
+            })
+            return new_name
+
 
 class SaleOrderInherit(models.Model):
     _inherit = 'sale.order'
+
+    hidden_ref = fields.Char("Hidden Ref", copy=False)
+    deal_ref = fields.Char("Deal Ref", copy=False)
 
     @api.model
     def create(self, vals_list):
         res = super().create(vals_list)
         result = self.sale_create_seq_name(vals_list, res)
         res.name = result[0]
-        res.deal_ref = result[1]
+        res.hidden_ref = result[1]
         return res
 
     def get_month(self, rec=None):
@@ -256,6 +278,7 @@ class SaleOrderInherit(models.Model):
     def action_confirm(self):
         res = super(SaleOrderInherit, self).action_confirm()
         for rec in self:
+            rec.deal_ref = rec.hidden_ref
             if rec.picking_ids:
                 rec.picking_ids.write({'deal_ref': rec.deal_ref})
         return res
