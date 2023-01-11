@@ -1,5 +1,4 @@
 import datetime
-
 from odoo import api, fields, models, _
 
 
@@ -7,7 +6,6 @@ class AccountMoveInheritModel(models.Model):
     _inherit = 'account.move'
 
     def action_post(self):
-        res = super().action_post()
         if self.move_type == 'out_invoice':
             self.generate_sequence('invoice.sequence', 'invoice')
 
@@ -23,6 +21,7 @@ class AccountMoveInheritModel(models.Model):
         elif self.move_type == 'entry':
             seq = self.env['ir.sequence'].next_by_code('journal.entry.sequence')
             self.name = seq
+        res = super().action_post()
         return res
 
     def generate_sequence(self, code=None, move_type=None):
@@ -38,6 +37,7 @@ class AccountMoveInheritModel(models.Model):
                     self.generate_sequence(code, move_type)
                 else:
                     self.name = name
+                    self.payment_reference = name
             elif move_type == "bill":
                 self.partner_id.bill_partner_seq += 1
                 next_num = self.partner_id.bill_partner_seq
@@ -77,21 +77,21 @@ class AccountMoveInheritModel(models.Model):
 
     def get_new_name(self, seq=None, next_num=None):
         month = self.get_month()
+        year = self.get_year()
         short_name = str(self.partner_id.short_name) if self.partner_id.short_name else ''
-        if next_num in list(range(10)):
-            name = short_name + seq[0] + "-" + seq[
-                1] + "-" + str(self.invoice_date.year)[
-                           2:4] + "" + str(month) + "" + "0" + str(next_num)
-        else:
-            name = short_name + seq[0] + "-" + seq[
-                1] + "-" + str(self.invoice_date.year)[
-                           2:4] + "" + str(month) + "" + str(next_num)
+        name = short_name + "-" + seq[1] + "-" + str(year) + "" + str(month)
+        get_name = self.check_in_partner_seq(name)
+        return get_name
 
-        return name
+    def get_year(self):
+        year = str(datetime.datetime.now().year)[2:4]
+        year = str(self.invoice_date.year)[-2:] if self.invoice_date else year
+        return year
 
     def get_month(self):
+        month = datetime.datetime.now().month
         if self:
-            month = self.invoice_date.month
+            month = self.invoice_date.month if self.invoice_date else '0' + str(month) if month < 10 else str(month)
             if month in list(range(10)):
                 return "0" + str(month)
             return month
@@ -119,15 +119,38 @@ class AccountMoveInheritModel(models.Model):
         name = seq[0] + "-" + seq[1] + "-" + str(datetime.datetime.now().year)[2:4] + "" + str(month) + "" + seq[2]
         res['name'] = name
 
+    def check_in_partner_seq(self, name=None):
+        partner_seq_obj = self.env['partner.sequence']
+        is_exists = partner_seq_obj.search([('name', '=', name)])
+        if is_exists:
+            # new_name = is_exists.name + str(is_exists.next_number).zfill(2)
+            is_exists.next_number += 1
+            new_name = is_exists.name + str(is_exists.next_number).zfill(2)
+            return new_name
+        else:
+            num = 1
+            # new_name = name + str(num).zfill(2)
+            new_name = name + str(num).zfill(2)
+            num += 1
+            partner_seq_obj.create({
+                'name': name,
+                'next_number': num,
+            })
+            return new_name
+
 
 class InheritStockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    deal_ref = fields.Char("Deal Ref")
+
     @api.model
     def create(self, vals_list):
-        if self.env['stock.picking.type'].browse(vals_list.get('picking_type_id')).code == "outgoing":
-            self.create_seq_name(vals_list)
         res = super().create(vals_list)
+        if res.origin:
+            if self.env['stock.picking.type'].browse(vals_list.get('picking_type_id')).code == "outgoing":
+                name = self.create_seq_name(vals_list, rec=res)
+                res.name = name
         return res
 
     @staticmethod
@@ -137,7 +160,7 @@ class InheritStockPicking(models.Model):
             return "0" + str(month)
         return month
 
-    def create_seq_name(self, vals_list=None):
+    def create_seq_name(self, vals_list=None, rec=None):
         seq = self.env['ir.sequence'].next_by_code('delivery.sequence').split("-")
         next_num = 0
         short_name = str(self.env['res.partner'].browse(vals_list.get('partner_id')).short_name) if self.env[
@@ -146,33 +169,54 @@ class InheritStockPicking(models.Model):
             partner = self.env['res.partner'].browse(vals_list.get('partner_id'))
             partner.picking_partner_seq += 1
             next_num = partner.picking_partner_seq
-            name = self.get_new_name(seq, next_num, short_name)
+            name = self.get_new_name(seq, next_num, short_name, rec)
             is_exist = self.env['stock.picking'].search([('name', '=', name)])
             if is_exist:
-                self.create_seq_name(vals_list)
+                self.create_seq_name(vals_list, rec)
             else:
                 vals_list['name'] = name
+                return name
 
-    def get_new_name(self, seq=None, next_num=None, short_name=None):
-        month = self.get_month()
-        if next_num in list(range(10)):
-            name = short_name + seq[0] + "-" + str(datetime.datetime.now().year)[2:4] + "" + str(
-                month) + "0" + str(next_num)
+    def get_new_name(self, seq=None, next_num=None, short_name=None, rec=None):
+        if rec.origin:
+            origin = "-".join(rec.origin.split('-')[0::2])
+            new_name = self.check_in_partner_seq(origin)
+            return new_name
         else:
-            name = short_name + seq[0] + "-" + str(datetime.datetime.now().year)[2:4] + "" + str(
-                month) + str(next_num)
+            origin = rec.name
+        name = origin + "-" + str(seq[1])
         return name
+
+    def check_in_partner_seq(self, name=None):
+        partner_seq_obj = self.env['partner.sequence']
+        is_exists = partner_seq_obj.search([('name', '=', name)])
+        if is_exists:
+            new_name = is_exists.name + '-' + str(is_exists.next_number).zfill(2)
+            is_exists.next_number += 1
+            return new_name
+        else:
+            num = 1
+            new_name = name + '-' + str(num).zfill(2)
+            num += 1
+            partner_seq_obj.create({
+                'name': name,
+                'next_number': num,
+            })
+            return new_name
 
 
 class SaleOrderInherit(models.Model):
     _inherit = 'sale.order'
 
+    hidden_ref = fields.Char("Hidden Ref", copy=False)
+    deal_ref = fields.Char("Deal Ref", copy=False)
+
     @api.model
     def create(self, vals_list):
         res = super().create(vals_list)
-        name, deal_ref = self.sale_create_seq_name(vals_list, rec=res)
-        res.name = name
-        res.deal_ref = deal_ref
+        result = self.sale_create_seq_name(vals_list, res)
+        res.name = result[0]
+        res.hidden_ref = result[1]
         return res
 
     def get_month(self, rec=None):
@@ -193,7 +237,7 @@ class SaleOrderInherit(models.Model):
             name = self.get_new_name(seq, next_num, short_name, rec)
             is_exist = self.env['sale.order'].search([('name', '=', name)])
             if is_exist:
-                self.sale_create_seq_name(vals_list)
+                self.sale_create_seq_name(vals_list, rec)
             else:
                 # vals_list['name'] = name
                 deal_ref = name.split("-")[0] + "-" + name.split("-")[2]
@@ -202,12 +246,42 @@ class SaleOrderInherit(models.Model):
     def get_new_name(self, seq=None, next_num=None, short_name=None, rec=None):
         month = self.get_month(rec)
         if next_num in list(range(10)):
-            name = short_name + seq[0] + "-" + seq[1] + "-" + str(rec.date_order.year) + "" + str(
-                month) + "" + "0" + str(next_num)
+            # name = short_name + seq[0] + "-" + seq[1] + "-" + str(rec.date_order.year)[-2:] + "" + str(
+            #     month) + "" + "0"
+            name = short_name + "-" + seq[1] + "-" + str(rec.date_order.year)[-2:] + "" + str(month)
+            get_seq_name = self.check_in_partner_seq(name)
+            return get_seq_name
         else:
-            name = short_name + seq[0] + "-" + seq[1] + "-" + str(rec.date_order.year) + "" + str(
-                month) + "" + str(next_num)
-        return name
+            # name = short_name + seq[0] + "-" + seq[1] + "-" + str(rec.date_order.year)[-2:] + "" + str(
+            #     month) + "" + str(next_num)
+            name = short_name + "-" + seq[1] + "-" + str(rec.date_order.year)[-2:] + "" + str(month)
+            get_seq_name = self.check_in_partner_seq(name)
+            return get_seq_name
+
+    def check_in_partner_seq(self, name=None):
+        partner_seq_obj = self.env['partner.sequence']
+        is_exists = partner_seq_obj.search([('name', '=', name)])
+        if is_exists:
+            new_name = is_exists.name + str(is_exists.next_number).zfill(2)
+            is_exists.next_number += 1
+            return new_name
+        else:
+            num = 1
+            new_name = name + str(num).zfill(2)
+            num += 1
+            partner_seq_obj.create({
+                'name': name,
+                'next_number': num,
+            })
+            return new_name
+
+    def action_confirm(self):
+        res = super(SaleOrderInherit, self).action_confirm()
+        for rec in self:
+            rec.deal_ref = rec.hidden_ref
+            if rec.picking_ids:
+                rec.picking_ids.write({'deal_ref': rec.deal_ref})
+        return res
 
 
 class AccountPaymentInherit(models.Model):
@@ -250,3 +324,10 @@ class InheritResCustomer(models.Model):
     refund_partner_seq = fields.Integer("Refund Sequence")
     picking_partner_seq = fields.Integer("Picking Sequence")
     so_partner_seq = fields.Integer("SO Sequence")
+
+
+class PartnerSequence(models.Model):
+    _name = 'partner.sequence'
+
+    name = fields.Char("Name")
+    next_number = fields.Integer("Next Number", default=1)
