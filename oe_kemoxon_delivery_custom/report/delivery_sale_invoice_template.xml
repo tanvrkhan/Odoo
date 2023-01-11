@@ -154,6 +154,7 @@
                             <th width="20%">Truck No:</th>
                             <td width="80%">
                                 <t t-if="truck_transport_details_ids">
+                                    <span t-field="truck_transport_details_ids.truck"/>
                                     <span t-if="truck_transport_details_ids.trailer">-</span>
                                     <span t-field="truck_transport_details_ids.trailer"/>
                                 </t>
@@ -324,6 +325,8 @@
                             <td width="80%">
                                 <t t-if="truck_transport_details_ids">
                                     <span t-field="truck_transport_details_ids.truck"/>
+                                    <span t-if="truck_transport_details_ids.trailer">-</span>
+                                    <span t-field="truck_transport_details_ids.trailer"/>
                                 </t>
                             </td>
                         </table>
