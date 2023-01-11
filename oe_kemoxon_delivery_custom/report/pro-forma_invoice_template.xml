@@ -178,18 +178,22 @@
                 <strong>Delivery Information</strong>
                 <div style="border: 1px solid black;"/>
                 <br/>
-                <div class="row" t-if="doc.picking_ids.delivery_from or doc.picking_ids.delivery_to">
-                    <div class="col-2">
-                        <strong>Delivery Period</strong>
-                    </div>
-                    <div class="col-4" style="padding-left: 37px;">
-                        <t t-if="doc.picking_ids">
-                            <span class="m-0" t-field="doc.picking_ids.delivery_from"/>
-                            -
-                            <span class="m-0" t-field="doc.picking_ids.delivery_to"/>
-                        </t>
-                    </div>
-                </div>
+                <t t-if="doc.picking_ids">
+                    <t t-foreach="doc.picking_ids[0]" t-as="picking">
+                        <div class="row" t-if="picking.delivery_from or picking.delivery_to">
+                            <div class="col-2">
+                                <strong>Delivery Period</strong>
+                            </div>
+                            <div class="col-4" style="padding-left: 37px;">
+                                <t t-if="doc.picking_ids">
+                                    <span class="m-0" t-field="picking.delivery_from"/>
+                                    -
+                                    <span class="m-0" t-field="picking.delivery_to"/>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                </t>
                 <div class="row">
                     <div class="col-2" t-if="doc.picking_ids.delivery_location">
                         <strong>Delivery Location</strong>
@@ -239,7 +243,7 @@
                                     <strong>Payment Terms</strong>
                                 </div>
                                 <div class="col-8" style="padding-left: 38px;">
-                                    <span style="text-align:left;" class="m-0" t-field="doc.payment_term_id"/>
+                                    <span style="text-align:left;" class="m-0" t-field="doc.payment_term_id.name"/>
                                 </div>
                             </div>
                         </div>
