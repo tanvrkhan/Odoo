@@ -4,7 +4,7 @@
             <t t-call="web.html_container">
                 <t t-call="web.external_layout">
                     <t t-foreach="docs" t-as="o">
-                       <div style="border-top: 2px solid black; margin-top: -12px;"/>
+                        <div style="border-top: 2px solid black; margin-top: -12px;"/>
                         <strong style="font-size:30px;" class="text-center">
                             <center>DELIVERY SALES INVOICE</center>
                         </strong>
@@ -27,16 +27,17 @@
                                 <table width="100%" class="info_table table-borderless">
                                     <th width="30%">Reference :</th>
                                     <td width="70%">
-                                      <span t-field="picking.name"/>-<span t-field="truck_transport_details_ids.seq"/>
+                                        <span t-field="picking.name"/>-
+                                        <span t-field="truck_transport_details_ids.seq"/>
                                     </td>
                                 </table>
                             </div>
                             <div class="col-4">
-                                 <table width="100%" class="info_table table-borderless">
+                                <table width="100%" class="info_table table-borderless">
                                     <th width="40%">Date :</th>
                                     <td width="60%">
-                                      <span class="m-0" t-field="picking.scheduled_date"
-                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                        <span class="m-0" t-field="picking.scheduled_date"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
                                     </td>
                                 </table>
                             </div>
@@ -105,38 +106,40 @@
                         <br/>
                         <br/>
                         <br/>
-                         <style>
-                            .my_data_table th {border-right: 1px solid white;border-left: 1px solid white;padding-top: 5px;padding-bottom: 5px;}
-                            .my_data_table td {border-right: 1px solid white;border-left: 1px solid white;padding-top: 5px;padding-bottom: 5px;}
+                        <style>
+                            .my_data_table th {border-right: 1px solid white;border-left: 1px solid white;padding-top:
+                            5px;padding-bottom: 5px;}
+                            .my_data_table td {border-right: 1px solid white;border-left: 1px solid white;padding-top:
+                            5px;padding-bottom: 5px;}
                         </style>
                         <table width="100%" class="my_data_table">
                             <!-- In case we want to repeat the header, remove "display: table-row-group" -->
-                                <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
-                                    <th style="text-align:left;">Description</th>
-                                    <th style="text-align:right;">Quantity</th>
-                                    <th style="text-align:right;">Rate</th>
-                                    <th style="text-align:right;">Amount</th>
+                            <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
+                                <th style="text-align:left;">Description</th>
+                                <th style="text-align:right;">Quantity</th>
+                                <th style="text-align:right;">Rate</th>
+                                <th style="text-align:right;">Amount</th>
+                            </tr>
+                            <t t-foreach="picking.move_ids" t-as="move">
+                                <tr style="border-bottom:2px solid #d4d6d9">
+                                    <td>
+                                        <span t-field="move.name"/>
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <span t-field="move.product_uom_qty"/>
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <t t-if="move.sale_line_id">
+                                            <span t-field="move.sale_line_id.price_unit"/>
+                                        </t>
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <t t-if="move.sale_line_id">
+                                            <span t-field="move.sale_line_id.price_subtotal"/>
+                                        </t>
+                                    </td>
                                 </tr>
-                                <t t-foreach="picking.move_ids" t-as="move">
-                                    <tr style="border-bottom:2px solid #d4d6d9">
-                                        <td>
-                                            <span t-field="move.name"/>
-                                        </td>
-                                        <td style="text-align:right;">
-                                            <span t-field="move.product_uom_qty"/>
-                                        </td>
-                                        <td style="text-align:right;">
-                                            <t t-if="move.sale_line_id">
-                                                <span t-field="move.sale_line_id.price_unit"/>
-                                            </t>
-                                        </td>
-                                        <td style="text-align:right;">
-                                            <t t-if="move.sale_line_id">
-                                                <span t-field="move.sale_line_id.price_subtotal"/>
-                                            </t>
-                                        </td>
-                                    </tr>
-                                </t>
+                            </t>
                         </table>
                         <br/>
                         <br/>
@@ -146,11 +149,13 @@
                         <strong class="text-left">Truck Information</strong>
                         <div style="border: 1px solid black;"/>
                         <br/>
-                        <table width="100%" class="info_table table-borderless" t-if="truck_transport_details_ids.truck">
+                        <table width="100%" class="info_table table-borderless"
+                               t-if="truck_transport_details_ids.truck">
                             <th width="20%">Truck No:</th>
                             <td width="80%">
                                 <t t-if="truck_transport_details_ids">
-                                    <span t-field="truck_transport_details_ids.truck"/>
+                                    <span t-if="truck_transport_details_ids.trailer">-</span>
+                                    <span t-field="truck_transport_details_ids.trailer"/>
                                 </t>
                             </td>
                         </table>
@@ -159,8 +164,8 @@
                             <td width="80%">
                                 <span t-field="picking.transporter"/>
                             </td>
-                        </table>                        
-                        
+                        </table>
+
                         <br/>
                         <br/>
                         <br/>
@@ -169,17 +174,18 @@
                         <strong class="text-left">Delivery Information</strong>
                         <div style="border-top: 2px solid black;"/>
                         <br/>
-                        
-                        
+
+
                         <table width="100%" class="info_table table-borderless" t-if="picking.sale_id.incoterm">
                             <th width="20%">Incotems :</th>
                             <td width="80%">
-                               <t t-if="picking.sale_id">
-                                        <span t-field="picking.sale_id.incoterm"/>
+                                <t t-if="picking.sale_id">
+                                    <span t-field="picking.sale_id.incoterm"/>
                                 </t>
                             </td>
                         </table>
-                        <br/><br/>
+                        <br/>
+                        <br/>
                         <table width="100%" class="info_table table-borderless" t-if="picking.delivery_location">
                             <th width="20%">Delivery Location :</th>
                             <td width="80%">
@@ -189,10 +195,11 @@
                         <table width="100%" class="info_table table-borderless" t-if="picking.name">
                             <th width="20%">Loading Point :</th>
                             <td width="80%">
-                                 <span t-field="picking.name"/>
+                                <span t-field="picking.location_id.name"/>
+                                <span t-if="picking.location_id.location_id.name">/</span>
+                                <span t-field="picking.location_id.location_id.name"/>
                             </td>
                         </table>
-                        
 
 
                         <p style="page-break-before:always;"></p>
@@ -204,21 +211,22 @@
                         </strong>
                         <div style="border-top: 2px solid black;"/>
                         <br/>
-                       <div class="col-12 row">
+                        <div class="col-12 row">
                             <div class="col-8">
                                 <table width="100%" class="info_table table-borderless" t-if="picking.name">
                                     <th width="30%">Reference :</th>
                                     <td width="70%">
-                                      <span t-field="picking.name"/>-<span t-field="truck_transport_details_ids.seq"/>
+                                        <span t-field="picking.name"/>-
+                                        <span t-field="truck_transport_details_ids.seq"/>
                                     </td>
                                 </table>
                             </div>
                             <div class="col-4">
-                                 <table width="100%" class="info_table table-borderless">
+                                <table width="100%" class="info_table table-borderless">
                                     <th width="40%">Date :</th>
                                     <td width="60%">
-                                      <span class="m-0" t-field="picking.scheduled_date"
-                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                        <span class="m-0" t-field="picking.scheduled_date"
+                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
                                     </td>
                                 </table>
                             </div>
@@ -270,36 +278,36 @@
                         </t>
                         <br/>
                         <br/>
-                        <table width="100%"   class="my_data_table">
+                        <table width="100%" class="my_data_table">
                             <!-- In case we want to repeat the header, remove "display: table-row-group" -->
-                                <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
-                                    <th style="text-align:left;">Description</th>
-                                    <th style="text-align:left;">Uom</th>
-                                    <th style="text-align:right;">Order Qty</th>
-                                    <th style="text-align:right;">Actual Qty</th>
-                                </tr>
-                                <t t-foreach="picking.move_ids" t-as="move">
-                                    <tr style="border-bottom:2px solid #d4d6d9">
-                                        <td>
-                                            <span t-field="move.name"/>
-                                        </td>
-                                        <td>
-                                            <span t-field="move.product_id.uom_id"/>
-                                        </td>
-                                        <td style="text-align:right;">
-                                            <span t-field="move.product_uom_qty"/>
-                                        </td>
-                                        <td style="text-align:right;">
-                                            <t t-if="move.forecast_availability&lt;0">
+                            <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
+                                <th style="text-align:left;">Description</th>
+                                <th style="text-align:left;">Uom</th>
+                                <th style="text-align:right;">Order Qty</th>
+                                <th style="text-align:right;">Actual Qty</th>
+                            </tr>
+                            <t t-foreach="picking.move_ids" t-as="move">
+                                <tr style="border-bottom:2px solid #d4d6d9">
+                                    <td>
+                                        <span t-field="move.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="move.product_id.uom_id"/>
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <span t-field="move.product_uom_qty"/>
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <t t-if="move.forecast_availability&lt;0">
                                             <t t-set="actual_qty" t-value="move.forecast_availability*(-1)"/>
-                                            </t>
-                                            <t t-else="">
-                                                 <t t-set="actual_qty" t-value="move.forecast_availability"/>
-                                            </t>
-                                            <span t-esc="actual_qty"/>
-                                        </td>
-                                    </tr>
-                                </t>
+                                        </t>
+                                        <t t-else="">
+                                            <t t-set="actual_qty" t-value="move.forecast_availability"/>
+                                        </t>
+                                        <span t-esc="actual_qty"/>
+                                    </td>
+                                </tr>
+                            </t>
                         </table>
                         <br/>
                         <br/>
@@ -309,9 +317,8 @@
                         <strong class="text-left">Truck Information</strong>
                         <div style="border: 1px solid black;"/>
                         <br/>
-                        
-                        
-                        
+
+
                         <table width="100%" class="info_table table-borderless">
                             <th width="20%">Truck No :</th>
                             <td width="80%">
@@ -323,26 +330,28 @@
                         <table width="100%" class="info_table table-borderless" t-if="picking.transporter">
                             <th width="20%">Transporter :</th>
                             <td width="80%">
-                               <span t-field="picking.transporter"/>
+                                <span t-field="picking.transporter"/>
                             </td>
                         </table>
-                        <table width="100%" class="info_table table-borderless" t-if="truck_transport_details_ids.passport">
+                        <table width="100%" class="info_table table-borderless"
+                               t-if="truck_transport_details_ids.passport">
                             <th width="20%">Driver Passport :</th>
                             <td width="80%">
                                 <t t-if="truck_transport_details_ids">
-                                        <span t-field="truck_transport_details_ids.passport"/>
-                                    </t>
+                                    <span t-field="truck_transport_details_ids.passport"/>
+                                </t>
                             </td>
                         </table>
-                        <table width="100%" class="info_table table-borderless" t-if="truck_transport_details_ids.driver">
+                        <table width="100%" class="info_table table-borderless"
+                               t-if="truck_transport_details_ids.driver">
                             <th width="20%">Driver Name :</th>
                             <td width="80%">
                                 <t t-if="truck_transport_details_ids">
-                                        <span t-field="truck_transport_details_ids.driver"/>
-                                    </t>
+                                    <span t-field="truck_transport_details_ids.driver"/>
+                                </t>
                             </td>
                         </table>
-                        
+
                         <br/>
                         <br/>
                         <br/>
@@ -351,17 +360,18 @@
                         <strong class="text-left">Delivery Information</strong>
                         <div style="border-top: 2px solid black;"/>
                         <br/>
-                        
+
                         <table width="100%" class="info_table table-borderless" t-if="picking.sale_id.incoterm">
                             <th width="20%">Incotems :</th>
                             <td width="80%">
-                               <t t-if="picking.sale_id">
-                                        <span t-field="picking.sale_id.incoterm"/>
-                                    </t>
+                                <t t-if="picking.sale_id">
+                                    <span t-field="picking.sale_id.incoterm"/>
+                                </t>
 
                             </td>
                         </table>
-                        <br/><br/>
+                        <br/>
+                        <br/>
                         <table width="100%" class="info_table table-borderless" t-if="picking.delivery_location">
                             <th width="20%">Delivery Location :</th>
                             <td width="80%">
@@ -371,7 +381,9 @@
                         <table width="100%" class="info_table table-borderless" t-if="picking.name">
                             <th width="20%">Loading Point :</th>
                             <td width="80%">
-                                <span t-field="picking.name"/>
+                                <span t-field="picking.location_id.name"/>
+                                <span t-if="picking.location_id.location_id.name">/</span>
+                                <span t-field="picking.location_id.location_id.name"/>
                             </td>
                         </table>
 

@@ -283,10 +283,9 @@
                                 <strong t-if="o.invoice_payment_term_id">Payment Term</strong>
                             </div>
                             <div class="col-8">
-                                <span class="m-0" t-field="o.invoice_payment_term_id.name"/>
+                                <span class="m-0" t-esc="o.get_text_from_html_field(o)"/>
                             </div>
                         </div>
-
                     </div>
                     <!-- Left div ended Here -->
 

@@ -243,7 +243,8 @@
                                     <strong>Payment Terms</strong>
                                 </div>
                                 <div class="col-8" style="padding-left: 38px;">
-                                    <span style="text-align:left;" class="m-0" t-field="doc.payment_term_id.name"/>
+                                    <span class="text-content" t-esc="doc.get_text_from_html_field(doc)"
+                                          t-options="{'widget': 'html'}"/>
                                 </div>
                             </div>
                         </div>
