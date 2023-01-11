@@ -146,7 +146,7 @@
                         <strong class="text-left">Truck Information</strong>
                         <div style="border: 1px solid black;"/>
                         <br/>
-                        <table width="100%" class="info_table table-borderless">
+                        <table width="100%" class="info_table table-borderless" t-if="truck_transport_details_ids.truck">
                             <th width="20%">Truck No:</th>
                             <td width="80%">
                                 <t t-if="truck_transport_details_ids">
@@ -154,7 +154,7 @@
                                 </t>
                             </td>
                         </table>
-                        <table width="100%" class="info_table table-borderless">
+                        <table width="100%" class="info_table table-borderless" t-if="picking.transporter">
                             <th width="20%">Transporter :</th>
                             <td width="80%">
                                 <span t-field="picking.transporter"/>
@@ -171,7 +171,7 @@
                         <br/>
                         
                         
-                        <table width="100%" class="info_table table-borderless">
+                        <table width="100%" class="info_table table-borderless" t-if="picking.sale_id.incoterm">
                             <th width="20%">Incotems :</th>
                             <td width="80%">
                                <t t-if="picking.sale_id">
@@ -180,13 +180,13 @@
                             </td>
                         </table>
                         <br/><br/>
-                        <table width="100%" class="info_table table-borderless">
+                        <table width="100%" class="info_table table-borderless" t-if="picking.delivery_location">
                             <th width="20%">Delivery Location :</th>
                             <td width="80%">
                                 <span t-field="picking.delivery_location"/>
                             </td>
                         </table>
-                        <table width="100%" class="info_table table-borderless">
+                        <table width="100%" class="info_table table-borderless" t-if="picking.name">
                             <th width="20%">Loading Point :</th>
                             <td width="80%">
                                  <span t-field="picking.name"/>
@@ -206,7 +206,7 @@
                         <br/>
                        <div class="col-12 row">
                             <div class="col-8">
-                                <table width="100%" class="info_table table-borderless">
+                                <table width="100%" class="info_table table-borderless" t-if="picking.name">
                                     <th width="30%">Reference :</th>
                                     <td width="70%">
                                       <span t-field="picking.name"/>-<span t-field="truck_transport_details_ids.seq"/>
@@ -320,13 +320,13 @@
                                 </t>
                             </td>
                         </table>
-                        <table width="100%" class="info_table table-borderless">
+                        <table width="100%" class="info_table table-borderless" t-if="picking.transporter">
                             <th width="20%">Transporter :</th>
                             <td width="80%">
                                <span t-field="picking.transporter"/>
                             </td>
                         </table>
-                        <table width="100%" class="info_table table-borderless">
+                        <table width="100%" class="info_table table-borderless" t-if="truck_transport_details_ids.passport">
                             <th width="20%">Driver Passport :</th>
                             <td width="80%">
                                 <t t-if="truck_transport_details_ids">
@@ -334,7 +334,7 @@
                                     </t>
                             </td>
                         </table>
-                        <table width="100%" class="info_table table-borderless">
+                        <table width="100%" class="info_table table-borderless" t-if="truck_transport_details_ids.driver">
                             <th width="20%">Driver Name :</th>
                             <td width="80%">
                                 <t t-if="truck_transport_details_ids">
@@ -352,7 +352,7 @@
                         <div style="border-top: 2px solid black;"/>
                         <br/>
                         
-                        <table width="100%" class="info_table table-borderless">
+                        <table width="100%" class="info_table table-borderless" t-if="picking.sale_id.incoterm">
                             <th width="20%">Incotems :</th>
                             <td width="80%">
                                <t t-if="picking.sale_id">
@@ -362,13 +362,13 @@
                             </td>
                         </table>
                         <br/><br/>
-                        <table width="100%" class="info_table table-borderless">
+                        <table width="100%" class="info_table table-borderless" t-if="picking.delivery_location">
                             <th width="20%">Delivery Location :</th>
                             <td width="80%">
                                 <span t-field="picking.delivery_location"/>
                             </td>
                         </table>
-                        <table width="100%" class="info_table table-borderless">
+                        <table width="100%" class="info_table table-borderless" t-if="picking.name">
                             <th width="20%">Loading Point :</th>
                             <td width="80%">
                                 <span t-field="picking.name"/>

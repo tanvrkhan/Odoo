@@ -31,11 +31,10 @@
                     <div class="col-2"/>
                     <div class="col-6">
                         <div class="row">
-                            <div class="col-4 pl-1">
+                            <div class="col-5" style="padding-left: 10px;">
                                 <strong>Date :</strong>
                             </div>
-                            <div class="col-2"/>
-                            <div class="col-4">
+                            <div class="col-7" style="padding-left: 23px;">
                                 <span class="m-0" t-field="doc.date_order"
                                       t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
                             </div>
@@ -224,92 +223,107 @@
                 <br/>
                 <!--                <table width="100%">-->
                 <div class="row">
-                    <div class="col-1">
-                        <strong>Currency</strong>
-                    </div>
-                    <div class="col-1"/>
-                    <div class="col-2"  style="padding-left: 37px;">
-                            <span class="m-0" t-field="doc.pricelist_id.currency_id.name"/>
-                    </div>
-                    <div class="col-2"/>
-                    <div class="col-2">
-                        <strong>BANK</strong>
-                    </div>
-                    <div class="col-1"/>
-                    <div class="col-3">
-                        <t t-if="doc.partner_id.company_bank_account_id">
-                            <span style="text-align:left;" class="m-0" t-field="doc.partner_id.company_bank_account_id.bank_id"/>
-                        </t>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-2">
-                        <strong>Payment Terms</strong>
-                    </div>
-                    <div class="col-2" style="padding-left: 37px;">
-                        <span style="text-align:left;" class="m-0" t-field="doc.payment_term_id"/>
-                    </div>
-                    <div class="col-2"/>
-                    <div class="col-6">
-                        <div class="row">
-                            <div class="col-4">
-                                <strong>In favour of</strong>
+                    <div class="col-12 row">
+                        <!-- left div start from here -->
+                        <div class="col-6">
+                            <div class="col-12 row">
+                                <div class="col-4">
+                                    <strong>Currency</strong>
+                                </div>
+                                <div class="col-8" style="padding-left: 38px;">
+                                    <span class="m-0" t-field="doc.pricelist_id.currency_id.name"/>
+                                </div>
                             </div>
-                            <div class="col-2"/>
-                            <div class="col-6">
-                                <t t-if="doc.partner_id.company_bank_account_id">
-                                    <span style="text-align:left;" class="m-0"
-                                          t-field="doc.partner_id.company_bank_account_id.acc_holder_name"/>
-                                </t>
+                            <div class="col-12 row" t-if="doc.payment_term_id">
+                                <div class="col-4">
+                                    <strong>Payment Terms</strong>
+                                </div>
+                                <div class="col-8" style="padding-left: 38px;">
+                                    <span style="text-align:left;" class="m-0" t-field="doc.payment_term_id"/>
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-4">
+                        <!-- Left div ended Here -->
+                        
+                        <!-- Right Div started from here -->
+                        <div class="col-6">
+                            <div class="col-12 row" t-if="doc.partner_id.company_bank_account_id.bank_id.name">
+                                <div class="col-5" style="padding-left: 4px;">
+                                    <strong>Bank</strong>
+                                </div>
+                                <div class="col-7"  style="padding-left: 0px;" >
+                                    <t t-if="doc.partner_id.company_bank_account_id">
+                                        <span style="text-align:left;" class="m-0"
+                                              t-field="doc.partner_id.company_bank_account_id.bank_id.name"/>
+                                    </t>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="col-12 row" t-if="doc.partner_id.company_bank_account_id.acc_holder_name">
+                                <div class="col-5" style="padding-left: 4px;">
+                                    <strong>In favour of</strong>
+                                </div>
+                                <div class="col-7"  style="padding-left: 0px;" >
+                                    <t t-if="doc.partner_id.company_bank_account_id">
+                                        <span style="text-align:left;" class="m-0"
+                                              t-field="doc.partner_id.company_bank_account_id.acc_holder_name"/>
+                                    </t>
+                                </div>
+                            </div>
+                            
+                            
+                            
+                         <div class="col-12 row" t-if="doc.partner_id.company_bank_account_id.acc_number">
+                            <div class="col-5"  style="padding-left: 4px;">
                                 <strong>A/C No</strong>
                             </div>
-                            <div class="col-2"/>
-                            <div class="col-6">
+                            <div class="col-7" style="padding-left: 0px;">
                                 <t t-if="doc.partner_id.company_bank_account_id">
                                     <span style="text-align:left;" class="m-0"
                                           t-field="doc.partner_id.company_bank_account_id.acc_number"/>
                                 </t>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-4">
+                            
+                            
+                        <div class="col-12 row" t-if="doc.partner_id.company_bank_account_id.bank_id.bic">
+                            <div class="col-5" style="padding-left: 4px;">
                                 <strong>Swift Code</strong>
                             </div>
-                            <div class="col-2"/>
-                            <div class="col-6" style="text-align:left;">
+                            <div class="col-7" style="padding-left: 0px;">
                                 <t t-if="doc.partner_id.company_bank_account_id">
                                     <span class="m-0" t-field="doc.partner_id.company_bank_account_id.bank_id.bic"/>
                                 </t>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-4">
-                                <strong>Intermediary Bank</strong>
-                            </div>
-                            <div class="col-2"/>
-                            <div class="col-6">
-                                <t t-if="doc.partner_id.company_bank_account_id">
-                                    <span class="m-0" t-field="doc.partner_id.company_bank_account_id.inter_mediatory_bank_id"/>
+                            
+                        
+                        <div class="col-12 row" t-if="doc.partner_id.company_bank_account_id.inter_mediatory_bank_id">
+                            <div class="col-5" style="padding-left: 4px;">
+                                    <strong>Intermediary Bank</strong>
+                                </div>
+                                <div class="col-7" style="padding-left: 0px;">
+                                    <t t-if="doc.partner_id.company_bank_account_id">
+                                <span class="m-0" t-field="doc.partner_id.company_bank_account_id.inter_mediatory_bank_id.name"/>
                                 </t>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-4">
-                                <strong>Intermediary Swift</strong>
-                            </div>
-                            <div class="col-2"/>
-                            <div class="col-6">
-                                <t t-if="doc.partner_id.company_bank_account_id">
-                                    <span class="m-0" t-field="doc.partner_id.company_bank_account_id.inter_mediatory_swift"/>
-                                </t>
+                            
+                        <div class="col-12 row" t-if="doc.partner_id.company_bank_account_id.inter_mediatory_swift">
+                            <div class="col-5" style="padding-left: 4px;">
+                                    <strong>Intermediary Swift</strong>
+                                </div>
+                                <div class="col-7" style="padding-left: 0px;">
+                                    <t t-if="doc.partner_id.company_bank_account_id">
+                            <span class="m-0" t-field="doc.partner_id.company_bank_account_id.inter_mediatory_swift"/>
+                        </t>
                             </div>
                         </div>
-                    </div>
-                </div>
+                        </div>
+                        <!-- Right Div Ended Here -->
+                    </div>               
+                </div>  
                 <br/>
                 <br/>
                 <br/>
