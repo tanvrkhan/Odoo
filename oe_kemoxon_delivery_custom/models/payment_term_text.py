@@ -19,7 +19,7 @@ class InheritSaleOrder(models.Model):
 
     @staticmethod
     def get_text_from_html_field(doc):
-        if doc.doc.payment_term_id.note:
+        if doc.payment_term_id.note:
             text = ' '.join(BeautifulSoup(doc.payment_term_id.note, "html.parser").findAll(text=True))
             return text
         else:
