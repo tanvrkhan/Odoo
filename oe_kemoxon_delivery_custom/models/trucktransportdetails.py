@@ -1,4 +1,4 @@
-from odoo import models, fields, _,api
+from odoo import models, fields, _, api
 
 from odoo.exceptions import UserError
 
@@ -20,6 +20,7 @@ class Truck_Transport_Details(models.Model):
     statusdate = fields.Date()
     picking_id = fields.Many2one('stock.picking', 'Delivery')
     stock_pick_ids = fields.Many2one("stock.picking", string="Truck Details", required=True)
+    seq = fields.Char("Sequence")
     _sql_constraints = [
         ('checkPrices', 'CHECK(nominated >= 0 AND loaded >=0 AND offloaded>=0 )', 'Quantities cannot be less than 0')
     ]
