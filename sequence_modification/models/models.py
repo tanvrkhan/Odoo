@@ -1,5 +1,6 @@
 import datetime
 from odoo import api, fields, models, _
+from dateutil import parser
 
 
 class AccountMoveInheritModel(models.Model):
@@ -213,19 +214,28 @@ class SaleOrderInherit(models.Model):
 
     @api.model
     def create(self, vals_list):
+        self.sale_create_seq_name(vals_list)
         res = super().create(vals_list)
-        result = self.sale_create_seq_name(vals_list, res)
-        res.name = result[0]
-        res.hidden_ref = result[1]
         return res
 
-    def get_month(self, rec=None):
-        month = rec.date_order.month
-        if month in list(range(10)):
-            return "0" + str(month)
-        return month
+    def get_year(self, rec=None):
+        year = str(datetime.datetime.now().year)[2:4]
+        if rec:
+            year = str(parser.parse(rec.get('date_order')).year)[-2:] if rec.get('date_order') else '0' + str(
+                year) if year < 10 else str(year)
+        return year
 
-    def sale_create_seq_name(self, vals_list=None, rec=None):
+    def get_month(self, rec=None):
+        month = datetime.datetime.now().month
+        if rec:
+            month = parser.parse(rec.get('date_order')).month if rec.get('date_order') else '0' + str(
+                month) if month < 10 else str(month)
+            if month in list(range(10)):
+                return "0" + str(month)
+            return month
+        return None
+
+    def sale_create_seq_name(self, vals_list=None):
         seq = self.env['ir.sequence'].next_by_code('sale.order.sequence').split("-")
         next_num = 0
         short_name = str(self.env['res.partner'].browse(vals_list.get('partner_id')).short_name) if self.env[
@@ -234,27 +244,23 @@ class SaleOrderInherit(models.Model):
             partner = self.env['res.partner'].browse(vals_list.get('partner_id'))
             partner.so_partner_seq += 1
             next_num = partner.so_partner_seq
-            name = self.get_new_name(seq, next_num, short_name, rec)
+            name = self.get_new_name(seq, next_num, short_name, vals_list)
             is_exist = self.env['sale.order'].search([('name', '=', name)])
             if is_exist:
-                self.sale_create_seq_name(vals_list, rec)
+                self.sale_create_seq_name(vals_list)
             else:
-                # vals_list['name'] = name
-                deal_ref = name.split("-")[0] + "-" + name.split("-")[2]
-                return name, deal_ref
+                vals_list['name'] = name
+                vals_list['hidden_ref'] = name.split("-")[0] + "-" + name.split("-")[2]
 
     def get_new_name(self, seq=None, next_num=None, short_name=None, rec=None):
         month = self.get_month(rec)
+        year = self.get_year(rec)
         if next_num in list(range(10)):
-            # name = short_name + seq[0] + "-" + seq[1] + "-" + str(rec.date_order.year)[-2:] + "" + str(
-            #     month) + "" + "0"
-            name = short_name + "-" + seq[1] + "-" + str(rec.date_order.year)[-2:] + "" + str(month)
+            name = short_name + "-" + seq[1] + "-" + year + "" + str(month)
             get_seq_name = self.check_in_partner_seq(name)
             return get_seq_name
         else:
-            # name = short_name + seq[0] + "-" + seq[1] + "-" + str(rec.date_order.year)[-2:] + "" + str(
-            #     month) + "" + str(next_num)
-            name = short_name + "-" + seq[1] + "-" + str(rec.date_order.year)[-2:] + "" + str(month)
+            name = short_name + "-" + seq[1] + "-" + year + "" + str(month)
             get_seq_name = self.check_in_partner_seq(name)
             return get_seq_name
 
