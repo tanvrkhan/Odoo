@@ -40,7 +40,7 @@
                                 <span class="m-0" t-field="o.invoice_date"
                                       t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
                                 <br/>
-                                <span class="m-0" t-field="o.invoice_date"
+                                <span class="m-0" t-field="o.invoice_date_due"
                                       t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
                             </div>
                         </div>
