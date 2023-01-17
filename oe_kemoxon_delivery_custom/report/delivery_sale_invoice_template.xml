@@ -178,7 +178,7 @@
 
 
                         <table width="100%" class="info_table table-borderless" t-if="picking.sale_id.incoterm">
-                            <th width="20%">Incotems :</th>
+                            <th width="20%">Incoterms :</th>
                             <td width="80%">
                                 <t t-if="picking.sale_id">
                                     <span t-field="picking.sale_id.incoterm"/>
@@ -363,7 +363,7 @@
                         <br/>
 
                         <table width="100%" class="info_table table-borderless" t-if="picking.sale_id.incoterm">
-                            <th width="20%">Incotems :</th>
+                            <th width="20%">Incoterms :</th>
                             <td width="80%">
                                 <t t-if="picking.sale_id">
                                     <span t-field="picking.sale_id.incoterm"/>
