@@ -318,8 +318,6 @@
                         <strong class="text-left">Truck Information</strong>
                         <div style="border: 1px solid black;"/>
                         <br/>
-
-
                         <table width="100%" class="info_table table-borderless">
                             <th width="20%">Truck No :</th>
                             <td width="80%">
