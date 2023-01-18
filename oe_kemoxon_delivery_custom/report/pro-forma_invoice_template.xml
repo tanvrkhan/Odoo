@@ -15,9 +15,11 @@
                     <div class="col-4">
                         <div class="row">
                             <div class="col-5">
-                                <strong>PFI No :</strong>
+                                <strong>PFI No.</strong>
                                 <br/>
-                                <strong>Deal Ref :</strong>
+                                <p t-if="o.deal_ref">
+                                    <strong>Deal Ref</strong>
+                                </p>
                             </div>
                             <div class="col-2"/>
                             <br/>
@@ -32,7 +34,7 @@
                     <div class="col-6">
                         <div class="row">
                             <div class="col-5" style="padding-left: 10px;">
-                                <strong>Date :</strong>
+                                <strong>Date</strong>
                             </div>
                             <div class="col-7" style="padding-left: 23px;">
                                 <span class="m-0" t-field="doc.date_order"

@@ -15,7 +15,7 @@
                             <div class="col-4">
                                 <strong>Invoice No.</strong>
                                 <br/>
-                                <p>
+                                <p t-if="o.deal_ref">
                                     <strong>Deal Ref</strong>
                                 </p>
                             </div>
