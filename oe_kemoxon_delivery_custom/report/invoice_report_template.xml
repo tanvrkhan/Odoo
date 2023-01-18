@@ -15,9 +15,7 @@
                             <div class="col-4">
                                 <strong>Invoice No.</strong>
                                 <br/>
-                                <p t-if="o.deal_ref">
-                                    <strong>Deal Ref</strong>
-                                </p>
+                                <p t-if="o.deal_ref"><strong>Deal Ref</strong></p>
                             </div>
                             <div class="col-2"/>
                             <br/>
@@ -471,5 +469,3 @@
         <field name="paperformat_id" ref="paperformat_invoice_portrait"/>
     </record>
 </odoo>
-
-
