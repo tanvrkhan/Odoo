@@ -45,3 +45,14 @@ class Truck_Transport_Details(models.Model):
                     'quantity_done': self.offloaded + quantity_done
                 })
                 self.is_updated = True
+
+    def get_warehouse(self, picking_id=None):
+        if picking_id:
+            warehouse_obj = self.env['stock.warehouse']
+            warehouse_id = warehouse_obj.search([('lot_stock_id', '=', picking_id.location_id.id)])
+            result = [warehouse_id.name, warehouse_id.lot_stock_id.display_name]
+            return result
+
+    def get_total(self, total=None):
+        number = "{:.2f}".format(total)
+        return "{:,.2f}".format(float(number))

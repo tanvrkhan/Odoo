@@ -126,7 +126,8 @@
                                         <span t-field="move.name"/>
                                     </td>
                                     <td style="text-align:right;">
-                                        <span t-field="move.product_uom_qty"/>
+                                        <!--                                        <span t-field="move.product_uom_qty"/>-->
+                                        <span t-field="o.loaded" t-options='{"widget": "float", "precision": 3}'/>
                                     </td>
                                     <td style="text-align:right;">
                                         <t t-if="move.sale_line_id">
@@ -135,7 +136,11 @@
                                     </td>
                                     <td style="text-align:right;">
                                         <t t-if="move.sale_line_id">
-                                            <span t-field="move.sale_line_id.price_subtotal"/>
+                                            <t t-set="total"
+                                               t-value="o.get_total(move.sale_line_id.price_unit*o.loaded)"/>
+                                            <span t-esc="total"/>
+                                            <!--                                            <t t-esc="move.sale_line_id.price_unit*o.loaded"/>-->
+                                            <!--                                            <span t-field="move.sale_line_id.price_subtotal"/>-->
                                         </t>
                                     </td>
                                 </tr>
@@ -178,7 +183,7 @@
 
 
                         <table width="100%" class="info_table table-borderless" t-if="picking.sale_id.incoterm">
-                            <th width="20%">incoterms :</th>
+                            <th width="20%">Incoterms :</th>
                             <td width="80%">
                                 <t t-if="picking.sale_id">
                                     <span t-field="picking.sale_id.incoterm"/>
@@ -196,9 +201,8 @@
                         <table width="100%" class="info_table table-borderless" t-if="picking.name">
                             <th width="20%">Loading Point :</th>
                             <td width="80%">
-                                <span t-field="picking.location_id.name"/>
-                                <span t-if="picking.location_id.location_id.name">/</span>
-                                <span t-field="picking.location_id.location_id.name"/>
+                                <t t-set="warehouse" t-value="o.get_warehouse(picking)"/>
+                                <span t-esc="warehouse[0]"/>
                             </td>
                         </table>
                         <p style="page-break-before:always;"></p>
@@ -294,16 +298,18 @@
                                         <span t-field="move.product_id.uom_id"/>
                                     </td>
                                     <td style="text-align:right;">
-                                        <span t-field="move.product_uom_qty"/>
+                                        <span t-field="o.nominated" t-options='{"widget": "float", "precision": 3}'/>
+                                        <!--                                        <span t-field="move.product_uom_qty"/>-->
                                     </td>
                                     <td style="text-align:right;">
-                                        <t t-if="move.forecast_availability&lt;0">
-                                            <t t-set="actual_qty" t-value="move.forecast_availability*(-1)"/>
-                                        </t>
-                                        <t t-else="">
-                                            <t t-set="actual_qty" t-value="move.forecast_availability"/>
-                                        </t>
-                                        <span t-esc="actual_qty"/>
+                                        <span t-field="o.loaded" t-options='{"widget": "float", "precision": 3}'/>
+                                        <!--                                        <t t-if="move.forecast_availability&lt;0">-->
+                                        <!--                                            <t t-set="actual_qty" t-value="move.forecast_availability*(-1)"/>-->
+                                        <!--                                        </t>-->
+                                        <!--                                        <t t-else="">-->
+                                        <!--                                            <t t-set="actual_qty" t-value="move.forecast_availability"/>-->
+                                        <!--                                        </t>-->
+                                        <!--                                        <span t-esc="actual_qty"/>-->
                                     </td>
                                 </tr>
                             </t>
@@ -359,7 +365,7 @@
                         <div style="border-top: 2px solid black;"/>
                         <br/>
                         <table width="100%" class="info_table table-borderless" t-if="picking.sale_id.incoterm">
-                            <th width="20%">incoterms :</th>
+                            <th width="20%">Incoterms :</th>
                             <td width="80%">
                                 <t t-if="picking.sale_id">
                                     <span t-field="picking.sale_id.incoterm"/>
@@ -378,10 +384,8 @@
                         <table width="100%" class="info_table table-borderless" t-if="picking.name">
                             <th width="20%">Loading Point :</th>
                             <td width="80%">
-                                <!--                                <span t-esc="o.get_warehouse(picking)"/>-->
-                                <span t-field="picking.location_id.name"/>
-                                <span t-if="picking.location_id.location_id.name">/</span>
-                                <span t-field="picking.location_id.location_id.name"/>
+                                <t t-set="warehouse" t-value="o.get_warehouse(picking)"/>
+                                <span t-esc="warehouse[0]"/>
                             </td>
                         </table>
 
