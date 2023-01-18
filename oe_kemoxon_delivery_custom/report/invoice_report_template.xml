@@ -13,9 +13,11 @@
                     <div class="col-4">
                         <div class="row">
                             <div class="col-4">
-                                <strong>Invoice No :</strong>
+                                <strong>Invoice No.</strong>
                                 <br/>
-                                <strong>Deal Ref :</strong>
+                                <p>
+                                    <strong>Deal Ref</strong>
+                                </p>
                             </div>
                             <div class="col-2"/>
                             <br/>
@@ -30,9 +32,9 @@
                     <div class="col-6">
                         <div class="row">
                             <div class="col-4">
-                                <strong>Date :</strong>
+                                <strong>Date</strong>
                                 <br/>
-                                <strong>Due Date :</strong>
+                                <strong>Due Date</strong>
                             </div>
                             <div class="col-1"/>
                             <br/>
