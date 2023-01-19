@@ -10,9 +10,9 @@ class Truck_Transport_Details(models.Model):
     trailer = fields.Char()
     driver = fields.Char()
     passport = fields.Char()
-    nominated = fields.Float()
-    loaded = fields.Float()
-    offloaded = fields.Float()
+    nominated = fields.Float(digits=(3, 3))
+    loaded = fields.Float(digits=(3, 3))
+    offloaded = fields.Float(digits=(3, 3))
     is_updated = fields.Boolean('Updated', copy=False)
     status = fields.Selection(
         [("Nominated", "Nominated"), ("Waiting to load", "Waiting to load"), ("In transit", "In transit"),
