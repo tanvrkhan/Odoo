@@ -1,42 +1,15 @@
 <odoo>
     <data>
-        <record id="sale_order_form_inherit" model="ir.ui.view">
+        <record id="view_order_form" model="ir.ui.view">
             <field name="name">make_quotation_field_visible</field>
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//group[@name='order_details']" position="replace">
-                    <group name="order_details">
-                        <field name="validity_date" attrs="{'invisible': [('state', 'in', ['sale', 'done'])]}"/>
-                        <div class="o_td_label"
-                             attrs="{'invisible': [('state', 'in', ['sale', 'done', 'cancel'])]}">
-                            <label for="date_order" string="Quotation Date"/>
-                        </div>
-                        <field name="date_order" nolabel="1"
-                               attrs="{'invisible': [('state', 'in', ['sale', 'done', 'cancel'])]}"/>
-                        <div class="o_td_label" attrs="{'invisible': [('state', 'in', ['draft', 'sent'])]}">
-                            <label for="date_order" string="Order Date"/>
-                        </div>
-                        <field name="date_order"
-                               attrs="{'required': [('state', 'in', ['sale', 'done'])], 'invisible': [('state', 'in', ['draft', 'sent'])]}"
-                               nolabel="1"/>
-                        <field name="show_update_pricelist" invisible="1"/>
-                        <label for="pricelist_id" groups="product.group_product_pricelist"/>
-                        <div groups="product.group_product_pricelist" class="o_row">
-                            <field name="pricelist_id" options="{'no_open':True,'no_create': True}"/>
-                            <button name="action_update_prices" type="object"
-                                    string=" Update Prices"
-                                    help="Recompute all prices based on this pricelist"
-                                    class="btn-link mb-1 px-0" icon="fa-refresh"
-                                    confirm="This will update all unit prices based on the currently set pricelist."
-                                    attrs="{'invisible': ['|', ('show_update_pricelist', '=', False), ('state', 'in', ['sale', 'done', 'cancel'])]}"/>
-                        </div>
-                        <field name="company_id" invisible="1"/>
-                        <field name="currency_id" invisible="1"/>
-                        <field name="pricelist_id" invisible="1"/>
-                        <field name="tax_country_id" invisible="1"/>
-                        <field name="payment_term_id" options="{'no_open':True,'no_create': True}"/>
-                    </group>
+                <xpath expr="//field[@name='date_order']" position="attributes">
+                    <attribute name="groups"></attribute>
+                </xpath>
+                <xpath expr="//div[hasclass('o_td_label')]" position="attributes">
+                    <attribute name="groups"></attribute>
                 </xpath>
             </field>
         </record>
