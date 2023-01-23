@@ -11,7 +11,7 @@ from odoo import api, fields, models, _
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
 
-    vendor_del_date = fields.Date(string="Vendor Delivery Date")
+    customer_del_date = fields.Date(string="customer Delivery Date")
 
     def button_confirm(self):
         res = super(PurchaseOrder, self).button_confirm()

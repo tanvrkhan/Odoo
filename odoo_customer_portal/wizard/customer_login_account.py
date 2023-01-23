@@ -9,18 +9,18 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 
-class VendorLoginAccount(models.TransientModel):
-    _name = 'vendor.login.account'
-    _description = "Vendor Login Account"
+class customerLoginAccount(models.TransientModel):
+    _name = 'customer.login.account'
+    _description = "customer Login Account"
 
-    def create_vendor_acocunt(self):
+    def create_customer_acocunt(self):
         self.ensure_one()
         ctx = dict(self.env.context or {})
         activeModel = ctx.get('active_model')
         activeId = ctx.get('active_id')
         if activeModel == 'res.partner':
             parnterObj = self.env['res.partner'].browse(activeId)
-            if parnterObj.vendor_reg:
+            if parnterObj.customer_reg:
                 self.env['res.users'].reset_password(parnterObj.email)
             else:
                 userObj = self.env['res.users'].with_context(active_test=False).search([('login', '=', parnterObj.email)])
@@ -32,7 +32,7 @@ class VendorLoginAccount(models.TransientModel):
                             'groups_id': [(6, 0, [templXmlId])],
                             'active': True,
                         })
-                        parnterObj.vendor_reg = True
+                        parnterObj.customer_reg = True
                         userObj.reset_password(parnterObj.email)
                     else:
                         raise UserError(_("An user is already exist for the another partner with the same credentials i.e email."))
@@ -49,5 +49,5 @@ class VendorLoginAccount(models.TransientModel):
                         irModelData = self.env['ir.model.data']
                         templXmlId = irModelData._xmlid_to_res_id('base.group_portal')
                         res = userObj.write({'groups_id': [(6, 0, [templXmlId])]})
-                        parnterObj.vendor_reg = True
+                        parnterObj.customer_reg = True
         return True

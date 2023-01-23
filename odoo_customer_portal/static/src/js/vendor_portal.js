@@ -21,12 +21,12 @@ odoo.define('odoo_customer_portal.take_price', function (require) {
             } else {
                 var userId = parseInt($('#loguser').val());
                 var rfqId = parseInt($('#rfqId').val());
-                ajax.jsonRpc("/update/vendorprice/", 'call', {
+                ajax.jsonRpc("/update/customerprice/", 'call', {
                     'rfqId': rfqId,
                     'offerPrice': offerPirce,
                     'offerDate': offerDate,
                     'offerNote': offerNote,
-                    'vendorUserId': userId
+                    'customerUserId': userId
                 })
                 .then(function (vals) {
                     window.location.reload();

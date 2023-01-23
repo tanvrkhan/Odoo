@@ -18,10 +18,10 @@ class CustomerPortal(CustomerPortal):
     def _prepare_portal_layout_values(self):
         values = super(CustomerPortal, self)._prepare_portal_layout_values()
         partner = request.env.user.partner_id
-        vendorRfq = request.env['customer.rfq'].sudo()
-        rfqCount = vendorRfq.search_count(['|',
+        customerRfq = request.env['customer.rfq'].sudo()
+        rfqCount = customerRfq.search_count(['|',
             ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
-            ('vendor_ids', 'child_of', [partner.commercial_partner_id.id]),
+            ('customer_ids', 'child_of', [partner.commercial_partner_id.id]),
             ('state', 'in', ['sent', 'cancel', 'done'])
         ])
         values.update({
@@ -44,11 +44,11 @@ class CustomerPortal(CustomerPortal):
         rfqHistoryModel = request.env['customer.rfqhistory'].sudo()
         currentLogUser = request.env.user
         loggedPartner = currentLogUser.partner_id
-        vendorIds = rfqObjSudo.vendor_ids
+        customerIds = rfqObjSudo.customer_ids
         offerPrice = 'yes'
-        if loggedPartner not in vendorIds:
+        if loggedPartner not in customerIds:
             offerPrice = 'no'
-        rfqHstry = rfqHistoryModel.search([('vendorrfq_id', '=', rfqObjSudo.id),
+        rfqHstry = rfqHistoryModel.search([('customerrfq_id', '=', rfqObjSudo.id),
                                            ('name', '=', loggedPartner.id)])
         mpPrice, myEstDel, myNote = rfqHstry.quoted_price, rfqHstry.quoted_del_date, rfqHstry.quoted_note if rfqHstry else ''
         IrConfigPrmtrSudo = request.env['ir.config_parameter'].sudo()
@@ -66,7 +66,7 @@ class CustomerPortal(CustomerPortal):
             'odoo_customer_portal.msg_po_create'
         ) or "Congratulations! A Purchase Order has been created for this RFQ."
         rejectMsg = ''
-        if rfqObjSudo.assign_vendor and rfqObjSudo.assign_vendor.id != loggedPartner.id:
+        if rfqObjSudo.assign_customer and rfqObjSudo.assign_customer.id != loggedPartner.id:
             rejectMsg = IrConfigPrmtrSudo.get_param(
                 'odoo_customer_portal.msg_rfq_reject'
             ) or "We regret that your quote has not been accepted. We will be glad to give you an another opportunity soon."
@@ -104,12 +104,12 @@ class CustomerPortal(CustomerPortal):
     def portal_my_rfqrequest(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
-        vendorRfq = request.env['customer.rfq'].sudo()
+        customerRfq = request.env['customer.rfq'].sudo()
         rfqHistoryModel = request.env['customer.rfqhistory'].sudo()
 
         domain = ['|',
             ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
-            ('vendor_ids', 'child_of', [partner.commercial_partner_id.id]),
+            ('customer_ids', 'child_of', [partner.commercial_partner_id.id]),
             ('state', 'in', ['sent', 'cancel', 'done'])
         ]
 
@@ -165,7 +165,7 @@ class CustomerPortal(CustomerPortal):
                        ('create_date', '<=', date_end)]
 
         # count for pager
-        rfqCount = vendorRfq.search_count(domain)
+        rfqCount = customerRfq.search_count(domain)
         # make pager
         pager = request.website.pager(url="/my/rfqrequests",
                                       url_args={
@@ -175,13 +175,13 @@ class CustomerPortal(CustomerPortal):
                                       },
                                       total=rfqCount, page=page, step=self._items_per_page)
         # search the count to display, according to the pager data
-        pageRfqrequest = vendorRfq.search(domain, order=sort_order, limit=self._items_per_page,
+        pageRfqrequest = customerRfq.search(domain, order=sort_order, limit=self._items_per_page,
                                           offset=pager['offset'])
         request.session['my_rfqs_history'] = pageRfqrequest.ids[:100]
         quoted = {}
         for rfqObj in pageRfqrequest:
             rfqId = rfqObj.id
-            rfqHstry = rfqHistoryModel.search([('vendorrfq_id', '=', rfqId),
+            rfqHstry = rfqHistoryModel.search([('customerrfq_id', '=', rfqId),
                                                ('name', '=', partner.id)])
             quoted.update({rfqId: 'no'})
             if rfqHstry:
@@ -211,9 +211,9 @@ class CustomerPortal(CustomerPortal):
         values = self._rfq_get_page_view_values(rfqObjSudo, access_token, **kw)
         return request.render("odoo_customer_portal.rfq_followup", values)
 
-    @http.route(['/update/vendorprice/'], type='json', auth="user", methods=['POST'], website=True)
-    def vendor_update_price(self, rfqId, offerPrice, offerDate, offerNote, vendorUserId):
+    @http.route(['/update/customerprice/'], type='json', auth="user", methods=['POST'], website=True)
+    def customer_update_price(self, rfqId, offerPrice, offerDate, offerNote, customerUserId):
         context, env = request.context, request.env
         rfqModel = env['customer.rfq']
-        res = rfqModel.sudo().update_vendor_history(int(rfqId), float(offerPrice), offerDate, offerNote, vendorUserId)
+        res = rfqModel.sudo().update_customer_history(int(rfqId), float(offerPrice), offerDate, offerNote, customerUserId)
         return {'rfqId': rfqId}
