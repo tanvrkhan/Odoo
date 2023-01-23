@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2015-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- "License URL : <https://store.webkul.com/license.html/>" -->
+<odoo>
+    <data>
+        <record id="view_res_partner_filter" model="ir.ui.view">
+            <field name="name">res.partner.select</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='inactive']" position="after">
+                    <filter string="Registered Customers" name="vendors_reg" domain="[('vendor_reg','=',1)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="id_wk_vendor_portal_action" model="ir.actions.act_window">
+            <field name="name">vendor login account</field>
+            <field name="res_model">vendor.login.account</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="id_wk_vendor_portal_account_wzard"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="id_wk_vendor_portal_action2" model="ir.actions.act_window">
+            <field name="name">vendor login account</field>
+            <field name="res_model">vendor.login.account</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="id_wk_vendor_portal_account_wzard2"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="res_partner_view_wk_vendor_login_account_buttons" model="ir.ui.view">
+            <field name="name">res.partner.view.ek.vendor.login.account.buttons</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="priority" eval="30"/>
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <field name="customer_rank" invisible="1"/>
+                    <button class="oe_stat_button" name="%(id_wk_vendor_portal_action)d" type="action" attrs="{'invisible': ['|',('customer_rank', '=', 0),('vendor_reg', '!=', True)]}" icon="fa-user-plus" help="Manage vendor registration">
+                        <field name="vendor_reg" invisible='1' />
+                        <span>Registered</span>
+                    </button>
+                    <button class="oe_stat_button" name="%(id_wk_vendor_portal_action2)d" type="action" attrs="{'invisible': ['|',('customer_rank', '=', 0),('vendor_reg', '!=', False)]}" icon="fa-user-plus" help="Manage vendor registration">
+                        <field name="vendor_reg" invisible='1'/>
+                        <span>Make portal user</span>
+                    </button>
+                </div>
+            </field>
+        </record>
+            <record id="action_partner_vendor_registered" model="ir.actions.act_window">
+            <field name="name">Registered Customers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="domain">[]</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{
+                'res_partner_search_mode': 'customer',
+                'default_is_company': True,
+                'search_default_vendors_reg': 1,
+                'default_customer_rank': 1
+            }</field>
+            <field name="filter" eval="True"/>
+        </record>
+
+        <record id="base.action_partner_customer_form" model="ir.actions.act_window">
+            <field name="context">{
+                'res_partner_search_mode': 'customer',
+                'default_is_company': True,
+                'search_default_customer': 1,
+                'default_customer_rank': 1
+            }</field>
+        </record>
+
+        <menuitem name="Customer Portal" id="menu_vendor_portal_root" groups="purchase.group_purchase_manager,purchase.group_purchase_user" web_icon="odoo_customer_portal,static/description/icon.png" sequence="26"/>
+
+        <menuitem name="Purchase" id="portal_purchase" parent="odoo_customer_portal.menu_vendor_portal_root" sequence="2"/>
+
+        <menuitem name="Requests for Quotation" id="po_id1" parent="odoo_customer_portal.portal_purchase" action="purchase.purchase_rfq" sequence="1"/>
+
+        <menuitem name="Purchase Orders" id="po_id2" parent="odoo_customer_portal.portal_purchase" action="purchase.purchase_form_action" sequence="2"/>
+
+        <menuitem name="Customers" id="portal_vendor" parent="odoo_customer_portal.menu_vendor_portal_root" sequence="3"/>
+
+        <menuitem name="Customers" id="portal_vendor1" parent="odoo_customer_portal.portal_vendor" action="base.action_partner_customer_form" sequence="1"/>
+
+        <menuitem name="Registered Customers" id="portal_vendor_reg" parent="odoo_customer_portal.portal_vendor" action="odoo_customer_portal.action_partner_vendor_registered" sequence="2"/>
+
+
+    </data>
+</odoo>
