@@ -74,13 +74,13 @@
             }</field>
         </record>
 
-        <menuitem name="Customer Portal" id="menu_customer_portal_root" groups="purchase.group_purchase_manager,purchase.group_purchase_user" web_icon="odoo_customer_portal,static/description/icon.png" sequence="26"/>
+        <menuitem name="Customer Portal" id="menu_customer_portal_root"  web_icon="odoo_customer_portal,static/description/icon.png" sequence="26"/>
 
-        <menuitem name="Purchase" id="portal_purchase" parent="odoo_customer_portal.menu_customer_portal_root" sequence="2"/>
+        <menuitem name="Sale" id="portal_purchase" parent="odoo_customer_portal.menu_customer_portal_root" sequence="2"/>
 
-        <menuitem name="Requests for Quotation" id="po_id1" parent="odoo_customer_portal.portal_purchase" action="purchase.purchase_rfq" sequence="1"/>
+        <menuitem name="Quotation" id="po_id1" parent="odoo_customer_portal.portal_purchase" action="sale.action_quotations_with_onboarding" sequence="1"/>
 
-        <menuitem name="Purchase Orders" id="po_id2" parent="odoo_customer_portal.portal_purchase" action="purchase.purchase_form_action" sequence="2"/>
+        <menuitem name="Orders" id="po_id2" parent="odoo_customer_portal.portal_purchase" action="sale.action_orders" sequence="2"/>
 
         <menuitem name="Customers" id="portal_customer" parent="odoo_customer_portal.menu_customer_portal_root" sequence="3"/>
 

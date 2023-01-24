@@ -28,7 +28,7 @@ Odoo Customer website account
 Manage purchase order from Customer account""",
   "live_test_url"        :  "http://odoodemo.webkul.com/?module=odoo_customer_portal&lout=1&custom_url=/",
   "depends"              :  [
-                             'purchase',
+                             'sale',
                              'website',
                             ],
   "data"                 :  [
