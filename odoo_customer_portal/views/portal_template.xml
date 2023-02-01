@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_my_home_attachments" name="Show Attachments" customize_show="True"
+              inherit_id="portal.portal_my_home" priority="20">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Attachments</t>
+                <t t-set="url" t-value="'/my/attachments'"/>
+                <t t-set="placeholder_count" t-value="'attachment_count'"/>
+            </t>
+        </xpath>
+    </template>
+    <template id="portal_my_attachments" name="My Attachments">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Attachments</t>
+            </t>
+            <t t-if="not invoices">
+                <p>There are currently no attachments for your account.</p>
+            </t>
+            <t t-if="invoices" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Name</th>
+                        <th>Expiry</th>
+                        <th class="text-end">File</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="invoices" t-as="invoice">
+                        <tr>
+                            <td>
+<!--                                 <a t-attf-href="/my/attachment/#{invoice.id}?{{ keep_query() }}">-->
+                                    <t t-esc="invoice.name"/>
+<!--                                </a>-->
+                            </td>
+                            <td>
+                                <span t-field="invoice.expiry_date"/>
+                            </td>
+                             <td>
+                                <span t-field="invoice.datas"/>
+                            </td>
+
+
+                        </tr>
+                    </t>
+                </tbody>
+            </t>
+        </t>
+    </template>
+</odoo>

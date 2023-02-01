@@ -5,4 +5,4 @@
 # License URL : <https://store.webkul.com/license.html/>
 ##############################################################################
 
-# from . import main
+from . import main
