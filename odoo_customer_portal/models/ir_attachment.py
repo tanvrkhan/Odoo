@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 class ResPartner(models.Model):
     _inherit = 'ir.attachment'
 
-    #expiry_date = fields.Date('Expiry Date')
+    expiry_date = fields.Date('Expiry Date')
 
     def action_send_customer_reminder(self):
         one_month_before = fields.Date.today() + relativedelta(months=1)
