@@ -48,6 +48,10 @@
                         <span>Make portal user</span>
                     </button>
                 </div>
+
+                <xpath expr="//field[@name='vat']" position="attributes">
+                    <attribute name="string">VAT ID</attribute>
+                </xpath>
             </field>
         </record>
             <record id="action_partner_customer_registered" model="ir.actions.act_window">

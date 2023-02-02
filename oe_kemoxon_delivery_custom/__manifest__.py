@@ -25,7 +25,8 @@ OdooERP Sales
         'views/stock_picking_view.xml',
         'views/trucktransportdetails.xml',
         'wizard/kemexon_aging_balance_report_view.xml',
-        'views/res_partner_bank_view.xml'
+        'views/res_partner_bank_view.xml',
+        'views/res_currency_view.xml'
     ],
     'installable': True,
     'application': True,

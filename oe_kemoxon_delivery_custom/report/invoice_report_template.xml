@@ -68,7 +68,7 @@
                     <br/>
                     <span t-field="o.partner_id.state_id.name"/>
                 </t>
-                <t t-if="o.is_vtd_ids">
+                <t t-if="o.show_vat_ids">
                     <br/>
                     <span t-field="o.partner_id.vat"/>
                 </t>
@@ -441,9 +441,11 @@
                     <!--                                    <li t-if="company.website" >-->
                     <!--                                        <span t-field="company.website"/>-->
                     <!--                                    </li>-->
-                    <li t-if="company.vat"><t t-out="company.country_id.vat_label or 'Tax ID'"/>:
-                        <span t-field="company.vat"/>
-                    </li>
+                    <t t-if="o.show_vat_ids">
+                        <li t-if="company.vat"><t t-out="company.country_id.vat_label or 'Tax ID'"/>:
+                            <span t-field="company.vat"/>
+                        </li>
+                    </t>
                 </ul>
                 <div t-if="report_type == 'pdf'" class="text-muted" style="margin-top: -20px; text-align: right;">
                     Page:

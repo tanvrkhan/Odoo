@@ -21,7 +21,7 @@ class AccountMove(models.Model):
                                  states={'draft': [('readonly', False)]},
                                  check_company=True)
 
-    is_vtd_ids = fields.Boolean(string="Is Vtd Ids")
+    show_vat_ids = fields.Boolean(string="Show VAT Ids")
     
     def get_invoice_details(self):
         invoices = self.env['account.move'].search(
