@@ -437,15 +437,21 @@
                         <span class="o_force_ltr" t-field="company.phone"/>
                         -
                         <span t-field="company.email"/>
+                        <t t-if="o.show_vat_ids">
+                            <t t-if="company.vat">
+                                <t t-out="company.country_id.vat_label or 'VAT ID'"/>:
+                            <span t-field="company.vat"/>
+                            </t>
+                        </t>
                     </li>
                     <!--                                    <li t-if="company.website" >-->
                     <!--                                        <span t-field="company.website"/>-->
                     <!--                                    </li>-->
-                    <t t-if="o.show_vat_ids">
+                    <!-- <t t-if="o.show_vat_ids">
                         <li t-if="company.vat"><t t-out="company.country_id.vat_label or 'VAT ID'"/>:
                             <span t-field="company.vat"/>
                         </li>
-                    </t>
+                    </t> -->
                 </ul>
                 <div t-if="report_type == 'pdf'" class="text-muted" style="margin-top: -20px; text-align: right;">
                     Page:
