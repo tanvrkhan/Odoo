@@ -23,7 +23,7 @@ class CustomerPortal(CustomerPortal):
             attachment_count = request.env['ir.attachment'].sudo().search_count(
                 [('res_model', '=', 'res.partner'), ('res_id', '=', request.env.user.partner_id.id)]) \
                 if request.env['account.move'].check_access_rights('read', raise_exception=False) else 0
-            values['attachment_count'] = attachment_count
+            values['attachment_count'] = attachment_count or 1
         return values
 
     def _get_attachment_searchbar_filters(self):
