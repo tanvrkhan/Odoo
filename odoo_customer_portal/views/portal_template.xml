@@ -5,7 +5,7 @@
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
             <t t-call="portal.portal_docs_entry">
                 <t t-set="title">Attachments</t>
-                <t t-set="url" t-value="'/my/attachments'"/>
+                <t t-set="url" t-value="'/add/attachments'"/>
                 <t t-set="placeholder_count" t-value="'attachment_count'"/>
             </t>
         </xpath>
@@ -32,14 +32,14 @@
                     <t t-foreach="invoices" t-as="invoice">
                         <tr>
                             <td>
-<!--                                 <a t-attf-href="/my/attachment/#{invoice.id}?{{ keep_query() }}">-->
-                                    <t t-esc="invoice.name"/>
-<!--                                </a>-->
+                                <!--                                 <a t-attf-href="/my/attachment/#{invoice.id}?{{ keep_query() }}">-->
+                                <t t-esc="invoice.name"/>
+                                <!--                                </a>-->
                             </td>
                             <td>
                                 <span t-field="invoice.expiry_date"/>
                             </td>
-                             <td>
+                            <td>
                                 <span t-field="invoice.datas"/>
                             </td>
 
@@ -48,6 +48,35 @@
                     </t>
                 </tbody>
             </t>
+        </t>
+    </template>
+    <template id="add_attachment_form" name="Project Detail">
+        <t t-call="website.layout">
+            <div class="col-md-offset-5 col-sm-offset-4 col-sm-8 col-md-7" style="margin-top:30px;">
+                <form action="/attachment/uploaded" method="post"
+                      class="s_website_form form-horizontal container-fluid mt32" enctype="multipart/form-data"
+                      id="file_upload_form">
+                    <div t-attf-class="form-group">
+                        <div class="col-md-7 col-sm-8">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <!--                            <input type="hidden" name="project_id" t-att-value="project.id"/>-->
+                            <label for="attachment">Attachment:</label>
+                            <br/>
+                            <input type="file"  name="attachment" class="file" multiple="true" data-show-upload="true"
+                                   data-show-caption="true" lass="file" data-show-preview="true" id="attachment"/>
+                            <br/>
+                            <label for="expiry_date">Expiry Date:</label>
+                            <br/>
+                            <input type="date"  name="expiry_date"  id="expiry_date"/>
+                            <br/>
+
+                            <button type="submit" name="Upload" style="margin-top:20px;" class="fa fa-upload">
+                                Upload
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </t>
     </template>
 </odoo>

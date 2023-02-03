@@ -12,41 +12,44 @@ from odoo.exceptions import AccessError
 from odoo.http import request
 from odoo.tools import consteq
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager, get_records_pager
-
+import base64
 
 class CustomerPortal(CustomerPortal):
 
     def _prepare_home_portal_values(self, counters):
-        print(counters,'counterscounters')
+        print(counters, 'counterscounters')
         values = super()._prepare_home_portal_values(counters)
         if 'attachment_count' in counters:
-            attachment_count = request.env['ir.attachment'].sudo().search_count([('res_model','=','res.partner'),('res_id','=',request.env.user.partner_id.id)]) \
+            attachment_count = request.env['ir.attachment'].sudo().search_count(
+                [('res_model', '=', 'res.partner'), ('res_id', '=', request.env.user.partner_id.id)]) \
                 if request.env['account.move'].check_access_rights('read', raise_exception=False) else 0
             values['attachment_count'] = attachment_count
         return values
+
     def _get_attachment_searchbar_filters(self):
         return {
             'all': {'label': _('All'), 'domain': []},
         }
+
     def _get_attachment_searchbar_sortings(self):
         return {
             'date': {'label': _('Date'), 'order': 'create_date desc'},
             'name': {'label': _('Reference'), 'order': 'name desc'},
         }
 
-    def _prepare_my_attachment_values(self, page, date_begin, date_end, sortby, filterby, domain=None, url="/my/attachments"):
+    def _prepare_my_attachment_values(self, page, date_begin, date_end, sortby, filterby, domain=None,
+                                      url="/my/attachments"):
         print('_prepare_my_attachment_values')
         values = self._prepare_portal_layout_values()
-        print(values,'valuesvalues')
+        print(values, 'valuesvalues')
         IrAttachment = request.env['ir.attachment'].sudo()
 
         # domain = expression.AND([
         #     domain or [],
         #     self._get_invoices_domain(),
         # ])
-        domain = [('res_model','=','res.partner'),('res_id','=',request.env.user.partner_id.id)]
+        domain = [('res_model', '=', 'res.partner'), ('res_id', '=', request.env.user.partner_id.id)]
         partner = request.env.user.partner_id
-        print(partner,partner.name,'partner')
 
         searchbar_sortings = self._get_attachment_searchbar_sortings()
         # default sort by order
@@ -67,7 +70,8 @@ class CustomerPortal(CustomerPortal):
             'date': date_begin,
             # content according to pager and archive selected
             # lambda function to get the invoices recordset when the pager will be defined in the main method of a route
-            'invoices': lambda pager_offset: IrAttachment.search(domain, order=order, limit=self._items_per_page, offset=pager_offset),
+            'invoices': lambda pager_offset: IrAttachment.search(domain, order=order, limit=self._items_per_page,
+                                                                 offset=pager_offset),
             'page_name': 'Attachments',
             'pager': {  # vals to define the pager.
                 "url": url,
@@ -112,6 +116,37 @@ class CustomerPortal(CustomerPortal):
         if current_request_item and current_request_item.partner_id.lang:
             http.request.env.context = dict(http.request.env.context, lang=current_request_item.partner_id.lang)
         return http.request.render('sign.doc_sign', document_context)
+
+    @http.route(['/add/attachments', '/add/attachments/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_add_attachments(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, **kw):
+
+        return request.render("odoo_customer_portal.add_attachment_form")
+
+    @http.route(["/attachment/uploaded"], type='http', auth='public', website=True)
+    def attachment_uploaded(self, **post):
+        values = {}
+        partner = request.env.user.partner_id
+        print(partner,'partner',partner.name)
+        if post.get('attachment', False):
+            Attachments = request.env['ir.attachment']
+            name = post.get('attachment').filename
+            file = post.get('attachment')
+            expiry_date = post.get('expiry_date')
+            attachment = file.read()
+            attachment_id = Attachments.sudo().create({
+                'name': name,
+                'res_name': name,
+                'type': 'binary',
+                'expiry_date':expiry_date,
+                'res_model': 'res.partner',
+                'res_id': partner.id,
+            'datas': base64.b64encode(attachment),
+            })
+            value = {
+                'attachment': attachment_id
+            }
+            return request.redirect('/my')
+            # return request.render("modulename.template_to_render", value)
 
     # @http.route(['/my/attachment/<int:item_id>'], type='http', auth='user', website=True)
     # def portal_my_attachment(self, item_id, **kwargs):
