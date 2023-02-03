@@ -439,8 +439,8 @@
                         <span t-field="company.email"/>
                         <t t-if="o.show_vat_ids">
                             <t t-if="company.vat">
-                                <t t-out="company.country_id.vat_label or 'VAT ID'"/>:
-                            <span t-field="company.vat"/>
+                                &#160;-&#160;<t t-out="company.country_id.vat_label or 'VAT ID'"/>:
+                                <span t-field="company.vat"/>
                             </t>
                         </t>
                     </li>
