@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models, _
 from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessError
+from odoo.exceptions import UserError
 
 
 class StockPicking(models.Model):
@@ -23,7 +24,6 @@ class StockPicking(models.Model):
 
     @api.onchange('consignee')
     def _domain_change(self):
-        print('_domain_change_domain_change')
         domain = []
         if self.partner_id:
             if self.partner_id.child_ids:
@@ -31,7 +31,6 @@ class StockPicking(models.Model):
                 domain.append(self.partner_id.id)
             else:
                 domain.append(self.partner_id.id)
-        print(domain,'domaindomain')
         return {
             'domain': {
                 'consignee': [('id', 'in', domain)]}
@@ -42,3 +41,36 @@ class DeliveryLocation(models.Model):
     _name = "delivery.location"
 
     name = fields.Char("Name")
+
+
+class StockMove(models.Model):
+    _inherit = "stock.move"
+
+    @api.constrains('quantity_done')
+    @api.onchange('quantity_done')
+    def _check_quantity_done(self):
+        if self.quantity_done:
+            if self.sale_line_id:
+                product_uom_qty = self.sale_line_id.product_uom_qty
+                if self.sale_line_id.tolerance_type:
+                    if self.sale_line_id.tolerance_type == 'min_max':
+                        if product_uom_qty + self.sale_line_id.tolerance_percentage < self.quantity_done or product_uom_qty - self.sale_line_id.tolerance_percentage > self.quantity_done:
+                            raise UserError(_("You cannot Allow This Quantity."))
+                    elif self.sale_line_id.tolerance_type == 'max':
+                        if product_uom_qty + self.sale_line_id.tolerance_percentage < self.quantity_done:
+                            raise UserError(_("You cannot Allow This Quantity."))
+                    elif self.sale_line_id.tolerance_type == 'min':
+                        if product_uom_qty - self.sale_line_id.tolerance_percentage > self.quantity_done:
+                            raise UserError(_("You cannot Allow This Quantity."))
+            elif self.purchase_line_id:
+                product_qty = self.purchase_line_id.product_qty
+                if self.purchase_line_id.tolerance_type:
+                    if self.purchase_line_id.tolerance_type == 'min_max':
+                        if product_qty + self.purchase_line_id.tolerance_percentage < self.quantity_done or product_qty - self.sale_line_id.tolerance_percentage > self.quantity_done:
+                            raise UserError(_("You cannot Allow This Quantity."))
+                    elif self.purchase_line_id.tolerance_type == 'max':
+                        if product_qty + self.purchase_line_id.tolerance_percentage < self.quantity_done:
+                            raise UserError(_("You cannot Allow This Quantity."))
+                    elif self.purchase_line_id.tolerance_type == 'min':
+                        if product_qty - self.purchase_line_id.tolerance_percentage > self.quantity_done:
+                            raise UserError(_("You cannot Allow This Quantity."))

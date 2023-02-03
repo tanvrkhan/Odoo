@@ -42,11 +42,11 @@ class AccountMove(models.Model):
                 thirtyone_sixty = 0
                 sixteeone_nineteen = 0
                 nineteen_above = 0
-                if 0 <= due_days >= 30:
+                if 0 <= due_days <= 30:
                     zero_thirty = invoice.amount_residual
-                elif 31 <= due_days >= 60:
+                elif 31 <= due_days <= 60:
                     thirtyone_sixty = invoice.amount_residual
-                elif 61 <= due_days >= 90:
+                elif 61 <= due_days <= 90:
                     sixteeone_nineteen = invoice.amount_residual
                 else:
                     nineteen_above = invoice.amount_residual
@@ -150,11 +150,11 @@ class AccountMove(models.Model):
                 thirtyone_sixty = 0
                 sixteeone_nineteen = 0
                 nineteen_above = 0
-                if 0 <= due_days >= 30:
+                if 0 <= due_days <= 30:
                     zero_thirty = invoice.amount_residual
-                elif 31 <= due_days >= 60:
+                elif 31 <= due_days <= 60:
                     thirtyone_sixty = invoice.amount_residual
-                elif 61 <= due_days >= 90:
+                elif 61 <= due_days <= 90:
                     sixteeone_nineteen = invoice.amount_residual
                 else:
                     nineteen_above = invoice.amount_residual
