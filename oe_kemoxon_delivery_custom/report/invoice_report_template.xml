@@ -70,7 +70,7 @@
                 </t>
                 <t t-if="o.show_vat_ids">
                     <br/>
-                    <span t-field="o.partner_id.vat"/>
+                    VAT ID:&#160;<span t-field="o.partner_id.vat"/>
                 </t>
                 <br/>
                 <br/>
@@ -442,7 +442,7 @@
                     <!--                                        <span t-field="company.website"/>-->
                     <!--                                    </li>-->
                     <t t-if="o.show_vat_ids">
-                        <li t-if="company.vat"><t t-out="company.country_id.vat_label or 'Tax ID'"/>:
+                        <li t-if="company.vat"><t t-out="company.country_id.vat_label or 'VAT ID'"/>:
                             <span t-field="company.vat"/>
                         </li>
                     </t>
