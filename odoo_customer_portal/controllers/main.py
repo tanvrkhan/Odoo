@@ -14,6 +14,7 @@ from odoo.tools import consteq
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager, get_records_pager
 import base64
 
+
 class CustomerPortal(CustomerPortal):
 
     def _prepare_home_portal_values(self, counters):
@@ -126,26 +127,28 @@ class CustomerPortal(CustomerPortal):
     def attachment_uploaded(self, **post):
         values = {}
         partner = request.env.user.partner_id
-        print(partner,'partner',partner.name)
+        print(partner, 'partner', partner.name)
         if post.get('attachment', False):
             Attachments = request.env['ir.attachment']
             name = post.get('attachment').filename
             file = post.get('attachment')
             expiry_date = post.get('expiry_date')
+            description = post.get('description')
             attachment = file.read()
             attachment_id = Attachments.sudo().create({
                 'name': name,
                 'res_name': name,
                 'type': 'binary',
-                'expiry_date':expiry_date,
+                'description': description,
+                'expiry_date': expiry_date,
                 'res_model': 'res.partner',
                 'res_id': partner.id,
-            'datas': base64.b64encode(attachment),
+                'datas': base64.b64encode(attachment),
             })
             value = {
                 'attachment': attachment_id
             }
-            return request.redirect('/my')
+            return request.redirect('/my/attachments')
             # return request.render("modulename.template_to_render", value)
 
     # @http.route(['/my/attachment/<int:item_id>'], type='http', auth='user', website=True)

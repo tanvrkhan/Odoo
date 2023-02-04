@@ -5,7 +5,7 @@
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
             <t t-call="portal.portal_docs_entry">
                 <t t-set="title">Attachments</t>
-                <t t-set="url" t-value="'/add/attachments'"/>
+                <t t-set="url" t-value="'/my/attachments'"/>
                 <t t-set="placeholder_count" t-value="'attachment_count'"/>
             </t>
         </xpath>
@@ -25,6 +25,7 @@
                     <tr class="active">
                         <th>Name</th>
                         <th>Expiry</th>
+                        <th>Remarks</th>
                         <th class="text-end">File</th>
                     </tr>
                 </thead>
@@ -32,22 +33,48 @@
                     <t t-foreach="invoices" t-as="invoice">
                         <tr>
                             <td>
-                                <!--                                 <a t-attf-href="/my/attachment/#{invoice.id}?{{ keep_query() }}">-->
                                 <t t-esc="invoice.name"/>
-                                <!--                                </a>-->
                             </td>
                             <td>
                                 <span t-field="invoice.expiry_date"/>
                             </td>
                             <td>
+                                <span t-field="invoice.description"/>
+                            </td>
+                            <td>
                                 <span t-field="invoice.datas"/>
                             </td>
-
-
                         </tr>
+
                     </t>
+                    <form action="/attachment/uploaded" method="post"
+                              class="s_website_form form-horizontal container-fluid mt32" enctype="multipart/form-data"
+                              id="file_upload_form">
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <!--                            <input type="hidden" name="project_id" t-att-value="project.id"/>-->
+                                    <input type="file" name="attachment" class="file" multiple="true"
+                                           data-show-upload="true"
+                                           data-show-caption="true" lass="file" data-show-preview="true"
+                                           id="attachment"/>
+                                </td>
+                                <td>
+                                    <input type="date" name="expiry_date" id="expiry_date"/>
+                                </td>
+                                 <td>
+                                    <input type="text" name="description" id="description"/>
+                                </td>
+                                <td>
+                                    <button type="submit" name="Upload" style="margin-top:20px;" class="fa fa-upload">
+                                        Upload
+                                    </button>
+                                </td>
+                            </tr>
+                        </form>
                 </tbody>
             </t>
+
         </t>
     </template>
     <template id="add_attachment_form" name="Project Detail">
@@ -62,12 +89,12 @@
                             <!--                            <input type="hidden" name="project_id" t-att-value="project.id"/>-->
                             <label for="attachment">Attachment:</label>
                             <br/>
-                            <input type="file"  name="attachment" class="file" multiple="true" data-show-upload="true"
+                            <input type="file" name="attachment" class="file" multiple="true" data-show-upload="true"
                                    data-show-caption="true" lass="file" data-show-preview="true" id="attachment"/>
                             <br/>
                             <label for="expiry_date">Expiry Date:</label>
                             <br/>
-                            <input type="date"  name="expiry_date"  id="expiry_date"/>
+                            <input type="date" name="expiry_date" id="expiry_date"/>
                             <br/>
 
                             <button type="submit" name="Upload" style="margin-top:20px;" class="fa fa-upload">
