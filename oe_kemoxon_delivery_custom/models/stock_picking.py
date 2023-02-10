@@ -58,19 +58,19 @@ class StockMove(models.Model):
                             if product_uom_qty + rec.sale_line_id.tolerance_percentage < rec.quantity_done or product_uom_qty - rec.sale_line_id.tolerance_percentage > rec.quantity_done:
                                 return {'warning': {
                                     'title': _('Warning'),
-                                    'message': _('You cannot Allow This Quantity.')
+                                    'message': _('Please note that the quantity is not within the tolerance limit of the order.')
                                 }}
                         elif rec.sale_line_id.tolerance_type == 'max':
                             if product_uom_qty + rec.sale_line_id.tolerance_percentage < rec.quantity_done:
                                 return {'warning': {
                                     'title': _('Warning'),
-                                    'message': _('You cannot Allow This Quantity.')
+                                    'message': _('Please note that the quantity is not within the tolerance limit of the order.')
                                 }}
                         elif rec.sale_line_id.tolerance_type == 'min':
                             if product_uom_qty - rec.sale_line_id.tolerance_percentage > rec.quantity_done:
                                 return {'warning': {
                                     'title': _('Warning'),
-                                    'message': _('You cannot Allow This Quantity.')
+                                    'message': _('Please note that the quantity is not within the tolerance limit of the order.')
                                 }}
                 elif rec.purchase_line_id:
                     product_qty = rec.purchase_line_id.product_qty
@@ -79,17 +79,17 @@ class StockMove(models.Model):
                             if product_qty + rec.purchase_line_id.tolerance_percentage < rec.quantity_done or product_qty - rec.sale_line_id.tolerance_percentage > rec.quantity_done:
                                 return {'warning': {
                                     'title': _('Warning'),
-                                    'message': _('You cannot Allow This Quantity.')
+                                    'message': _('Please note that the quantity is not within the tolerance limit of the order.')
                                 }}
                         elif rec.purchase_line_id.tolerance_type == 'max':
                             if product_qty + rec.purchase_line_id.tolerance_percentage < rec.quantity_done:
                                 return {'warning': {
                                     'title': _('Warning'),
-                                    'message': _('You cannot Allow This Quantity.')
+                                    'message': _('Please note that the quantity is not within the tolerance limit of the order.')
                                 }}
                         elif rec.purchase_line_id.tolerance_type == 'min':
                             if product_qty - rec.purchase_line_id.tolerance_percentage > rec.quantity_done:
                                 return {'warning': {
                                     'title': _('Warning'),
-                                    'message': _('You cannot Allow This Quantity.')
+                                    'message': _('Please note that the quantity is not within the tolerance limit of the order.')
                                 }}
