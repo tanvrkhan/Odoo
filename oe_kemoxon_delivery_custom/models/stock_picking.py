@@ -3,7 +3,7 @@
 
 from odoo import api, fields, models, _
 from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessError
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError,Warning
 
 
 class StockPicking(models.Model):
@@ -49,28 +49,47 @@ class StockMove(models.Model):
     @api.constrains('quantity_done')
     @api.onchange('quantity_done')
     def _check_quantity_done(self):
-        if self.quantity_done:
-            if self.sale_line_id:
-                product_uom_qty = self.sale_line_id.product_uom_qty
-                if self.sale_line_id.tolerance_type:
-                    if self.sale_line_id.tolerance_type == 'min_max':
-                        if product_uom_qty + self.sale_line_id.tolerance_percentage < self.quantity_done or product_uom_qty - self.sale_line_id.tolerance_percentage > self.quantity_done:
-                            raise UserError(_("You cannot Allow This Quantity."))
-                    elif self.sale_line_id.tolerance_type == 'max':
-                        if product_uom_qty + self.sale_line_id.tolerance_percentage < self.quantity_done:
-                            raise UserError(_("You cannot Allow This Quantity."))
-                    elif self.sale_line_id.tolerance_type == 'min':
-                        if product_uom_qty - self.sale_line_id.tolerance_percentage > self.quantity_done:
-                            raise UserError(_("You cannot Allow This Quantity."))
-            elif self.purchase_line_id:
-                product_qty = self.purchase_line_id.product_qty
-                if self.purchase_line_id.tolerance_type:
-                    if self.purchase_line_id.tolerance_type == 'min_max':
-                        if product_qty + self.purchase_line_id.tolerance_percentage < self.quantity_done or product_qty - self.sale_line_id.tolerance_percentage > self.quantity_done:
-                            raise UserError(_("You cannot Allow This Quantity."))
-                    elif self.purchase_line_id.tolerance_type == 'max':
-                        if product_qty + self.purchase_line_id.tolerance_percentage < self.quantity_done:
-                            raise UserError(_("You cannot Allow This Quantity."))
-                    elif self.purchase_line_id.tolerance_type == 'min':
-                        if product_qty - self.purchase_line_id.tolerance_percentage > self.quantity_done:
-                            raise UserError(_("You cannot Allow This Quantity."))
+        for rec in self:
+            if rec.quantity_done:
+                if rec.sale_line_id:
+                    product_uom_qty = rec.sale_line_id.product_uom_qty
+                    if rec.sale_line_id.tolerance_type:
+                        if rec.sale_line_id.tolerance_type == 'min_max':
+                            if product_uom_qty + rec.sale_line_id.tolerance_percentage < rec.quantity_done or product_uom_qty - rec.sale_line_id.tolerance_percentage > rec.quantity_done:
+                                return {'warning': {
+                                    'title': _('Warning'),
+                                    'message': _('You cannot Allow This Quantity.')
+                                }}
+                        elif rec.sale_line_id.tolerance_type == 'max':
+                            if product_uom_qty + rec.sale_line_id.tolerance_percentage < rec.quantity_done:
+                                return {'warning': {
+                                    'title': _('Warning'),
+                                    'message': _('You cannot Allow This Quantity.')
+                                }}
+                        elif rec.sale_line_id.tolerance_type == 'min':
+                            if product_uom_qty - rec.sale_line_id.tolerance_percentage > rec.quantity_done:
+                                return {'warning': {
+                                    'title': _('Warning'),
+                                    'message': _('You cannot Allow This Quantity.')
+                                }}
+                elif rec.purchase_line_id:
+                    product_qty = rec.purchase_line_id.product_qty
+                    if rec.purchase_line_id.tolerance_type:
+                        if rec.purchase_line_id.tolerance_type == 'min_max':
+                            if product_qty + rec.purchase_line_id.tolerance_percentage < rec.quantity_done or product_qty - rec.sale_line_id.tolerance_percentage > rec.quantity_done:
+                                return {'warning': {
+                                    'title': _('Warning'),
+                                    'message': _('You cannot Allow This Quantity.')
+                                }}
+                        elif rec.purchase_line_id.tolerance_type == 'max':
+                            if product_qty + rec.purchase_line_id.tolerance_percentage < rec.quantity_done:
+                                return {'warning': {
+                                    'title': _('Warning'),
+                                    'message': _('You cannot Allow This Quantity.')
+                                }}
+                        elif rec.purchase_line_id.tolerance_type == 'min':
+                            if product_qty - rec.purchase_line_id.tolerance_percentage > rec.quantity_done:
+                                return {'warning': {
+                                    'title': _('Warning'),
+                                    'message': _('You cannot Allow This Quantity.')
+                                }}
