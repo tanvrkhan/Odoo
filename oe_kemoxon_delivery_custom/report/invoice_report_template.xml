@@ -198,10 +198,10 @@
                 <div style="border-top: 2px solid black;"/>
                 <br/>
                 <div class="row">
-                    <div class="col-4">
+                    <div class="col-6">
                         <t t-if="o.delivery_location">
                             <div class="row">
-                                <div class="col-5">
+                                <div class="col-3">
                                     <strong>Delivery Location</strong>
                                 </div>
                                 <br/>
@@ -213,11 +213,11 @@
                         </t>
                         <t t-if="o.invoice_incoterm_id">
                             <div class="row">
-                                <div class="col-4">
+                                <div class="col-3">
                                     <strong>Incoterms</strong>
                                 </div>
                                 <br/>
-                                <div class="col-2"/>
+                                <div class="col-1"/>
                                 <div class="col-6">
                                     <span class="m-0" t-field="o.invoice_incoterm_id"/>
                                 </div>
@@ -226,11 +226,11 @@
 
                         <t t-if="o.bill_date">
                             <div class="row">
-                                <div class="col-4">
+                                <div class="col-3">
                                     <strong>B/L Date</strong>
                                 </div>
                                 <br/>
-                                <div class="col-2"/>
+                                <div class="col-1"/>
                                 <div class="col-6">
                                     <span class="m-0" t-field="o.bill_date"
                                           t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
@@ -240,11 +240,11 @@
 
                         <t t-if="o.vessel_name">
                             <div class="row">
-                                <div class="col-4">
+                                <div class="col-3">
                                     <strong>Vessel Name</strong>
                                 </div>
                                 <br/>
-                                <div class="col-2"/>
+                                <div class="col-1"/>
                                 <div class="col-6">
                                     <span class="m-0" t-field="o.vessel_name"/>
                                 </div>
