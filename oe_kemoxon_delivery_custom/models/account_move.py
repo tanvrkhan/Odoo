@@ -21,6 +21,8 @@ class AccountMove(models.Model):
                                  states={'draft': [('readonly', False)]},
                                  check_company=True)
 
+    show_vat_ids = fields.Boolean(string="Show VAT Ids")
+    
     def get_invoice_details(self):
         invoices = self.env['account.move'].search(
             [('amount_residual', '>', 0), ('move_type', '=', self.move_type), ('state', '=', 'posted')])

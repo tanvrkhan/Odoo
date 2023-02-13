@@ -17,6 +17,9 @@
                     <field name="delivery_location" invisible="0"/>
                     <field name="picking_id"/>
                 </xpath>
+                <xpath expr="//group/group[@id='header_left_group']" position="inside">
+                    <field name="show_vat_ids"/>
+                </xpath>
             </field>
         </record>
     </data>

@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models, _
 from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessError
+from odoo.exceptions import UserError,Warning
 
 
 class StockPicking(models.Model):

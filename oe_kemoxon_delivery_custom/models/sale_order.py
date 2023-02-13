@@ -20,7 +20,7 @@ class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
     tolerance_type = fields.Selection([('min_max', 'Min/Max'), ('max', 'Max'), ('min', 'Min')],
-                                      string='Tollerance Type')
+                                      string='Tolerance Type')
     tolerance_percentage = fields.Float("Tolerance Percentage")
 
 #
@@ -28,5 +28,5 @@ class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
 
     tolerance_type = fields.Selection([('min_max', 'Min/Max'), ('max', 'Max'), ('min', 'Min')],
-                                      string='Tollerance Type')
+                                      string='Tolerance Type')
     tolerance_percentage = fields.Float("Tolerance Percentage")
