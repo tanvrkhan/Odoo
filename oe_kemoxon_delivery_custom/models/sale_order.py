@@ -9,6 +9,7 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     deal_ref = fields.Char("Deal Ref")
+    show_vat_ids = fields.Boolean(string="Show VAT Ids")
 
     def _prepare_invoice(self):
         res = super(SaleOrder, self)._prepare_invoice()
