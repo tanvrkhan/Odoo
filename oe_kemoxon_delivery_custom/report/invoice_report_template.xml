@@ -12,7 +12,7 @@
                             <span t-if="o.move_type == 'out_refund'" style="font-size:35px;" class="text-center">Credit Note</span>
                             <span t-if="o.move_type == 'in_refund'" style="font-size:35px;" class="text-center">Vendor Credit Note</span>
                             <span t-if="o.move_type == 'in_invoice'" style="font-size:35px;" class="text-center">Vendor Bill</span>
-                            <span t-if="o.name != '/'" t-field="o.name"/>
+<!--                            <span t-if="o.name != '/'" t-field="o.name"/>-->
                         </b>
                 </center>
                 <div style="border: 1px solid black;"/>
