@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_truck_seq_truck_seq,truck_seq.truck_seq,model_truck_seq_truck_seq,base.group_user,1,1,1,1

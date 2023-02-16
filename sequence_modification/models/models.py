@@ -221,8 +221,7 @@ class SaleOrderInherit(models.Model):
     def get_year(self, rec=None):
         year = str(datetime.datetime.now().year)[2:4]
         if rec:
-            year = str(parser.parse(rec.get('date_order')).year)[-2:] if rec.get('date_order') else '0' + str(
-                year) if year < 10 else str(year)
+            year = str(parser.parse(rec.get('date_order')).year)[-2:] if rec.get('date_order') else str(year)
         return year
 
     def get_month(self, rec=None):

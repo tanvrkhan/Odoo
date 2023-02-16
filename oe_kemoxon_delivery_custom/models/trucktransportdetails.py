@@ -10,9 +10,9 @@ class Truck_Transport_Details(models.Model):
     trailer = fields.Char()
     driver = fields.Char()
     passport = fields.Char()
-    nominated = fields.Float()
-    loaded = fields.Float()
-    offloaded = fields.Float()
+    nominated = fields.Float(digits=(3, 3))
+    loaded = fields.Float(digits=(3, 3))
+    offloaded = fields.Float(digits=(3, 3))
     is_updated = fields.Boolean('Updated', copy=False)
     status = fields.Selection(
         [("Nominated", "Nominated"), ("Waiting to load", "Waiting to load"), ("In transit", "In transit"),
@@ -20,6 +20,7 @@ class Truck_Transport_Details(models.Model):
     statusdate = fields.Date()
     picking_id = fields.Many2one('stock.picking', 'Delivery')
     stock_pick_ids = fields.Many2one("stock.picking", string="Truck Details", required=True)
+    show_vat_ids = fields.Boolean(string="Show VAT Ids")
     seq = fields.Char("Sequence")
     _sql_constraints = [
         ('checkPrices', 'CHECK(nominated >= 0 AND loaded >=0 AND offloaded>=0 )', 'Quantities cannot be less than 0')
@@ -45,3 +46,14 @@ class Truck_Transport_Details(models.Model):
                     'quantity_done': self.offloaded + quantity_done
                 })
                 self.is_updated = True
+
+    def get_warehouse(self, picking_id=None):
+        if picking_id:
+            warehouse_obj = self.env['stock.warehouse']
+            warehouse_id = warehouse_obj.search([('lot_stock_id', '=', picking_id.location_id.id)])
+            result = [warehouse_id.name, warehouse_id.lot_stock_id.display_name]
+            return result
+
+    def get_total(self, total=None):
+        number = "{:.2f}".format(total)
+        return "{:,.2f}".format(float(number))

@@ -24,6 +24,7 @@ class StockPicking(models.Model):
 
     @api.onchange('consignee')
     def _domain_change(self):
+        print('_domain_change_domain_change')
         domain = []
         if self.partner_id:
             if self.partner_id.child_ids:
@@ -31,6 +32,7 @@ class StockPicking(models.Model):
                 domain.append(self.partner_id.id)
             else:
                 domain.append(self.partner_id.id)
+        print(domain,'domaindomain')
         return {
             'domain': {
                 'consignee': [('id', 'in', domain)]}
@@ -41,7 +43,6 @@ class DeliveryLocation(models.Model):
     _name = "delivery.location"
 
     name = fields.Char("Name")
-
 
 class StockMove(models.Model):
     _inherit = "stock.move"
