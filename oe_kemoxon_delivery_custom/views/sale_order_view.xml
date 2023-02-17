@@ -9,6 +9,11 @@
                        position="after">
                     <field name="deal_ref"/>
                 </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="options">{'no_quick_create':True,'no_create_edit':True,'no_open': True,}</attribute>
+                </xpath>
+
                 <xpath expr="//tree//field[@name='product_uom_qty']"
                        position="after">
                     <field name="tolerance_type"/>
@@ -25,6 +30,10 @@
                        position="after">
                     <field name="tolerance_type"/>
                     <field name="tolerance_percentage"/>
+                </xpath>
+
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="options">{'no_quick_create':True,'no_create_edit':True,'no_open': True,}</attribute>
                 </xpath>
             </field>
         </record>
