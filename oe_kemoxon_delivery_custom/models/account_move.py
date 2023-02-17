@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+#
 import datetime
 
 from odoo import api, fields, models, _
@@ -11,12 +12,24 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     deal_ref = fields.Char("Deal Ref")
-    bill_date = fields.Date("B/L Date", related='picking_id.bill_date')
-    vessel_name = fields.Char("Vessel Name", related='picking_id.vessel_name')
+
+    picking_id = fields.Many2one('stock.picking', "Delivery Order")
     delivery_location = fields.Many2one('delivery.location', "Delivery Location",
                                         related='picking_id.delivery_location')
-    picking_id = fields.Many2one('stock.picking', "Delivery Order")
 
+    vessel_information_id = fields.Many2one('vessel.information', "Vessel Details")
+    vessel_name=fields.Char("Vessel Name", related='vessel_information_id.vessel_id.vessel_name')
+    imo=fields.Char("IMO", related='vessel_information_id.vessel_id.imo')
+    ncv=fields.Char("NCV")
+    loadport=fields.Many2one("delivery.location","Load port", related='vessel_information_id.loadport')
+    disport=fields.Many2one("delivery.location","Discharge port", related='vessel_information_id.disport')
+    country_of_origin = fields.Many2one("res.country","COO", related='vessel_information_id.country_of_origin')
+    payment_notes=fields.Char("Payment Notes")
+    bl_date=fields.Date("BL Date", related='vessel_information_id.bl_date')
+    # bill_date = fields.Date("B/L Date", related='picking_id.bill_date')
+    # vessel_name = fields.Char("Vessel Name", related='picking_id.vessel_name')
+    payment_notes=fields.Char()
+    delivery_notes=fields.Char()
     journal_id = fields.Many2one('account.journal', string='Journal', domain=[], required=True, readonly=True,
                                  states={'draft': [('readonly', False)]},
                                  check_company=True)

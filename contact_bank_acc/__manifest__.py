@@ -9,7 +9,7 @@
     """,
     'author': "OdooErp.ae",
     'website': "https://www.yourcompany.com",
-    'category': 'Uncategorized',
+    'category': 'Kemexon',
     'version': '0.1',
     'depends': ['base', 'account', 'contacts', 'sequence_modification'],
     'data': [

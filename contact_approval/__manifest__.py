@@ -7,7 +7,7 @@
     """,
     'author': "odooerp.ae",
     'website': "",
-    'category': 'Uncategorized',
+    'category': 'Kemexon',
     'version': '16.0.0.1',
     'depends': ['base', 'contacts'],
     'data': [

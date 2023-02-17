@@ -7,7 +7,7 @@
     """,
     'author': "OKLAND",
     'website': "http://www.yourcompany.com",
-    'category': 'Uncategorized',
+    'category': 'Kemexon',
     'version': '0.1',
     'depends': ['base', 'account', 'sale', 'stock', 'purchase'],
     'data': [

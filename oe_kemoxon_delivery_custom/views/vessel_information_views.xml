@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_tree_vessels_information" model="ir.ui.view">
+        <field name="name">tree.vessels.information</field>
+        <field name="model">vessel.information</field>
+        <field name="arch" type="xml">
+            <tree  multi_edit="1" >
+                <field name="vessel_id"/>
+                <field name="bl_date"/>
+               <field name="cp_date"/>
+               <field name="confimation_date"/>
+               <field name="loadport_agent"/>
+               <field name="disport_agent"/>
+               <field name="loadport_inspectors"/>
+               <field name="disport_inspectors"/>
+               <field name="demurrage_rate"/>
+                <field name="loadport"/>
+                <field name="disport"/>
+               <field name="country_of_origin"/>
+
+            </tree>
+        </field>
+    </record>
+</odoo>

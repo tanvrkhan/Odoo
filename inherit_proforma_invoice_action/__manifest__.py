@@ -9,7 +9,7 @@
     """,
     'author': "odooERP.ae",
     'website': "https://www.yourcompany.com",
-    'category': 'Uncategorized',
+    'category': 'Kemexon',
     'version': '0.1',
     'depends': ['base', 'sale'],
     'data': [

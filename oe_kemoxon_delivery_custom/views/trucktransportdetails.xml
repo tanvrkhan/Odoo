@@ -5,6 +5,7 @@
         <field name="model">truck.transport.details</field>
         <field name="arch" type="xml">
             <tree editable="bottom">
+                <field name="date"/>
                 <field name="truck"/>
                 <field name="trailer"/>
                 <field name="driver"/>

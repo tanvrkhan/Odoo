@@ -13,14 +13,15 @@ class StockPicking(models.Model):
     vessel_name = fields.Char("Vessel Name")
     delivery_location = fields.Many2one('delivery.location', "Delivery Location")
     imo_number = fields.Char("IMO Number")
-    delivery_from = fields.Date("Delivery From")
-    delivery_to = fields.Date('Delivry To')
+    delivery_from = fields.Date(string="Delivery From", related='sale_id.delivery_from')
+    delivery_to = fields.Date(string="To", related='sale_id.delivery_to')
     truck_transport_details_ids = fields.One2many('truck.transport.details', 'stock_pick_ids', "Truck Details")
     transporter = fields.Many2one('res.partner', 'Transporter')
     consignee = fields.Many2one('res.partner', 'Consignee')
     transporter_payment_terms = fields.Many2one('account.payment.term', 'Transporter Payment Terms')
     rate = fields.Float('Rate')
     transport_tolerance = fields.Float('Transport Tolerance')
+    vessel_ids = fields.One2many('vessel.information', 'stock_pick_ids', "Vessel Details")
 
     @api.onchange('consignee')
     def _domain_change(self):

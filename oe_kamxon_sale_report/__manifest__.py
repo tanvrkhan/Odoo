@@ -11,7 +11,7 @@
     'author': "OKLAND",
     'website': "https://www.yourcompany.com",
 
-    'category': 'Uncategorized',
+    'category': 'Kemexon',
     'version': '0.1',
 
     # any module necessary for this one to work correctly

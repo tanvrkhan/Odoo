@@ -14,6 +14,7 @@ class Truck_Transport_Details(models.Model):
     loaded = fields.Float(digits=(3, 3))
     offloaded = fields.Float(digits=(3, 3))
     is_updated = fields.Boolean('Updated', copy=False)
+    date = fields.Date('Date')
     status = fields.Selection(
         [("Nominated", "Nominated"), ("Waiting to load", "Waiting to load"), ("In transit", "In transit"),
          ("Waiting to offload", "Waiting to offload"), ("Completed", "Completed")])

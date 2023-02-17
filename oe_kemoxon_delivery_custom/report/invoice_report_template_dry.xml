@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="report_invoice_document" inherit_id="account.report_invoice_document">
+    <template id="invoice_report_template_dry" inherit_id="account.report_invoice_document">
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-call="web.external_layout">
                 <div style="border-top: 2px solid black; margin-top: -12px;"/>
@@ -203,22 +203,72 @@
                 <br/>
                 <div class="row">
                     <div class="col-6">
-                        <t t-if="o.delivery_location">
+                        <t t-if="o.bl_date">
                             <div class="row">
                                 <div class="col-3">
-                                    <strong>Delivery Location</strong>
+                                    <strong>B/L Date</strong>
                                 </div>
                                 <br/>
                                 <div class="col-1"/>
                                 <div class="col-6">
-                                    <span class="m-0" t-field="o.delivery_location"/>
+                                    <span class="m-0" t-field="o.bl_date"/>
                                 </div>
                             </div>
                         </t>
-                        <t t-if="o.invoice_incoterm_id">
+                         <t t-if="o.loadport">
                             <div class="row">
                                 <div class="col-3">
-                                    <strong>Incoterms</strong>
+                                    <strong>Port of Loading</strong>
+                                </div>
+                                <br/>
+                                <div class="col-1"/>
+                                <div class="col-6">
+                                    <span class="m-0" t-field="o.loadport"/>
+                                </div>
+                            </div>
+                        </t>
+
+                         <t t-if="o.vessel_name">
+                            <div class="row">
+                                <div class="col-3">
+                                    <strong>Vessel</strong>
+                                </div>
+                                <br/>
+                                <div class="col-1"/>
+                                <div class="col-6">
+                                    <span class="m-0" t-field="o.vessel_name"/>
+                                </div>
+                            </div>
+                        </t>
+                         <t t-if="o.disport">
+                            <div class="row">
+                                <div class="col-3">
+                                    <strong>Port of Discharge</strong>
+                                </div>
+                                <br/>
+                                <div class="col-1"/>
+                                <div class="col-6">
+                                    <span class="m-0" t-field="o.disport"/>
+                                </div>
+                            </div>
+                        </t>
+
+                         <t t-if="o.country_of_origin">
+                            <div class="row">
+                                <div class="col-3">
+                                    <strong>Country of Origin</strong>
+                                </div>
+                                <br/>
+                                <div class="col-1"/>
+                                <div class="col-6">
+                                    <span class="m-0" t-field="o.country_of_origin"/>
+                                </div>
+                            </div>
+                        </t>
+                         <t t-if="o.invoice_incoterm_id">
+                            <div class="row">
+                                <div class="col-3">
+                                    <strong>Incoterm</strong>
                                 </div>
                                 <br/>
                                 <div class="col-1"/>
@@ -227,30 +277,27 @@
                                 </div>
                             </div>
                         </t>
-
-<!--                        <t t-if="o.bill_date">-->
-<!--                            <div class="row">-->
-<!--                                <div class="col-3">-->
-<!--                                    <strong>B/L Date</strong>-->
-<!--                                </div>-->
-<!--                                <br/>-->
-<!--                                <div class="col-1"/>-->
-<!--                                <div class="col-6">-->
-<!--                                    <span class="m-0" t-field="o.bill_date"-->
-<!--                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </t>-->
-
-                        <t t-if="o.vessel_name">
+                         <t t-if="o.ncv">
                             <div class="row">
                                 <div class="col-3">
-                                    <strong>Vessel Name</strong>
+                                    <strong>Net Caloric Value</strong>
                                 </div>
                                 <br/>
                                 <div class="col-1"/>
                                 <div class="col-6">
-                                    <span class="m-0" t-field="o.vessel_name"/>
+                                    <span class="m-0" t-field="o.ncv"/>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-if="o.delivery_notes">
+                            <div class="row">
+                                <div class="col-3">
+                                    <strong>Delivery Notes</strong>
+                                </div>
+                                <br/>
+                                <div class="col-1"/>
+                                <div class="col-6">
+                                    <span class="m-0" t-field="o.delivery_notes"/>
                                 </div>
                             </div>
                         </t>
@@ -282,6 +329,16 @@
                                 <span class="m-0" t-field="o.currency_id.name"/>
                             </div>
                         </div>
+                        <t t-if="o.payment_notes">
+                            <div class="col-12 row">
+                                <div class="col-4">
+                                    <strong>Payment Notes</strong>
+                                </div>
+                                <div class="col-8">
+                                    <span class="m-0" t-field="o.payment_notes"/>
+                                </div>
+                            </div>
+                        </t>
                         <div class="col-12 row">
                             <div class="col-4">
                                 <strong t-if="o.invoice_payment_term_id">Payment Term</strong>

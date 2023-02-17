@@ -2,3 +2,5 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_delivery.location,access_delivery.location,model_delivery_location,base.group_user,1,1,1,1
 access_truck_transport_details,access_truck.transport.details,model_truck_transport_details,base.group_user,1,1,1,1
 access_kemexon.aging.balance.report,access_kemexon.aging.balance.report,model_kemexon_aging_balance_report,base.group_user,1,1,1,1
+access_vessels,access.vessels,model_vessel,base.group_user,1,1,1,1
+access_vessels_information,access.vessels_information,model_vessel_information,base.group_user,1,1,1,1
