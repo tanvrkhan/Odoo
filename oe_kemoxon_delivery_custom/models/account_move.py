@@ -117,7 +117,7 @@ class AccountMove(models.Model):
                             <br/>
                                                                                    <table class="table table-sm o_main_table" name="invoice_line_table">
                                                                                <thead>
-                                    <tr>
+                                    <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
                                         <th>Customer</th>
                                         <th>Reference</th>
                                         <th>Currency</th>
@@ -165,10 +165,10 @@ class AccountMove(models.Model):
                 total_sixteeone_nineteen += sixteeone_nineteen
                 total_nineteen_above += nineteen_above
 
-                body_html += '''<tr><td>''' + str(invoice.partner_id.short_name) + '''</td> <td>''' + str(
+                body_html += '''<tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9"><td>''' + str(invoice.partner_id.short_name) + '''</td> <td>''' + str(
                     invoice.name) + '''</td><td>''' + str(
                     invoice.currency_id.name) + '''</td><td>''' + str(invoice.invoice_date_due) + '''</td><td>''' + str(
-                    due_days) + '''</td><td>''' + str(invoice.amount_total) + '''</td><td>''' + str(
+                    due_days) + '''</td><td>''' + str(invoice.amount_total) + '''</td><td  style='color:red;'>''' + str(
                     invoice.amount_residual) + '''</td><td>''' + str(
                     zero_thirty) + '''</td><td>''' + str(thirtyone_sixty) + '''</td><td>''' + str(
                     sixteeone_nineteen) + '''</td><td>''' + str(nineteen_above) + '''</td></tr>'''
