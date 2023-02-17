@@ -28,7 +28,7 @@ OdooERP Sales
         'views/res_partner_bank_view.xml',
         'views/vessel_views.xml',
         'views/vessel_information_views.xml',
-        'report/invoice_report_template_dry.xml',
+        # 'report/invoice_report_template_dry.xml',
         # menu_items
         #'views/menu_items.xml',
         # actions

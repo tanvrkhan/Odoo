@@ -49,14 +49,6 @@
             <field name="report_file">oe_kemoxon_delivery_custom.report_delivery_sale_invoice</field>
             <field name="paperformat_id" ref="paperformat_delivery_sale_invoice_portrait"/>
         </record>
-         <record id="action_report_invoice_dry" model="ir.actions.report">
-            <field name="name">Invoice Dry Products</field>
-            <field name="model">account.move</field>
-            <field name="report_type">qweb-pdf</field>
-            <field name="binding_model_id" ref="model_account_move"/>
-            <field name="report_name">oe_kemoxon_delivery_custom.invoice_report_template_dry</field>
-            <field name="report_file">oe_kemoxon_delivery_custom.invoice_report_template_dry</field>
-            <field name="paperformat_id" ref="paperformat_aged_balance_report_portrait"/>
-        </record>
+
     </data>
 </odoo>
