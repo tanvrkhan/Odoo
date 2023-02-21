@@ -168,10 +168,10 @@ class AccountMove(models.Model):
                 body_html += '''<tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9"><td>''' + str(invoice.partner_id.short_name) + '''</td> <td>''' + str(
                     invoice.name) + '''</td><td>''' + str(
                     invoice.currency_id.name) + '''</td><td>''' + str(invoice.invoice_date_due) + '''</td><td>''' + str(
-                    due_days) + '''</td><td>''' + str(invoice.amount_total) + '''</td><td  style='color:red;'>''' + str(
-                    invoice.amount_residual) + '''</td><td>''' + str(
-                    zero_thirty) + '''</td><td>''' + str(thirtyone_sixty) + '''</td><td>''' + str(
-                    sixteeone_nineteen) + '''</td><td>''' + str(nineteen_above) + '''</td></tr>'''
+                    due_days) + '''</td><td style="text-align:right;">''' + str('{:0,.2f}'.format(invoice.amount_total)) + '''</td><td  style='color:red;text-align:right;'>''' + str(
+                    '{:0,.2f}'.format(invoice.amount_residual)) + '''</td><td style="text-align:right;">''' + str(
+                    '{:0,.2f}'.format(zero_thirty)) + '''</td><td style="text-align:right;">''' + str('{:0,.2f}'.format(thirtyone_sixty)) + '''</td><td style="text-align:right;">''' + str(
+                    '{:0,.2f}'.format(sixteeone_nineteen)) + '''</td><td style="text-align:right;">''' + str('{:0,.2f}'.format(nineteen_above)) + '''</td></tr>'''
 
         sow_template_id.body_html = body_html
         sow_template_id.send_mail(self.id, force_send=True)
