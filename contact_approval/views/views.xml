@@ -44,11 +44,22 @@
                 </xpath>
             </field>
         </record>
+        <record id="res_partner_tree_inherit" model="ir.ui.view">
+            <field name="name">Add status to res partner tree view</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='activity_ids']" position="after">
+                    <field name="status" optional="show"/>
+                </xpath>
+
+            </field>
+        </record>
         <!-- Approval Request -->
         <act_window id="contact_approval_request_action"
                     name="Contact Approval Requests"
                     res_model="res.partner"
-                    view_mode="kanban,form"
+                    view_mode="kanban,tree,form"
                     domain="['&amp;',('active', '=', False), ('status', '=', 'draft')]"/>
         <menuitem id="contact_approval_request_id" name="Contact Approval Requests" parent="contacts.menu_contacts"
                   action="contact_approval_request_action"
