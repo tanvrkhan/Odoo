@@ -12,6 +12,7 @@
     'depends': ['base', 'contacts'],
     'data': [
         'security/contact_approval.xml',
+        'views/server_actions.xml',
         'views/views.xml',
     ]
 }
