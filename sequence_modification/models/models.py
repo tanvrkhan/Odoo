@@ -115,10 +115,7 @@ class AccountMoveInheritModel(models.Model):
         return res
 
     def get_default_sequence(self, res=None, code=None):
-        month = self.get_month()
-        seq = self.env['ir.sequence'].next_by_code(code).split("-")
-        name = seq[0] + "-" + seq[1] + "-" + str(datetime.datetime.now().year)[2:4] + "" + str(month) + "" + seq[2]
-        res['name'] = name
+        res['name'] = '/'
 
     def check_in_partner_seq(self, name=None):
         partner_seq_obj = self.env['partner.sequence']
