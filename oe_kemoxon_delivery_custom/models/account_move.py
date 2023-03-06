@@ -123,12 +123,12 @@ class AccountMove(models.Model):
                                         <th>Currency</th>
                                         <th>Due Date</th>
                                         <th>Due Days</th>
-                                        <th>Total Amount</th>
-                                        <th>Balance</th>
-                                        <th>0-30 Days</th>
-                                        <th>31-60 Days</th>
-                                        <th>61-90 Days</th>
-                                        <th>Over 90 Days</th>
+                                        <th style="text-align:right;">Total Amount</th>
+                                        <th style="text-align:right;">Balance</th>
+                                        <th style="text-align:right;">0-30 Days</th>
+                                        <th style="text-align:right;">31-60 Days</th>
+                                        <th style="text-align:right;">61-90 Days</th>
+                                        <th style="text-align:right;">Over 90 Days</th>
                                     </tr>
                                 </thead>
                                                                               <tbody>
