@@ -21,6 +21,7 @@ class StockPicking(models.Model):
     transporter_payment_terms = fields.Many2one('account.payment.term', 'Transporter Payment Terms')
     rate = fields.Float('Rate')
     transport_tolerance = fields.Float('Transport Tolerance')
+    show_vat_ids = fields.Boolean(string="Show VAT Ids")
 
     @api.onchange('consignee')
     def _domain_change(self):
