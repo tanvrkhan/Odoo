@@ -5,6 +5,13 @@ from odoo import api, fields, models, _
 from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessError
 
 
+class InheritPurchaseOrder(models.Model):
+    _inherit = "purchase.order"
+
+    show_vat_ids = fields.Boolean(string="Show VAT Ids")
+
+
+
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
