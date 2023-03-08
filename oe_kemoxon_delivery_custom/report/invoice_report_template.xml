@@ -5,7 +5,15 @@
             <t t-call="web.external_layout">
                 <div style="border-top: 2px solid black; margin-top: -12px;"/>
                 <center>
-                    <b style="font-size:35px;" class="text-center">INVOICE</b>
+                    <b>
+                            <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'" style="font-size:35px;" class="text-center">INVOICE</span>
+                            <span t-if="o.move_type == 'out_invoice' and o.state == 'draft'" style="font-size:35px;" class="text-center">DRAFT INVOICE</span>
+                            <span t-if="o.move_type == 'out_invoice' and o.state == 'cancel'" style="font-size:35px;" class="text-center">CANCELLED INVOICE</span>
+                            <span t-if="o.move_type == 'out_refund'" style="font-size:35px;" class="text-center">CREDIT NOTE</span>
+                            <span t-if="o.move_type == 'in_refund'" style="font-size:35px;" class="text-center">VENDOR CREDIT NOTE</span>
+                            <span t-if="o.move_type == 'in_invoice'" style="font-size:35px;" class="text-center">VENDOR BILL</span>
+<!--                            <span t-if="o.name != '/'" t-field="o.name"/>-->
+                        </b>
                 </center>
                 <div style="border: 1px solid black;"/>
                 <br/>

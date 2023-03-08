@@ -117,18 +117,18 @@ class AccountMove(models.Model):
                             <br/>
                                                                                    <table class="table table-sm o_main_table" name="invoice_line_table">
                                                                                <thead>
-                                    <tr>
+                                    <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
                                         <th>Customer</th>
                                         <th>Reference</th>
                                         <th>Currency</th>
                                         <th>Due Date</th>
                                         <th>Due Days</th>
-                                        <th>Total Amount</th>
-                                        <th>Balance</th>
-                                        <th>0-30 Days</th>
-                                        <th>31-60 Days</th>
-                                        <th>61-90 Days</th>
-                                        <th>Over 90 Days</th>
+                                        <th style="text-align:right;">Total Amount</th>
+                                        <th style="text-align:right;">Balance</th>
+                                        <th style="text-align:right;">0-30 Days</th>
+                                        <th style="text-align:right;">31-60 Days</th>
+                                        <th style="text-align:right;">61-90 Days</th>
+                                        <th style="text-align:right;">Over 90 Days</th>
                                     </tr>
                                 </thead>
                                                                               <tbody>
@@ -165,13 +165,13 @@ class AccountMove(models.Model):
                 total_sixteeone_nineteen += sixteeone_nineteen
                 total_nineteen_above += nineteen_above
 
-                body_html += '''<tr><td>''' + str(invoice.partner_id.short_name) + '''</td> <td>''' + str(
+                body_html += '''<tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9"><td>''' + str(invoice.partner_id.short_name) + '''</td> <td>''' + str(
                     invoice.name) + '''</td><td>''' + str(
                     invoice.currency_id.name) + '''</td><td>''' + str(invoice.invoice_date_due) + '''</td><td>''' + str(
-                    due_days) + '''</td><td>''' + str(invoice.amount_total) + '''</td><td>''' + str(
-                    invoice.amount_residual) + '''</td><td>''' + str(
-                    zero_thirty) + '''</td><td>''' + str(thirtyone_sixty) + '''</td><td>''' + str(
-                    sixteeone_nineteen) + '''</td><td>''' + str(nineteen_above) + '''</td></tr>'''
+                    due_days) + '''</td><td style="text-align:right;">''' + str('{:0,.2f}'.format(invoice.amount_total)) + '''</td><td  style='color:red;text-align:right;'>''' + str(
+                    '{:0,.2f}'.format(invoice.amount_residual)) + '''</td><td style="text-align:right;">''' + str(
+                    '{:0,.2f}'.format(zero_thirty)) + '''</td><td style="text-align:right;">''' + str('{:0,.2f}'.format(thirtyone_sixty)) + '''</td><td style="text-align:right;">''' + str(
+                    '{:0,.2f}'.format(sixteeone_nineteen)) + '''</td><td style="text-align:right;">''' + str('{:0,.2f}'.format(nineteen_above)) + '''</td></tr>'''
 
         sow_template_id.body_html = body_html
         sow_template_id.send_mail(self.id, force_send=True)
