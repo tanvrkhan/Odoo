@@ -41,7 +41,7 @@
                     <p>Financial Department</p>
                     <p>Kemexon Limited</p>
                     <p>Hong Kong</p>
-                    <p>Date<t t-out="datetime.date.today() or ''"/>,
+                    <p>Date<t t-out="datetime.date.today() or ''"/>
                     </p>
 
                 </div>
@@ -74,7 +74,7 @@
                     <p>Financial Department</p>
                     <p>Kemexon Limited</p>
                     <p>Hong Kong</p>
-                    <p>Date<t t-out="datetime.date.today() or ''"/>,
+                    <p>Date<t t-out="datetime.date.today() or ''"/>
                     </p>
 
                 </div>

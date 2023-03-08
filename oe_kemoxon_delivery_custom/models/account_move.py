@@ -7,6 +7,7 @@ from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessE
 import base64
 from operator import itemgetter
 
+
 class AccountMove(models.Model):
     _inherit = "account.move"
 
@@ -22,7 +23,7 @@ class AccountMove(models.Model):
                                  check_company=True)
 
     show_vat_ids = fields.Boolean(string="Show VAT Ids")
-    
+
     def get_invoice_details(self):
         invoices = self.env['account.move'].search(
             [('amount_residual', '>', 0), ('move_type', '=', self.move_type), ('state', '=', 'posted')])
@@ -74,7 +75,7 @@ class AccountMove(models.Model):
                 result.append(data_dict)
         USD = self.env['res.currency'].search([('name', '=', 'USD')])
         base_currency = self.env.company.currency_id
-        result = sorted(result, key=itemgetter('due_days'),reverse=True)
+        result = sorted(result, key=itemgetter('due_days'), reverse=True)
         data = {
             'result': result,
             'total_amount_total': round(base_currency.compute(total_amount_total, USD), 2),
@@ -165,13 +166,17 @@ class AccountMove(models.Model):
                 total_sixteeone_nineteen += sixteeone_nineteen
                 total_nineteen_above += nineteen_above
 
-                body_html += '''<tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9"><td>''' + str(invoice.partner_id.short_name) + '''</td> <td>''' + str(
+                body_html += '''<tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9"><td>''' + str(
+                    invoice.partner_id.short_name) + '''</td> <td>''' + str(
                     invoice.name) + '''</td><td>''' + str(
                     invoice.currency_id.name) + '''</td><td>''' + str(invoice.invoice_date_due) + '''</td><td>''' + str(
-                    due_days) + '''</td><td style="text-align:right;">''' + str('{:0,.2f}'.format(invoice.amount_total)) + '''</td><td  style='color:red;text-align:right;'>''' + str(
+                    due_days) + '''</td><td style="text-align:right;">''' + str('{:0,.2f}'.format(
+                    invoice.amount_total)) + '''</td><td  style='color:red;text-align:right;'>''' + str(
                     '{:0,.2f}'.format(invoice.amount_residual)) + '''</td><td style="text-align:right;">''' + str(
-                    '{:0,.2f}'.format(zero_thirty)) + '''</td><td style="text-align:right;">''' + str('{:0,.2f}'.format(thirtyone_sixty)) + '''</td><td style="text-align:right;">''' + str(
-                    '{:0,.2f}'.format(sixteeone_nineteen)) + '''</td><td style="text-align:right;">''' + str('{:0,.2f}'.format(nineteen_above)) + '''</td></tr>'''
+                    '{:0,.2f}'.format(zero_thirty)) + '''</td><td style="text-align:right;">''' + str(
+                    '{:0,.2f}'.format(thirtyone_sixty)) + '''</td><td style="text-align:right;">''' + str(
+                    '{:0,.2f}'.format(sixteeone_nineteen)) + '''</td><td style="text-align:right;">''' + str(
+                    '{:0,.2f}'.format(nineteen_above)) + '''</td></tr>'''
 
         sow_template_id.body_html = body_html
         sow_template_id.send_mail(self.id, force_send=True)
@@ -179,22 +184,33 @@ class AccountMove(models.Model):
     def action_send_customer_reminder(self):
         yesterday = fields.Date.today() - datetime.timedelta(days=1)
         after_three_day = fields.Date.today() + datetime.timedelta(days=3)
-        invoices_1_day = self.env['account.move'].search(
-            [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'),
-             ('invoice_date_due', '=', yesterday)])
         over_due_template = self.env.ref('oe_kemoxon_delivery_custom.email_template_customer_reminder')
-        for invoice1 in invoices_1_day:
-            email_values = {
-                'email_to': invoice1.partner_id.email or 'abcd@gmail.com'
-            }
-            over_due_template.send_mail(invoice1.id, force_send=True, email_values=email_values)
+        to_emails = over_due_template.email_to
+        partner_ids = []
+        if to_emails:
+            to_emails = to_emails.split(',')
+            for to_email in to_emails:
+                partner = self.env['res.partner'].search([('email', 'ilike', to_email)], limit=1)
+                if partner:
+                    partner_ids.append(partner.id)
+        if partner_ids:
+            invoices_1_day = self.env['account.move'].search(
+                [('amount_residual', '>', 0), ('partner_id', 'in', partner_ids), ('move_type', '=', 'out_invoice'),
+                 ('state', '=', 'posted'),
+                 ('invoice_date_due', '=', yesterday)])
+            for invoice1 in invoices_1_day:
+                email_values = {
+                    'email_to': invoice1.partner_id.email or 'abcd@gmail.com'
+                }
+                over_due_template.send_mail(invoice1.id, force_send=True, email_values=email_values)
 
         # friendly_reminder
 
         invoices_3_day = self.env['account.move'].search(
             [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'),
              ('invoice_date_due', '=', after_three_day)])
-        friendly_reminder_template = self.env.ref('oe_kemoxon_delivery_custom.email_template_friendly_reminder_reminder')
+        friendly_reminder_template = self.env.ref(
+            'oe_kemoxon_delivery_custom.email_template_friendly_reminder_reminder')
         for invoice3 in invoices_3_day:
             email_values = {
                 'email_to': invoice3.partner_id.email or 'abcd@gmail.com'
