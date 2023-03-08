@@ -191,7 +191,7 @@
                 <br/>
                 <t t-if="doc.picking_ids">
                     <t t-foreach="doc.picking_ids[0]" t-as="picking">
-                        <div class="row" t-if="picking.delivery_from or picking.delivery_to">
+                        <div class="row" t-if="doc.delivery_from or doc.delivery_to">
                             <div class="col-2">
                                 <strong>Delivery Period</strong>
                             </div>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_tree_vessels" model="ir.ui.view">
+        <field name="name">tree.vessels</field>
+        <field name="model">vessel</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="imo"/>
+                <field name="vessel_name"/>
+                <field name="owner"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_vessels_search" model="ir.ui.view">
+        <field name="name">vessel.search</field>
+        <field name="model">vessel</field>
+        <field name="arch" type="xml">
+            <search string="Vessels">
+                <field name="imo"/>
+                <field name="vessel_name"/>
+                <field name="owner"/>
+                <separator/>
+                <group expand="1" string="Group By">
+                    <filter name="group_owner" context="{'group_by':'owner', 'residual_visible':True}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

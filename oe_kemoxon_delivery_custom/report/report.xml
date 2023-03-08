@@ -49,5 +49,6 @@
             <field name="report_file">oe_kemoxon_delivery_custom.report_delivery_sale_invoice</field>
             <field name="paperformat_id" ref="paperformat_delivery_sale_invoice_portrait"/>
         </record>
+
     </data>
 </odoo>

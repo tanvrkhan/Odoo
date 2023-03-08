@@ -33,11 +33,19 @@
                             </div>
                             <div class="col-4">
                                 <table width="100%" class="info_table table-borderless">
-                                    <th width="40%">Date :</th>
-                                    <td width="60%">
-                                        <span class="m-0" t-field="picking.scheduled_date"
-                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
-                                    </td>
+                                    <t t-if="truck_transport_details_ids">
+                                        <th width="40%">Date :</th>
+                                            <td width="60%">
+                                                <span class="m-0" t-field="truck_transport_details_ids.date"
+                                                t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                             </td>
+                                    </t>
+
+<!--                                    <th width="40%">Date :</th>-->
+<!--                                    <td width="60%">-->
+<!--                                        <span class="m-0" t-field="truck_transport_details_ids.date"-->
+<!--                                              t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>-->
+<!--                                    </td>-->
                                 </table>
                             </div>
                         </div>
@@ -224,11 +232,14 @@
                             </div>
                             <div class="col-4">
                                 <table width="100%" class="info_table table-borderless">
-                                    <th width="40%">Date :</th>
+                                    <t t-if="truck_transport_details_ids">
+                                  <th width="40%">Date :</th>
                                     <td width="60%">
-                                        <span class="m-0" t-field="picking.scheduled_date"
+                                        <span class="m-0" t-field="truck_transport_details_ids.date"
                                               t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
                                     </td>
+                                </t>
+
                                 </table>
                             </div>
                         </div>

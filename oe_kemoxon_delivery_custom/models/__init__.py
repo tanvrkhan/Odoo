@@ -4,3 +4,5 @@ from . import stock_picking
 from . import trucktransportdetails
 from . import res_partner_bank
 from . import payment_term_text
+from . import vessel
+from . import vessel_information

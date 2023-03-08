@@ -8,6 +8,15 @@
                 <xpath expr="//field[@name='payment_term_id']"
                        position="after">
                     <field name="deal_ref"/>
+                    <label for="delivery_from" string="Period"/>
+                     <div name="date_edit_only" class="o_row oe_edit_only">
+                        <span><strong>From </strong>
+                            <field name="delivery_from" class='oe_inline'/>
+                        </span>
+                        <span><strong>To </strong>
+                            <field name="delivery_to" class='oe_inline'/>
+                        </span>
+                    </div>
                 </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="attributes">
