@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_kx_summary_analytics_kx_summary_analytics,kx_summary_analytics.kx_summary_analytics,model_kx_summary_analytics_kx_summary_analytics,base.group_user,1,1,1,1
