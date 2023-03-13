@@ -172,10 +172,10 @@
                                 </t>
                             </td>
                         </table>
-                        <table width="100%" class="info_table table-borderless" t-if="picking.transporter">
+                        <table width="100%" class="info_table table-borderless" t-if="truck_transport_details_ids.transporter">
                             <th width="20%">Transporter :</th>
                             <td width="80%">
-                                <span t-field="picking.transporter"/>
+                                <span t-field="truck_transport_details_ids.transporter"/>
                             </td>
                         </table>
 
@@ -341,10 +341,10 @@
                                 </t>
                             </td>
                         </table>
-                        <table width="100%" class="info_table table-borderless" t-if="picking.transporter">
+                        <table width="100%" class="info_table table-borderless" t-if="truck_transport_details_ids.transporter">
                             <th width="20%">Transporter :</th>
                             <td width="80%">
-                                <span t-field="picking.transporter"/>
+                                <span t-field="truck_transport_details_ids.transporter"/>
                             </td>
                         </table>
                         <table width="100%" class="info_table table-borderless"
