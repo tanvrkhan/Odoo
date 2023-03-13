@@ -4,7 +4,7 @@
         <field name="name">tree.vessels.information</field>
         <field name="model">vessel.information</field>
         <field name="arch" type="xml">
-            <tree  multi_edit="1" >
+            <tree  multi_edit="1" editable="bottom" >
                 <field name="vessel_id"/>
                 <field name="bl_date"/>
                <field name="cp_date"/>

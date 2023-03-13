@@ -6,6 +6,7 @@ from odoo.exceptions import UserError
 class Truck_Transport_Details(models.Model):
     _name = "truck.transport.details"
     _description = "Truck Transport Details model"
+    transporter = fields.Many2one("res.partner", "Transporter")
     truck = fields.Char("Truck", required=True)
     trailer = fields.Char()
     driver = fields.Char()
