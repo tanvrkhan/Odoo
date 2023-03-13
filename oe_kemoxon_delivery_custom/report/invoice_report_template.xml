@@ -93,11 +93,6 @@
                 <br/>
                 <br/>
                 <br/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
                 <style>
                     .my_data_table th {border-right: 1px solid white;border-left: 1px solid white;padding-top:
                     5px;padding-bottom: 5px;}
@@ -209,12 +204,12 @@
                 <strong>Delivery Information</strong>
                 <div style="border-top: 2px solid black;"/>
                 <br/>
-                <div class="row">
-                    <div class="col-6">
+
 
 
                         <t t-if="o.vessel_information_id">
-
+ <div class="row">
+         <div class="col-6">
                         <t t-if="o.bl_date">
                             <div class="row">
                                 <div class="col-3">
@@ -264,7 +259,8 @@
                                 </div>
                             </div>
                         </t>
-
+         </div>
+      <div class="col-6">
                          <t t-if="o.country_of_origin">
                             <div class="row">
                                 <div class="col-3">
@@ -313,9 +309,12 @@
                                 </div>
                             </div>
                         </t>
+                            </div>
+                             </div>
                </t>
                         <t t-else="">
-
+  <div class="row">
+                    <div class="col-6">
                             <t t-if="o.delivery_location">
 
                                 <div class="row">
@@ -344,7 +343,7 @@
                             </div>
 
                         </t>
-
+        </div>  </div>
                         </t>
 <!--                        <t t-if="o.bill_date">-->
 <!--                            <div class="row">-->
@@ -373,13 +372,13 @@
 <!--                            </div>-->
 <!--                        </t>-->
 
-                    </div>
+
                     <!--                    <div class="col-2"/>-->
                     <!--                    <div class="col-5">-->
                     <!--                        <img t-att-src="'oe_kemoxon_delivery_custom/static/src/img/kemexon_seal.jpeg'"-->
                     <!--                             style="max-height: 2cm; max-width: 4cm;"/>-->
                     <!--                    </div>-->
-                </div>
+
 
                 <br/>
                 <br/>
