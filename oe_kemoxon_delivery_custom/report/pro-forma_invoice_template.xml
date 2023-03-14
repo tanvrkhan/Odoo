@@ -206,13 +206,13 @@
                     </t>
                 </t>
                 <div class="row">
-                    <div class="col-2" t-if="doc.picking_ids.delivery_location">
+                    <div class="col-2" t-if="doc.delivery_location">
                         <strong>Delivery Location</strong>
                     </div>
                     <br/>
                     <div class="col-4" style="padding-left: 37px;">
-                        <t t-if="doc.picking_ids">
-                            <span class="m-0" t-field="doc.picking_ids.delivery_location"/>
+                        <t t-if="doc.delivery_location">
+                            <span class="m-0" t-field="doc.delivery_location"/>
                         </t>
                     </div>
                 </div>

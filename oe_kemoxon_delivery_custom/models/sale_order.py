@@ -19,7 +19,7 @@ class SaleOrder(models.Model):
     show_vat_ids = fields.Boolean(string="Show VAT Ids")
     delivery_from = fields.Date("Delivery From")
     delivery_to = fields.Date('Delivry To')
-
+    delivery_location = fields.Many2one('delivery.location', "Delivery Location")
     def _prepare_invoice(self):
         res = super(SaleOrder, self)._prepare_invoice()
         res['deal_ref'] = self.deal_ref
