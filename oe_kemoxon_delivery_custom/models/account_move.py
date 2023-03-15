@@ -29,8 +29,8 @@ class AccountMove(models.Model):
     bl_date=fields.Date("BL Date", related='vessel_information_id.bl_date')
     # bill_date = fields.Date("B/L Date", related='picking_id.bill_date')
     # vessel_name = fields.Char("Vessel Name", related='picking_id.vessel_name')
-    payment_notes=fields.Char()
-    delivery_notes=fields.Char()
+    payment_notes=fields.Text()
+    delivery_notes=fields.Text()
     journal_id = fields.Many2one('account.journal', string='Journal', domain=[], required=True, readonly=True,
                                  states={'draft': [('readonly', False)]},
                                  check_company=True)
