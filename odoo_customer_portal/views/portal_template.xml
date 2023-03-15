@@ -20,7 +20,7 @@
             <t t-if="not invoices">
                 <p>There are currently no attachments for your account.</p>
             </t>
-            <t t-if="invoices" t-call="portal.portal_table">
+            <t t-call="portal.portal_table">
                 <thead>
                     <tr class="active">
                         <th>Name</th>
@@ -48,30 +48,30 @@
 
                     </t>
                     <form action="/attachment/uploaded" method="post"
-                              class="s_website_form form-horizontal container-fluid mt32" enctype="multipart/form-data"
-                              id="file_upload_form">
-                            <tr>
-                                <td>
-                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                    <!--                            <input type="hidden" name="project_id" t-att-value="project.id"/>-->
-                                    <input type="file" name="attachment" class="file" multiple="true"
-                                           data-show-upload="true"
-                                           data-show-caption="true" lass="file" data-show-preview="true"
-                                           id="attachment"/>
-                                </td>
-                                <td>
-                                    <input type="date" name="expiry_date" id="expiry_date"/>
-                                </td>
-                                 <td>
-                                    <input type="text" name="description" id="description"/>
-                                </td>
-                                <td>
-                                    <button type="submit" name="Upload" style="margin-top:20px;" class="fa fa-upload">
-                                        Upload
-                                    </button>
-                                </td>
-                            </tr>
-                        </form>
+                          class="s_website_form form-horizontal container-fluid mt32" enctype="multipart/form-data"
+                          id="file_upload_form">
+                        <tr>
+                            <td>
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <!--                            <input type="hidden" name="project_id" t-att-value="project.id"/>-->
+                                <input type="file" name="attachment" class="file" multiple="true"
+                                       data-show-upload="true"
+                                       data-show-caption="true" lass="file" data-show-preview="true"
+                                       id="attachment"/>
+                            </td>
+                            <td>
+                                <input type="date" name="expiry_date" id="expiry_date"/>
+                            </td>
+                            <td>
+                                <input type="text" name="description" id="description"/>
+                            </td>
+                            <td>
+                                <button type="submit" name="Upload" style="margin-top:20px;" class="fa fa-upload">
+                                    Upload
+                                </button>
+                            </td>
+                        </tr>
+                    </form>
                 </tbody>
             </t>
 
