@@ -57,7 +57,7 @@ class StockMove(models.Model):
                     if rec.sale_line_id.tolerance_type:
                         tolerance_quantity = (product_uom_qty*rec.sale_line_id.tolerance_percentage)/100
                         if rec.sale_line_id.tolerance_type == 'min_max':
-                            if product_uom_qty + tolerance_quantity < rec.quantity_done or product_uom_qty - rec.sale_line_id.tolerance_percentage > rec.quantity_done:
+                            if product_uom_qty + tolerance_quantity < rec.quantity_done or product_uom_qty - tolerance_quantity > rec.quantity_done:
                                 return {'warning': {
                                     'title': _('Warning'),
                                     'message': _('Please note that the quantity is not within the tolerance limit of the order.')
@@ -79,7 +79,7 @@ class StockMove(models.Model):
                     if rec.purchase_line_id.tolerance_type:
                         tolerance_quantity = (product_qty * rec.purchase_line_id.tolerance_percentage) / 100
                         if rec.purchase_line_id.tolerance_type == 'min_max':
-                            if product_qty + tolerance_quantity < rec.quantity_done or product_qty - rec.sale_line_id.tolerance_percentage > rec.quantity_done:
+                            if product_qty + tolerance_quantity < rec.quantity_done or product_qty - tolerance_quantity > rec.quantity_done:
                                 return {'warning': {
                                     'title': _('Warning'),
                                     'message': _('Please note that the quantity is not within the tolerance limit of the order.')
@@ -111,7 +111,7 @@ class StockMoveLine(models.Model):
                     if rec.move_id.sale_line_id.tolerance_type:
                         tolerance_quantity = (product_uom_qty*rec.move_id.sale_line_id.tolerance_percentage)/100
                         if rec.move_id.sale_line_id.tolerance_type == 'min_max':
-                            if product_uom_qty + tolerance_quantity < rec.qty_done or product_uom_qty - rec.move_id.sale_line_id.tolerance_percentage > rec.qty_done:
+                            if product_uom_qty + tolerance_quantity < rec.qty_done or product_uom_qty - tolerance_quantity > rec.qty_done:
                                 return {'warning': {
                                     'title': _('Warning'),
                                     'message': _('Please note that the quantity is not within the tolerance limit of the order.')
@@ -133,7 +133,7 @@ class StockMoveLine(models.Model):
                     if rec.move_id.purchase_line_id.tolerance_type:
                         tolerance_quantity = (product_qty * rec.move_id.purchase_line_id.tolerance_percentage) / 100
                         if rec.move_id.purchase_line_id.tolerance_type == 'min_max':
-                            if product_qty + tolerance_quantity < rec.qty_done or product_qty - rec.move_id.sale_line_id.tolerance_percentage > rec.qty_done:
+                            if product_qty + tolerance_quantity < rec.qty_done or product_qty - tolerance_quantity > rec.qty_done:
                                 return {'warning': {
                                     'title': _('Warning'),
                                     'message': _('Please note that the quantity is not within the tolerance limit of the order.')
