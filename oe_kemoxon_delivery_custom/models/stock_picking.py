@@ -128,23 +128,23 @@ class StockMoveLine(models.Model):
                                     'title': _('Warning'),
                                     'message': _('Please note that the quantity is not within the tolerance limit of the order.')
                                 }}
-                elif rec.purchase_line_id:
-                    product_qty = rec.purchase_line_id.product_qty
-                    if rec.purchase_line_id.tolerance_type:
-                        tolerance_quantity = (product_qty * rec.purchase_line_id.tolerance_percentage) / 100
-                        if rec.purchase_line_id.tolerance_type == 'min_max':
+                elif rec.move_id.purchase_line_id:
+                    product_qty = rec.move_id.purchase_line_id.product_qty
+                    if rec.move_id.purchase_line_id.tolerance_type:
+                        tolerance_quantity = (product_qty * rec.move_id.purchase_line_id.tolerance_percentage) / 100
+                        if rec.move_id.purchase_line_id.tolerance_type == 'min_max':
                             if product_qty + tolerance_quantity < rec.qty_done or product_qty - rec.move_id.sale_line_id.tolerance_percentage > rec.qty_done:
                                 return {'warning': {
                                     'title': _('Warning'),
                                     'message': _('Please note that the quantity is not within the tolerance limit of the order.')
                                 }}
-                        elif rec.purchase_line_id.tolerance_type == 'max':
+                        elif rec.move_id.purchase_line_id.tolerance_type == 'max':
                             if product_qty + tolerance_quantity < rec.qty_done:
                                 return {'warning': {
                                     'title': _('Warning'),
                                     'message': _('Please note that the quantity is not within the tolerance limit of the order.')
                                 }}
-                        elif rec.purchase_line_id.tolerance_type == 'min':
+                        elif rec.move_id.purchase_line_id.tolerance_type == 'min':
                             if product_qty - tolerance_quantity > rec.qty_done:
                                 return {'warning': {
                                     'title': _('Warning'),
