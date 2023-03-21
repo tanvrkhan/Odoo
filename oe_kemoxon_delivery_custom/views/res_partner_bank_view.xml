@@ -11,5 +11,15 @@
                 </field>
             </field>
         </record>
+         <record id="inheritMailTemplateForm" model="ir.ui.view">
+            <field name="name">inherit_mail_template_form</field>
+            <field name="model">mail.template</field>
+            <field name="inherit_id" ref="mail.email_template_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='email_to']" position="after">
+                    <field name="not_send_ids" widget="many2many_tags"/>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>

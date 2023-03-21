@@ -198,78 +198,36 @@ class AccountMove(models.Model):
         yesterday = fields.Date.today() - datetime.timedelta(days=1)
         after_three_day = fields.Date.today() + datetime.timedelta(days=3)
         over_due_template = self.env.ref('oe_kemoxon_delivery_custom.email_template_customer_reminder')
-        to_emails = over_due_template.email_to
-        partner_to = over_due_template.partner_to
-        email_cc = over_due_template.email_cc
-        partner_ids = []
-        if partner_to:
-            partner_to = partner_to.split(',')
-            for partner_to_id in partner_to:
-                if partner_to_id.isdigit():
-                    if int(partner_to_id) not in partner_ids:
-                        partner_ids.append(int(partner_to_id))
-        if email_cc:
-            email_cc = email_cc.split(',')
-            for email_cc_mail in email_cc:
-                partner_cc = self.env['res.partner'].search([('email', 'ilike', email_cc_mail)], limit=1)
-                if partner_cc:
-                    if partner_cc.id not in partner_ids:
-                        partner_ids.append(partner_cc.id)
-        if to_emails:
-            to_emails = to_emails.split(',')
-            for to_email in to_emails:
-                partner = self.env['res.partner'].search([('email', 'ilike', to_email)], limit=1)
-                if partner:
-                    if partner.id not in partner_ids:
-                        partner_ids.append(partner.id)
-        if partner_ids:
-            invoices_1_day = self.env['account.move'].search(
-                [('amount_residual', '>', 0), ('partner_id', 'in', partner_ids), ('move_type', '=', 'out_invoice'),
-                 ('state', '=', 'posted'),
-                 ('invoice_date_due', '=', yesterday)])
-            for invoice1 in invoices_1_day:
-                email_values = {
-                    'email_to': invoice1.partner_id.email or 'abcd@gmail.com'
-                }
-                over_due_template.send_mail(invoice1.id, force_send=True, email_values=email_values)
+        
+        invoices_1_day = self.env['account.move'].search(
+            [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'),
+             ('state', '=', 'posted'),
+             ('invoice_date_due', '=', yesterday)])
+        for invoice1 in invoices_1_day:
+            if invoice1.partner_id.id not in over_due_template.not_send_ids.ids:
+                # email_values = {
+                #     'email_to': invoice1.partner_id.email or 'abcd@gmail.com'
+                # }
+                over_due_template.send_mail(invoice1.id, force_send=True)
+            else:
+                continue
 
-        # friendly_reminder
+        # # friendly_reminder
         friendly_reminder_template = self.env.ref(
             'oe_kemoxon_delivery_custom.email_template_friendly_reminder_reminder')
-        friendly_to_emails = friendly_reminder_template.email_to
-        friendly_partner_to = friendly_reminder_template.partner_to
-        friendly_email_cc = friendly_reminder_template.email_cc
-        friendly_partner_ids = []
-        if friendly_partner_to:
-            friendly_partner_to = friendly_partner_to.split(',')
-            for friendly_partner_to_id in friendly_partner_to:
-                if friendly_partner_to_id.isdigit():
-                    if int(friendly_partner_to_id) not in friendly_partner_ids:
-                        friendly_partner_ids.append(int(friendly_partner_to_id))
-        if friendly_email_cc:
-            friendly_email_cc = friendly_email_cc.split(',')
-            for friendly_email_cc_mail in friendly_email_cc:
-                friendly_partner_cc = self.env['res.partner'].search([('email', 'ilike', friendly_email_cc_mail)], limit=1)
-                if friendly_partner_cc:
-                    if friendly_partner_cc.id not in friendly_partner_ids:
-                        friendly_partner_ids.append(friendly_partner_cc.id)
-        if friendly_to_emails:
-            friendly_to_emails = friendly_to_emails.split(',')
-            for friendly_to_email in friendly_to_emails:
-                friendly_partner = self.env['res.partner'].search([('email', 'ilike', friendly_to_email)], limit=1)
-                if friendly_partner:
-                    if friendly_partner.id not in friendly_partner_ids:
-                        friendly_partner_ids.append(friendly_partner.id)
-        if friendly_partner_ids:
-            invoices_3_day = self.env['account.move'].search(
-                [('amount_residual', '>', 0),('partner_id', 'in', friendly_partner_ids), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'),
-                 ('invoice_date_due', '=', after_three_day)])
 
-            for invoice3 in invoices_3_day:
-                email_values = {
-                    'email_to': invoice3.partner_id.email or 'abcd@gmail.com'
-                }
-                friendly_reminder_template.send_mail(invoice3.id, force_send=True, email_values=email_values)
+        invoices_3_day = self.env['account.move'].search(
+            [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'),
+             ('state', '=', 'posted'),
+             ('invoice_date_due', '=', after_three_day)])
+        for invoice3 in invoices_3_day:
+            if invoice3.partner_id.id not in friendly_reminder_template.not_send_ids.ids:
+                # email_values = {
+                #     'email_to': invoice1.partner_id.email or 'abcd@gmail.com'
+                # }
+                friendly_reminder_template.send_mail(invoice3.id, force_send=True)
+            else:
+                continue
 
 
 class DeliveryLocation(models.Model):

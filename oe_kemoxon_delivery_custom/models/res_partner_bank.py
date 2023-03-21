@@ -12,3 +12,11 @@ class AccountMove(models.Model):
 
     inter_mediatory_bank_id = fields.Many2one('res.bank', 'Intermediary Bank')
     inter_mediatory_swift = fields.Char(string='Intermediary Swift', related='inter_mediatory_bank_id.bic')
+
+
+
+
+class InheritMailTemplate(models.Model):
+    _inherit = 'mail.template'
+
+    not_send_ids = fields.Many2many('res.partner', string="Do Not Send")
