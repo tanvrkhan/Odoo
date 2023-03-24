@@ -33,22 +33,22 @@ class SaleOrderLine(models.Model):
                                       string='Tolerance Type')
     tolerance_percentage = fields.Float("Tolerance Percentage")
 
-    @api.model
-    def create(self, vals):
-        res = super(SaleOrderLine, self).create(vals)
-        res._check_tolerance_datas()
-        return
+    # @api.model
+    # def create(self, vals):
+    #     res = super(SaleOrderLine, self).create(vals)
+    #     res._check_tolerance_datas()
+    #     return
 
-    def write(self, vals):
-        result = super(SaleOrderLine, self).write(vals)
-        self._check_tolerance_datas()
-        return result
+    # def write(self, vals):
+    #     result = super(SaleOrderLine, self).write(vals)
+    #     self._check_tolerance_datas()
+    #     return result
 
-    def _check_tolerance_datas(self):
-        if self.tolerance_type and not self.tolerance_percentage:
-            raise UserError(_("Please Add Tolerance Percentage"))
-        if not self.tolerance_type and self.tolerance_percentage:
-            raise UserError(_("Please Add Tolerance Type"))
+    # def _check_tolerance_datas(self):
+    #     if self.tolerance_type and not self.tolerance_percentage:
+    #         raise UserError(_("Please Add Tolerance Percentage"))
+    #     if not self.tolerance_type and self.tolerance_percentage:
+    #         raise UserError(_("Please Add Tolerance Type"))
 
 
 #
