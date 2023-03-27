@@ -28,7 +28,7 @@ class SaleOrderLine(models.Model):
     def create(self, vals):
         res = super(SaleOrderLine, self).create(vals)
         res._check_tolerance_datas()
-        return
+        return res
 
     def write(self, vals):
         result = super(SaleOrderLine, self).write(vals)
