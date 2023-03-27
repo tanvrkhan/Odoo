@@ -63,7 +63,7 @@ class PurchaseOrderLine(models.Model):
     def create(self, vals):
         res = super(PurchaseOrderLine, self).create(vals)
         res._check_tolerance_datas()
-        return
+        return res
 
     def write(self, vals):
         result = super(PurchaseOrderLine, self).write(vals)
