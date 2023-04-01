@@ -8,6 +8,7 @@ from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessE
 import base64
 from operator import itemgetter
 
+
 class AccountMove(models.Model):
     _inherit = "account.move"
 
@@ -19,24 +20,24 @@ class AccountMove(models.Model):
     picking_id = fields.Many2one('stock.picking', "Delivery Order")
 
     vessel_information_id = fields.Many2one('vessel.information', "Vessel Details")
-    vessel_name=fields.Char("Vessel Name", related='vessel_information_id.vessel_id.vessel_name')
-    imo=fields.Char("IMO", related='vessel_information_id.vessel_id.imo')
-    ncv=fields.Char("NCV")
-    loadport=fields.Many2one("delivery.location","Load port", related='vessel_information_id.loadport')
-    disport=fields.Many2one("delivery.location","Discharge port", related='vessel_information_id.disport')
-    country_of_origin = fields.Many2one("res.country","COO", related='vessel_information_id.country_of_origin')
-    payment_notes=fields.Char("Payment Notes")
-    bl_date=fields.Date("BL Date", related='vessel_information_id.bl_date')
+    vessel_name = fields.Char("Vessel Name", related='vessel_information_id.vessel_id.vessel_name')
+    imo = fields.Char("IMO", related='vessel_information_id.vessel_id.imo')
+    ncv = fields.Char("NCV")
+    loadport = fields.Many2one("delivery.location", "Load port", related='vessel_information_id.loadport')
+    disport = fields.Many2one("delivery.location", "Discharge port", related='vessel_information_id.disport')
+    country_of_origin = fields.Many2one("res.country", "COO", related='vessel_information_id.country_of_origin')
+    payment_notes = fields.Char("Payment Notes")
+    bl_date = fields.Date("BL Date", related='vessel_information_id.bl_date')
     # bill_date = fields.Date("B/L Date", related='picking_id.bill_date')
     # vessel_name = fields.Char("Vessel Name", related='picking_id.vessel_name')
-    payment_notes=fields.Text()
-    delivery_notes=fields.Text()
+    payment_notes = fields.Text()
+    delivery_notes = fields.Text()
     journal_id = fields.Many2one('account.journal', string='Journal', domain=[], required=True, readonly=True,
                                  states={'draft': [('readonly', False)]},
                                  check_company=True)
 
     show_vat_ids = fields.Boolean(string="Show VAT Ids")
-    
+
     def get_invoice_details(self):
         invoices = self.env['account.move'].search(
             [('amount_residual', '>', 0), ('move_type', '=', self.move_type), ('state', '=', 'posted')])
@@ -194,11 +195,15 @@ class AccountMove(models.Model):
         sow_template_id.body_html = body_html
         sow_template_id.send_mail(self.id, force_send=True)
 
+    def get_total(self, total=None):
+        number = "{:.2f}".format(total)
+        return "{:,.2f}".format(float(number))
+
     def action_send_customer_reminder(self):
         yesterday = fields.Date.today() - datetime.timedelta(days=1)
         after_three_day = fields.Date.today() + datetime.timedelta(days=3)
         over_due_template = self.env.ref('oe_kemoxon_delivery_custom.email_template_customer_reminder')
-        
+
         invoices_1_day = self.env['account.move'].search(
             [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'),
              ('state', '=', 'posted'),

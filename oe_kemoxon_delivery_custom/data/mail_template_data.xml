@@ -25,12 +25,13 @@
             <field name="email_from">{{object.env.user.email}}</field>
             <field name="body_html" type="html">
                 <div>
-                    <p>Dear Management<t t-out="object.partner_id.name or ''"/>,
+                    <p>Dear Management <t t-out="object.partner_id.name or ''"/>,
                     </p>
-                    <p>Please note that for customer<t t-out="object.partner_id.name or ''"/>,<t
+                    <p>Please note that for customer <t t-out="object.partner_id.name or ''"/>,<t
                             t-out="object.partner_id.name or ''"/>, the following invoice was not paid in due
                         time:
-                        <t t-out="object.amount_residual or ''"/>
+                        <!--                        <t t-out="object.amount_residual or ''"/>-->
+                        <span t-esc="object.get_total(object.amount_residual)"/>
                         <t t-out="object.currency_id.name or ''"/>
                         for our invoice no.
                         <t
@@ -56,15 +57,14 @@
             <field name="email_from">{{object.env.user.email}}</field>
             <field name="body_html" type="html">
                 <div>
-                    <p>Dear Management<t t-out="object.partner_id.name or ''"/>,
+                    <p>Dear Management <t t-out="object.partner_id.name or ''"/>,
                     </p>
 
                     <p>Please make sure the following invoice is paid in due time
-                        <t t-out="object.amount_residual or ''"/>
-                         <t t-out="object.currency_id.name or ''"/>
+                        <span t-esc="object.get_total(object.amount_residual)"/>
+                        <t t-out="object.currency_id.name or ''"/>
                         for our invoice no.
-                        <t
-                                t-out="object.name or ''"/>
+                        <t t-out="object.name or ''"/>
                         due on
                         <t t-out="object.invoice_date_due"/>
                         Please disregard this email if this invoice has already been paid
