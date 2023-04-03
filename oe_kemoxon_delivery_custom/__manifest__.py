@@ -26,7 +26,6 @@ OdooERP Sales
         'views/trucktransportdetails.xml',
         'wizard/kemexon_aging_balance_report_view.xml',
         'views/res_partner_bank_view.xml',
-        'report/sales_purcahses_and_expense.xml'
     ],
     'installable': True,
     'application': True,
