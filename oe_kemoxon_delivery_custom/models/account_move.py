@@ -236,7 +236,8 @@ class AccountMove(models.Model):
         if friendly_email_cc:
             friendly_email_cc = friendly_email_cc.split(',')
             for friendly_email_cc_mail in friendly_email_cc:
-                friendly_partner_cc = self.env['res.partner'].search([('email', 'ilike', friendly_email_cc_mail)], limit=1)
+                friendly_partner_cc = self.env['res.partner'].search([('email', 'ilike', friendly_email_cc_mail)],
+                                                                     limit=1)
                 if friendly_partner_cc:
                     if friendly_partner_cc.id not in friendly_partner_ids:
                         friendly_partner_ids.append(friendly_partner_cc.id)
@@ -249,7 +250,8 @@ class AccountMove(models.Model):
                         friendly_partner_ids.append(friendly_partner.id)
         if friendly_partner_ids:
             invoices_3_day = self.env['account.move'].search(
-                [('amount_residual', '>', 0),('partner_id', 'in', friendly_partner_ids), ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'),
+                [('amount_residual', '>', 0), ('partner_id', 'in', friendly_partner_ids),
+                 ('move_type', '=', 'out_invoice'), ('state', '=', 'posted'),
                  ('invoice_date_due', '=', after_three_day)])
 
             for invoice3 in invoices_3_day:
@@ -257,6 +259,36 @@ class AccountMove(models.Model):
                     'email_to': invoice3.partner_id.email or 'abcd@gmail.com'
                 }
                 friendly_reminder_template.send_mail(invoice3.id, force_send=True, email_values=email_values)
+
+
+class AccountMoveLine(models.Model):
+    _inherit = "account.move.line"
+
+    deduction = fields.Float('Deduction')
+
+    @api.depends('quantity', 'discount', 'price_unit', 'tax_ids', 'currency_id','deduction')
+    def _compute_totals(self):
+        for line in self:
+            if line.display_type != 'product':
+                line.price_total = line.price_subtotal = False
+            # Compute 'price_subtotal'.
+            line_discount_price_unit = line.price_unit * (1 - (line.discount / 100.0))
+            subtotal = line.quantity * line_discount_price_unit
+
+            # Compute 'price_total'.
+            if line.tax_ids:
+                taxes_res = line.tax_ids.compute_all(
+                    line_discount_price_unit,
+                    quantity=line.quantity,
+                    currency=line.currency_id,
+                    product=line.product_id,
+                    partner=line.partner_id,
+                    is_refund=line.is_refund,
+                )
+                line.price_subtotal = taxes_res['total_excluded'] - line.deduction
+                line.price_total = taxes_res['total_included'] - line.deduction
+            else:
+                line.price_total = line.price_subtotal = subtotal - line.deduction
 
 
 class DeliveryLocation(models.Model):
