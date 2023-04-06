@@ -298,6 +298,16 @@
                                 <span class="m-0" t-esc="o.get_text_from_html_field(o)"/>
                             </div>
                         </div>
+                        <t t-if="o.payment_notes">
+                            <div class="row col-12">
+                                 <div class="col-4">
+                                    <strong>Payment Notes</strong>
+                                </div>
+                                <div class="col-8">
+                                    <span class="m-0" t-field="o.payment_notes"/>
+                                </div>
+                            </div>
+                        </t>
                     </div>
                     <!-- Left div ended Here -->
 
