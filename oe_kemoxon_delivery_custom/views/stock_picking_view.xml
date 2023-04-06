@@ -8,9 +8,24 @@
                 <xpath expr="//button[@name='action_confirm']"
                        position="after">
                     <field name="is_truck_invoice_created" invisible="1"/>
-                    <button name="action_create_truck_invoice" attrs="{'invisible': [('is_truck_invoice_created', '=', True)]}"
-                            string="Create Transporter Invoice" type="object" class="oe_highlight" />
+                    <button name="action_create_truck_invoice"
+                            attrs="{'invisible': [('is_truck_invoice_created', '=', True)]}"
+                            string="Create Transporter Invoice" type="object" class="oe_highlight"/>
 
+                </xpath>
+                <xpath expr="//button[@name='action_picking_move_tree']"
+                       position="after">
+                    <field name="transporter_invoice_id" invisible="1"/>
+                    <button class="oe_stat_button" name="action_view_transporter_invoice" type="object" icon="fa-dollar"
+                            attrs="{'invisible': [('transporter_invoice_id', '=', False)]}"
+                            groups="sales_team.group_sale_salesman">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value">
+                                1
+                            </span>
+                            <span class="o_stat_text">Transporter Invoice</span>
+                        </div>
+                    </button>
                 </xpath>
                 <xpath expr="//field[@name='origin']"
                        position="after">
