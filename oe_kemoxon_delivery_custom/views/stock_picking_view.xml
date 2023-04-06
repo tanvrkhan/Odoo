@@ -9,7 +9,7 @@
                        position="after">
                     <field name="is_truck_invoice_created" invisible="1"/>
                     <button name="action_create_truck_invoice" attrs="{'invisible': [('is_truck_invoice_created', '=', True)]}"
-                            string="Create Truck Invoice" type="object" class="oe_highlight" />
+                            string="Create Transporter Invoice" type="object" class="oe_highlight" />
 
                 </xpath>
                 <xpath expr="//field[@name='origin']"
