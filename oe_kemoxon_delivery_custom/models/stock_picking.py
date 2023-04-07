@@ -22,7 +22,6 @@ class StockPicking(models.Model):
     rate = fields.Float('Rate')
     transport_tolerance = fields.Float('Transport Tolerance')
     is_truck_invoice_created = fields.Boolean('Truck Invoice Created')
-    transporter_invoice_id = fields.Many2one('account.move', 'Transporter Invoice')
 
     def action_create_truck_invoice(self):
         invoice_line_ids = []
@@ -31,35 +30,51 @@ class StockPicking(models.Model):
         transport_tolerance = self.transport_tolerance / 100
         sale_price = move.sale_line_id.price_unit
 
-        if not self.transporter:
-            raise UserError(_('Please Add Transporter!!'))
+        transporterids = []
+        invoice_details_dict = {}
+        transporter_invoices = []
         for truck_line in self.truck_transport_details_ids:
+            if not truck_line.transporter:
+                raise UserError(_('Please Add Transporter!!'))
+            if truck_line.transporter.id not in transporterids:
+                transporterids.append(truck_line.transporter.id)
+                invoice_details_dict[truck_line.transporter.id] = {
+                    'lines': [truck_line]
+                }
+            else:
+                invoice_details_dict[truck_line.transporter.id]['lines'].append(truck_line)
+        for transporterid in transporterids:
             self.is_truck_invoice_created = True
-            actual_loss = truck_line.loaded - truck_line.offloaded
-            tolerable_loss = transport_tolerance * truck_line.loaded
-            loss_in_quantity = tolerable_loss - actual_loss
-            loss_in_amount = sale_price * loss_in_quantity
+            for line in invoice_details_dict.get(transporterid).get('lines'):
+                actual_loss = line.loaded - line.offloaded
+                tolerable_loss = transport_tolerance * line.loaded
+                loss_in_quantity = tolerable_loss - actual_loss
+                loss_in_amount = sale_price * loss_in_quantity
+                if line.offloaded > line.loaded:
+                    loss_in_amount = 0
 
-            invoice_line_ids.append((0, 0, {
-                'product_id': product_id.id,
-                'quantity': truck_line.loaded,
-                'price_unit': self.rate,
-                'deduction': loss_in_amount
-            }))
-        account_move = self.env['account.move'].create(
-            {
-                'move_type': 'out_invoice',
-                'date': self.scheduled_date,
-                'invoice_date': self.scheduled_date,
-                'partner_id': self.transporter.id,
-                'invoice_line_ids': invoice_line_ids,
-            }
-        )
-        self.transporter_invoice_id = account_move.id
+                invoice_line_ids.append((0, 0, {
+                    'product_id': product_id.id,
+                    'quantity': line.loaded,
+                    'price_unit': self.rate,
+                    'deduction': loss_in_amount
+                }))
+            account_move = self.env['account.move'].create(
+                {
+                    'move_type': 'out_invoice',
+                    'date': self.scheduled_date,
+                    'invoice_date': self.scheduled_date,
+                    'partner_id': transporterid,
+                    'invoice_line_ids': invoice_line_ids,
+                    'transporter_details_id':self.id
+
+                }
+            )
+            transporter_invoices.append(account_move.id)
 
     def action_view_transporter_invoice(self):
         action = {
-            'domain': [('id', '=', self.transporter_invoice_id.id)],
+            'domain': [('transporter_details_id', '=', self.id)],
             'name': 'Transporter Invoice',
             'view_mode': 'tree,form',
             'res_model': 'account.move',

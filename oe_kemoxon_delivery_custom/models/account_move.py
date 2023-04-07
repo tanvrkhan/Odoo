@@ -23,6 +23,7 @@ class AccountMove(models.Model):
                                  check_company=True)
 
     show_vat_ids = fields.Boolean(string="Show VAT Ids")
+    transporter_details_id = fields.Many2one('stock.picking','Transporter Delivery')
 
     def get_invoice_details(self):
         invoices = self.env['account.move'].search(
@@ -266,7 +267,7 @@ class AccountMoveLine(models.Model):
 
     deduction = fields.Float('Deduction')
 
-    @api.depends('quantity', 'discount', 'price_unit', 'tax_ids', 'currency_id','deduction')
+    @api.depends('quantity', 'discount', 'price_unit', 'tax_ids', 'currency_id', 'deduction')
     def _compute_totals(self):
         for line in self:
             if line.display_type != 'product':
