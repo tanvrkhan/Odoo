@@ -24,7 +24,7 @@ class StockPicking(models.Model):
     is_truck_invoice_created = fields.Boolean('Truck Invoice Created')
 
     def action_create_truck_invoice(self):
-        invoice_line_ids = []
+
         product_id = self.env.ref('oe_kemoxon_delivery_custom.product_product_freight_charges')
         move = self.move_ids_without_package[0]
         transport_tolerance = self.transport_tolerance / 100
@@ -45,6 +45,7 @@ class StockPicking(models.Model):
                 invoice_details_dict[truck_line.transporter.id]['lines'].append(truck_line)
         for transporterid in transporterids:
             self.is_truck_invoice_created = True
+            invoice_line_ids = []
             for line in invoice_details_dict.get(transporterid).get('lines'):
                 actual_loss = line.loaded - line.offloaded
                 tolerable_loss = transport_tolerance * line.loaded
@@ -70,7 +71,7 @@ class StockPicking(models.Model):
 
                 }
             )
-            transporter_invoices.append(account_move.id)
+            # transporter_invoices.append(account_move.id)
 
     def action_view_transporter_invoice(self):
         action = {
