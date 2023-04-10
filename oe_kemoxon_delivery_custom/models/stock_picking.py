@@ -22,6 +22,16 @@ class StockPicking(models.Model):
     rate = fields.Float('Rate')
     transport_tolerance = fields.Float('Transport Tolerance')
     is_truck_invoice_created = fields.Boolean('Truck Invoice Created')
+    transport_invoice_count = fields.Integer('Truck Invoice Count', compute='_compute_transport_invoice_count')
+
+    @api.depends('is_truck_invoice_created')
+    def _compute_transport_invoice_count(self):
+        for rec in self:
+            moves = self.env['account.move'].search([('transporter_details_id', '=', self.id)])
+            if moves:
+                rec.transport_invoice_count = len(moves)
+            else:
+                rec.transport_invoice_count = 0
 
     def action_create_truck_invoice(self):
 
@@ -62,12 +72,13 @@ class StockPicking(models.Model):
                 }))
             account_move = self.env['account.move'].create(
                 {
-                    'move_type': 'out_invoice',
+                    'move_type': 'in_invoice',
                     'date': self.scheduled_date,
                     'invoice_date': self.scheduled_date,
                     'partner_id': transporterid,
                     'invoice_line_ids': invoice_line_ids,
-                    'transporter_details_id':self.id
+                    'transporter_details_id': self.id,
+                    'invoice_payment_term_id': self.transporter_payment_terms.id if self.transporter_payment_terms else False
 
                 }
             )
@@ -92,7 +103,6 @@ class StockPicking(models.Model):
                 domain.append(self.partner_id.id)
             else:
                 domain.append(self.partner_id.id)
-        print(domain, 'domaindomain')
         return {
             'domain': {
                 'consignee': [('id', 'in', domain)]}
