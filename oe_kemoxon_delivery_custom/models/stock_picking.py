@@ -21,17 +21,18 @@ class StockPicking(models.Model):
     transporter_payment_terms = fields.Many2one('account.payment.term', 'Transporter Payment Terms')
     rate = fields.Float('Rate')
     transport_tolerance = fields.Float('Transport Tolerance')
-    is_truck_invoice_created = fields.Boolean('Truck Invoice Created')
+    is_truck_invoice_created = fields.Boolean('Truck Invoice Created',compute='_compute_transport_invoice_count')
     transport_invoice_count = fields.Integer('Truck Invoice Count', compute='_compute_transport_invoice_count')
 
-    @api.depends('is_truck_invoice_created')
     def _compute_transport_invoice_count(self):
         for rec in self:
             moves = self.env['account.move'].search([('transporter_details_id', '=', self.id)])
             if moves:
                 rec.transport_invoice_count = len(moves)
+                rec.is_truck_invoice_created = True
             else:
                 rec.transport_invoice_count = 0
+                rec.is_truck_invoice_created= False
 
     def action_create_truck_invoice(self):
 
@@ -54,7 +55,6 @@ class StockPicking(models.Model):
             else:
                 invoice_details_dict[truck_line.transporter.id]['lines'].append(truck_line)
         for transporterid in transporterids:
-            self.is_truck_invoice_created = True
             invoice_line_ids = []
             for line in invoice_details_dict.get(transporterid).get('lines'):
                 actual_loss = line.loaded - line.offloaded
@@ -66,6 +66,7 @@ class StockPicking(models.Model):
 
                 invoice_line_ids.append((0, 0, {
                     'product_id': product_id.id,
+                    'name':line.truck,
                     'quantity': line.loaded,
                     'price_unit': self.rate,
                     'deduction': loss_in_amount
