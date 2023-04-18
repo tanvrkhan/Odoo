@@ -12,7 +12,7 @@ class InheritAccountPayment(models.Model):
     def _create_paired_internal_transfer_payment(self):
         ''' When an internal transfer is posted, a paired payment is created
         with opposite payment_type and swapped journal_id & destination_journal_id.
-        Both payments liquidity transfer lines are then reconciled.
+        Both payments liquidity transfer lines are then reconciled..
         '''
         for payment in self:
             paired_payment = payment.copy({
