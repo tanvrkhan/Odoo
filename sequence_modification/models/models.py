@@ -291,9 +291,11 @@ class AccountPaymentInherit(models.Model):
 
     pv_count = fields.Float("Pv Count")
     rv_count = fields.Float("Pv Count")
+    sequence_done = fields.Boolean("Sequence Done", copy=False)
 
     def action_post(self):
-        self.generate_payment_sequence()
+        if not self.sequence_done:
+            self.generate_payment_sequence()
         res = super().action_post()
         return res
 
@@ -304,14 +306,18 @@ class AccountPaymentInherit(models.Model):
             if check_name:
                 self.generate_payment_sequence()
             else:
+                self.name = None
                 self.name = seq
+                self.sequence_done = True
         else:
             seq = self.env['ir.sequence'].next_by_code('payment.voucher.sequence')
             check_name = self.check_exist(seq)
             if check_name:
                 self.generate_payment_sequence()
             else:
+                self.name = None
                 self.name = seq
+                self.sequence_done = True
 
     def check_exist(self, seq=None):
         return self.env['account.payment'].search([('name', '=', seq)])
