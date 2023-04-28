@@ -9,7 +9,7 @@ class AccountMoveInheritModel(models.Model):
     move_sequence_done = fields.Boolean("Sequence Done")
 
     def action_post(self):
-        if not self.move_sequence_done:
+        if not self.move_sequence_done and self.name == '/':
             if self.move_type == 'out_invoice':
                 self.generate_sequence('invoice.sequence', 'invoice')
 
@@ -23,7 +23,7 @@ class AccountMoveInheritModel(models.Model):
                 self.generate_sequence('credit.sequence', 'credit')
 
             elif self.move_type == 'entry':
-                if not self.move_sequence_done:
+                if not self.move_sequence_done and self.name == '/':
                     self.set_entry_seq()
 
         res = super().action_post()
