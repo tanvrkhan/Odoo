@@ -277,15 +277,16 @@ class SaleOrderInherit(models.Model):
         is_exists = partner_seq_obj.search([('name', '=', name)])
 
         if is_exists:
-            if name == "so_partner_seq":
+            if "PFI" in name:
                 new_name = is_exists.name + str(is_exists.next_number).zfill(3)
             else:
                 new_name = is_exists.name + str(is_exists.next_number).zfill(2)
+
             is_exists.next_number += 1
             return new_name
         else:
             num = 1
-            if name == "so_partner_seq":
+            if "PFI" in name:
                 new_name = name + str(num).zfill(3)
             else:
                 new_name = name + str(num).zfill(2)
