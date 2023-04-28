@@ -121,14 +121,14 @@ class AccountMoveInheritModel(models.Model):
         partner_seq_obj = self.env['partner.sequence']
         is_exists = partner_seq_obj.search([('name', '=', name)])
         if is_exists:
-            # new_name = is_exists.name + str(is_exists.next_number).zfill(2)
+            # new_name = is_exists.name + str(is_exists.next_number).zfill(3)
             is_exists.next_number += 1
-            new_name = is_exists.name + str(is_exists.next_number).zfill(2)
+            new_name = is_exists.name + str(is_exists.next_number).zfill(3)
             return new_name
         else:
             num = 1
-            # new_name = name + str(num).zfill(2)
-            new_name = name + str(num).zfill(2)
+            # new_name = name + str(num).zfill(3)
+            new_name = name + str(num).zfill(3)
             num += 1
             partner_seq_obj.create({
                 'name': name,
@@ -189,12 +189,12 @@ class InheritStockPicking(models.Model):
         partner_seq_obj = self.env['partner.sequence']
         is_exists = partner_seq_obj.search([('name', '=', name)])
         if is_exists:
-            new_name = is_exists.name + '-' + str(is_exists.next_number).zfill(2)
+            new_name = is_exists.name + '-' + str(is_exists.next_number).zfill(3)
             is_exists.next_number += 1
             return new_name
         else:
             num = 1
-            new_name = name + '-' + str(num).zfill(2)
+            new_name = name + '-' + str(num).zfill(3)
             num += 1
             partner_seq_obj.create({
                 'name': name,
@@ -233,6 +233,8 @@ class SaleOrderInherit(models.Model):
 
     def sale_create_seq_name(self, vals_list=None):
         seq = self.env['ir.sequence'].next_by_code('sale.order.sequence').split("-")
+        seqCO = self.env['ir.sequence'].next_by_code('sale.order.contract.sequence')
+
         next_num = 0
         short_name = str(self.env['res.partner'].browse(vals_list.get('partner_id')).short_name) if self.env[
             'res.partner'].browse(vals_list.get('partner_id')).short_name else ''
@@ -246,6 +248,16 @@ class SaleOrderInherit(models.Model):
                 self.sale_create_seq_name(vals_list)
             else:
                 vals_list['name'] = name
+
+        if seqCO:
+            partner = self.env['res.partner'].browse(vals_list.get('partner_id'))
+            partner.co_partner_seq += 1
+            next_num = partner.co_partner_seq
+            name = self.get_new_name(seqCO, next_num, short_name, vals_list)
+            is_exist = self.env['sale.order'].search([('deal_ref', '=', name)])
+            if is_exist:
+                self.sale_create_seq_name(vals_list)
+            else:
                 vals_list['hidden_ref'] = name.split("-")[0] + "-" + name.split("-")[2]
 
     def get_new_name(self, seq=None, next_num=None, short_name=None, rec=None):
@@ -263,13 +275,20 @@ class SaleOrderInherit(models.Model):
     def check_in_partner_seq(self, name=None):
         partner_seq_obj = self.env['partner.sequence']
         is_exists = partner_seq_obj.search([('name', '=', name)])
+
         if is_exists:
-            new_name = is_exists.name + str(is_exists.next_number).zfill(2)
+            if name == "so_partner_seq":
+                new_name = is_exists.name + str(is_exists.next_number).zfill(3)
+            else:
+                new_name = is_exists.name + str(is_exists.next_number).zfill(2)
             is_exists.next_number += 1
             return new_name
         else:
             num = 1
-            new_name = name + str(num).zfill(2)
+            if name == "so_partner_seq":
+                new_name = name + str(num).zfill(3)
+            else:
+                new_name = name + str(num).zfill(2)
             num += 1
             partner_seq_obj.create({
                 'name': name,
@@ -332,6 +351,7 @@ class InheritResCustomer(models.Model):
     refund_partner_seq = fields.Integer("Refund Sequence")
     picking_partner_seq = fields.Integer("Picking Sequence")
     so_partner_seq = fields.Integer("SO Sequence")
+    co_partner_seq = fields.Integer("Contract Sequence")
 
 
 class PartnerSequence(models.Model):
