@@ -375,7 +375,6 @@ class InheritResCustomer(models.Model):
     picking_partner_seq = fields.Integer("Picking Sequence")
     so_partner_seq = fields.Integer("SO Sequence")
     co_partner_seq = fields.Integer("Contract Sequence")
-    journal_entry_seq = fields.Integer("Journal Entry Sequence")
 
 
 class PartnerSequence(models.Model):
