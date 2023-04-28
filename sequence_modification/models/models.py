@@ -6,24 +6,44 @@ from dateutil import parser
 class AccountMoveInheritModel(models.Model):
     _inherit = 'account.move'
 
+    move_sequence_done = fields.Boolean("Sequence Done")
+
     def action_post(self):
-        if self.move_type == 'out_invoice':
-            self.generate_sequence('invoice.sequence', 'invoice')
+        if not self.move_sequence_done:
+            if self.move_type == 'out_invoice':
+                self.generate_sequence('invoice.sequence', 'invoice')
 
-        elif self.move_type == 'in_invoice':
-            self.generate_sequence('bill.sequence', 'bill')
+            elif self.move_type == 'in_invoice':
+                self.generate_sequence('bill.sequence', 'bill')
 
-        elif self.move_type == 'in_refund':
-            self.generate_sequence('debit.sequence', 'refund')
+            elif self.move_type == 'in_refund':
+                self.generate_sequence('debit.sequence', 'refund')
 
-        elif self.move_type == 'out_refund':
-            self.generate_sequence('credit.sequence', 'credit')
+            elif self.move_type == 'out_refund':
+                self.generate_sequence('credit.sequence', 'credit')
 
-        elif self.move_type == 'entry':
-            seq = self.env['ir.sequence'].next_by_code('journal.entry.sequence')
-            self.name = seq
+            elif self.move_type == 'entry':
+                if not self.move_sequence_done:
+                    self.set_entry_seq()
+
         res = super().action_post()
         return res
+
+    def is_entry_sequence_exits(self, seq=None):
+        seq = self.env['account.move'].search([('name', '=', seq)])
+        if seq:
+            return True
+        else:
+            return False
+
+    def set_entry_seq(self):
+        seq = self.env['ir.sequence'].next_by_code('journal.entry.sequence')
+        is_exists = self.is_entry_sequence_exits(seq)
+        if is_exists:
+            self.set_entry_seq()
+        else:
+            self.name = seq
+            self.move_sequence_done = True
 
     def generate_sequence(self, code=None, move_type=None):
         seq = self.env['ir.sequence'].next_by_code(code).split("-")
@@ -75,6 +95,8 @@ class AccountMoveInheritModel(models.Model):
                     self.generate_sequence(code, move_type)
                 else:
                     self.name = name
+
+        self.move_sequence_done = True
 
     def get_new_name(self, seq=None, next_num=None):
         month = self.get_month()
@@ -353,6 +375,7 @@ class InheritResCustomer(models.Model):
     picking_partner_seq = fields.Integer("Picking Sequence")
     so_partner_seq = fields.Integer("SO Sequence")
     co_partner_seq = fields.Integer("Contract Sequence")
+    journal_entry_seq = fields.Integer("Journal Entry Sequence")
 
 
 class PartnerSequence(models.Model):
