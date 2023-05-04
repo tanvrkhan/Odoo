@@ -1,0 +1,9 @@
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<odoo>-->
+
+<!--    <menuitem id="menu_tree_view_master"-->
+<!--              name="Tree View"-->
+<!--              parent="purchase.menu_purchase_root"-->
+<!--              sequence="40"/>-->
+
+<!--</odoo>-->
