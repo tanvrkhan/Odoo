@@ -576,33 +576,33 @@
                 <!--                <strong>-->
                 <!--                    <center>'This is a system generated document and does not require a signature'</center>-->
                 <!--                </strong>-->
-<!--                <ul class="list-inline mb4">-->
-<!--                    <li t-if="company.name">-->
-<!--                        <span class="o_force_ltr" t-field="company.name"/>-->
-<!--                    </li>-->
-<!--                    <li t-if="company.street">-->
-<!--                        <span class="o_force_ltr" t-field="company.street"/>-->
-<!--                    </li>-->
-<!--                    <li>-->
-<!--                        <span class="o_force_ltr" t-field="company.phone"/>-->
-<!--                        - -->
-<!--                        <span t-field="company.email"/>-->
-<!--                        <t t-if="o.show_vat_ids">-->
-<!--                            <t t-if="company.vat">-->
-<!--                                &#160;-&#160;<t t-out="company.country_id.vat_label or 'VAT ID'"/>:-->
-<!--                                <span t-field="company.vat"/>-->
-<!--                            </t>-->
-<!--                        </t>-->
-<!--                    </li>-->
-<!--                    &lt;!&ndash;                                    <li t-if="company.website" >&ndash;&gt;-->
-<!--                    &lt;!&ndash;                                        <span t-field="company.website"/>&ndash;&gt;-->
-<!--                    &lt;!&ndash;                                    </li>&ndash;&gt;-->
-<!--                    &lt;!&ndash; <t t-if="o.show_vat_ids">-->
-<!--                        <li t-if="company.vat"><t t-out="company.country_id.vat_label or 'VAT ID'"/>:-->
-<!--                            <span t-field="company.vat"/>-->
-<!--                        </li>-->
-<!--                    </t> &ndash;&gt;-->
-<!--                </ul>-->
+                <ul class="list-inline mb4">
+                    <li t-if="company.name">
+                        <span class="o_force_ltr" t-field="company.name"/>
+                    </li>
+                    <li t-if="company.street">
+                        <span class="o_force_ltr" t-field="company.street"/>
+                    </li>
+                    <li>
+                        <span class="o_force_ltr" t-field="company.phone"/>
+                        -
+                        <span t-field="company.email"/>
+                        <t t-if="o.show_vat_ids">
+                            <t t-if="company.vat">
+                                &#160;-&#160;<t t-out="company.country_id.vat_label or 'VAT ID'"/>:
+                                <span t-field="company.vat"/>
+                            </t>
+                        </t>
+                    </li>
+                    <!--                                    <li t-if="company.website" >-->
+                    <!--                                        <span t-field="company.website"/>-->
+                    <!--                                    </li>-->
+                    <!-- <t t-if="o.show_vat_ids">
+                        <li t-if="company.vat"><t t-out="company.country_id.vat_label or 'VAT ID'"/>:
+                            <span t-field="company.vat"/>
+                        </li>
+                    </t> -->
+                </ul>
                 <div t-if="report_type == 'pdf'" class="text-muted" style="margin-top: -20px; text-align: right;">
                     Page:
                     <span class="page"/>
