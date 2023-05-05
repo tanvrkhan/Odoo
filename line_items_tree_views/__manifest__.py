@@ -19,7 +19,7 @@
     'version': '0.1',
     'sequence': -100,
     # any module necessary for this one to work correctly
-    'depends': ['product', 'sale', 'purchase'],
+    'depends': ['product', 'sale', 'purchase','oe_kemoxon_delivery_custom'],
 
     # always loaded
     'data': [
