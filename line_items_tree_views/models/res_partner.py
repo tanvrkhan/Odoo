@@ -5,7 +5,7 @@ from odoo.exceptions import ValidationError
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    res_partner = fields.Many2one('res.partner', string='Group', tracking=True)
+    res_partner_id = fields.Many2one('res.partner', string='Group', tracking=True)
     short_name = fields.Char(string='Short Name')
 
     @api.constrains('short_name')
