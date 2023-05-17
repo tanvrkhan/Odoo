@@ -1,0 +1,16 @@
+<odoo>
+    <data>
+        <record id="view_truck_fields_inherited" model="ir.ui.view">
+            <field name="name">stock.picking.truck.fields.form.inherit</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='location_dest_id']" position="before">
+                    <field name="nominated_total"/>
+                    <field name="loaded_total"/>
+                    <field name="offloaded_total"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

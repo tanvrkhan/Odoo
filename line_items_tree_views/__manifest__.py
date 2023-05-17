@@ -3,7 +3,7 @@
     'name': "Line Items Tree Views",
     'author': 'Kemexon IT Dxb',
 
-    'summary': 'Hospital Management System',
+    'summary': 'Line Items Tree Views',
 
     'description': """
         Line Items Tree Views
@@ -16,17 +16,21 @@
     # for the full list
     'category': 'Kemexon',
     'version': '0.1',
-    'sequence': -100,
+    'sequence': 10,
     # any module necessary for this one to work correctly
-    'depends': ['product', 'sale', 'purchase','oe_kemoxon_delivery_custom','account'],
+    'depends': ['product', 'sale', 'purchase', 'oe_kemoxon_delivery_custom', 'account'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
-        'views/line_items_tree_views.xml'
-
+        'views/analytic_account_views.xml',
+        'views/blanket_order_line_views.xml',
+        'views/blanket_order_view.xml',
+        'views/line_items_tree_views.xml',
+        'views/res_partner_view.xml',
+        'views/transfer_fields_view.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import fields, models, api
 
 
 class PurchaseOrderLine(models.Model):
@@ -7,9 +7,11 @@ class PurchaseOrderLine(models.Model):
     analytic_distribution_formatted = fields.Char(
         string='Analytic',
         compute='_compute_analytic_distribution_formatted',
-        store=True, default=''
+        store=True,
+        readonly=True
     )
 
+    @api.depends('analytic_distribution')
     def _compute_analytic_distribution_formatted(self):
         for record in self:
             analytic_distribution = record.analytic_distribution
@@ -22,3 +24,4 @@ class PurchaseOrderLine(models.Model):
                 record.analytic_distribution_formatted = ', '.join(formatted)
             else:
                 record.analytic_distribution_formatted = ''
+

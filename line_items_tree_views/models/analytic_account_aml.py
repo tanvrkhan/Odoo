@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import fields, models, _, api
 
 
 class AccountMoveLine(models.Model):
@@ -7,9 +7,11 @@ class AccountMoveLine(models.Model):
     analytic_distribution_formatted_aml = fields.Char(
         string='Analytic',
         compute='_compute_analytic_distribution_formatted_aml',
-        store=True, default=''
+        store=True,
+        readonly=True
     )
 
+    @api.depends('analytic_distribution')
     def _compute_analytic_distribution_formatted_aml(self):
         for record in self:
             analytic_distribution = record.analytic_distribution

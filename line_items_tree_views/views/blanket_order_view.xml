@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_purchase_requisition_form_inherited" model="ir.ui.view">
+            <field name="name">purchase.requisition.form.inherit</field>
+            <field name="model">purchase.requisition</field>
+            <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='vendor_id']" position="after">
+                    <field name="vendor_ref"/>
+                    <field name="incoterm_id"/>
+                    <field name="payment_term_id"/>
+                    <field name="analytic_accounts_summary"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="purchase_requisition_form" model="ir.ui.view">
+            <field name="name">purchase.requisition.form</field>
+            <field name="model">purchase.requisition</field>
+            <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree//field[@name='product_qty']"
+                       position="after">
+                    <field name="tolerance_type"/>
+                    <field name="tolerance_percentage"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
