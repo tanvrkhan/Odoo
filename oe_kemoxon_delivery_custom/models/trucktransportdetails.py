@@ -59,3 +59,12 @@ class Truck_Transport_Details(models.Model):
     def get_total(self, total=None):
         number = "{:.2f}".format(total)
         return "{:,.2f}".format(float(number))
+
+    def unlink(self):
+        for record in self:
+            if record.stock_pick_ids:
+                record.stock_pick_ids.move_line_ids_without_package.unlink()
+
+        return super(Truck_Transport_Details, self).unlink()
+
+
