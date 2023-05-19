@@ -39,15 +39,21 @@ class Truck_Transport_Details(models.Model):
     def _get_update_value(self):
         move = self.env['stock.move'].search([('picking_id', '=', self.stock_pick_ids._origin.id)], limit=1)
         if self.offloaded:
-            if move and not self.is_updated:
+            # if move and not self.is_updated:
+            if move:
                 quantity_done = move.quantity_done
                 product_uom_qty = move.product_uom_qty
                 if product_uom_qty < self.offloaded + quantity_done:
-                    raise UserError(_("You Can't Add Morethan Demand QTy."))
+                    # raise UserError(_("You Can't Add Morethan Demand Qty."))
+                    return {'warning': {
+                        'title': _('Check Demand Qty'),
+                        'message': _(
+                            "You Can't Add Morethan Demand Qty.")
+                    }}
                 move.write({
                     'quantity_done': self.offloaded + quantity_done
                 })
-                self.is_updated = True
+                # self.is_updated = True
 
     def get_warehouse(self, picking_id=None):
         if picking_id:
@@ -59,3 +65,12 @@ class Truck_Transport_Details(models.Model):
     def get_total(self, total=None):
         number = "{:.2f}".format(total)
         return "{:,.2f}".format(float(number))
+
+    def unlink(self):
+        for record in self:
+            if record.stock_pick_ids:
+                record.stock_pick_ids.move_line_ids_without_package.unlink()
+
+        return super(Truck_Transport_Details, self).unlink()
+
+
