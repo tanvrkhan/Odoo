@@ -37,6 +37,7 @@ class AccountMove(models.Model):
                                  check_company=True)
 
     show_vat_ids = fields.Boolean(string="Show VAT Ids")
+    transporter_details_id = fields.Many2one('stock.picking', 'Transporter Delivery')
 
     def get_invoice_details(self):
         invoices = self.env['account.move'].search(
