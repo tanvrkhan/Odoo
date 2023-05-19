@@ -43,13 +43,13 @@ class Truck_Transport_Details(models.Model):
             if move:
                 quantity_done = move.quantity_done
                 product_uom_qty = move.product_uom_qty
-                if product_uom_qty < self.offloaded + quantity_done:
-                    # raise UserError(_("You Can't Add Morethan Demand Qty."))
-                    return {'warning': {
-                        'title': _('Check Demand Qty'),
-                        'message': _(
-                            "You Can't Add Morethan Demand Qty.")
-                    }}
+                # if product_uom_qty < self.offloaded + quantity_done:
+                #     # raise UserError(_("You Can't Add Morethan Demand Qty."))
+                #     return {'warning': {
+                #         'title': _('Check Demand Qty'),
+                #         'message': _(
+                #             "You Can't Add Morethan Demand Qty.")
+                #     }}
                 move.write({
                     'quantity_done': self.offloaded + quantity_done
                 })
