@@ -13,7 +13,7 @@
                 <field name="passport"/>
                 <field name="nominated"/>
                 <field name="loaded"/>
-                <field name="offloaded" attrs="{'readonly': [('parent.state', '=', 'done')]}" force_save="1"/>
+                <field name="offloaded" attrs="{'readonly': [('is_updated', '=', True)]}" force_save="1"/>
                 <field name="status"/>
                 <field name="statusdate"/>
                 <field name="is_updated" invisible="1"/>
