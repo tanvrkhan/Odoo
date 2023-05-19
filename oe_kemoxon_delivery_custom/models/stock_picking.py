@@ -23,7 +23,7 @@ class StockPicking(models.Model):
     transport_tolerance = fields.Float('Transport Tolerance')
     show_vat_ids = fields.Boolean(string="Show VAT Ids")
     vessel_ids = fields.One2many('vessel.information', 'stock_pick_ids', "Vessel Details")
-    is_truck_invoice_created = fields.Boolean('Truck Invoice Created',compute='_compute_transport_invoice_count')
+    is_truck_invoice_created = fields.Boolean('Truck Invoice Created', compute='_compute_transport_invoice_count')
     transport_invoice_count = fields.Integer('Truck Invoice Count', compute='_compute_transport_invoice_count')
 
     def _compute_transport_invoice_count(self):
@@ -34,7 +34,7 @@ class StockPicking(models.Model):
                 rec.is_truck_invoice_created = True
             else:
                 rec.transport_invoice_count = 0
-                rec.is_truck_invoice_created= False
+                rec.is_truck_invoice_created = False
 
     def action_create_truck_invoice(self):
 
@@ -68,7 +68,7 @@ class StockPicking(models.Model):
 
                 invoice_line_ids.append((0, 0, {
                     'product_id': product_id.id,
-                    'name':line.truck,
+                    'name': line.truck,
                     'quantity': line.loaded,
                     'price_unit': self.rate,
                     'deduction': loss_in_amount
@@ -129,7 +129,10 @@ class StockMove(models.Model):
                 if rec.sale_line_id:
                     product_uom_qty = rec.sale_line_id.product_uom_qty
                     if rec.sale_line_id.tolerance_type:
-                        tolerance_quantity = (product_uom_qty * rec.sale_line_id.tolerance_percentage) / 100
+                        if rec.sale_line_id.tolerance_percentage:
+                            tolerance_quantity = (product_uom_qty * rec.sale_line_id.tolerance_percentage) / 100
+                        else:
+                            tolerance_quantity = product_uom_qty
                         if rec.sale_line_id.tolerance_type == 'min_max':
                             if product_uom_qty + tolerance_quantity < rec.quantity_done or product_uom_qty - tolerance_quantity > rec.quantity_done:
                                 return {'warning': {

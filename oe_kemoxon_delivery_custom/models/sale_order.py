@@ -11,7 +11,6 @@ class InheritPurchaseOrder(models.Model):
     show_vat_ids = fields.Boolean(string="Show VAT Ids")
 
 
-
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
@@ -20,6 +19,7 @@ class SaleOrder(models.Model):
     delivery_from = fields.Date("Delivery From")
     delivery_to = fields.Date('Delivry To')
     delivery_location = fields.Many2one('delivery.location', "Delivery Location")
+
     def _prepare_invoice(self):
         res = super(SaleOrder, self)._prepare_invoice()
         res['deal_ref'] = self.deal_ref
@@ -75,4 +75,3 @@ class PurchaseOrderLine(models.Model):
             raise UserError(_("Please Add Tolerance Percentage"))
         if not self.tolerance_type and self.tolerance_percentage:
             raise UserError(_("Please Add Tolerance Type"))
-
