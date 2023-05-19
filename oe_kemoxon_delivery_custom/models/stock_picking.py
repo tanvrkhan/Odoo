@@ -21,6 +21,8 @@ class StockPicking(models.Model):
     transporter_payment_terms = fields.Many2one('account.payment.term', 'Transporter Payment Terms')
     rate = fields.Float('Rate')
     transport_tolerance = fields.Float('Transport Tolerance')
+    show_vat_ids = fields.Boolean(string="Show VAT Ids")
+    vessel_ids = fields.One2many('vessel.information', 'stock_pick_ids', "Vessel Details")
     is_truck_invoice_created = fields.Boolean('Truck Invoice Created',compute='_compute_transport_invoice_count')
     transport_invoice_count = fields.Integer('Truck Invoice Count', compute='_compute_transport_invoice_count')
 
