@@ -96,12 +96,12 @@
                   action="action_blanket_order_lines_po"
                   parent="purchase.menu_procurement_management"
                   sequence="10"/>
-        <menuitem id="menu_truck_transport_details_account"
+        <menuitem id="menu_truck_transport_details_account_2"
                   name="Truck Transport Details"
                   action="action_stock_truck_transport_details_lines"
                   parent="account.menu_finance_receivables"
                   sequence="10"/>
-        <menuitem id="menu_truck_transport_details_stock"
+        <menuitem id="menu_truck_transport_details_stock_1"
                   name="Truck Transport Details"
                   action="action_stock_truck_transport_details_lines"
                   parent="stock.menu_stock_warehouse_mgmt"
