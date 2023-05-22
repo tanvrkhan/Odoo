@@ -184,6 +184,30 @@ class StockMove(models.Model):
 class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
 
+    truck_detail_ref = fields.Integer("Truck Detail Id")
+    delete_option = fields.Boolean("Delete Option", default=True)
+
+    @api.onchange('qty_done')
+    def _oe_onchange_qty_done(self):
+        for rec in self:
+            related_truck_details = self.env['truck.transport.details'].search([
+                ('stock_pick_ids', '=', rec.picking_id._origin.id), ('truck_detail_ref', '=', rec.truck_detail_ref)])
+            if not related_truck_details:
+                related_truck_details = self.env['truck.transport.details'].search([
+                    ('stock_pick_ids', '=', rec.picking_id.id),
+                    ('truck_detail_ref', '=', rec.truck_detail_ref)])
+            if related_truck_details:
+                related_truck_details.offloaded = rec.qty_done
+
+    def unlink(self):
+        for rec in self:
+            rec.delete_option = False
+            related_truck_details = self.env['truck.transport.details'].search([
+                ('stock_pick_ids', '=', rec.picking_id.id), ('truck_detail_ref', '=', rec.truck_detail_ref)])
+            if related_truck_details and related_truck_details.delete_option:
+                related_truck_details.unlink()
+        return super(StockMoveLine, self).unlink()
+
     @api.constrains('qty_done')
     @api.onchange('qty_done')
     def _check_qty_done(self):
