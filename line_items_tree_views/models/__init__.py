@@ -9,6 +9,8 @@ from . import delivered_invoiced_sol
 from . import blanket_order
 from . import transfer_fields
 from . import res_partner
+from . import operation_type
+
 
 
 

@@ -18,7 +18,7 @@
     'version': '0.1',
     'sequence': 10,
     # any module necessary for this one to work correctly
-    'depends': ['product', 'sale', 'purchase', 'oe_kemoxon_delivery_custom', 'account'],
+    'depends': ['product', 'sale', 'purchase', 'oe_kemoxon_delivery_custom', 'account', 'stock'],
 
     # always loaded
     'data': [
@@ -29,6 +29,7 @@
         'views/blanket_order_line_views.xml',
         'views/blanket_order_view.xml',
         'views/line_items_tree_views.xml',
+        'views/operation_type_view.xml',
         'views/res_partner_view.xml',
         'views/transfer_fields_view.xml'
     ],

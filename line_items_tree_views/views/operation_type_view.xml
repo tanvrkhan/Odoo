@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_stock_move_line_new_tree_inherited" model="ir.ui.view">
+            <field name="name">stock.move.line.new.tree.inherit</field>
+            <field name="model">stock.move.line</field>
+            <field name="inherit_id" ref="stock.view_move_line_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='qty_done']" position="after">
+                    <field name="qty_done_incoming" sum="Sum"/>
+                    <field name="qty_done_outgoing" sum="Sum"/>
+                    <field name="qty_done_internal_transfer" sum="Sum"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
