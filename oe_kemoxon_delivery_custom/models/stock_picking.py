@@ -81,13 +81,16 @@ class StockPicking(models.Model):
     @staticmethod
     def get_tolerance_val(move=None):
         for rec in move:
-            if rec.sale_line_id:
-                product_uom_qty = rec.sale_line_id.product_uom_qty
-                if rec.sale_line_id.tolerance_type:
-                    tolerance_quantity = (product_uom_qty * rec.sale_line_id.tolerance_percentage) / 100
-                    if rec.sale_line_id.tolerance_type == 'min':
+            if rec.sale_line_id or rec.purchase_line_id:
+                product_uom_qty = rec.sale_line_id.product_uom_qty or rec.purchase_line_id.product_uom_qty
+                if rec.sale_line_id.tolerance_type or rec.purchase_line_id.tolerance_type:
+                    tolerance_quantity = (product_uom_qty * rec.sale_line_id.tolerance_percentage) / 100 \
+                        if rec.sale_line_id\
+                        else (product_uom_qty * rec.purchase_line_id.tolerance_percentage) / 100
+
+                    if rec.sale_line_id.tolerance_type or rec.purchase_line_id.tolerance_type == 'min':
                         return product_uom_qty - tolerance_quantity, 'min', True
-                    elif rec.sale_line_id.tolerance_type == 'max':
+                    elif rec.sale_line_id.tolerance_type or rec.purchase_line_id.tolerance_type == 'max':
                         return product_uom_qty + tolerance_quantity, 'max', True
                     else:
                         return {'min': product_uom_qty - tolerance_quantity,
