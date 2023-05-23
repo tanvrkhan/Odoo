@@ -3,7 +3,7 @@ from odoo import models, fields, _, api
 from odoo.exceptions import UserError
 
 
-class TruckTransportDetails(models.Model):
+class truck_transport_details(models.Model):
     _name = "truck.transport.details"
     _description = "Truck Transport Details model"
     _sql_constraints = [
@@ -43,44 +43,7 @@ class TruckTransportDetails(models.Model):
         for rec in self:
             move = self.env['stock.move'].search([('picking_id', '=', rec.stock_pick_ids._origin.id)], limit=1)
             if move and rec.offloaded > 0:
-                with_tol_allwd_qty, tol_type, is_tol = rec.get_tolerance_val(move)
-                if not is_tol:
-                    with_tol_allwd_qty = move.product_uom_qty
-                current_rel_ml_qty = rec.get_current_mv_line(rec, move)
-                all_done_qty = sum(
-                    move.picking_id.move_line_ids_without_package.mapped('qty_done')) - current_rel_ml_qty
-                if tol_type == 'min' and all_done_qty + rec.offloaded < with_tol_allwd_qty:
-                    rec.create_mv_line(rec, move)
-                    return {'warning': {
-                        'title': _('Warning'),
-                        'message': _(
-                            'Please note that the quantity is not within the tolerance limit of the order. \n'
-                            f'allowed quantity {with_tol_allwd_qty} remaining quantity {with_tol_allwd_qty - all_done_qty}'
-                        )
-                    }}
-                elif tol_type == 'max' and all_done_qty + rec.offloaded > with_tol_allwd_qty:
-                    rec.create_mv_line(rec, move)
-                    return {'warning': {
-                        'title': _('Warning'),
-                        'message': _(
-                            'Please note that the quantity is not within the tolerance limit of the order.\n'
-                            f'allowed quantity {with_tol_allwd_qty}')
-                    }}
-
-                elif tol_type == 'both' and (all_done_qty + rec.offloaded > with_tol_allwd_qty.get(
-                        'max') or all_done_qty + rec.offloaded < with_tol_allwd_qty.get('min')):
-                    rec.create_mv_line(rec, move)
-                    return {'warning': {
-                        'title': _('Warning'),
-                        'message': _(
-                            'Please note that the quantity is not within the tolerance limit of the order.\n'
-                            f'Max quantity: {with_tol_allwd_qty.get("max")}\n'
-                            f'Min Quantity {with_tol_allwd_qty.get("min")}\n'
-                            f'Max Remaining {with_tol_allwd_qty.get("max") - all_done_qty}'
-                        )
-                    }}
-                else:
-                    rec.create_mv_line(rec, move)
+                rec.create_mv_line(rec, move)
 
     def get_current_mv_line(self, rec=None, move=None):
         move_line = self.env['stock.move.line'].search(
@@ -141,7 +104,7 @@ class TruckTransportDetails(models.Model):
                 [('picking_id', '=', rec.stock_pick_ids.id), ('truck_detail_ref', '=', rec.truck_detail_ref)])
             if move_line and move_line.delete_option:
                 move_line.unlink()
-        return super(TruckTransportDetails, self).unlink()
+        return super(truck_transport_details, self).unlink()
 
     def get_warehouse(self, picking_id=None):
         if picking_id:

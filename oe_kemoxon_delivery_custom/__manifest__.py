@@ -10,7 +10,7 @@ OdooERP Sales
     'category': 'Kemexon',
     'author': 'OdooERP.ae, tou-odoo, Kemexon',
     'website': 'https://odooerp.ae/',
-    'depends': ['account', 'base','sale', 'sale_management','sale_stock','purchase'],
+    'depends': ['account', 'base', 'sale', 'sale_management', 'sale_stock', 'purchase'],
     'data': [
         'security/ir.model.access.csv',
         'report/aged_balance_report.xml',
@@ -28,12 +28,12 @@ OdooERP Sales
         'views/res_partner_bank_view.xml',
         'views/vessel_views.xml',
         'views/vessel_information_views.xml',
+        'wizard/message.xml',
         # 'report/invoice_report_template_dry.xml',
         # menu_items
-        #'views/menu_items.xml',
+        # 'views/menu_items.xml',
         # actions
-        #'data/actions.xml'
-
+        # 'data/actions.xml'
 
     ],
     'installable': True,

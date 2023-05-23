@@ -25,6 +25,75 @@ class StockPicking(models.Model):
     vessel_ids = fields.One2many('vessel.information', 'stock_pick_ids', "Vessel Details")
     is_truck_invoice_created = fields.Boolean('Truck Invoice Created', compute='_compute_transport_invoice_count')
     transport_invoice_count = fields.Integer('Truck Invoice Count', compute='_compute_transport_invoice_count')
+    allow_validation = fields.Boolean("Allow Validate")
+
+    def button_validate(self):
+        for rec in self:
+            if rec.move_ids and rec.env.context.get('check_condition'):
+                return rec.check_tolerance_condition()
+            else:
+                return super().button_validate()
+
+    def check_tolerance_condition(self):
+        for rec in self:
+            move = rec.move_ids[0]
+            with_tol_allwd_qty, tol_type, is_tol = rec.get_tolerance_val(move)
+            if not is_tol:
+                with_tol_allwd_qty = move.product_uom_qty
+            all_done_qty = sum(
+                move.picking_id.move_line_ids_without_package.mapped('qty_done'))
+
+            if tol_type == 'min' and all_done_qty < with_tol_allwd_qty:
+                name = 'Warning'
+                message = _(
+                    'Please note that the quantity is not within the tolerance limit of the order. \n'
+                    f'allowed quantity {with_tol_allwd_qty} remaining quantity {with_tol_allwd_qty - all_done_qty}')
+                return self.env['wk.wizard.message'].genrated_message(message, name)
+
+            elif tol_type == 'max' and all_done_qty > with_tol_allwd_qty:
+                name = 'Warning'
+                message = _(
+                    'Please note that the quantity is not within the tolerance limit of the order.\n'
+                    f'allowed quantity {with_tol_allwd_qty}'
+                )
+                return self.env['wk.wizard.message'].genrated_message(message, name)
+
+            elif tol_type == 'both' and (all_done_qty > with_tol_allwd_qty.get(
+                    'max') or all_done_qty < with_tol_allwd_qty.get('min')):
+                message = _(
+                    'Please note that the quantity is not within the tolerance limit of the order.\n'
+                    f'Max quantity: {with_tol_allwd_qty.get("max")}\n'
+                    f'Min Quantity {with_tol_allwd_qty.get("min")}\n'
+                    f'Max Remaining {with_tol_allwd_qty.get("max") - all_done_qty}'
+                )
+                name = 'Warning'
+                return self.env['wk.wizard.message'].genrated_message(message, name)
+
+            elif not tol_type and (all_done_qty > with_tol_allwd_qty or all_done_qty < with_tol_allwd_qty):
+                name = "Warning"
+                message = f"Please note that the quantity is not within the tolerance limit of the order ," \
+                          f" max allowed {with_tol_allwd_qty} min allowed {with_tol_allwd_qty}"
+                return self.env['wk.wizard.message'].genrated_message(message, name)
+
+            else:
+                return self.with_context(check_condition=0).button_validate()
+
+    @staticmethod
+    def get_tolerance_val(move=None):
+        for rec in move:
+            if rec.sale_line_id:
+                product_uom_qty = rec.sale_line_id.product_uom_qty
+                if rec.sale_line_id.tolerance_type:
+                    tolerance_quantity = (product_uom_qty * rec.sale_line_id.tolerance_percentage) / 100
+                    if rec.sale_line_id.tolerance_type == 'min':
+                        return product_uom_qty - tolerance_quantity, 'min', True
+                    elif rec.sale_line_id.tolerance_type == 'max':
+                        return product_uom_qty + tolerance_quantity, 'max', True
+                    else:
+                        return {'min': product_uom_qty - tolerance_quantity,
+                                'max': product_uom_qty + tolerance_quantity}, 'both', True
+                else:
+                    return False, False, False
 
     def _compute_transport_invoice_count(self):
         for rec in self:
@@ -118,69 +187,6 @@ class DeliveryLocation(models.Model):
     name = fields.Char("Name")
 
 
-class StockMove(models.Model):
-    _inherit = "stock.move"
-
-    @api.constrains('quantity_done')
-    @api.onchange('quantity_done')
-    def _check_quantity_done(self):
-        for rec in self:
-            if rec.quantity_done:
-                if rec.sale_line_id:
-                    product_uom_qty = rec.sale_line_id.product_uom_qty
-                    if rec.sale_line_id.tolerance_type:
-                        if rec.sale_line_id.tolerance_percentage:
-                            tolerance_quantity = (product_uom_qty * rec.sale_line_id.tolerance_percentage) / 100
-                        else:
-                            tolerance_quantity = product_uom_qty
-                        if rec.sale_line_id.tolerance_type == 'min_max':
-                            if product_uom_qty + tolerance_quantity < rec.quantity_done or product_uom_qty - tolerance_quantity > rec.quantity_done:
-                                return {'warning': {
-                                    'title': _('Warning'),
-                                    'message': _(
-                                        'Please note that the quantity is not within the tolerance limit of the order.')
-                                }}
-                        elif rec.sale_line_id.tolerance_type == 'max':
-                            if product_uom_qty + tolerance_quantity < rec.quantity_done:
-                                return {'warning': {
-                                    'title': _('Warning'),
-                                    'message': _(
-                                        'Please note that the quantity is not within the tolerance limit of the order.')
-                                }}
-                        elif rec.sale_line_id.tolerance_type == 'min':
-                            if product_uom_qty - tolerance_quantity > rec.quantity_done:
-                                return {'warning': {
-                                    'title': _('Warning'),
-                                    'message': _(
-                                        'Please note that the quantity is not within the tolerance limit of the order.')
-                                }}
-                elif rec.purchase_line_id:
-                    product_qty = rec.purchase_line_id.product_qty
-                    if rec.purchase_line_id.tolerance_type:
-                        tolerance_quantity = (product_qty * rec.purchase_line_id.tolerance_percentage) / 100
-                        if rec.purchase_line_id.tolerance_type == 'min_max':
-                            if product_qty + tolerance_quantity < rec.quantity_done or product_qty - tolerance_quantity > rec.quantity_done:
-                                return {'warning': {
-                                    'title': _('Warning'),
-                                    'message': _(
-                                        'Please note that the quantity is not within the tolerance limit of the order.')
-                                }}
-                        elif rec.purchase_line_id.tolerance_type == 'max':
-                            if product_qty + tolerance_quantity < rec.quantity_done:
-                                return {'warning': {
-                                    'title': _('Warning'),
-                                    'message': _(
-                                        'Please note that the quantity is not within the tolerance limit of the order.')
-                                }}
-                        elif rec.purchase_line_id.tolerance_type == 'min':
-                            if product_qty - tolerance_quantity > rec.quantity_done:
-                                return {'warning': {
-                                    'title': _('Warning'),
-                                    'message': _(
-                                        'Please note that the quantity is not within the tolerance limit of the order.')
-                                }}
-
-
 class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
 
@@ -207,59 +213,3 @@ class StockMoveLine(models.Model):
             if related_truck_details and related_truck_details.delete_option:
                 related_truck_details.unlink()
         return super(StockMoveLine, self).unlink()
-
-    @api.constrains('qty_done')
-    @api.onchange('qty_done')
-    def _check_qty_done(self):
-        for rec in self:
-            if rec.qty_done:
-                if rec.move_id.sale_line_id:
-                    product_uom_qty = rec.move_id.sale_line_id.product_uom_qty
-                    if rec.move_id.sale_line_id.tolerance_type:
-                        tolerance_quantity = (product_uom_qty * rec.move_id.sale_line_id.tolerance_percentage) / 100
-                        if rec.move_id.sale_line_id.tolerance_type == 'min_max':
-                            if product_uom_qty + tolerance_quantity < rec.qty_done or product_uom_qty - tolerance_quantity > rec.qty_done:
-                                return {'warning': {
-                                    'title': _('Warning'),
-                                    'message': _(
-                                        'Please note that the quantity is not within the tolerance limit of the order.')
-                                }}
-                        elif rec.move_id.sale_line_id.tolerance_type == 'max':
-                            if product_uom_qty + tolerance_quantity < rec.qty_done:
-                                return {'warning': {
-                                    'title': _('Warning'),
-                                    'message': _(
-                                        'Please note that the quantity is not within the tolerance limit of the order.')
-                                }}
-                        elif rec.move_id.sale_line_id.tolerance_type == 'min':
-                            if product_uom_qty - tolerance_quantity > rec.qty_done:
-                                return {'warning': {
-                                    'title': _('Warning'),
-                                    'message': _(
-                                        'Please note that the quantity is not within the tolerance limit of the order.')
-                                }}
-                elif rec.move_id.purchase_line_id:
-                    product_qty = rec.move_id.purchase_line_id.product_qty
-                    if rec.move_id.purchase_line_id.tolerance_type:
-                        tolerance_quantity = (product_qty * rec.move_id.purchase_line_id.tolerance_percentage) / 100
-                        if rec.move_id.purchase_line_id.tolerance_type == 'min_max':
-                            if product_qty + tolerance_quantity < rec.qty_done or product_qty - tolerance_quantity > rec.qty_done:
-                                return {'warning': {
-                                    'title': _('Warning'),
-                                    'message': _(
-                                        'Please note that the quantity is not within the tolerance limit of the order.')
-                                }}
-                        elif rec.move_id.purchase_line_id.tolerance_type == 'max':
-                            if product_qty + tolerance_quantity < rec.qty_done:
-                                return {'warning': {
-                                    'title': _('Warning'),
-                                    'message': _(
-                                        'Please note that the quantity is not within the tolerance limit of the order.')
-                                }}
-                        elif rec.move_id.purchase_line_id.tolerance_type == 'min':
-                            if product_qty - tolerance_quantity > rec.qty_done:
-                                return {'warning': {
-                                    'title': _('Warning'),
-                                    'message': _(
-                                        'Please note that the quantity is not within the tolerance limit of the order.')
-                                }}
