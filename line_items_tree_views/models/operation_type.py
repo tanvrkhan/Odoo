@@ -25,7 +25,6 @@ class StockMoveLine(models.Model):
         string='Difference',
         compute='_compute_qty_difference',
         group_operator='sum',
-        digits=(6, 3)
     )
 
     @api.depends('qty_done_success', 'qty_done_danger')
