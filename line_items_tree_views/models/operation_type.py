@@ -6,8 +6,8 @@ class StockMoveLine(models.Model):
 
     qty_done_internal_transfer = fields.Float(string='Internal Transfer', compute='_compute_qty_done_internal_transfer',
                                               digits=(6, 3))
-    qty_done_incoming=fields.Float("Incoming")
-    qty_done_outgoing=fields.Float("Outgoing")
+    qty_done_incoming=fields.Float("Incoming-dep")
+    qty_done_outgoing=fields.Float("Outgoing-dep")
 
     qty_done_success = fields.Float(
         string='Incoming',
@@ -42,7 +42,8 @@ class StockMoveLine(models.Model):
                 lines = self.search(res['__domain'])
                 total_qty_done_difference = sum(lines.mapped('qty_done_difference'))
                 res['qty_done_difference'] = total_qty_done_difference
-
+                res['qty_done_difference'] = total_qty_success_difference
+                res['qty_done_difference'] = total_qty_danger_difference
         return result
 
     @api.depends('qty_done', 'picking_type_id.code')
