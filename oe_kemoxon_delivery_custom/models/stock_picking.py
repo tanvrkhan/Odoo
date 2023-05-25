@@ -30,9 +30,23 @@ class StockPicking(models.Model):
     def button_validate(self):
         for rec in self:
             if rec.move_ids and rec.env.context.get('check_condition'):
-                return rec.check_tolerance_condition()
+                if self.check_is_return():
+                    return super().button_validate()
+                else:
+                    return rec.check_tolerance_condition()
             else:
                 return super().button_validate()
+
+    def check_is_return(self):
+        for rec in self:
+            if rec.move_ids:
+                if rec.picking_type_code == 'incoming' or 'outgoing' and rec.move_ids[0].state == 'done' \
+                        and rec.move_ids[0].scrapped:
+                    return True
+                else:
+                    return False
+            else:
+                return False
 
     def check_tolerance_condition(self):
         for rec in self:
@@ -85,7 +99,7 @@ class StockPicking(models.Model):
                 product_uom_qty = rec.sale_line_id.product_uom_qty or rec.purchase_line_id.product_uom_qty
                 if rec.sale_line_id.tolerance_type or rec.purchase_line_id.tolerance_type:
                     tolerance_quantity = (product_uom_qty * rec.sale_line_id.tolerance_percentage) / 100 \
-                        if rec.sale_line_id\
+                        if rec.sale_line_id \
                         else (product_uom_qty * rec.purchase_line_id.tolerance_percentage) / 100
 
                     if rec.sale_line_id.tolerance_type or rec.purchase_line_id.tolerance_type == 'min':
@@ -97,6 +111,8 @@ class StockPicking(models.Model):
                                 'max': product_uom_qty + tolerance_quantity}, 'both', True
                 else:
                     return False, False, False
+        else:
+            return False, False, False
 
     def _compute_transport_invoice_count(self):
         for rec in self:
