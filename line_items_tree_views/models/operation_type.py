@@ -6,6 +6,9 @@ class StockMoveLine(models.Model):
 
     qty_done_internal_transfer = fields.Float(string='Internal Transfer', compute='_compute_qty_done_internal_transfer',
                                               digits=(6, 3))
+    qty_done_incoming=fields.Float("Incoming")
+    qty_done_outgoing=fields.Float("Outgoing")
+
     qty_done_success = fields.Float(
         string='Incoming',
         related='qty_done',

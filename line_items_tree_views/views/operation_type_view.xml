@@ -13,6 +13,8 @@
                            attrs="{'invisible': [('location_usage', 'not in', ('internal','transit')), ('location_dest_usage', 'in', ('internal','transit'))]}"/>
                     <field name="qty_done_difference"/>
                     <field name="qty_done_internal_transfer" sum="Sum"/>
+                    <field name="qty_done_outgoing" sum="Sum"/>
+                    <field name="qty_done_incoming" sum="Sum"/>
                 </xpath>
             </field>
         </record>
