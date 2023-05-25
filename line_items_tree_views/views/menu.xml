@@ -1,9 +1,13 @@
 <!--<?xml version="1.0" encoding="utf-8"?>-->
 <!--<odoo>-->
+<!--    &lt;!&ndash; Finance Menu &ndash;&gt;-->
+<!--&lt;!&ndash;    <menuitem id="menu_finance_task" name="Finance" parent="account.menu_finance_entries" sequence="10">&ndash;&gt;-->
 
-<!--    <menuitem id="menu_tree_view_master"-->
-<!--              name="Tree View"-->
-<!--              parent="purchase.menu_purchase_root"-->
-<!--              sequence="40"/>-->
+<!--        &lt;!&ndash; LC Menu &ndash;&gt;-->
+<!--&lt;!&ndash;        <menuitem id="menu_letter_credit" name="LC" action="action_letter_credit"&ndash;&gt;-->
+<!--&lt;!&ndash;                  sequence="1"/>&ndash;&gt;-->
 
+<!--&lt;!&ndash;        &lt;!&ndash; SBLC Menu &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;        <menuitem id="menu_sblc" name="SBLC" action="action_sblc_form" sequence="2"/>&ndash;&gt;-->
+<!--    </menuitem>-->
 <!--</odoo>-->
