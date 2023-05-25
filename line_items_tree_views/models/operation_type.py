@@ -41,9 +41,11 @@ class StockMoveLine(models.Model):
             if '__domain' in res:
                 lines = self.search(res['__domain'])
                 total_qty_done_difference = sum(lines.mapped('qty_done_difference'))
+                total_qty_done_success= sum(lines.mapped('qty_done_success'))
+                total_qty_done_danger= sum(lines.mapped('qty_done_danger'))
                 res['qty_done_difference'] = total_qty_done_difference
-                res['qty_done_difference'] = total_qty_success_difference
-                res['qty_done_difference'] = total_qty_danger_difference
+                res['qty_done_success'] = total_qty_done_success
+                res['qty_done_danger'] = total_qty_done_danger
         return result
 
     @api.depends('qty_done', 'picking_type_id.code')
