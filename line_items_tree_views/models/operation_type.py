@@ -30,8 +30,7 @@ class StockMoveLine(models.Model):
     @api.depends('qty_done', 'location_usage', 'location_dest_usage')
     def _compute_qty_done_danger(self):
         for record in self:
-            if (record.location_usage in ['internal', 'transit']) and (
-                    record.location_dest_usage not in ['internal', 'transit']):
+            if (record.location_usage in ['internal', 'transit']) and (record.location_dest_usage not in ['internal', 'transit']):
                 record.qty_done_danger = record.qty_done
                 record.qty_done_success = 0.0
             else:
@@ -55,8 +54,11 @@ class StockMoveLine(models.Model):
             if (record.location_usage not in ['internal', 'transit']) and (
                 record.location_dest_usage in ['internal', 'transit']):
                 record.qty_done_difference = record.qty_done
-            else:
+            elif (record.location_usage in ['internal', 'transit']) and (
+                    record.location_dest_usage not in ['internal', 'transit']):
                 record.qty_done_difference = record.qty_done*-1
+            else:
+                record.qty_done_difference=0
 
 
     @api.model
@@ -75,8 +77,11 @@ class StockMoveLine(models.Model):
                     if (record.location_usage not in ['internal', 'transit']) and (
                             record.location_dest_usage in ['internal', 'transit']):
                         total_qty_done_success += record.qty_done_success
-                    else:
-                        total_qty_done_danger += record.qty_done_danger
+                    elif (record.location_usage in ['internal', 'transit']) and (
+                    record.location_dest_usage not in ['internal', 'transit']):
+                        total_qty_done_danger+= record.qty_done_danger
+
+
                 res['qty_done_difference'] = total_qty_done_difference
                 res['qty_done_success'] = total_qty_done_success
                 res['qty_done_danger'] = total_qty_done_danger
