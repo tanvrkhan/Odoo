@@ -96,14 +96,45 @@
                   action="action_blanket_order_lines_po"
                   parent="purchase.menu_procurement_management"
                   sequence="10"/>
+
+        <record id="truck_detail_action" model="ir.actions.act_window">
+            <field name="name">Truck Transport Details</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">truck.transport.details.view</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record model="ir.ui.view" id="truck_transport_details_tree">
+            <field name="name">Truck Transport Details</field>
+            <field name="model">truck.transport.details.view</field>
+            <field name="arch" type="xml">
+                <tree string="Truck Transport Details">
+                    <field name='seq' optional="hide"/>
+                    <field name='truck'/>
+                    <field name='transporter'/>
+                    <field name='trailer'/>
+                    <field name='driver'/>
+                    <field name='passport'/>
+                    <field name='nominated'/>
+                    <field name='loaded'/>
+                    <field name='offloaded'/>
+                    <field name='date' optional="hide"/>
+                    <field name='status' widget="badge"/>
+                    <field name='statusdate' optional="hide"/>
+                    <field name='picking_id' optional="hide"/>
+                    <field name='stock_pick_ids' optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
         <menuitem id="menu_truck_transport_details_account_2"
                   name="Truck Transport Details"
-                  action="action_stock_truck_transport_details_lines"
+                  action="truck_detail_action"
                   parent="account.menu_finance_receivables"
                   sequence="10"/>
         <menuitem id="menu_truck_transport_details_stock_1"
                   name="Truck Transport Details"
-                  action="action_stock_truck_transport_details_lines"
+                  action="truck_detail_action"
                   parent="stock.menu_stock_warehouse_mgmt"
                   sequence="20"/>
 
