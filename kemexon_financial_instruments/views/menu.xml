@@ -1,0 +1,25 @@
+<!--&lt;!&ndash;<?xml version="1.0" encoding="utf-8"?>&ndash;&gt;-->
+<!--&lt;!&ndash;<odoo>&ndash;&gt;-->
+<!--&lt;!&ndash;    <data>&ndash;&gt;-->
+<!--&lt;!&ndash;        <menuitem id="menu_finance" name="Finance" parent="account.menu_root" sequence="55"/>&ndash;&gt;-->
+
+<!--&lt;!&ndash;        <menuitem id="menu_fi_lc" name="FI LC" parent="menu_finance" sequence="10"&ndash;&gt;-->
+<!--&lt;!&ndash;                  action="action_fi_lc"/>&ndash;&gt;-->
+
+<!--&lt;!&ndash;    </data>&ndash;&gt;-->
+<!--&lt;!&ndash;</odoo>&ndash;&gt;-->
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<odoo>-->
+<!--    <record id="menu_finance_instrument" model="ir.ui.menu">-->
+<!--        <field name="name">Finance</field>-->
+<!--        <field name="parent_id" ref="account.menu_finance"/>-->
+<!--        <field name="sequence">20</field>-->
+<!--    </record>-->
+
+<!--    <record id="menu_fi_lc" model="ir.ui.menu">-->
+<!--        <field name="name">FI LC</field>-->
+<!--        <field name="parent_id" ref="kemexon_financial_instruments.menu_finance_instrument"/>-->
+<!--        <field name="sequence">10</field>-->
+<!--        <field name="action" ref="kemexon_financial_instruments.action_fi_lc"/>-->
+<!--    </record>-->
+<!--</odoo>-->

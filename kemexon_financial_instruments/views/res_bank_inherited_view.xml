@@ -1,0 +1,29 @@
+<odoo>
+    <data>
+        <record id="view_res_bank_form_inherited" model="ir.ui.view">
+            <field name="name">res.bank.form.inherited</field>
+            <field name="model">res.bank</field>
+            <field name="inherit_id" ref="base.view_res_bank_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form/sheet" position="inside">
+                    <notebook>
+                        <page string="Financing Limits">
+                            <field name="bank_financing_limits_ids"/>
+                            <group name="note_group" col="6" class="mt-2 mt-md-0">
+                                <group colspan="4">
+                                    <field colspan="2" name="notes" nolabel="1" placeholder="Terms and conditions..."/>
+                                </group>
+                                <group class="oe_subtotal_footer oe_right" colspan="2" name="lc_total">
+                                    <field name="total_amount" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"
+                                           style="font-size: 14px; font-weight: bold;"/>
+                                </group>
+                                <div class="clearfix"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

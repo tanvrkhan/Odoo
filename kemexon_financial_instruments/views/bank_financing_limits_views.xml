@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bank_financing_limits_tree" model="ir.ui.view">
+        <field name="name">bank.financing.limits.tree</field>
+        <field name="model">bank.financing.limits</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="bank_id" invisible="1"/>
+                <field name="limit_name"/>
+                <field name="amount" sum="Total" widget="monetary"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_bank_financing_limits_form" model="ir.ui.view">
+        <field name="name">bank.financing.limits.form</field>
+        <field name="model">bank.financing.limits</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="limit_name" invisible="1"/>
+                        <field name="limit_name"/>
+                        <field name="amount" sum="Total" widget="monetary"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_lc_lines_tree" model="ir.ui.view">
+        <field name="name">lc.lines.tree</field>
+        <field name="model">lc.lines</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="product"/>
+                <field name="product_family"/>
+                <field name="quantity"/>
+                <field name="tolerance_type"/>
+                <field name="tolerance_percentage"/>
+                <field name="unit_price" widget="monetary"/>
+                <field name="amount" widget="monetary"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_lc_lines_form" model="ir.ui.view">
+        <field name="name">lc.lines.form</field>
+        <field name="model">lc.lines</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="product"/>
+                        <field name="product_family"/>
+                        <field name="quantity"/>
+                        <field name="tolerance_type"/>
+                        <field name="tolerance_percentage"/>
+                        <field name="unit_price" widget="monetary"/>
+                        <field name="amount" widget="monetary"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
