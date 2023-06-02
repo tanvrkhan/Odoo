@@ -14,6 +14,7 @@ class AccountMove(models.Model):
 
     deal_ref = fields.Char("Deal Ref")
     bill_date = fields.Date("B/L Date", related='picking_id.bill_date')
+    tt_date = fields.Date("TT Date", related='picking_id.tt_date')
     vessel_name = fields.Char("Vessel Name", related='picking_id.vessel_name')
     delivery_location = fields.Many2one('delivery.location', "Delivery Location",
                                         related='picking_id.delivery_location')
@@ -28,6 +29,8 @@ class AccountMove(models.Model):
     country_of_origin = fields.Many2one("res.country", "COO", related='vessel_information_id.country_of_origin')
     payment_notes = fields.Char("Payment Notes")
     bl_date = fields.Date("BL Date", related='vessel_information_id.bl_date')
+    cod_date = fields.Date("COD Date", related='vessel_information_id.cod_date')
+    nor_date = fields.Date("NOR Date", related='vessel_information_id.nor_date')
     # bill_date = fields.Date("B/L Date", related='picking_id.bill_date')
     # vessel_name = fields.Char("Vessel Name", related='picking_id.vessel_name')
     payment_notes = fields.Text()
@@ -35,7 +38,7 @@ class AccountMove(models.Model):
     journal_id = fields.Many2one('account.journal', string='Journal', domain=[], required=True, readonly=True,
                                  states={'draft': [('readonly', False)]},
                                  check_company=True)
-
+    show_delivery_to = fields.Boolean(string="Show Delivery To", default=False)
     show_vat_ids = fields.Boolean(string="Show VAT Ids")
     transporter_details_id = fields.Many2one('stock.picking', 'Transporter Delivery')
 
@@ -103,6 +106,7 @@ class AccountMove(models.Model):
             'partner': 'Customer' if self.move_type == 'out_invoice' else "Vendor"
         }
         return data
+
 
     def action_send_aged_balance_invoice_report(self, move_type):
         if move_type == 'out_invoice':

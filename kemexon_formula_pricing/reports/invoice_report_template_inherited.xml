@@ -97,6 +97,7 @@
                 <br/>
                 <br/>
                 <br/>
+                <t t-if="o.show_delivery_to">
                 <strong>Delivery To</strong>
                 <br/>
                 <span t-field="o.partner_shipping_id.name"/>
@@ -107,6 +108,7 @@
                 <br/>
                 <br/>
                 <br/>
+                    </t>
                 <style>
                     .my_data_table th {border-right: 1px solid white;border-left: 1px solid white;padding-top:
                     5px;padding-bottom: 5px;}
@@ -341,12 +343,60 @@
                                     </div>
                                 </div>
                             </t>
+                            <t t-if="o.nor_date">
+                                <div class="row">
+                                    <div class="col-5">
+                                        <strong>NOR Date</strong>
+                                    </div>
+                                    <br/>
+                                    <!--                                    <div class="col-1"/>-->
+                                    <div class="col-7">
+                                        <span class="m-0" t-field="o.nor_date"/>
+                                    </div>
+                                </div>
+                            </t>
+                            <t t-if="o.cod_date">
+                                <div class="row">
+                                    <div class="col-5">
+                                        <strong>Completion of Discharge</strong>
+                                    </div>
+                                    <br/>
+                                    <!--                                    <div class="col-1"/>-->
+                                    <div class="col-7">
+                                        <span class="m-0" t-field="o.cod_date"/>
+                                    </div>
+                                </div>
+                            </t>
                         </div>
                     </div>
                 </t>
                 <t t-else="">
                     <div class="row">
                         <div class="col-6">
+                            <t t-if="o.delivery_notes">
+                                <div class="row">
+                                    <div class="col-5">
+                                        <strong>Delivery Notes</strong>
+                                    </div>
+                                    <br/>
+                                    <!--                                    <div class="col-1"/>-->
+                                    <div class="col-7">
+                                        <span class="m-0" t-field="o.delivery_notes"/>
+                                    </div>
+                                </div>
+                            </t>
+                            <t t-if="o.tt_date">
+                                <div class="row">
+                                    <div class="col-5">
+                                        <strong>Title Transfer Date</strong>
+                                    </div>
+                                    <br/>
+                                    <!--                                    <div class="col-1"/>-->
+                                    <div class="col-7">
+                                        <span class="m-0" t-field="o.tt_date"/>
+                                    </div>
+                                </div>
+                            </t>
                             <t t-if="o.delivery_location">
                                 <!--                        faizan 5,7-->
                                 <div class="row">
@@ -549,7 +599,7 @@
                 <br/>
                 <!--                <span class="m-0" t-field="o.narration"/>-->
                 <ul style="font-size:18px;">
-                    <li>Kemexon Ltd. follows a detailed process as per the company policy for informing any change
+                    <li>Kemexon follows a detailed process as per the company policy for informing any change
                         in
                         bank account/ remittance process. We request you to not rely on any isolated email
                         communication

@@ -74,6 +74,9 @@
                         <field name="vessel_ids"/>
                     </page>
                 </xpath>
+                <xpath expr="//field[@name='move_type']" position="after">
+                    <field name="tt_date"/>
+                </xpath>
             </field>
         </record>
     </data>

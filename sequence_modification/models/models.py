@@ -10,11 +10,17 @@ class AccountMoveInheritModel(models.Model):
 
     def action_post(self):
         if not self.move_sequence_done and self.name == '/':
-            if self.move_type == 'out_invoice':
+            if self.move_type == 'out_invoice' and self.journal_id == 2:
                 self.generate_sequence('invoice.sequence', 'invoice')
 
-            elif self.move_type == 'in_invoice':
+            elif self.move_type == 'out_invoice' and self.journal_id != 2:
+                self.generate_sequence('invoice.provisional.sequence', 'invoice')
+
+            elif self.move_type == 'in_invoice' and self.journal_id == 3:
                 self.generate_sequence('bill.sequence', 'bill')
+
+            elif self.move_type == 'in_invoice' and self.journal_id != 3:
+                self.generate_sequence('bill.provisional.sequence', 'bill')
 
             elif self.move_type == 'in_refund':
                 self.generate_sequence('debit.sequence', 'refund')
@@ -25,7 +31,6 @@ class AccountMoveInheritModel(models.Model):
             elif self.move_type == 'entry':
                 if not self.move_sequence_done and self.name == '/':
                     self.set_entry_seq()
-
         res = super().action_post()
         return res
 
@@ -49,7 +54,7 @@ class AccountMoveInheritModel(models.Model):
         seq = self.env['ir.sequence'].next_by_code(code).split("-")
         next_num = 0
         if seq:
-            if move_type == "invoice":
+            if move_type == "invoice" and code == 'invoice.sequence':
                 self.partner_id.inv_partner_seq += 1
                 next_num = self.partner_id.inv_partner_seq
                 name = self.get_new_name(seq, next_num)
@@ -59,9 +64,29 @@ class AccountMoveInheritModel(models.Model):
                 else:
                     self.name = name
                     self.payment_reference = name
-            elif move_type == "bill":
+            elif move_type == "invoice" and code == 'invoice.provisional.sequence':
+                self.partner_id.inv_prov_partner_seq += 1
+                next_num = self.partner_id.inv_prov_partner_seq
+                name = self.get_new_name(seq, next_num)
+                is_exists = self.env['account.move'].search([('name', '=', name)])
+                if is_exists:
+                    self.generate_sequence(code, move_type)
+                else:
+                    self.name = name
+                    self.payment_reference = name
+            elif move_type == "bill" and code == 'bill.sequence':
                 self.partner_id.bill_partner_seq += 1
                 next_num = self.partner_id.bill_partner_seq
+                name = self.get_new_name(seq, next_num)
+                is_exists = self.env['account.move'].search([('name', '=', name)])
+                if is_exists:
+                    self.generate_sequence(code, move_type)
+                else:
+                    self.name = name
+
+            elif move_type == "bill" and code == 'bill.provisional.sequence':
+                self.partner_id.bill_prov_partner_seq += 1
+                next_num = self.partner_id.bill_prov_partner_seq
                 name = self.get_new_name(seq, next_num)
                 is_exists = self.env['account.move'].search([('name', '=', name)])
                 if is_exists:
@@ -369,7 +394,9 @@ class InheritResCustomer(models.Model):
     _inherit = 'res.partner'
 
     inv_partner_seq = fields.Integer("Invoice Sequence")
+    inv_prov_partner_seq=fields.Integer("Provisional Invoice Sequence")
     bill_partner_seq = fields.Integer("Bill Sequence")
+    bill_prov_partner_seq = fields.Integer("Provisional Bill Sequence")
     credit_partner_seq = fields.Integer("Credit Note Sequence")
     refund_partner_seq = fields.Integer("Refund Sequence")
     picking_partner_seq = fields.Integer("Picking Sequence")

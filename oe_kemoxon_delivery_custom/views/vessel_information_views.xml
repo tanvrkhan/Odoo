@@ -4,19 +4,21 @@
         <field name="name">tree.vessels.information</field>
         <field name="model">vessel.information</field>
         <field name="arch" type="xml">
-            <tree  multi_edit="1" editable="bottom" >
+            <tree multi_edit="1" editable="bottom">
                 <field name="vessel_id"/>
                 <field name="bl_date"/>
-               <field name="cp_date"/>
-               <field name="confimation_date"/>
-               <field name="loadport_agent"/>
-               <field name="disport_agent"/>
-               <field name="loadport_inspectors"/>
-               <field name="disport_inspectors"/>
-               <field name="demurrage_rate"/>
+                <field name="cp_date"/>
+                <field name="confimation_date"/>
+                <field name="nor_date"/>
+                <field name="cod_date"/>
+                <field name="loadport_agent"/>
+                <field name="disport_agent"/>
+                <field name="loadport_inspectors"/>
+                <field name="disport_inspectors"/>
+                <field name="demurrage_rate"/>
                 <field name="loadport"/>
                 <field name="disport"/>
-               <field name="country_of_origin"/>
+                <field name="country_of_origin"/>
 
             </tree>
         </field>

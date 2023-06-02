@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Line Items Tree Views",
+    'name': "Formula Pricing",
     'author': 'Kemexon IT Dxb',
 
-    'summary': 'Line Items Tree Views',
+    'summary': 'Formula Pricing',
 
     'description': """
-        Line Items Tree Views
+        Formula Pricing
     """,
 
     'website': "https://www.yourcompany.com",

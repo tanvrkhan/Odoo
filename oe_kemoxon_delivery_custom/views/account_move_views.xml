@@ -12,7 +12,7 @@
                 <xpath expr="//field[@name='invoice_user_id']"
                        position="after">
                     <field name="deal_ref" invisible="0"/>
-                    <field name="picking_id"/>
+                    <field name="picking_id"  />
                     <field name="delivery_location" invisible="0"/>
 
                     <field name="vessel_information_id" domain="[('stock_pick_ids', '=', picking_id)]" >
@@ -21,6 +21,9 @@
                     <field name="vessel_name" invisible="0"/>
                     <field name="imo" invisible="0"/>
                     <field name="bl_date" invisible="0"/>
+                    <field name="cod_date" invisible="0"/>
+                    <field name="nor_date" invisible="0"/>
+                    <field name="tt_date" invisible="0"/>
                     <field name="ncv" invisible="0"/>
                     <field name="loadport" invisible="0"/>
                     <field name="disport" invisible="0"/>
@@ -30,6 +33,7 @@
                 </xpath>
                 <xpath expr="//group/group[@id='header_left_group']" position="inside">
                     <field name="show_vat_ids"/>
+                     <field name="show_delivery_to"/>
                 </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="attributes">

@@ -26,6 +26,7 @@ class StockPicking(models.Model):
     is_truck_invoice_created = fields.Boolean('Truck Invoice Created', compute='_compute_transport_invoice_count')
     transport_invoice_count = fields.Integer('Truck Invoice Count', compute='_compute_transport_invoice_count')
     allow_validation = fields.Boolean("Allow Validate")
+    tt_date = fields.Date('Title Transfer Date')
 
     def button_validate(self):
         for rec in self:

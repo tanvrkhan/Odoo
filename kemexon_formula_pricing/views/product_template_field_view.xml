@@ -7,6 +7,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='uom_po_id']" position="after">
                     <field name="m2m_price"/>
+                    <field name="mt_factor"/>
                 </xpath>
             </field>
         </record>
