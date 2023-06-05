@@ -36,19 +36,13 @@ class SaleOrderLine(models.Model):
     @api.model
     def create(self, vals):
         res = super(SaleOrderLine, self).create(vals)
-        res._check_tolerance_datas()
         return res
 
     def write(self, vals):
         result = super(SaleOrderLine, self).write(vals)
-        self._check_tolerance_datas()
         return result
 
-    def _check_tolerance_datas(self):
-        if self.tolerance_type and not self.tolerance_percentage:
-            raise UserError(_("Please Add Tolerance Percentage"))
-        if not self.tolerance_type and self.tolerance_percentage:
-            raise UserError(_("Please Add Tolerance Type"))
+
 
 
 #
@@ -62,16 +56,10 @@ class PurchaseOrderLine(models.Model):
     @api.model
     def create(self, vals):
         res = super(PurchaseOrderLine, self).create(vals)
-        res._check_tolerance_datas()
         return res
 
     def write(self, vals):
         result = super(PurchaseOrderLine, self).write(vals)
-        self._check_tolerance_datas()
         return result
 
-    def _check_tolerance_datas(self):
-        if self.tolerance_type and not self.tolerance_percentage:
-            raise UserError(_("Please Add Tolerance Percentage"))
-        if not self.tolerance_type and self.tolerance_percentage:
-            raise UserError(_("Please Add Tolerance Type"))
+
