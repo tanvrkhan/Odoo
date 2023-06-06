@@ -123,14 +123,14 @@
                         <th name="th_quantity" class="text-end">
                             <span>Quantity</span>
                         </th>
-                        <th name="th_formula_price" class="text-end"
-                            t-if="o.invoice_line_ids.filtered(lambda l: l.is_formula_pricing)">
-                            <span>Formula Price</span>
-                        </th>
-                        <th name="th_premium" class="text-end"
-                            t-if="o.invoice_line_ids.filtered(lambda l: l.is_formula_pricing)">
-                            <span>Premium</span>
-                        </th>
+                        <t t-if="o.show_formula_pricing">
+                            <th name="th_formula_price" class="text-end">
+                                <span>Formula Price</span>
+                            </th>
+                            <th name="th_premium" class="text-end">
+                                <span>Premium</span>
+                            </th>
+                        </t>
                         <th name="th_priceunit"
                             t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
                             <span>Rate</span>
@@ -168,12 +168,14 @@
                                     <span t-field="line.quantity"/>
                                     <span t-field="line.product_uom_id" groups="uom.group_uom"/>
                                 </td>
-                                <td t-if="line.is_formula_pricing" class="text-end">
-                                    <span t-field="line.formula_price"/>
-                                </td>
-                                <td t-if="line.is_formula_pricing" class="text-end">
-                                    <span t-field="line.premium"/>
-                                </td>
+                                <t t-if="o.show_formula_pricing">
+                                    <td class="text-end">
+                                        <span t-field="line.formula_price"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="line.premium"/>
+                                    </td>
+                                </t>
 
                                 <td t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
                                     <span class="text-nowrap" t-field="line.price_unit"/>

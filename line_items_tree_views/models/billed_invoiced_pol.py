@@ -22,25 +22,6 @@ class PurchaseOrderLine(models.Model):
         for line in self:
             line.qty_to_billed = line.product_qty - line.qty_received
 
-    @api.model
-    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-        result = super(PurchaseOrderLine, self).read_group(
-            domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
-
-        for res in result:
-            if '__domain' in res:
-                lines = self.search(res['__domain'])
-                total_qty_to_billed = 0
-                total_product_qty = 0
-                total_qty_received = 0
-                for line in lines:
-                    line.qty_to_billed = line.product_qty - line.qty_received
-
-                res['qty_to_billed'] = total_qty_to_billed
-                res['product_qty'] = total_product_qty
-                res['qty_received'] = total_qty_received
-        return result
-
     @api.depends('product_uom_qty', 'qty_received', 'qty_invoiced', 'product_id.product_tmpl_id.detailed_type')
     def _compute_to_invoice(self):
         for line in self:
@@ -54,4 +35,28 @@ class PurchaseOrderLine(models.Model):
             else:
                 line.qty_to_invoiced_pol = 0.0
 
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        result = super(PurchaseOrderLine, self).read_group(
+            domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+
+        for res in result:
+            if '__domain' in res:
+                lines = self.search(res['__domain'])
+                for line in lines:
+                    res['qty_received'] = line.qty_received
+        return result
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        result = super(PurchaseOrderLine, self).read_group(
+            domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+
+        for res in result:
+            if '__domain' in res:
+                lines = self.search(res['__domain'])
+                total_qty_to_billed = sum(lines.mapped('qty_to_billed'))
+                res['qty_to_billed'] = total_qty_to_billed
+
+        return result
 

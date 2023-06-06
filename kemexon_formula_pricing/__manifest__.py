@@ -23,6 +23,7 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'reports/pro-forma_invoice_template_inherited.xml',
         'reports/invoice_report_template_inherited.xml',
         'views/product_template_field_view.xml',
         'views/account_move_view.xml',

@@ -5,6 +5,10 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='incoterm_location']"
+                       position="after">
+                    <field name="show_formula_pricing"/>
+                </xpath>
                 <xpath expr="//tree//field[@name='price_unit']"
                        position="before">
                     <field name="is_formula_pricing"/>
