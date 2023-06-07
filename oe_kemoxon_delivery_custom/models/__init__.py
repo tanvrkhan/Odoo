@@ -6,3 +6,6 @@ from . import res_partner_bank
 from . import payment_term_text
 from . import vessel
 from . import vessel_information
+from . import purchase_order
+from . import stock_lot
+from . import stock_move

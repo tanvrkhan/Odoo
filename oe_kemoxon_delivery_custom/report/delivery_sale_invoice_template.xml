@@ -37,7 +37,7 @@
                                         <th width="40%">Date :</th>
                                             <td width="60%">
                                                 <span class="m-0" t-field="truck_transport_details_ids.date"
-                                                t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                                      t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
                                              </td>
                                     </t>
 

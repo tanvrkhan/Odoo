@@ -56,8 +56,7 @@
                     <field name="consignee"/>
                     <field name="transporter_payment_terms"/>
                 </xpath>
-                <xpath expr="//notebook"
-                       position="inside">
+                <xpath expr="//notebook" position="inside">
                     <page string="Vessel" name="vessel">
                         <group>
                             <group>
@@ -76,6 +75,9 @@
                 </xpath>
                 <xpath expr="//field[@name='move_type']" position="after">
                     <field name="tt_date"/>
+                </xpath>
+                  <xpath expr="//tree//field[@name='product_id']" position="after">
+                    <field name="lot_id_custom" context="{'default_product_id': product_id}"/>
                 </xpath>
             </field>
         </record>

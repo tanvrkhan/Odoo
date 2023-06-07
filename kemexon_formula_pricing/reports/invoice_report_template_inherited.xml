@@ -60,10 +60,10 @@
                             <br/>
                             <div class="col-4">
                                 <span class="m-0" t-field="o.invoice_date"
-                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                      t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
                                 <br/>
                                 <span class="m-0" t-field="o.invoice_date_due"
-                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                      t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
                             </div>
                         </div>
                     </div>
@@ -98,17 +98,17 @@
                 <br/>
                 <br/>
                 <t t-if="o.show_delivery_to">
-                <strong>Delivery To</strong>
-                <br/>
-                <span t-field="o.partner_shipping_id.name"/>
-                <br/>
-                <span t-field="o.partner_shipping_id.street"/>
-                <br t-if="o.partner_shipping_id.street2"/>
-                <span t-field="o.partner_shipping_id.street2"/>
-                <br/>
-                <br/>
-                <br/>
-                    </t>
+                    <strong>Delivery To</strong>
+                    <br/>
+                    <span t-field="o.partner_shipping_id.name"/>
+                    <br/>
+                    <span t-field="o.partner_shipping_id.street"/>
+                    <br t-if="o.partner_shipping_id.street2"/>
+                    <span t-field="o.partner_shipping_id.street2"/>
+                    <br/>
+                    <br/>
+                    <br/>
+                </t>
                 <style>
                     .my_data_table th {border-right: 1px solid white;border-left: 1px solid white;padding-top:
                     5px;padding-bottom: 5px;}
@@ -249,7 +249,8 @@
                                     <br/>
                                     <!--                                    <div class="col-1"/>-->
                                     <div class="col-7">
-                                        <span class="m-0" t-field="o.bl_date"/>
+                                        <span class="m-0" t-field="o.bl_date"
+                                              t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
                                     </div>
                                 </div>
                             </t>
@@ -353,7 +354,8 @@
                                     <br/>
                                     <!--                                    <div class="col-1"/>-->
                                     <div class="col-7">
-                                        <span class="m-0" t-field="o.nor_date"/>
+                                        <span class="m-0" t-field="o.nor_date"
+                                              t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
                                     </div>
                                 </div>
                             </t>
@@ -365,7 +367,8 @@
                                     <br/>
                                     <!--                                    <div class="col-1"/>-->
                                     <div class="col-7">
-                                        <span class="m-0" t-field="o.cod_date"/>
+                                        <span class="m-0" t-field="o.cod_date"
+                                              t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
                                     </div>
                                 </div>
                             </t>
@@ -395,7 +398,8 @@
                                     <br/>
                                     <!--                                    <div class="col-1"/>-->
                                     <div class="col-7">
-                                        <span class="m-0" t-field="o.tt_date"/>
+                                        <span class="m-0" t-field="o.tt_date"
+                                              t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
                                     </div>
                                 </div>
                             </t>

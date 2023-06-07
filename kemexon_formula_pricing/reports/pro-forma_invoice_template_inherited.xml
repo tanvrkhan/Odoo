@@ -38,7 +38,7 @@
                             </div>
                             <div class="col-7" style="padding-left: 23px;">
                                 <span class="m-0" t-field="doc.date_order"
-                                      t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>
+                                      t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
                             </div>
 
                             <!--                            <br/>-->
@@ -220,9 +220,9 @@
                             </div>
                             <div class="col-4" style="padding-left: 37px;">
                                 <t t-if="doc.picking_ids">
-                                    <span class="m-0" t-field="picking.delivery_from"/>
-                                    -
-                                    <span class="m-0" t-field="picking.delivery_to"/>
+                                    <span class="m-0" t-field="picking.delivery_from" t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                                    to
+                                    <span class="m-0" t-field="picking.delivery_to" t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
                                 </t>
                             </div>
                         </div>

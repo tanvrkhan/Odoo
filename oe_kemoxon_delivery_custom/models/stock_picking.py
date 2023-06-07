@@ -34,7 +34,9 @@ class StockPicking(models.Model):
                 if self.check_is_return():
                     return super().button_validate()
                 else:
+                    self.generate_lot_number()
                     return rec.check_tolerance_condition()
+
             else:
                 return super().button_validate()
 
@@ -233,3 +235,4 @@ class StockMoveLine(models.Model):
             if related_truck_details and related_truck_details.delete_option:
                 related_truck_details.unlink()
         return super(StockMoveLine, self).unlink()
+
