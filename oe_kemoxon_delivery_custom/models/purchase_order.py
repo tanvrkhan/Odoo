@@ -12,10 +12,14 @@ class InheritPurchaseOrderLine(models.Model):
         res = super(InheritPurchaseOrderLine, self)._prepare_stock_move_vals(picking, price_unit, product_uom_qty,
                                                                              product_uom)
         partner = self.partner_id.x_studio_quick_name
+        if not(partner):
+            raise UserError("Please update the contact quick name.")
+            return
         year = str(self.order_id.date_order.year)[2:]
         month = self.order_id.date_order.month
         if (month < 10):
             month = "0" + str(month)
+
         else:
             str(month)
         datepart = str(year) + str(month)
@@ -26,8 +30,9 @@ class InheritPurchaseOrderLine(models.Model):
                     analytic_account = self.env['account.analytic.account'].search([('id', '=', key), ])
                     analytic_name = analytic_account.name
                     lot_number = partner + "-" + datepart + "-" + analytic_name
-                    lot_id = self.env['stock.lot'].create(
-                        {'name': lot_number, 'product_id': self.product_id.id, 'company_id': self.company_id.id})
+                    lot_id=(self.env['stock.lot'].search([ ('name', '=', lot_number), ('product_id', '=', self.product_id.id)]))
+                    if not(lot_id):
+                        lot_id = self.env['stock.lot'].create({'name': lot_number, 'product_id': self.product_id.id, 'company_id': self.company_id.id})
                     lot_to_add = (4, lot_id.id)
                     if ('lot_ids' in res):
                         res['lot_ids'].append(lot_to_add)
