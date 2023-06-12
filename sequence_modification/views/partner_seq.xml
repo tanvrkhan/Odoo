@@ -6,6 +6,7 @@
             <field name="arch" type="xml">
                 <tree string="Partner Sequence">
                     <field name="name"/>
+                    <field name="company_id"/>
                     <field name="next_number"/>
                 </tree>
             </field>
