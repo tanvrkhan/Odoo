@@ -34,7 +34,6 @@ class StockPicking(models.Model):
                 if self.check_is_return():
                     return super().button_validate()
                 else:
-                    self.generate_lot_number()
                     return rec.check_tolerance_condition()
 
             else:
