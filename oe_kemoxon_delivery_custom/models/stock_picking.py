@@ -161,7 +161,7 @@ class StockPicking(models.Model):
                     'name': line.truck,
                     'quantity': line.loaded,
                     'price_unit': self.rate,
-                    'deduction': loss_in_amount
+                    'deduction': loss_in_amount,
                 }))
             account_move = self.env['account.move'].create(
                 {
@@ -234,4 +234,3 @@ class StockMoveLine(models.Model):
             if related_truck_details and related_truck_details.delete_option:
                 related_truck_details.unlink()
         return super(StockMoveLine, self).unlink()
-

@@ -106,7 +106,7 @@ class AccountMove(models.Model):
                 result.append(data_dict)
         USD = self.env['res.currency'].search([('name', '=', 'USD')])
         base_currency = self.env.company.currency_id
-        result = sorted(result, key=itemgetter('due_days'),reverse=True)
+        result = sorted(result, key=itemgetter('due_days'), reverse=True)
         data = {
             'result': result,
             'total_amount_total': round(base_currency.compute(total_amount_total, USD), 2),
@@ -119,7 +119,6 @@ class AccountMove(models.Model):
             'partner': 'Customer' if self.move_type == 'out_invoice' else "Vendor"
         }
         return data
-
 
     def action_send_aged_balance_invoice_report(self, move_type):
         if move_type == 'out_invoice':
@@ -251,6 +250,36 @@ class AccountMove(models.Model):
                 friendly_reminder_template.send_mail(invoice3.id, force_send=True)
             else:
                 continue
+
+
+class AccountMoveLine(models.Model):
+    _inherit = "account.move.line"
+
+    deduction = fields.Float('Deduction')
+
+    @api.depends('quantity', 'discount', 'price_unit', 'tax_ids', 'currency_id', 'deduction')
+    def _compute_totals(self):
+        for line in self:
+            if line.display_type != 'product':
+                line.price_total = line.price_subtotal = False
+            # Compute 'price_subtotal'.
+            line_discount_price_unit = line.price_unit * (1 - (line.discount / 100.0))
+            subtotal = line.quantity * line_discount_price_unit
+
+            # Compute 'price_total'.
+            if line.tax_ids:
+                taxes_res = line.tax_ids.compute_all(
+                    line_discount_price_unit,
+                    quantity=line.quantity,
+                    currency=line.currency_id,
+                    product=line.product_id,
+                    partner=line.partner_id,
+                    is_refund=line.is_refund,
+                )
+                line.price_subtotal = taxes_res['total_excluded'] - line.deduction
+                line.price_total = taxes_res['total_included'] - line.deduction
+            else:
+                line.price_total = line.price_subtotal = subtotal - line.deduction
 
 
 class DeliveryLocation(models.Model):

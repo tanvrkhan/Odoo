@@ -17,6 +17,7 @@ OdooERP Sales
         'report/delivery_sale_invoice_template.xml',
         'report/report.xml',
         'data/mail_template_data.xml',
+        'data/data.xml',
         'data/crone.xml',
         'report/invoice_report_template.xml',
         'report/pro-forma_invoice_template.xml',
