@@ -166,22 +166,28 @@ class AccountMoveInheritModel(models.Model):
 
     def check_in_partner_seq(self, name=None):
         partner_seq_obj = self.env['partner.sequence']
-        is_exists = partner_seq_obj.search([('name', '=', name)])
+        is_exists = partner_seq_obj.search([('name', '=', name), ('company_id', '=', self.env.company.id)])
         if is_exists:
-            # new_name = is_exists.name + str(is_exists.next_number).zfill(3)
             is_exists.next_number += 1
             new_name = is_exists.name + str(is_exists.next_number).zfill(3)
             return new_name
         else:
-            num = 1
-            # new_name = name + str(num).zfill(3)
-            new_name = name + str(num).zfill(3)
-            num += 1
-            partner_seq_obj.create({
-                'name': name,
-                'next_number': num,
-            })
-            return new_name
+            is_kem_seq = partner_seq_obj.search([('name', '=', name), ('company_id', '=', False)])
+            if is_kem_seq and self.env.company.id == 1:
+                is_kem_seq.next_number += 1
+                new_name = is_kem_seq.name + str(is_kem_seq.next_number).zfill(3)
+                return new_name
+            else:
+                num = 1
+                # new_name = name + str(num).zfill(3)
+                new_name = name + str(num).zfill(3)
+                num += 1
+                partner_seq_obj.create({
+                    'name': name,
+                    'next_number': num,
+                    'company_id': self.env.company.id
+                })
+                return new_name
 
 
 class InheritStockPicking(models.Model):
@@ -234,20 +240,27 @@ class InheritStockPicking(models.Model):
 
     def check_in_partner_seq(self, name=None):
         partner_seq_obj = self.env['partner.sequence']
-        is_exists = partner_seq_obj.search([('name', '=', name)])
+        is_exists = partner_seq_obj.search([('name', '=', name), ('company_id', '=', self.env.company.id)])
         if is_exists:
             new_name = is_exists.name + '-' + str(is_exists.next_number).zfill(3)
             is_exists.next_number += 1
             return new_name
         else:
-            num = 1
-            new_name = name + '-' + str(num).zfill(3)
-            num += 1
-            partner_seq_obj.create({
-                'name': name,
-                'next_number': num,
-            })
-            return new_name
+            is_kem_seq = partner_seq_obj.search([('name', '=', name), ('company_id', '=', False)])
+            if is_kem_seq and self.env.company.id == 1:
+                is_kem_seq.next_number += 1
+                new_name = is_kem_seq.name + '-' + str(is_kem_seq.next_number).zfill(3)
+                return new_name
+            else:
+                num = 1
+                new_name = name + '-' + str(num).zfill(3)
+                num += 1
+                partner_seq_obj.create({
+                    'name': name,
+                    'next_number': num,
+                    'company_id': self.env.company.id
+                })
+                return new_name
 
 
 class SaleOrderInherit(models.Model):
@@ -321,7 +334,8 @@ class SaleOrderInherit(models.Model):
 
     def check_in_partner_seq(self, name=None):
         partner_seq_obj = self.env['partner.sequence']
-        is_exists = partner_seq_obj.search([('name', '=', name)])
+        # is_exists = partner_seq_obj.search([('name', '=', name)])
+        is_exists = partner_seq_obj.search([('name', '=', name), ('company_id', '=', self.env.company.id)])
 
         if is_exists:
             if "PFI" in name:
@@ -332,17 +346,29 @@ class SaleOrderInherit(models.Model):
             is_exists.next_number += 1
             return new_name
         else:
-            num = 1
-            if "PFI" in name:
-                new_name = name + str(num).zfill(3)
+            # if there is no company id in record and the current company id is kemexon id
+            # then it means that we should get the is_kem_seq next number
+            is_kem_seq = partner_seq_obj.search([('name', '=', name), ('company_id', '=', False)])
+            if is_kem_seq and self.env.company.id == 1:
+                is_kem_seq.next_number += 1
+                if "PFI" in name:
+                    new_name = is_kem_seq.name + str(is_kem_seq.next_number).zfill(3)
+                else:
+                    new_name = is_kem_seq.name + str(is_kem_seq.next_number).zfill(2)
+                return new_name
             else:
-                new_name = name + str(num).zfill(2)
-            num += 1
-            partner_seq_obj.create({
-                'name': name,
-                'next_number': num,
-            })
-            return new_name
+                num = 1
+                if "PFI" in name:
+                    new_name = name + str(num).zfill(3)
+                else:
+                    new_name = name + str(num).zfill(2)
+                num += 1
+                partner_seq_obj.create({
+                    'name': name,
+                    'next_number': num,
+                    'company_id': self.env.company.id
+                })
+                return new_name
 
     def action_confirm(self):
         res = super(SaleOrderInherit, self).action_confirm()
@@ -394,7 +420,7 @@ class InheritResCustomer(models.Model):
     _inherit = 'res.partner'
 
     inv_partner_seq = fields.Integer("Invoice Sequence")
-    inv_prov_partner_seq=fields.Integer("Provisional Invoice Sequence")
+    inv_prov_partner_seq = fields.Integer("Provisional Invoice Sequence")
     bill_partner_seq = fields.Integer("Bill Sequence")
     bill_prov_partner_seq = fields.Integer("Provisional Bill Sequence")
     credit_partner_seq = fields.Integer("Credit Note Sequence")
@@ -409,3 +435,4 @@ class PartnerSequence(models.Model):
 
     name = fields.Char("Name")
     next_number = fields.Integer("Next Number", default=1)
+    company_id = fields.Many2one('res.company', 'Company', readonly=True)
