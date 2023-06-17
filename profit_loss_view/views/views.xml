@@ -38,7 +38,7 @@
             <field name="name">Profit And Loss</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">profit.loss.view</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,pivot</field>
             <field name="context">{'search_default_group_report_type':1,'search_default_group_name':1}
             </field>
 
