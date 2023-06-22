@@ -10,8 +10,9 @@
                 <field name="quantity"/>
                 <field name="tolerance_type"/>
                 <field name="tolerance_percentage"/>
-                <field name="unit_price" widget="monetary"/>
+                <field name="unit_price"/>
                 <field name="amount" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
             </tree>
         </field>
     </record>

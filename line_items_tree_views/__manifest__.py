@@ -31,7 +31,9 @@
         'views/line_items_tree_views.xml',
         'views/operation_type_view.xml',
         'views/res_partner_view.xml',
-        'views/transfer_fields_view.xml'
+        'views/transfer_fields_view.xml',
+        'views/purchase_order_lines_view_inherited.xml',
+        'views/sale_order_lines_view_inherited.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -10,5 +10,29 @@
             <field name="purchase_ok" eval="False"/>
             <field name="list_price">0.0</field>
         </record>
+        <record id="model_stock_valuation_button_update_valuation" model="ir.actions.server">
+            <field name="name">Update stock valuation</field>
+            <field name="model_id" ref="stock_account.model_stock_valuation_layer"/>
+            <field name="binding_model_id" ref="stock_account.model_stock_valuation_layer"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.update_stock_value_to_match_initial_if_cancelled_out()</field>
+        </record>
+        <record id="model_stock_valuation_action_unset_value" model="ir.actions.server">
+            <field name="name">Remove stock valuation</field>
+            <field name="model_id" ref="stock_account.model_stock_valuation_layer"/>
+            <field name="binding_model_id" ref="stock_account.model_stock_valuation_layer"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.remove_from_valuation()</field>
+        </record>
+        <record id="model_stock_picking_action_set_draft" model="ir.actions.server">
+            <field name="name">Set to draft</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">records.set_stock_move_to_draft()</field>
+        </record>
     </data>
 </odoo>

@@ -13,7 +13,7 @@
                 <field name="beneficiary"/>
                 <field name="beneficiary_bank"/>
                 <field name="beneficiary_bank_reference"/>
-                <!--                <field name="applicant"/>-->
+                <field name="applicant"/>
                 <field name="applicant_bank"/>
                 <field name="applicant_bank_reference"/>
                 <field name="advising_confirming_bank"/>
@@ -44,7 +44,7 @@
                             <field name="beneficiary"/>
                             <field name="beneficiary_bank"/>
                             <field name="beneficiary_bank_reference"/>
-                            <!--                            <field name="applicant"/>-->
+                            <field name="applicant"/>
                             <field name="applicant_bank"/>
                             <field name="applicant_bank_reference"/>
                             <field name="advising_confirming_bank"/>
@@ -63,7 +63,9 @@
                                            style="font-size: 14px; font-weight: bold;"/>
                                     <field name="total_amount" widget="monetary"
                                            options="{'currency_field': 'currency_id'}"
-                                           style="font-size: 14px; font-weight: bold;"/>
+                                           style="font-size: 14px; font-weight: bold;">
+                                    </field>
+                                    <field name="currency_id" invisible="1"/>
                                 </group>
                                 <div class="clearfix"/>
                             </group>
@@ -106,19 +108,19 @@
         </field>
     </record>
     <record id="action_fi_lc" model="ir.actions.act_window">
-        <field name="name">Financial Instrument LC</field>
+        <field name="name">Financial Instruments</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">fi.lc</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create a new Financial Instrument LC!
+                Create a new Financial Instruments!
             </p>
         </field>
     </record>
     <menuitem id="menu_fi_lc"
-              name="FI LC"
+              name="Financial Instruments"
               action="action_fi_lc"
               parent="account.menu_finance_receivables"
               sequence="5"/>

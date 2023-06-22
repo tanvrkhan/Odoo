@@ -7,7 +7,8 @@
             <tree editable="bottom">
                 <field name="bank_id" invisible="1"/>
                 <field name="limit_name"/>
-                <field name="amount" sum="Total" widget="monetary"/>
+                <field name="amount" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
             </tree>
         </field>
     </record>
@@ -20,7 +21,8 @@
                     <group>
                         <field name="limit_name" invisible="1"/>
                         <field name="limit_name"/>
-                        <field name="amount" sum="Total" widget="monetary"/>
+                        <field name="amount" widget="monetary"/>
+                        <field name="currency_id" invisible="1"/>
                     </group>
                 </sheet>
             </form>

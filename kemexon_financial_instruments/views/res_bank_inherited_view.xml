@@ -17,6 +17,7 @@
                                     <field name="total_amount" widget="monetary"
                                            options="{'currency_field': 'currency_id'}"
                                            style="font-size: 14px; font-weight: bold;"/>
+                                    <field name="currency_id" invisible="1"/>
                                 </group>
                                 <div class="clearfix"/>
                             </group>

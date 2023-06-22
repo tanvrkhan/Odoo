@@ -16,14 +16,15 @@ class FiLc(models.Model):
     beneficiary = fields.Many2one('res.partner', string='Beneficiary')
     beneficiary_bank = fields.Many2one('res.bank', string='Beneficiary Bank')
     beneficiary_bank_reference = fields.Char(string='Beneficiary Bank Reference')
-    # applicant = fields.Many2one('res.partner', string='Applicant')
+    applicant = fields.Many2one('res.partner', string='Applicant')
     applicant_bank = fields.Many2one('res.bank', string='Applicant Bank')
     applicant_bank_reference = fields.Char(string='Applicant Bank Reference')
     advising_confirming_bank = fields.Many2one('res.bank', string='Advising/Confirming Bank')
     notes = fields.Html(string='Notes')
+    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.company.currency_id)
     lc_lines_ids = fields.One2many("lc.lines", 'fi_lc_ids', string="LC Lines")
     total_quantity = fields.Float(compute='_compute_total_quantity', string='Total Quantity')
-    total_amount = fields.Float(compute='_compute_total_amount', string='Total Amount')
+    total_amount = fields.Monetary(compute='_compute_total_amount', string='Total Amount', currency_field='currency_id')
 
     @api.depends('lc_lines_ids.quantity')
     def _compute_total_quantity(self):
@@ -46,5 +47,3 @@ class FiLc(models.Model):
         for record in self:
             if record.search([('ref_no', '=', record.ref_no), ('id', '!=', record.id)]):
                 raise ValidationError('Reference must be unique!')
-
-

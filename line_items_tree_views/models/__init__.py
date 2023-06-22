@@ -11,6 +11,9 @@ from . import transfer_fields
 from . import res_partner
 from . import operation_type
 from . import models
+from . import purchase_order_line
+from . import sale_order_line
+
 
 
 
