@@ -1,0 +1,100 @@
+/* buyer */
+.sale_line_ids_tree table thead > tr > th:nth-child(1){
+    max-width: 150px !important;
+    width: 150px !important;
+}
+/* product */
+.sale_line_ids_tree table thead > tr > th:nth-child(2){
+    max-width: 150px !important;
+    width: 150px !important;
+}
+/* uom id */
+.sale_line_ids_tree table thead > tr > th:nth-child(3){
+    max-width: 65px !important;
+    width: 65px !important;
+}
+/* incoterms id */
+.sale_line_ids_tree table thead > tr > th:nth-child(4){
+    max-width: 95px !important;
+    width: 95px !important;
+}
+/* delivery loc. */
+.sale_line_ids_tree table thead > tr > th:nth-child(5){
+    max-width: 112px !important;
+    width: 112px !important;
+}
+/* currency */
+.sale_line_ids_tree table thead > tr > th:nth-child(6){
+    max-width: 88px !important;
+    width: 88px !important;
+}
+/* qty confirmed */
+.sale_line_ids_tree table thead > tr > th:nth-child(8){
+    max-width: 123px !important;
+    width: 123px !important;
+}
+/* price confirmed */
+.sale_line_ids_tree table thead > tr > th:nth-child(10){
+    max-width: 130px !important;
+    width: 130px !important;
+}
+/* base amount */
+.sale_line_ids_tree table thead > tr > th:nth-child(11){
+    max-width: 115px !important;
+    width: 115px !important;
+}
+/* forex rate */
+.sale_line_ids_tree table thead > tr > th:nth-child(12){
+    max-width: 115px !important;
+    width: 115px !important;
+}
+/* converted amount */
+.sale_line_ids_tree table thead > tr > th:nth-child(13){
+    max-width: 148px !important;
+    width: 148px !important;
+}
+/* vessel */
+.sale_line_ids_tree table thead > tr > th:nth-child(14){
+    max-width: 110px !important;
+    width: 110px !important;
+}
+/* notes */
+.sale_line_ids_tree table thead > tr > th:nth-child(16){
+    max-width: 100px !important;
+    width: 100px !important;
+}
+/* lc amount */
+.sale_line_ids_tree table thead > tr > th:nth-child(19){
+    max-width: 100px !important;
+    width: 100px !important;
+}
+/* bank */
+.sale_line_ids_tree table thead > tr > th:nth-child(20){
+    max-width: 115px !important;
+    width: 115px !important;
+}
+/* analytic account */
+.sale_line_ids_tree table thead > tr > th:nth-child(21){
+    max-width: 145px !important;
+    width: 145px !important;
+}
+/* vendor ref */
+.sale_line_ids_tree table thead > tr > th:nth-child(22){
+    max-width: 110px !important;
+    width: 110px !important;
+}
+/* validated */
+.sale_line_ids_tree table thead > tr > th:nth-child(23){
+    max-width: 120px !important;
+    width: 120px !important;
+}
+/* sale order */
+.sale_line_ids_tree table thead > tr > th:nth-child(24){
+    max-width: 125px !important;
+    width: 125px !important;
+}
+/* delete button */
+.sale_line_ids_tree table thead > tr > th:nth-child(25){
+    max-width: 100px !important;
+    width: 100px !important;
+}

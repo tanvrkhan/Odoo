@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <template id="report_estimate_module_document">
+        <t t-call="web.basic_layout">
+            <div t-attf-class="header" t-att-style="report_header_style">
+                <div>
+                    <div class="row mb8">
+                        <div class="col-6">
+                            <img t-if="o.company_id.logo" class="float-start" style="width:70%;"
+                                 t-att-src="image_data_uri(o.company_id.logo)" alt="Logo"/>
+                        </div>
+                        <div class="col-6 text-end mb4">
+                            <div class="mt0 h4" t-field="o.company_id.report_header"/>
+                            <div name="company_address" class="float-end mb4">
+                                <span t-if="o.company_id.company_details" t-field="o.company_id.company_details"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="border-bottom:2px solid black;"/>
+                </div>
+            </div>
+            <div t-attf-class="o_report_layout_boxed o_company_#{o.company_id.id}_layout {{  'o_report_layout_background' if o.company_id.layout_background in ['Geometric', 'Custom']  else  '' }}" t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % o.company_id.layout_background_image.decode('utf-8') if o.company_id.layout_background_image and o.company_id.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' }});">
+                <div class="pt-5">
+                    <!-- This div ensures that the address is not cropped by the header. -->
+                    <t t-call="web.address_layout"/>
+                </div>
+                <t t-out="0"/>
+                <div class="mt-5">
+                    <div class="page">
+                        <h2 style="text-align:center;border-bottom:2px solid black;
+                            ">
+                            <b><span>DEAL BUDGET</span></b>
+                        </h2>
+                        <br/>
+                        <div class="row mt64">
+                            <div class="col-6">
+                                <div class="row">
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <strong style="color:black !important;">Deal Nb:</strong>
+                                    </div>
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <span style="color:black !important;" t-field="o.name"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <strong style="color:black !important;">Vessel:</strong>
+                                    </div>
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <t t-if="o.sale_line_ids">
+                                            <t t-foreach="o.sale_line_ids[0]" t-as="sale_line">
+                                                <span style="color:black !important;" t-field="sale_line.vessel_id.vessel_id.vessel_name"/>
+                                            </t>
+                                        </t>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <strong style="color:black !important;">IMO:</strong>
+                                    </div>
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <t t-if="o.sale_line_ids">
+                                            <t t-foreach="o.sale_line_ids[0]" t-as="sale_line">
+                                                <span style="color:black !important;" t-field="sale_line.vessel_id.vessel_id.imo"/>
+                                            </t>
+                                        </t>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="row">
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <strong style="color:black !important;">(First)Seller:</strong>
+                                    </div>
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <t t-if="o.purchase_line_ids">
+                                            <t t-foreach="o.purchase_line_ids[0]" t-as="purchase_line">
+                                                <span style="color:black !important;" t-field="purchase_line.seller_id.name"/>
+                                            </t>
+                                        </t>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <strong style="color:black !important;">(First)Buyer:</strong>
+                                    </div>
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <t t-if="o.sale_line_ids">
+                                            <t t-foreach="o.sale_line_ids[0]" t-as="sale_line">
+                                                <span style="color:black !important;" t-field="sale_line.buyer_id.name"/>
+                                            </t>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                               <div class="row">
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <strong style="color:black !important;">Purch. Terms:</strong>
+                                    </div>
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <t t-if="o.purchase_line_ids">
+                                            <t t-foreach="o.purchase_line_ids[0]" t-as="purchase_line">
+                                                <span style="color:black !important;" t-field="purchase_line.incoterms_id.name"/>
+                                            </t>
+                                        </t>
+                                    </div>
+                               </div>
+                                <div class="row">
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <strong style="color:black !important;">Sale Terms:</strong>
+                                    </div>
+                                    <div class="col-auto col-3 mw-100 mb-2">
+                                        <t t-if="o.sale_line_ids">
+                                            <t t-foreach="o.sale_line_ids[0]" t-as="sale_line">
+                                                <span style="color:black !important;" t-field="sale_line.incoterms_id.name"/>
+                                            </t>
+                                        </t>
+                                    </div>
+                               </div>
+                            </div>
+                        </div>
+                        <br/>
+                        <table class="table table-sm o_main_table table-borderless" name="estimate_line_table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <span>Source</span>
+                                    </th>
+                                    <th>
+                                        <span>Budgeted</span>
+                                    </th>
+                                    <th>
+                                        <span>Confirmed</span>
+                                    </th>
+                                    <th>
+                                        <span>Actual</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="estimate_tbody">
+                                <tr>
+                                    <td style="color:black !important;">
+                                        Total Purchase Qty.
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_purchase_budgeted_qty"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_purchase_confirmed_qty"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_purchase_realized_qty"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="color:black !important;">
+                                        Total Sale Qty.
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_sale_budgeted_qty"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_sale_confirmed_qty"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_sale_realized_qty"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="color:black !important;">
+                                        Sales
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_budgeted_sales"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_confirmed_sales"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_realized_sales"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="color:black !important;">
+                                        -Purchases
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_budgeted_purchases"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_confirmed_purchases"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_realized_purchases"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="color:black !important;">
+                                        -Costs
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_budgeted_costs"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_confirmed_costs"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_realized_costs"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="color:black !important;">
+                                        Total Margin
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_budgeted_margin"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_confirmed_margin"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_realized_margin"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="color:black !important;">
+                                        Per Unit Margin
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_budgeted_unit_margin"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_confirmed_unit_margin"/>
+                                    </td>
+                                    <td style="color:black !important;">
+                                        <span t-field="o.total_realized_unit_margin"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div t-attf-class="footer o_standard_footer o_company_#{o.company_id.id}_layout">
+                <div class="text-center" style="border-top: 1px solid black;">
+                    <ul class="list-inline mb4">
+                        <div t-field="o.company_id.report_footer"/>
+                    </ul>
+
+                    <div t-if="report_type == 'pdf'" class="text-muted">
+                        Page: <span class="page"/> / <span class="topage"/>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_estimate_module">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="estimate_module.report_estimate_module_document"/>
+            </t>
+        </t>
+    </template>
+
+    <record id="paperformat_estimate" model="report.paperformat">
+            <field name="name">Estimate Report Format</field>
+            <field name="default" eval="False" />
+            <field name="format">custom</field>
+            <field name="page_height">297</field>
+            <field name="page_width">210</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">4</field>
+            <field name="margin_bottom">18</field>
+            <field name="margin_left">3</field>
+            <field name="margin_right">3</field>
+            <field name="header_line" eval="False" />
+            <field name="header_spacing">0</field>
+            <field name="dpi">110</field>
+        </record>
+
+    <record id="estimate_module_report_print" model="ir.actions.report">
+        <field name="name">Estimate Report</field>
+        <field name="model">estimate.module</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">estimate_module.report_estimate_module</field>
+        <field name="report_file">estimate_module.report_estimate_module</field>
+        <field name="binding_model_id" ref="model_estimate_module"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="estimate_module.paperformat_estimate"/>
+    </record>
+
+</odoo>

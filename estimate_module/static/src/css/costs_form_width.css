@@ -1,0 +1,80 @@
+/* analytic account */
+.cost_line_ids_tree table thead > tr > th:nth-child(1){
+    max-width: 135px !important;
+    width: 135px !important;
+}
+/* product */
+.cost_line_ids_tree table thead > tr > th:nth-child(2){
+    max-width: 150px !important;
+    width: 150px !important;
+}
+/* uom id */
+.cost_line_ids_tree table thead > tr > th:nth-child(3){
+    max-width: 65px !important;
+    width: 65px !important;
+}
+/* vendor */
+.cost_line_ids_tree table thead > tr > th:nth-child(4){
+    max-width: 150px !important;
+    width: 150px !important;
+}
+/* currency */
+.cost_line_ids_tree table thead > tr > th:nth-child(5){
+    max-width: 88px !important;
+    width: 88px !important;
+}
+/* base amount */
+.cost_line_ids_tree table thead > tr > th:nth-child(8){
+    max-width: 115px !important;
+    width: 115px !important;
+}
+/* forex rate */
+.cost_line_ids_tree table thead > tr > th:nth-child(9){
+    max-width: 115px !important;
+    width: 115px !important;
+}
+/* converted amount */
+.cost_line_ids_tree table thead > tr > th:nth-child(10){
+    max-width: 148px !important;
+    width: 148px !important;
+}
+/* debit account */
+.cost_line_ids_tree table thead > tr > th:nth-child(11){
+    max-width: 120px !important;
+    width: 120px !important;
+}
+/* credit account */
+.cost_line_ids_tree table thead > tr > th:nth-child(12){
+    max-width: 125px !important;
+    width: 125px !important;
+}
+/* journal */
+.cost_line_ids_tree table thead > tr > th:nth-child(13){
+    max-width: 100px !important;
+    width: 100px !important;
+}
+/* counterparty */
+.cost_line_ids_tree table thead > tr > th:nth-child(14){
+    max-width: 150px !important;
+    width: 150px !important;
+}
+/* our percentage */
+.cost_line_ids_tree table thead > tr > th:nth-child(15){
+    max-width: 130px !important;
+    width: 130px !important;
+}
+/* our share */
+.cost_line_ids_tree table thead > tr > th:nth-child(16){
+    max-width: 100px !important;
+    width: 100px !important;
+}
+/* account move */
+.cost_line_ids_tree table thead > tr > th:nth-child(17){
+    max-width: 120px !important;
+    width: 120px !important;
+}
+/* delete button */
+.cost_line_ids_tree table thead > tr > th:nth-child(18){
+    max-width: 100px !important;
+    width: 100px !important;
+}

@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_estimate_module,estimate.module,model_estimate_module,,1,1,1,1
+access_estimate_purchase_line,estimate.purchase.line,model_estimate_purchase_line,,1,1,1,1
+access_estimate_sale_line,estimate.sale.line,model_estimate_sale_line,,1,1,1,1
+access_estimate_cost_line,estimate.cost.line,model_estimate_cost_line,,1,1,1,1
