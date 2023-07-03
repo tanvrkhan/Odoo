@@ -212,7 +212,7 @@ class StockPicking(models.Model):
 			record.move_ids.move_line_ids.state = 'assigned'
 			record.move_ids.state = 'assigned'
 			
-			for line in self.move_ids.move_line_ids:
+			for line in record.move_ids.move_line_ids:
 				if line.qty_done != 0:
 					location_quant = self.env['stock.quant'].search(['&', ('product_id', '=', self.product_id.id)
 						                                                , ('lot_id', '=', line.lot_id.id)
@@ -257,6 +257,92 @@ class StockPicking(models.Model):
 							                                                   location_id=line.location_dest_id,
 							                                                   quantity=-1 * line.qty_done,
 							                                                   lot_id=line.lot_id, in_date=None)
+	
+	def sync_stock_quant(self):
+		for record in self:
+			for line in record.move_ids.move_line_ids:
+				# check if move is in state done and quantity is not 0.
+				if line.qty_done != 0 and line.state == 'done':
+					location_quant = self.env['stock.quant'].search(['&', ('product_id', '=', line.product_id.id)
+						                                                , ('lot_id', '=', line.lot_id.id)
+						                                                , ('location_id', '=', line.location_id.id)
+					                                                 ])
+					
+					# if entry already exists, update it.
+					if location_quant:
+						self.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+						                                                   package_id=None, owner_id=None,
+						                                                   location_id=line.location_id,
+						                                                   quantity=-1 * line.qty_done,
+						                                                   lot_id=line.lot_id, in_date=None)
+					# otherwise create it.
+					else:
+						self.env['stock.quant'].create({
+							'product_id': line.product_id.id,
+							'location_id': line.location_id.id,
+							'lot_id': line.lot_id.id,
+							'quantity': -1 * line.qty_done
+						})
+					
+					location_dest_quant = self.env['stock.quant'].search(['&', ('product_id', '=', line.product_id.id)
+						                                                     , ('lot_id', '=', line.lot_id.id)
+						                                                     ,
+						                                                  ('location_id', '=', line.location_dest_id.id)
+					                                                      ])
+					
+					if location_dest_quant:
+						self.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+						                                                   package_id=None, owner_id=None,
+						                                                   location_id=line.location_dest_id,
+						                                                   quantity=1 * line.qty_done,
+						                                                   lot_id=line.lot_id, in_date=None)
+					# otherwise create it.
+					else:
+						self.env['stock.quant'].create({
+							'product_id': line.product_id.id,
+							'location_id': line.location_dest_id.id,
+							'lot_id': line.lot_id.id,
+							'quantity': line.qty_done
+						})
+	
+	def stock_quant_zero(self):
+		all_quant = self.env['stock.quant'].search([])
+		for quant in all_quant:
+			quant.quantity = 0
+	
+	def delete_all_inventory_adjustments(self):
+		all_moves = self.env['stock.move'].search([])
+		for move in all_moves:
+			if move.picking_id:
+				pass
+			else:
+				move.stock_valuation_layer_ids.account_move_id.state = 'draft'
+				move.stock_valuation_layer_ids.account_move_id.line_ids.unlink()
+				move.stock_valuation_layer_ids.account_move_id.unlink()
+				move.stock_valuation_layer_ids.unlink()
+				move.state = 'draft'
+				move.move_line_ids.state = 'draft'
+				move.move_line_ids.unlink()
+				move.unlink()
+	
+	def delete_all_internal_transfers(self):
+		all_pickings = self.env['stock.picking'].search([('picking_type_id.code', '=', 'internal')])
+		for picking in all_pickings:
+			picking.move_ids.stock_valuation_layer_ids.account_move_id.state = 'draft'
+			picking.move_ids.stock_valuation_layer_ids.account_move_id.line_ids.unlink()
+			picking.move_ids.stock_valuation_layer_ids.account_move_id.unlink()
+			picking.move_ids.stock_valuation_layer_ids.unlink()
+			picking.move_ids.state = 'draft'
+			picking.move_ids.move_line_ids.state = 'draft'
+			picking.move_ids.move_line_ids.unlink()
+			picking.move_ids.unlink()
+
+
+# search where location id is 8 and add it to a collection
+# search where location id is not 8 and is internal location
+# updates the ones with 8
+
+# or (lot.delivery_ids.location_id!=8 and lot.delivery_ids.location_dest_id==8):
 
 
 class DeliveryLocation(models.Model):

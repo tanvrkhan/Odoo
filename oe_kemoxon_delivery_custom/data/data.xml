@@ -34,5 +34,46 @@
             <field name="state">code</field>
             <field name="code">records.set_stock_move_to_draft()</field>
         </record>
+        <record id="model_stock_picking_action_set_quant_0" model="ir.actions.server">
+            <field name="name">Set All Quant to 0</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.stock_quant_zero()</field>
+        </record>
+        <record id="model_stock_picking_action_sync_quant" model="ir.actions.server">
+            <field name="name">Sync Quant</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.sync_stock_quant()</field>
+        </record>
+        <record id="model_stock_picking_action_delete_adjustments" model="ir.actions.server">
+            <field name="name">Delete stock adjustments</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.delete_all_inventory_adjustments()</field>
+        </record>
+        <record id="model_stock_picking_action_delete_internal_transfers" model="ir.actions.server">
+            <field name="name">Delete stock internal transfers</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.delete_all_internal_transfers()</field>
+        </record>
+        <record id="model_stock_move_action_fix_unmatching_locations" model="ir.actions.server">
+            <field name="name">Fix unmatching locations</field>
+            <field name="model_id" ref="stock.model_stock_move_line"/>
+            <field name="binding_model_id" ref="stock.model_stock_move_line"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.fix_incoming_outgoing_locations()</field>
+        </record>
+
     </data>
 </odoo>
