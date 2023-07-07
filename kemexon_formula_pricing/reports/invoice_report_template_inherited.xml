@@ -524,10 +524,10 @@
                         <!--                        faizan 5,7-->
                         <div class="col-12 row">
                             <div class="col-5">
-                                <strong t-if="o.invoice_payment_term_id">Payment Term</strong>
+                                <strong t-if="o.payment_terms_id2">Payment Term</strong>
                             </div>
                             <div class="col-7">
-                                <span class="m-0" t-esc="o.get_text_from_html_field(o)"/>
+                                <span class="m-0" style="borders:none;border-style=none;" t-esc="o.payment_terms_id2.note"/>
                             </div>
                         </div>
                         <!--                        faizan 5,7-->

@@ -125,48 +125,78 @@
                                     <span t-field="line.name"/>
                                 </td>
                                 <td name="td_quantity" class="text-end  col col-md-3">
-                                    <span t-field="line.product_uom_qty"/>
+                                    <t t-if="line.product_id.name != 'Down payment'">
+                                        <span t-field="line.product_uom_qty"/>
 
-                                    <span t-if="line.tolerance_type=='min_max'">
-                                        <span>
-                                            <span>+/-</span>
-                                            <span t-field="line.tolerance_percentage"/>
-                                            <span>%</span>
+                                        <span t-if="line.tolerance_type=='min_max'">
+                                            <span>
+                                                <span>+/-</span>
+                                                <span t-field="line.tolerance_percentage"/>
+                                                <span>%</span>
+                                            </span>
                                         </span>
-                                    </span>
-                                    <span t-elif="line.tolerance_type=='max'">
-                                        <span>Max</span>
-                                    </span>
-                                    <span t-elif="line.tolerance_type=='min'">
-                                        <span>Min</span>
-                                    </span>
-                                    <span t-field="line.product_uom"/>
+                                        <span t-elif="line.tolerance_type=='max'">
+                                            <span>Max</span>
+                                        </span>
+                                        <span t-elif="line.tolerance_type=='min'">
+                                            <span>Min</span>
+                                        </span>
+                                        <span t-field="line.product_uom"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span></span>
+                                    </t>
                                 </td>
                                 <t t-if="line.order_id.show_formula_pricing">
                                     <td class="text-end">
-                                        <span t-field="line.formula_price"/>
+                                        <t t-if="line.product_id.name != 'Down payment'">
+                                            <span t-field="line.formula_price"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span></span>
+                                        </t>
                                     </td>
                                     <td class="text-end">
-                                        <span t-field="line.premium"/>
+                                        <t t-if="line.product_id.name != 'Down payment'">
+                                            <span t-field="line.premium"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span></span>
+                                        </t>
                                     </td>
                                 </t>
 
                                 <td name="td_priceunit" class="text-end">
-                                    <span t-field="line.price_unit"/>
+                                    <t t-if="line.product_id.name != 'Down payment'">
+                                        <span t-field="line.price_unit"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span></span>
+                                    </t>
                                 </td>
                                 <td t-if="display_discount" class="text-end"
                                     groups="product.group_discount_per_so_line">
-                                    <span t-field="line.discount"/>
+                                    <t t-if="line.product_id.name != 'Down payment'">
+                                        <span t-field="line.discount"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span></span>
+                                    </t>
                                 </td>
                                 <!--                                <td name="td_taxes" class="text-end">-->
                                 <!--                                    <span t-out="', '.join(map(lambda x: (x.description or x.name), line.tax_id))"/>-->
                                 <!--                                </td>-->
-                                <td t-if="not line.is_downpayment" name="td_subtotal"
+                                <td  name="td_subtotal"
                                     class="text-end o_price_total">
-                                    <span t-field="line.price_subtotal"
-                                          groups="account.group_show_line_subtotals_tax_excluded"/>
-                                    <span t-field="line.price_total"
-                                          groups="account.group_show_line_subtotals_tax_included"/>
+                                    <t t-if="line.product_id.name != 'Down payment'">
+                                        <span class="text-nowrap" t-field="line.price_subtotal"
+                                              groups="account.group_show_line_subtotals_tax_excluded"/>
+                                        <span class="text-nowrap" t-field="line.price_total"
+                                              groups="account.group_show_line_subtotals_tax_included"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="text-nowrap" t-field="line.price_unit"/>
+                                    </t>
                                 </td>
                             </t>
                             <t t-elif="line.display_type == 'line_section'">
@@ -220,9 +250,11 @@
                             </div>
                             <div class="col-4" style="padding-left: 37px;">
                                 <t t-if="doc.picking_ids">
-                                    <span class="m-0" t-field="picking.delivery_from" t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                                    <span class="m-0" t-field="picking.delivery_from"
+                                          t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
                                     to
-                                    <span class="m-0" t-field="picking.delivery_to" t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                                    <span class="m-0" t-field="picking.delivery_to"
+                                          t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
                                 </t>
                             </div>
                         </div>

@@ -44,6 +44,8 @@ class AccountMove(models.Model):
     show_vat_ids = fields.Boolean(string="Show VAT Ids")
     transporter_details_id = fields.Many2one('stock.picking', 'Transporter Delivery')
 
+    payment_terms_id2 = fields.Many2one('account.payment.term', 'Payment terms')
+
     @api.depends('invoice_line_ids.sale_line_ids.move_ids.picking_id')
     def _compute_picking_id2(self):
         for invoice in self:
