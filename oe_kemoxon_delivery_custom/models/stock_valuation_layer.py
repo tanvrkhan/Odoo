@@ -50,7 +50,7 @@ class StockValuationLayer(models.Model):
                             all_purchases_before = self.env['stock.valuation.layer'].search(
                                 ['&', '&', ('product_id', '=', record.product_id.id),
                                  ('stock_move_id', '!=', record.stock_move_id.id),
-                                 ('stock_move_id.picking_id.date', '<=', record.stock_move_id.picking_id.date)])
+                                 ('stock_move_id.date', '<=', record.stock_move_id.date)])
                             if all_purchases_before:
                                 total_quantity = 0
                                 total_amount = 0
@@ -211,7 +211,7 @@ class StockValuationLayer(models.Model):
     def calculate_costing_from_later_dates(self, record):
         all_valuations_after = self.env['stock.valuation.layer'].search(
             ['&', '&', ('product_id', '=', record.product_id.id), ('stock_move_id', '!=', record.stock_move_id.id),
-             ('stock_move_id.picking_id.date', '>=', record.stock_move_id.date)])
+             ('stock_move_id.date', '>=', record.stock_move_id.date)])
         total_quantity = 0
         total_amount = 0
         for later_valuation in all_valuations_after:
