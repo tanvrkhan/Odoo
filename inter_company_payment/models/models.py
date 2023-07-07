@@ -50,32 +50,29 @@ class InheritAccountPayment(models.Model):
             # custom logic starts here
             move_obj = self.env['account.move.line']
 
-            # paired payment which created automatically
-            paired_amount = move_obj.browse(
-                paired_payment.line_ids.ids[0]).balance * paired_payment.journal_id.currency_id.rate
-            paired_amount_2 = move_obj.browse(
-                paired_payment.line_ids.ids[1]).balance * paired_payment.journal_id.currency_id.rate
-            paired_currency = paired_payment.journal_id.currency_id.id
+            paired_currency = paired_payment.journal_id.currency_id or payment.env.company.currency_id
+            paired_amount = move_obj.browse(paired_payment.line_ids.ids[0]).balance * paired_currency.rate
+            paired_amount_2 = move_obj.browse(paired_payment.line_ids.ids[1]).balance * paired_currency.rate
 
             paired_payment.move_id.line_ids = [
                 (1, paired_payment.line_ids.ids[0], {'amount_currency': paired_amount,
                                                      'currency_id': paired_currency}),
                 (1, paired_payment.line_ids.ids[1], {'amount_currency': paired_amount_2,
-                                                     'currency_id': paired_currency})]
+                                                     'currency_id': paired_currency})
+            ]
 
             # inter payment which we create
 
-            payment_amount = move_obj.browse(
-                payment.line_ids.ids[0]).balance * payment.journal_id.currency_id.rate
-            payment_amount_2 = move_obj.browse(
-                payment.line_ids.ids[1]).balance * payment.journal_id.currency_id.rate
-            payment_currency = payment.journal_id.currency_id.id
+            payment_currency = payment.journal_id.currency_id or payment.env.company.currency_id
+            payment_amount = move_obj.browse(payment.line_ids.ids[0]).balance * payment_currency.rate
+            payment_amount_2 = move_obj.browse(payment.line_ids.ids[1]).balance * payment_currency.rate
 
             payment.move_id.line_ids = [
                 (1, payment.line_ids.ids[0], {'amount_currency': payment_amount,
                                               'currency_id': payment_currency}),
                 (1, payment.line_ids.ids[1], {'amount_currency': payment_amount_2,
-                                              'currency_id': payment_currency})]
+                                              'currency_id': payment_currency})
+            ]
 
             lines.reconcile()
 

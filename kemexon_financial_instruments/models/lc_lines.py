@@ -15,10 +15,16 @@ class LcLines(models.Model):
     ], string='Tolerance Type')
     tolerance_percentage = fields.Float(string='Tolerance Percentage')
     unit_price = fields.Float(string='Unit Price')
-    amount = fields.Monetary(string='Amount', readonly=True, currency_field='currency_id')
+    amount = fields.Monetary(string='Amount', readonly=True, currency_field='currency_id', compute='_compute_amount')
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.company.currency_id)
     fi_lc_ids = fields.Many2one('fi.lc', string="LC Lines")
 
-    @api.onchange('unit_price', 'quantity')
-    def _onchange_unit_price_quantity(self):
-        self.amount = self.unit_price * self.quantity
+    # @api.onchange('unit_price', 'quantity')
+    # def _onchange_unit_price_quantity(self):
+    #     self.amount = self.unit_price * self.quantity
+
+    @api.depends('unit_price', 'quantity')
+    def _compute_amount(self):
+        for line in self:
+            line.amount = line.unit_price*line.quantity
+

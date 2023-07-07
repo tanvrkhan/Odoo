@@ -264,7 +264,10 @@ class StockPicking(models.Model):
                                                                                lot_id=line.lot_id, in_date=None)
 
     def sync_stock_quant(self):
-        for record in self:
+        company = self.env.company.id
+        self.env['stock.quant'].search([]).unlink()
+        pickings = self.env['stock.picking'].search([])
+        for record in pickings:
             for line in record.move_ids.move_line_ids:
                 # check if move is in state done and quantity is not 0.
                 if line.qty_done != 0 and line.state == 'done':
@@ -272,7 +275,6 @@ class StockPicking(models.Model):
                                                                         , ('lot_id', '=', line.lot_id.id)
                                                                         , ('location_id', '=', line.location_id.id)
                                                                      ])
-
                     # if entry already exists, update it.
                     if location_quant:
                         self.env['stock.quant']._update_available_quantity(product_id=line.product_id,
@@ -288,13 +290,11 @@ class StockPicking(models.Model):
                             'lot_id': line.lot_id.id,
                             'quantity': -1 * line.qty_done
                         })
-
                     location_dest_quant = self.env['stock.quant'].search(['&', ('product_id', '=', line.product_id.id)
                                                                              , ('lot_id', '=', line.lot_id.id)
                                                                              ,
                                                                           ('location_id', '=', line.location_dest_id.id)
                                                                           ])
-
                     if location_dest_quant:
                         self.env['stock.quant']._update_available_quantity(product_id=line.product_id,
                                                                            package_id=None, owner_id=None,

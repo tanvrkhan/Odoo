@@ -25,6 +25,7 @@ class FiLc(models.Model):
     lc_lines_ids = fields.One2many("lc.lines", 'fi_lc_ids', string="LC Lines")
     total_quantity = fields.Float(compute='_compute_total_quantity', string='Total Quantity')
     total_amount = fields.Monetary(compute='_compute_total_amount', string='Total Amount', currency_field='currency_id')
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
 
     @api.depends('lc_lines_ids.quantity')
     def _compute_total_quantity(self):

@@ -4,7 +4,7 @@
         <field name="name">fi.lc.tree</field>
         <field name="model">fi.lc</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree default_order="id desc">
                 <field name="ref_no"/>
                 <field name="type"/>
                 <field name="lc_type"/>
