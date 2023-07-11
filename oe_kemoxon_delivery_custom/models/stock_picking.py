@@ -28,6 +28,20 @@ class StockPicking(models.Model):
     allow_validation = fields.Boolean("Allow Validate")
     tt_date = fields.Date('Title Transfer Date')
 
+    def fix_unmatching_lots(self):
+        for rec in self:
+            for mv in rec.move_ids:
+                mv.date = rec.scheduled_date
+            if rec.move_ids and rec.env.context.get('check_condition'):
+                if self.check_is_return():
+                    return super().button_validate()
+                else:
+
+                    return rec.check_tolerance_condition()
+
+            else:
+                return super().button_validate()
+
     def button_validate(self):
         for rec in self:
             for mv in rec.move_ids:
@@ -213,9 +227,9 @@ class StockPicking(models.Model):
             record.move_ids.stock_valuation_layer_ids.account_move_id.line_ids.unlink()
             record.move_ids.stock_valuation_layer_ids.account_move_id.unlink()
             record.move_ids.stock_valuation_layer_ids.unlink()
-            record.state = 'assigned'
-            record.move_ids.move_line_ids.state = 'assigned'
-            record.move_ids.state = 'assigned'
+            record.state = 'draft'
+            record.move_ids.move_line_ids.state = 'draft'
+            record.move_ids.state = 'draft'
 
             for line in record.move_ids.move_line_ids:
                 if line.qty_done != 0:
