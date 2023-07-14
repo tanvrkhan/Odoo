@@ -27,7 +27,8 @@ class StockPicking(models.Model):
     transport_invoice_count = fields.Integer('Truck Invoice Count', compute='_compute_transport_invoice_count')
     allow_validation = fields.Boolean("Allow Validate")
     tt_date = fields.Date('Title Transfer Date')
-
+    incoterm_location_custom = fields.Many2one('incoterm.location', string='Incoterm Location',
+                                               related='sale_id.incoterm_location_custom')
     def fix_unmatching_lots(self):
         for rec in self:
             for mv in rec.move_ids:
