@@ -5,4 +5,5 @@ access_kemexon.aging.balance.report,access_kemexon.aging.balance.report,model_ke
 access_vessels,access.vessels,model_vessel,base.group_user,1,1,1,1
 access_vessels_information,access.vessels_information,model_vessel_information,base.group_user,1,1,1,1
 access_wizard_message,Access Message Wizard,model_wk_wizard_message,,1,1,1,1
-
+incoterm_location,access_incoterm.location,model_incoterm_location,base.group_user,1,1,1,1
+region_region,access_region.region,model_region_region,base.group_user,1,1,1,1

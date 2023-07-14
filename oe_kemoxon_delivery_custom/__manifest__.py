@@ -22,6 +22,8 @@ OdooERP Sales
         'report/invoice_report_template.xml',
         'report/pro-forma_invoice_template.xml',
         'views/account_move_views.xml',
+        'views/incoterm_location_view.xml',
+        'views/region_view.xml',
         'views/sale_order_view.xml',
         'views/stock_picking_view.xml',
         'views/trucktransportdetails.xml',

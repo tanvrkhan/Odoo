@@ -199,10 +199,10 @@
                         </table>
                         <br/>
                         <br/>
-                        <table width="100%" class="info_table table-borderless" t-if="picking.delivery_location">
-                            <th width="20%">Delivery Location :</th>
+                        <table width="100%" class="info_table table-borderless" t-if="picking.incoterm_location_custom">
+                            <th width="20%">Incoterm Location :</th>
                             <td width="80%">
-                                <span t-field="picking.delivery_location"/>
+                                <span t-field="picking.incoterm_location_custom"/>
                             </td>
                         </table>
                         <table width="100%" class="info_table table-borderless" t-if="picking.name">
@@ -384,10 +384,10 @@
                         </table>
                         <br/>
                         <br/>
-                        <table width="100%" class="info_table table-borderless" t-if="picking.delivery_location">
-                            <th width="20%">Delivery Location :</th>
+                        <table width="100%" class="info_table table-borderless" t-if="picking.incoterm_location_custom">
+                            <th width="20%">Incoterm Location :</th>
                             <td width="80%">
-                                <span t-field="picking.delivery_location"/>
+                                <span t-field="picking.incoterm_location_custom"/>
                             </td>
                         </table>
                         <table width="100%" class="info_table table-borderless" t-if="picking.name">

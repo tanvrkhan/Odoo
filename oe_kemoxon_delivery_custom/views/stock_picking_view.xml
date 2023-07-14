@@ -35,6 +35,7 @@
                 <xpath expr="//field[@name='origin']"
                        position="after">
                     <field name="delivery_location"/>
+                    <field name="incoterm_location_custom"/>
                     <label for="delivery_from" string="Period"/>
                     <div name="date_edit_only" class="o_row oe_edit_only">
                         <span>

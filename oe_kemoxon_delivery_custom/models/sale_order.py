@@ -9,6 +9,7 @@ class InheritPurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
     show_vat_ids = fields.Boolean(string="Show VAT Ids")
+    incoterm_location2 = fields.Many2one('incoterm.location', string='Incoterm Location')
 
 
 class SaleOrder(models.Model):
@@ -19,6 +20,8 @@ class SaleOrder(models.Model):
     delivery_from = fields.Date("Delivery From")
     delivery_to = fields.Date('Delivry To')
     delivery_location = fields.Many2one('delivery.location', "Delivery Location")
+    incoterm_location2 = fields.Many2one('incoterm.location', string='Incoterm Location')
+
 
     def _prepare_invoice(self):
         res = super(SaleOrder, self)._prepare_invoice()
