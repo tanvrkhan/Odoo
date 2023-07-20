@@ -31,6 +31,11 @@
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="incoterm_location_custom" />
+                      <field name="status_custom" />
+                </xpath>
+                  <xpath expr="//form//field[@name='team_id']"
+                       position="before">
+                    <field name="trader"/>
                 </xpath>
             </field>
         </record>
@@ -50,6 +55,8 @@
                 </xpath>
                  <xpath expr="//field[@name='partner_ref']" position="after">
                     <field name="incoterm_location_custom" />
+                    <field name="trader"/>
+                       <field name="status_custom" />
                 </xpath>
             </field>
         </record>

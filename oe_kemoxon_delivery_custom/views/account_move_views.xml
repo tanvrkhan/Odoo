@@ -11,6 +11,7 @@
                 </xpath>
                 <xpath expr="//field[@name='invoice_user_id']"
                        position="after">
+                    <field name="trader" invisible="0"/>
                     <field name="deal_ref" invisible="0"/>
                     <field name="picking_id"  />
                     <field name="picking_domain_ids" invisible="1"/>

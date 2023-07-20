@@ -29,6 +29,7 @@ class StockPicking(models.Model):
     tt_date = fields.Date('Title Transfer Date')
     incoterm_location_custom = fields.Many2one('incoterm.location', string='Incoterm Location',
                                                related='sale_id.incoterm_location_custom')
+    trader = fields.Many2one('hr.employee', string='Trader', related='sale_id.trader')
     def fix_unmatching_lots(self):
         for rec in self:
             for mv in rec.move_ids:
@@ -194,8 +195,12 @@ class StockPicking(models.Model):
                 }
             )
 
-    # transporter_invoices.append(account_move.id)
-
+    def set_reserved_zero(self):
+        for record in self:
+            for move in record.move_ids:
+                for line  in move.move_line_ids:
+                    line.reserved_qty=0
+                    line.reserved_uom_qty=0
     def action_view_transporter_invoice(self):
         action = {
             'domain': [('transporter_details_id', '=', self.id)],

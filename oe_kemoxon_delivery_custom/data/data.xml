@@ -82,6 +82,14 @@
             <field name="state">code</field>
             <field name="code">records.delete_all_internal_transfers()</field>
         </record>
+          <record id="model_stock_picking_action_reserve_zero" model="ir.actions.server">
+            <field name="name">Set Reserved 0</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.set_reserved_zero()</field>
+        </record>
         <record id="model_stock_move_action_fix_unmatching_locations" model="ir.actions.server">
             <field name="name">Fix unmatching locations</field>
             <field name="model_id" ref="stock.model_stock_move_line"/>

@@ -47,6 +47,7 @@ class AccountMove(models.Model):
     payment_terms_id2 = fields.Many2one('account.payment.term', 'Payment terms')
     incoterm_location_custom = fields.Many2one('incoterm.location', string='Incoterm Location',
                                                related='picking_id.incoterm_location_custom')
+    trader = fields.Many2one('hr.employee', string='Trader', related='picking_id.trader')
     @api.depends('invoice_line_ids.sale_line_ids.move_ids.picking_id')
     def _compute_picking_id2(self):
         for invoice in self:
