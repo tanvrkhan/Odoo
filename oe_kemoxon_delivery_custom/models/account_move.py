@@ -255,6 +255,15 @@ class AccountMove(models.Model):
             else:
                 continue
 
+    @api.depends('needed_terms', 'invoice_date_due')
+    def _compute_invoice_date_due(self):
+        today = fields.Date.context_today(self)
+        for move in self:
+            if not move.invoice_date_due:
+                move.invoice_date_due = move.needed_terms and max(
+                    (k['date_maturity'] for k in move.needed_terms.keys() if k),
+                    default=False,
+                ) or today
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
