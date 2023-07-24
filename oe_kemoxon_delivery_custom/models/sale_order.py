@@ -11,7 +11,7 @@ class InheritPurchaseOrder(models.Model):
     show_vat_ids = fields.Boolean(string="Show VAT Ids")
     incoterm_location2 = fields.Many2one('incoterm.location', string='Incoterm Location')
     incoterm_location_custom = fields.Many2one('incoterm.location', string='Incoterm Location')
-    status_custom = fields.Selection([('open', 'Open'), ('closed', 'Closed')], string='Status')
+    status_custom = fields.Selection([('open', 'Open'), ('closed', 'Closed'), ('cancelled', 'Cancelled')], string='Status')
     trader = fields.Many2one('hr.employee', string='Trader')
 class SaleOrder(models.Model):
     _inherit = "sale.order"
@@ -23,7 +23,7 @@ class SaleOrder(models.Model):
     delivery_location = fields.Many2one('delivery.location', "Delivery Location")
     incoterm_location2 = fields.Many2one('incoterm.location', string='Incoterm Location')
     incoterm_location_custom = fields.Many2one('incoterm.location', string='Incoterm Location')
-    status_custom = fields.Selection([('open', 'Open'), ('closed', 'Closed')], string='Status')
+    status_custom = fields.Selection([('open', 'Open'), ('closed', 'Closed'), ('pfi', 'PFI'), ('cancelled', 'Cancelled')], string='Status')
     trader = fields.Many2one('hr.employee', string='Trader')
     def _prepare_invoice(self):
         res = super(SaleOrder, self)._prepare_invoice()
