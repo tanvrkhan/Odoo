@@ -239,27 +239,28 @@
                             <t t-if="line.value=='percent'">
 
 
-                                    <tr style="border-bottom:2px solid #d4d6d9">
-                                        <td name="td_section_subtotal">
-                                             <t t-if="line.days==0">
-                                                 <strong><span class="mr16" t-out="line.document_description"></span></strong>
-                                              </t>
-                                            <t t-else="0">
-                                                <span class="mr16" t-out="line.document_description"></span>
-                                            </t>
-                                        </td>
-                                        <td colspan="99" class="is-subtotal text-end mr16">
+                                <tr style="border-bottom:2px solid #d4d6d9">
+                                    <td name="td_section_subtotal">
+                                        <t t-if="line.days==0">
+                                            <strong><span class="mr16"
+                                                          t-out="line.document_description"></span></strong>
+                                        </t>
+                                        <t t-else="0">
+                                            <span class="mr16" t-out="line.document_description"></span>
+                                        </t>
+                                    </td>
+                                    <td colspan="99" class="is-subtotal text-end mr16">
 
-                                              <t t-if="line.days==0">
-                                               <strong><span t-out="current_subtotal*line.value_amount/100"
+                                        <t t-if="line.days==0">
+                                            <strong><span t-out="current_subtotal*line.value_amount/100"
                                                           t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/></strong>
-                                              </t>
-                                            <t t-else="0">
-                                                <span t-out="current_subtotal*line.value_amount/100"
-                                                          t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
-                                            </t>
-                                        </td>
-                                    </tr>
+                                        </t>
+                                        <t t-else="0">
+                                            <span t-out="current_subtotal*line.value_amount/100"
+                                                  t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
+                                        </t>
+                                    </td>
+                                </tr>
 
                             </t>
                         </t>
@@ -307,10 +308,16 @@
                         <strong>Incoterms</strong>
                     </div>
                     <div class="col-4" style="padding-left: 37px;">
-                        <t t-if="doc.incoterm">
-                            <span class="m-0" t-field="doc.incoterm"/>
-
-                        </t>
+                        <span class="m-0" t-field="doc.incoterm"/>
+                    </div>
+                </div>
+                <div class="row" t-if="doc.show_validity">
+                    <div class="col-2">
+                        <strong>PFI Valid until</strong>
+                    </div>
+                    <div class="col-4" style="padding-left: 37px;">
+                        <span class="m-0" t-field="doc.valid_until"
+                              t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
                     </div>
                 </div>
 
