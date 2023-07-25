@@ -28,6 +28,7 @@
         'views/product_template_field_view.xml',
         'views/account_move_view.xml',
         'views/sale_order_view.xml',
+        'views/payment_terms.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

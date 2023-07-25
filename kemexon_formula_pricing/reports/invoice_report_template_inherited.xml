@@ -225,8 +225,8 @@
                                 <td colspan="99">
                                     <span t-field="line.name" t-options="{'widget': 'text'}"/>
                                 </td>
-                                <t t-set="current_section" t-value="line"/>
-                                <t t-set="current_subtotal" t-value="0"/>
+<!--                                <t t-set="current_section" t-value="line"/>-->
+<!--                                <t t-set="current_subtotal" t-value="0"/>-->
                             </t>
                             <t t-if="line.display_type == 'line_note'">
                                 <td colspan="99">
@@ -244,7 +244,10 @@
                                 </td>
                             </tr>
                         </t>
+
+
                     </t>
+
                     <tr style="border-bottom:2px solid #d4d6d9">
                         <td name="td_section_subtotal">
                             <strong class="mr16">Total (<span t-field="o.currency_id"/>)
@@ -255,6 +258,34 @@
                             <span style="text-align:right;" class="m-0" t-field="o.amount_total"/>
                         </td>
                     </tr>
+                       <t t-if="len(o.payment_terms_id2.line_ids)>1">
+                        <t t-foreach="o.payment_terms_id2.line_ids" t-as="line">
+                            <t t-if="line.value=='percent'">
+                                    <tr style="border-bottom:2px solid #d4d6d9">
+                                        <td name="td_section_subtotal">
+                                             <t t-if="line.days==0">
+                                                 <strong><span class="mr16" t-out="line.document_description"></span></strong>
+                                              </t>
+                                            <t t-else="0">
+                                                <span class="mr16" t-out="line.document_description"></span>
+                                            </t>
+                                        </td>
+                                        <td colspan="99" class="is-subtotal text-end mr16">
+                                              <t t-if="line.days==0">
+                                               <strong><span t-out="current_subtotal*line.value_amount/100"
+                                                          t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></strong>
+                                              </t>
+                                            <t t-else="0">
+                                                <span t-out="current_subtotal*line.value_amount/100"
+                                                          t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                                            </t>
+                                        </td>
+                                    </tr>
+
+                            </t>
+                        </t>
+                    </t>
+
                 </table>
                 <br/>
                 <br/>

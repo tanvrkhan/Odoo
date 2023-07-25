@@ -186,7 +186,7 @@
                                 <!--                                <td name="td_taxes" class="text-end">-->
                                 <!--                                    <span t-out="', '.join(map(lambda x: (x.description or x.name), line.tax_id))"/>-->
                                 <!--                                </td>-->
-                                <td  name="td_subtotal"
+                                <td name="td_subtotal"
                                     class="text-end o_price_total">
                                     <t t-if="line.product_id.name != 'Down payment'">
                                         <span class="text-nowrap" t-field="line.price_subtotal"
@@ -203,8 +203,8 @@
                                 <td name="td_section_line" colspan="99">
                                     <span t-field="line.name"/>
                                 </td>
-                                <t t-set="current_section" t-value="line"/>
-                                <t t-set="current_subtotal" t-value="0"/>
+                                <!--                                <t t-set="current_section" t-value="line"/>-->
+                                <!--                                <t t-set="current_subtotal" t-value="0"/>-->
                             </t>
                             <t t-elif="line.display_type == 'line_note'">
                                 <td name="td_note_line" colspan="99">
@@ -232,7 +232,38 @@
                             <span t-out="current_subtotal"
                                   t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
                         </td>
+
                     </tr>
+                    <t t-if="len(doc.payment_term_id.line_ids)>1">
+                        <t t-foreach="doc.payment_term_id.line_ids" t-as="line">
+                            <t t-if="line.value=='percent'">
+
+
+                                    <tr style="border-bottom:2px solid #d4d6d9">
+                                        <td name="td_section_subtotal">
+                                             <t t-if="line.days==0">
+                                                 <strong><span class="mr16" t-out="line.document_description"></span></strong>
+                                              </t>
+                                            <t t-else="0">
+                                                <span class="mr16" t-out="line.document_description"></span>
+                                            </t>
+                                        </td>
+                                        <td colspan="99" class="is-subtotal text-end mr16">
+
+                                              <t t-if="line.days==0">
+                                               <strong><span t-out="current_subtotal*line.value_amount/100"
+                                                          t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/></strong>
+                                              </t>
+                                            <t t-else="0">
+                                                <span t-out="current_subtotal*line.value_amount/100"
+                                                          t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
+                                            </t>
+                                        </td>
+                                    </tr>
+
+                            </t>
+                        </t>
+                    </t>
                 </table>
                 <br/>
                 <br/>
