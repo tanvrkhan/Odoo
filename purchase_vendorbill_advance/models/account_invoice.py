@@ -195,7 +195,11 @@ class AccountMove(models.Model):
         )
         res = super(AccountMove, self).unlink()
         if downpayment_lines:
-            downpayment_lines.unlink()
+            for dp_line in downpayment_lines:
+                order_id= dp_line.order_id
+                order_id.state = 'draft'
+                dp_line.unlink()
+                order_id.state = 'purchase'
         return res
 
 

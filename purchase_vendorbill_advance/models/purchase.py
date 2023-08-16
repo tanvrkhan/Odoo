@@ -40,7 +40,7 @@ class PurchaseOrderLine(models.Model):
     def unlink(self):
         if self.filtered(
             lambda line: line.state in ("purchase", "done")
-            and (line.invoice_lines or not line.is_downpayment)
+            and ( not line.is_downpayment)
         ):
             raise UserError(
                 _(
