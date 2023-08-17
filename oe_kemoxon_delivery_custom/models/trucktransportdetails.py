@@ -18,6 +18,7 @@ class truck_transport_details(models.Model):
     nominated = fields.Float("Nominated", digits=(3, 3))
     loaded = fields.Float("Loaded", digits=(3, 3))
     offloaded = fields.Float("offloaded", digits=(3, 3))
+    backup_offloaded = fields.Float("offloaded", digits=(3, 3))
     is_updated = fields.Boolean('Updated', copy=False)
     date = fields.Date('Date')
     status = fields.Selection(
@@ -31,6 +32,11 @@ class truck_transport_details(models.Model):
     truck_detail_ref = fields.Integer("Move Link Ref")
     delete_option = fields.Boolean("Delete Option", default=True)
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        vals_list[0]['backup_offloaded']=vals_list[0]['offloaded']
+        new_id = super(truck_transport_details, self).create(vals_list)
+        return vals_list
     def action_print_report(self):
         seq = 0
         for line in self.env['truck.transport.details'].search([('stock_pick_ids', '=', self.env.context.get('p_id'))]):
@@ -42,8 +48,15 @@ class truck_transport_details(models.Model):
     def _onchange_offload(self):
         for rec in self:
             move = self.env['stock.move'].search([('picking_id', '=', rec.stock_pick_ids._origin.id)], limit=1)
-            if move and rec.offloaded > 0:
+            if move and not move.move_line_ids:
                 rec.create_mv_line(rec, move)
+            elif move and move.move_line_ids:
+                if len(move.move_line_ids)==1:
+                    line=move.move_line_ids
+                    line.qty_done-=rec.backup_offloaded
+                    line.qty_done+=rec.offloaded
+                    record= self.env['truck.transport.details'].search([('id','=',rec.id.origin)])
+                    record.backup_offloaded=rec.offloaded
 
     def get_current_mv_line(self, rec=None, move=None):
         move_line = self.env['stock.move.line'].search(
@@ -54,31 +67,30 @@ class truck_transport_details(models.Model):
         return 0
 
     def create_mv_line(self, rec=None, move=None):
-        if not rec.truck_detail_ref or rec.truck_detail_ref not in move.picking_id.move_line_ids_without_package.mapped(
-                'truck_detail_ref') and rec.offloaded > 0:
-            all_truck_detail_ref = move.picking_id.move_line_ids_without_package.mapped(
-                'truck_detail_ref')
-            target_number = 1 if not all_truck_detail_ref else max(all_truck_detail_ref) + 1
-            move.picking_id.move_line_ids_without_package = [(0, 0, {
-                'company_id': rec.env.company.id,
-                'location_id': move.picking_id.location_id.id,
-                'location_dest_id': move.picking_id.location_dest_id.id,
-                'product_id': move.picking_id.move_ids_without_package[0].product_id.id,
-                'product_uom_id': move.picking_id.move_ids_without_package[0].product_uom.id,
-                'qty_done': rec.offloaded,
-                'truck_detail_ref': target_number
-            })]
-            rec.truck_detail_ref = target_number
-            rec.picking_id = move.picking_id.id
+        # if not rec.truck_detail_ref or rec.truck_detail_ref not in move.picking_id.move_line_ids_without_package.mapped(
+        #         'truck_detail_ref') and rec.offloaded > 0:
+        #     all_truck_detail_ref = move.picking_id.move_line_ids_without_package.mapped(
+        #         'truck_detail_ref')
+        #     target_number = 1 if not all_truck_detail_ref else max(all_truck_detail_ref) + 1
+        move.picking_id.move_line_ids_without_package = [(0, 0, {
+            'company_id': rec.env.company.id,
+            'location_id': move.picking_id.location_id.id,
+            'location_dest_id': move.picking_id.location_dest_id.id,
+            'product_id': move.picking_id.move_ids_without_package[0].product_id.id,
+            'product_uom_id': move.picking_id.move_ids_without_package[0].product_uom.id,
+            'qty_done': rec.offloaded
+        })]
+        rec.picking_id = move.picking_id.id
 
-        else:
-            move_line = self.env['stock.move.line'].search(
-                [('picking_id', '=', move.picking_id.id),
-                 ('truck_detail_ref', '=', rec.truck_detail_ref)])
-            if move_line:
-                move_line.write({
-                    'qty_done': rec.offloaded,
-                })
+        # rec.backup_offloaded=rec.offloaded
+        # else:
+        #     move_line = self.env['stock.move.line'].search(
+        #         [('picking_id', '=', move.picking_id.id),
+        #          ('truck_detail_ref', '=', rec.truck_detail_ref)])
+        #     if move_line:
+        #         move_line.write({
+        #             'qty_done': rec.offloaded,
+        #         })
 
     @staticmethod
     def get_tolerance_val(move=None):
@@ -100,10 +112,9 @@ class truck_transport_details(models.Model):
     def unlink(self):
         for rec in self:
             rec.delete_option = False
-            move_line = self.env['stock.move.line'].search(
-                [('picking_id', '=', rec.stock_pick_ids.id), ('truck_detail_ref', '=', rec.truck_detail_ref)])
+            move_line = self.env['stock.move.line'].search([('picking_id', '=', rec.stock_pick_ids.id)])
             if move_line and move_line.delete_option:
-                move_line.unlink()
+                move_line.qty_done-=self.offloaded
         return super(truck_transport_details, self).unlink()
 
     def get_warehouse(self, picking_id=None):
