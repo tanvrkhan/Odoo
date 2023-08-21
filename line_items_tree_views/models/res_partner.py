@@ -16,7 +16,7 @@ class ResPartner(models.Model):
 
     @api.model
     def create(self, vals):
-        if self.search([('short_name', '=', vals.get('short_name')), ('active', '=', True)]):
+        if self.search([('short_name', '=', vals.get('short_name')), ('active', '=', True), ('id', '!=', vals.get('id')), ('is_company', '=', True), ('name', '!=', vals.get('name'))]):
             raise ValidationError('Short Name must be unique.')
         return super(ResPartner, self).create(vals)
 
