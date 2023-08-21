@@ -114,7 +114,7 @@ class truck_transport_details(models.Model):
             rec.delete_option = False
             move_line = self.env['stock.move.line'].search([('picking_id', '=', rec.stock_pick_ids.id)])
             if move_line and move_line.delete_option:
-                move_line.qty_done-=self.offloaded
+                move_line.qty_done-=rec.offloaded
         return super(truck_transport_details, self).unlink()
 
     def get_warehouse(self, picking_id=None):
