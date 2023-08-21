@@ -11,7 +11,7 @@ class ResPartner(models.Model):
     @api.constrains('short_name')
     def _check_unique_short_name(self):
         for record in self:
-            if self.search([('short_name', '=', record.short_name), ('active', '=', True), ('id', '!=', record.id)]):
+            if self.search([('short_name', '=', record.short_name), ('active', '=', True), ('id', '!=', record.id), ('is_company', '=', True)]):
                 raise ValidationError('Short Name must be unique.')
 
     @api.model
