@@ -11,25 +11,25 @@ class ResPartner(models.Model):
     @api.constrains('short_name')
     def _check_unique_short_name(self):
         for record in self:
-            if self.search([('short_name', '=', record.short_name), ('active', '=', True), ('id', '!=', record.id), ('is_company', '=', True), ('name', '!=', record.name)]):
+            if self.search([('short_name', '=', record.short_name), ('active', '=', True), ('id', '!=', record.id)]):
                 raise ValidationError('Short Name must be unique.')
 
     @api.model
     def create(self, vals):
-        if self.search([('short_name', '=', vals.get('short_name')), ('active', '=', True), ('id', '!=', vals.get('id')), ('is_company', '=', True), ('name', '!=', vals.get('name'))]):
+        if self.search([('short_name', '=', vals.get('short_name')), ('active', '=', True)]):
             raise ValidationError('Short Name must be unique.')
         return super(ResPartner, self).create(vals)
 
     def write(self, vals):
         if 'short_name' in vals:
-            if self.search([('short_name', '=', vals.get('short_name')), ('active', '=', True), ('id', '!=', vals.get('id')), ('is_company', '=', True), ('name', '!=', vals.get('name'))]):
+            if self.search([('short_name', '=', vals['short_name']), ('active', '=', True), ('id', '!=', self.id)]):
                 raise ValidationError('Short Name must be unique.')
         return super(ResPartner, self).write(vals)
 
     def approve(self):
         for contact in self:
             existing_contact = self.search(
-                self.search([('short_name', '=', contact.short_name), ('active', '=', True), ('id', '!=', contact.id), ('is_company', '=', True), ('name', '!=', contact.name)]))
+                [('short_name', '=', contact.short_name), ('active', '=', True), ('id', '!=', contact.id)])
             if existing_contact:
                 raise ValidationError('A contact with the same Short Name already exists.')
         return super(ResPartner, self).approve()
