@@ -7,3 +7,4 @@ access_vessels_information,access.vessels_information,model_vessel_information,b
 access_wizard_message,Access Message Wizard,model_wk_wizard_message,,1,1,1,1
 incoterm_location,access_incoterm.location,model_incoterm_location,base.group_user,1,1,1,1
 region_region,access_region.region,model_region_region,base.group_user,1,1,1,1
+legal_entity,access_legal.entity,model_legal_entity,base.group_user,1,1,1,1

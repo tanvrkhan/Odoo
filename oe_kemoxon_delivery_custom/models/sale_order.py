@@ -25,6 +25,10 @@ class SaleOrder(models.Model):
     incoterm_location_custom = fields.Many2one('incoterm.location', string='Incoterm Location')
     status_custom = fields.Selection([('open', 'Open'), ('closed', 'Closed'), ('pfi', 'PFI'), ('cancelled', 'Cancelled')], string='Status')
     trader = fields.Many2one('hr.employee', string='Trader')
+    legal_entity = fields.Many2one('legal.entity', string='Representing Entity')
+    show_vat_ids = fields.Boolean('Show VAT ID')
+
+
     def _prepare_invoice(self):
         res = super(SaleOrder, self)._prepare_invoice()
         res['deal_ref'] = self.deal_ref

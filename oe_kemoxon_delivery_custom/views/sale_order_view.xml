@@ -32,6 +32,8 @@
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <field name="incoterm_location_custom" />
                       <field name="status_custom" />
+                    <field name="legal_entity"/>
+                    <field name="show_vat_ids"/>
                 </xpath>
                   <xpath expr="//form//field[@name='team_id']"
                        position="before">

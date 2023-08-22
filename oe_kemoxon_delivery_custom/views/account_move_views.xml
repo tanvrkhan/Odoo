@@ -35,6 +35,7 @@
                     <field name="payment_notes"/>
                 </xpath>
                 <xpath expr="//group/group[@id='header_left_group']" position="inside">
+                    <field name="legal_entity"/>
                     <field name="show_vat_ids"/>
                      <field name="show_delivery_to"/>
                 </xpath>
