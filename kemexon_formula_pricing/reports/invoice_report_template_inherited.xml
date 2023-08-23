@@ -226,8 +226,8 @@
                                 <td colspan="99">
                                     <span t-field="line.name" t-options="{'widget': 'text'}"/>
                                 </td>
-<!--                                <t t-set="current_section" t-value="line"/>-->
-<!--                                <t t-set="current_subtotal" t-value="0"/>-->
+                                <!--                                <t t-set="current_section" t-value="line"/>-->
+                                <!--                                <t t-set="current_subtotal" t-value="0"/>-->
                             </t>
                             <t t-if="line.display_type == 'line_note'">
                                 <td colspan="99">
@@ -259,29 +259,33 @@
                             <span style="text-align:right;" class="m-0" t-field="o.amount_total"/>
                         </td>
                     </tr>
-                       <t t-if="len(o.payment_terms_id2.line_ids)>1">
+                    <t t-if="len(o.payment_terms_id2.line_ids)>1">
                         <t t-foreach="o.payment_terms_id2.line_ids" t-as="line">
                             <t t-if="line.value=='percent'">
-                                    <tr style="border-bottom:2px solid #d4d6d9">
-                                        <td name="td_section_subtotal">
-                                             <t t-if="line.days==0">
-                                                 <strong><span class="mr16" t-out="line.document_description"></span></strong>
-                                              </t>
-                                            <t t-else="0">
+                                <tr style="border-bottom:2px solid #d4d6d9">
+                                    <td name="td_section_subtotal">
+                                        <t t-if="line.days==0">
+                                            <strong>
                                                 <span class="mr16" t-out="line.document_description"></span>
-                                            </t>
-                                        </td>
-                                        <td colspan="99" class="is-subtotal text-end mr16">
-                                              <t t-if="line.days==0">
-                                               <strong><span t-out="current_subtotal*line.value_amount/100"
-                                                          t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></strong>
-                                              </t>
-                                            <t t-else="0">
+                                            </strong>
+                                        </t>
+                                        <t t-else="0">
+                                            <span class="mr16" t-out="line.document_description"></span>
+                                        </t>
+                                    </td>
+                                    <td colspan="99" class="is-subtotal text-end mr16">
+                                        <t t-if="line.days==0">
+                                            <strong>
                                                 <span t-out="current_subtotal*line.value_amount/100"
-                                                          t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
-                                            </t>
-                                        </td>
-                                    </tr>
+                                                      t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                                            </strong>
+                                        </t>
+                                        <t t-else="0">
+                                            <span t-out="current_subtotal*line.value_amount/100"
+                                                  t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                                        </t>
+                                    </td>
+                                </tr>
 
                             </t>
                         </t>
@@ -559,7 +563,8 @@
                                 <strong t-if="o.payment_terms_id2">Payment Term</strong>
                             </div>
                             <div class="col-7">
-                                <span class="m-0" style="borders:none;border-style=none;" t-esc="o.payment_terms_id2.note"/>
+                                <span class="m-0" style="borders:none;border-style=none;"
+                                      t-esc="o.payment_terms_id2.note"/>
                             </div>
                         </div>
                         <!--                        faizan 5,7-->
@@ -668,14 +673,29 @@
                 <br/>
                 <!--                <span class="m-0" t-field="o.narration"/>-->
                 <ul style="font-size:18px;">
-                    <li>Kemexon follows a detailed process as per the company policy for informing any change
-                        in
-                        bank account/ remittance process. We request you to not rely on any isolated email
-                        communication
-                        informing the change of bank account etc. If you do so, the same shall be at your risk and
-                        consequences.
-                    </li>
-                    <li>Kemexon terms and conditions apply.</li>
+                    <t t-if="o.legal_entity">
+                        <li>Kemexon follows a detailed process as per the company policy for informing any change
+                            in
+                            bank account/ remittance process. We request you to not rely on any isolated email
+                            communication
+                            informing the change of bank account etc. If you do so, the same shall be at your risk and
+                            consequences.
+                        </li>
+                        <li>Fiscal representation of KEMEXON SA in France: RM BOULANGER SA (17A rue du
+                            Vertuquet, 59960 Neuville-en-Ferrain, no SIREN: 321252827)
+                        </li>
+                        <li>Kemexon terms and conditions apply.</li>
+                    </t>
+                    <t t-else="">
+                        <li>Kemexon follows a detailed process as per the company policy for informing any change
+                            in
+                            bank account/ remittance process. We request you to not rely on any isolated email
+                            communication
+                            informing the change of bank account etc. If you do so, the same shall be at your risk and
+                            consequences.
+                        </li>
+                        <li>Kemexon terms and conditions apply.</li>
+                    </t>
                 </ul>
                 <!--                <hr style="height:3px; border:none; background-color:black;"/>-->
             </t>
@@ -713,15 +733,7 @@
                 <!--                </strong>-->
                 <ul class="list-inline mb4">
                     <li t-if="company.name">
-                        <t t-if="o.legal_entity">
-                            <span class="o_force_ltr" t-field="company.name"/>
-                            <span class="o_force_ltr"> c/o </span>
-                            <span class="o_force_ltr" t-field="o.legal_entity.name"/>
-                        </t>
-                        <t t-else="">
-                            <span class="o_force_ltr" t-field="company.name"/>
-                        </t>
-
+                        <span class="o_force_ltr" t-field="company.name"/>
                     </li>
                     <li t-if="company.street">
                         <span class="o_force_ltr" t-field="company.street"/>
@@ -731,11 +743,11 @@
                         -
                         <span t-field="company.email"/>
                         <t t-if="o.show_vat_ids">
-                             <t t-if="o.legal_entity">
+                            <t t-if="o.legal_entity">
                                 &#160;-&#160;<t t-out="company.country_id.vat_label or 'VAT ID'"/>:
                                 <span t-field="o.legal_entity.vat_id"/>
                             </t>
-                             <t t-else="">
+                            <t t-else="">
                                 &#160;-&#160;<t t-out="company.country_id.vat_label or 'VAT ID'"/>:
                                 <span t-field="company.vat"/>
                             </t>
