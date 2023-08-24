@@ -9,30 +9,30 @@ class AccountMoveInheritModel(models.Model):
     move_sequence_done = fields.Boolean("Sequence Done")
 
     def action_post(self):
-        if not self.move_sequence_done and self.name == '/':
-            if self.move_type == 'out_invoice' and self.journal_id == 2:
-                self.generate_sequence('invoice.sequence', 'invoice')
+        for rec in self:
+            if not rec.move_sequence_done and rec.name == '/':
+                if rec.move_type == 'out_invoice' and rec.journal_id == 2:
+                    rec.generate_sequence('invoice.sequence', 'invoice')
 
-            elif self.move_type == 'out_invoice' and self.journal_id != 2:
-                self.generate_sequence('invoice.provisional.sequence', 'invoice')
+                elif rec.move_type == 'out_invoice' and rec.journal_id != 2:
+                    rec.generate_sequence('invoice.provisional.sequence', 'invoice')
 
-            elif self.move_type == 'in_invoice' and self.journal_id == 3:
-                self.generate_sequence('bill.sequence', 'bill')
+                elif rec.move_type == 'in_invoice' and rec.journal_id == 3:
+                    rec.generate_sequence('bill.sequence', 'bill')
 
-            elif self.move_type == 'in_invoice' and self.journal_id != 3:
-                self.generate_sequence('bill.provisional.sequence', 'bill')
+                elif rec.move_type == 'in_invoice' and rec.journal_id != 3:
+                    rec.generate_sequence('bill.provisional.sequence', 'bill')
 
-            elif self.move_type == 'in_refund':
-                self.generate_sequence('debit.sequence', 'refund')
+                elif rec.move_type == 'in_refund':
+                    rec.generate_sequence('debit.sequence', 'refund')
 
-            elif self.move_type == 'out_refund':
-                self.generate_sequence('credit.sequence', 'credit')
+                elif rec.move_type == 'out_refund':
+                    rec.generate_sequence('credit.sequence', 'credit')
 
-            elif self.move_type == 'entry':
-                if not self.move_sequence_done and self.name == '/':
-                    self.set_entry_seq()
-        res = super().action_post()
-        return res
+                elif rec.move_type == 'entry':
+                    if not rec.move_sequence_done and rec.name == '/':
+                        rec.set_entry_seq()
+        return super().action_post()
 
     def is_entry_sequence_exits(self, seq=None):
         seq = self.env['account.move'].search([('name', '=', seq)])
@@ -387,10 +387,10 @@ class AccountPaymentInherit(models.Model):
     sequence_done = fields.Boolean("Sequence Done", copy=False)
 
     def action_post(self):
-        if not self.sequence_done:
-            self.generate_payment_sequence()
-        res = super().action_post()
-        return res
+        for rec in self:
+            if not rec.sequence_done:
+                rec.generate_payment_sequence()
+        return super().action_post()
 
     def generate_payment_sequence(self):
         if self.payment_type != 'outbound':
