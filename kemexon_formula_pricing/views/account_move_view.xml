@@ -8,6 +8,7 @@
                 <xpath expr="//field[@name='invoice_incoterm_id']"
                        position="after">
                     <field name="show_formula_pricing"/>
+                    <field name="en_plus"/>
                 </xpath>
                 <xpath expr="//tree//field[@name='price_unit']"
                        position="before">

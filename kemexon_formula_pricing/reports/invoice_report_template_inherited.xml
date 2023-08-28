@@ -296,212 +296,217 @@
                 <br/>
                 <br/>
                 <br/>
-                <strong>Delivery Information</strong>
-                <div style="border-top: 2px solid black;"/>
-                <br/>
-                <!--                        faizan 5,7-->
-                <t t-if="o.vessel_information_id">
-                    <div class="row">
-                        <div class="col-6">
-                            <t t-if="o.bl_date">
-                                <div class="row">
-                                    <div class="col-5">
-                                        <strong>B/L Date</strong>
+                <t t-if="o.vessel_information_id or o.delivery_notes or o.tt_date or o.delivery_location or o.invoice_incoterm_id">
+                    <strong>Delivery Information</strong>
+                    <div style="border-top: 2px solid black;"/>
+                    <br/>
+                    <!--                        faizan 5,7-->
+                    <t t-if="o.vessel_information_id">
+                        <div class="row">
+                            <div class="col-6">
+                                <t t-if="o.bl_date">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <strong>B/L Date</strong>
+                                        </div>
+                                        <br/>
+                                        <!--                                    <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.bl_date"
+                                                  t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                                        </div>
                                     </div>
-                                    <br/>
-                                    <!--                                    <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.bl_date"
-                                              t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
-                                    </div>
-                                </div>
-                            </t>
-                            <!--                        faizan 5,7-->
-                            <t t-if="o.loadport">
-                                <div class="row">
-                                    <div class="col-5">
-                                        <strong>Port of Loading</strong>
-                                    </div>
-                                    <br/>
-                                    <!--                                    <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.loadport"/>
-                                    </div>
-                                </div>
-                            </t>
-                            <!--                        faizan 5,7-->
-                            <t t-if="o.vessel_name">
-                                <div class="row">
-                                    <div class="col-5">
-                                        <strong>Vessel</strong>
-                                    </div>
-                                    <br/>
-                                    <!--                                    <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.vessel_name"/>
-                                    </div>
-                                </div>
-                            </t>
-                            <t t-if="o.disport">
-                                <div class="row">
-                                    <div class="col-5">
-                                        <strong>Port of Discharge</strong>
-                                    </div>
-                                    <br/>
-                                    <!--                                    <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.disport"/>
-                                    </div>
-                                </div>
-                            </t>
-                        </div>
-                        <!--                        faizan 5,7-->
-                        <div class="col-6">
-                            <t t-if="o.country_of_origin">
-                                <div class="row">
-                                    <div class="col-5">
-                                        <strong>Country of Origin</strong>
-                                    </div>
-                                    <br/>
-                                    <!--                                    <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.country_of_origin"/>
-                                    </div>
-                                </div>
-                            </t>
-                            <!--                        faizan 5,7-->
-                            <t t-if="o.invoice_incoterm_id">
-                                <div class="row">
-                                    <div class="col-5">
-                                        <strong>Incoterm</strong>
-                                    </div>
-                                    <br/>
-                                    <!--                                    <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.invoice_incoterm_id"/>
-                                    </div>
-                                </div>
-                            </t>
-                            <!--                        faizan 5,7-->
-                            <t t-if="o.ncv">
-                                <div class="row">
-                                    <div class="col-5">
-                                        <strong>Net Caloric Value</strong>
-                                    </div>
-                                    <br/>
-                                    <!--                                    <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.ncv"/>
-                                    </div>
-                                </div>
-                            </t>
-                            <!--                        faizan 5,7-->
-                            <t t-if="o.delivery_notes">
-                                <div class="row">
-                                    <div class="col-5">
-                                        <strong>Delivery Notes</strong>
-                                    </div>
-                                    <br/>
-                                    <!--                                    <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.delivery_notes"/>
-                                    </div>
-                                </div>
-                            </t>
-                            <t t-if="o.nor_date">
-                                <div class="row">
-                                    <div class="col-5">
-                                        <strong>NOR Date</strong>
-                                    </div>
-                                    <br/>
-                                    <!--                                    <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.nor_date"
-                                              t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
-                                    </div>
-                                </div>
-                            </t>
-                            <t t-if="o.cod_date">
-                                <div class="row">
-                                    <div class="col-5">
-                                        <strong>Completion of Discharge</strong>
-                                    </div>
-                                    <br/>
-                                    <!--                                    <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.cod_date"
-                                              t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
-                                    </div>
-                                </div>
-                            </t>
-                        </div>
-                    </div>
-                </t>
-                <t t-else="">
-                    <div class="row">
-                        <div class="col-6">
-                            <t t-if="o.delivery_notes">
-                                <div class="row">
-                                    <div class="col-5">
-                                        <strong>Delivery Notes</strong>
-                                    </div>
-                                    <br/>
-                                    <!--                                    <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.delivery_notes"/>
-                                    </div>
-                                </div>
-                            </t>
-                            <t t-if="o.tt_date">
-                                <div class="row">
-                                    <div class="col-5">
-                                        <t t-if="o.invoice_incoterm_id.name == 'ITT'">
-                                            <strong>ITT Date</strong>
-                                        </t>
-                                        <t t-else="">
-                                            <strong>Title Transfer Date</strong>
-                                        </t>
-                                    </div>
-                                    <br/>
-                                    <!--                                    <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.tt_date"
-                                              t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
-                                    </div>
-                                </div>
-                            </t>
-                            <t t-if="o.delivery_location">
+                                </t>
                                 <!--                        faizan 5,7-->
-                                <div class="row">
-                                    <div class="col-5">
-                                        <strong>Delivery Location</strong>
+                                <t t-if="o.loadport">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <strong>Port of Loading</strong>
+                                        </div>
+                                        <br/>
+                                        <!--                                    <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.loadport"/>
+                                        </div>
                                     </div>
-                                    <br/>
-                                    <!--                                <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.delivery_location"/>
+                                </t>
+                                <!--                        faizan 5,7-->
+                                <t t-if="o.vessel_name">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <strong>Vessel</strong>
+                                        </div>
+                                        <br/>
+                                        <!--                                    <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.vessel_name"/>
+                                        </div>
                                     </div>
-
-                                </div>
-
-                            </t>
+                                </t>
+                                <t t-if="o.disport">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <strong>Port of Discharge</strong>
+                                        </div>
+                                        <br/>
+                                        <!--                                    <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.disport"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
                             <!--                        faizan 5,7-->
-                            <t t-if="o.invoice_incoterm_id">
-                                <div class="row">
-                                    <div class="col-5">
-                                        <strong>Incoterms</strong>
+                            <div class="col-6">
+                                <t t-if="o.country_of_origin">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <strong>Country of Origin</strong>
+                                        </div>
+                                        <br/>
+                                        <!--                                    <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.country_of_origin"/>
+                                        </div>
                                     </div>
-                                    <br/>
-                                    <!--                                <div class="col-1"/>-->
-                                    <div class="col-7">
-                                        <span class="m-0" t-field="o.invoice_incoterm_id"/>
+                                </t>
+                                <!--                        faizan 5,7-->
+                                <t t-if="o.invoice_incoterm_id">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <strong>Incoterm</strong>
+                                        </div>
+                                        <br/>
+                                        <!--                                    <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.invoice_incoterm_id"/>
+                                        </div>
                                     </div>
-                                </div>
-
-                            </t>
+                                </t>
+                                <!--                        faizan 5,7-->
+                                <t t-if="o.ncv">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <strong>Net Caloric Value</strong>
+                                        </div>
+                                        <br/>
+                                        <!--                                    <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.ncv"/>
+                                        </div>
+                                    </div>
+                                </t>
+                                <!--                        faizan 5,7-->
+                                <t t-if="o.delivery_notes">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <strong>Delivery Notes</strong>
+                                        </div>
+                                        <br/>
+                                        <!--                                    <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.delivery_notes"/>
+                                        </div>
+                                    </div>
+                                </t>
+                                <t t-if="o.nor_date">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <strong>NOR Date</strong>
+                                        </div>
+                                        <br/>
+                                        <!--                                    <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.nor_date"
+                                                  t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                                        </div>
+                                    </div>
+                                </t>
+                                <t t-if="o.cod_date">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <strong>Completion of Discharge</strong>
+                                        </div>
+                                        <br/>
+                                        <!--                                    <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.cod_date"
+                                                  t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
                         </div>
-                    </div>
+                    </t>
+                    <t t-else="">
+                        <div class="row">
+                            <div class="col-6">
+                                <t t-if="o.delivery_notes">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <strong>Delivery Notes</strong>
+                                        </div>
+                                        <br/>
+                                        <!--                                    <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.delivery_notes"/>
+                                        </div>
+                                    </div>
+                                </t>
+                                <t t-if="o.tt_date">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <t t-if="o.invoice_incoterm_id.name == 'ITT'">
+                                                <strong>ITT Date</strong>
+                                            </t>
+                                            <t t-else="">
+                                                <strong>Title Transfer Date</strong>
+                                            </t>
+                                        </div>
+                                        <br/>
+                                        <!--                                    <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.tt_date"
+                                                  t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                                        </div>
+                                    </div>
+                                </t>
+                                <t t-if="o.delivery_location">
+                                    <!--                        faizan 5,7-->
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <strong>Delivery Location</strong>
+                                        </div>
+                                        <br/>
+                                        <!--                                <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.delivery_location"/>
+                                        </div>
+
+                                    </div>
+
+                                </t>
+                                <!--                        faizan 5,7-->
+                                <t t-if="o.invoice_incoterm_id">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <strong>Incoterms</strong>
+                                        </div>
+                                        <br/>
+                                        <!--                                <div class="col-1"/>-->
+                                        <div class="col-7">
+                                            <span class="m-0" t-field="o.invoice_incoterm_id"/>
+                                        </div>
+                                    </div>
+
+                                </t>
+                            </div>
+                        </div>
+                    </t>
                 </t>
+                <t t-else=""></t>
+
+
                 <!--                        <t t-if="o.bill_date">-->
                 <!--                            <div class="row">-->
                 <!--                                <div class="col-3">-->
@@ -707,10 +712,17 @@
                 <!-- <div class="">
                     <img t-att-src="'cdx_custom_reports/static/src/img/barajeel_final.png'" width="500px"/>
                 </div> -->
-                <div class="col-12">
+                <div class="col-6">
                     <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" width="320px" alt="Logo"
                          height="45px" style="margin-left:0px;margin-right:50px;"/>
                 </div>
+                <t t-if="o.en_plus">
+                    <div class="col-6" style="text-align: right;">
+                        <img t-att-src="'kemexon_formula_pricing/static/src/img/ENplus_A1_CH316_4c_Logo.png'"
+                             width="80px" alt="Logo"
+                             height="55px" style="margin-right: 50px;"/>
+                    </div>
+                </t>
             </div>
             <br/>
             <!--            <hr style="height:5px; border:none; background-color:#5AA2F9;margin-left:-1px;margin-top:4px;"/>-->
