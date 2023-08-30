@@ -13,6 +13,7 @@ class InheritPurchaseOrder(models.Model):
     incoterm_location_custom = fields.Many2one('incoterm.location', string='Incoterm Location')
     status_custom = fields.Selection([('open', 'Open'), ('closed', 'Closed'), ('cancelled', 'Cancelled')], string='Status')
     trader = fields.Many2one('hr.employee', string='Trader')
+    en_plus = fields.Boolean('EN Plus')
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
