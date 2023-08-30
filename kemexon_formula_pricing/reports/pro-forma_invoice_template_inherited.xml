@@ -69,10 +69,10 @@
                     <br/>
                     <span t-field="doc.partner_id.state_id.name"/>
                 </t>
-                <t t-if="o.show_vat_ids">
+                <t t-if="doc.show_vat_ids">
                     <br/>
-                    <t t-if="o.partner_id.vat">
-                        VAT ID:&#160;&#160;<span t-field="o.partner_id.vat"/>
+                    <t t-if="doc.partner_id.vat">
+                        VAT ID:&#160;&#160;<span t-field="doc.partner_id.vat"/>
                     </t>
                 </t>
                 <br/>
