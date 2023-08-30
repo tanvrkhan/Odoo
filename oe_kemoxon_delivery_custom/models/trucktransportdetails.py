@@ -31,6 +31,7 @@ class truck_transport_details(models.Model):
     seq = fields.Char("Sequence")
     truck_detail_ref = fields.Integer("Move Link Ref")
     delete_option = fields.Boolean("Delete Option", default=True)
+    en_plus = fields.Boolean('EN Plus')
 
     @api.model_create_multi
     def create(self, vals_list):
