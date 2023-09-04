@@ -28,6 +28,7 @@ class SaleOrder(models.Model):
     trader = fields.Many2one('hr.employee', string='Trader')
     legal_entity = fields.Many2one('legal.entity', string='Representing Entity')
     show_vat_ids = fields.Boolean('Show VAT ID')
+    en_plus = fields.Boolean('EN Plus')
 
 
     def _prepare_invoice(self):

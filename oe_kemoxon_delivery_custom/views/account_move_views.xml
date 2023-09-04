@@ -13,14 +13,15 @@
                        position="after">
                     <field name="trader" invisible="0"/>
                     <field name="deal_ref" invisible="0"/>
-                    <field name="picking_id"  />
+                    <field name="picking_id"/>
                     <field name="picking_domain_ids" invisible="1"/>
                     <field name="delivery_location" invisible="0"/>
                     <field name="incoterm_location_custom" invisible="0"/>
 
-                    <field name="vessel_information_id" domain="[('stock_pick_ids', '=', picking_id)]" >
-<!--                            #<attribute name="domain"></attribute>-->
+                    <field name="vessel_information_id" domain="[('stock_pick_ids', '=', picking_id)]">
+                        <!--                            #<attribute name="domain"></attribute>-->
                     </field>
+                    <field name="en_plus"/>
                     <field name="vessel_name" invisible="0"/>
                     <field name="imo" invisible="0"/>
                     <field name="bl_date" invisible="0"/>
@@ -31,31 +32,32 @@
                     <field name="loadport" invisible="0"/>
                     <field name="disport" invisible="0"/>
                     <field name="country_of_origin" invisible="0"/>
-		     <field name="delivery_notes"/>
+                    <field name="delivery_notes"/>
                     <field name="payment_notes"/>
                 </xpath>
                 <xpath expr="//group/group[@id='header_left_group']" position="inside">
                     <field name="legal_entity"/>
                     <field name="show_vat_ids"/>
-                     <field name="show_delivery_to"/>
+                    <field name="show_delivery_to"/>
                 </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="attributes">
-                    <attribute name="options">{'no_quick_create':True,'no_create_edit':True,'no_open': True,}</attribute>
+                    <attribute name="options">{'no_quick_create':True,'no_create_edit':True,'no_open': True,}
+                    </attribute>
                 </xpath>
             </field>
         </record>
 
 
-<!--        <record id="view_move_form_account_payment" model="ir.ui.view">-->
-<!--            <field name="name">account.payment.form</field>-->
-<!--            <field name="model">account.payment</field>-->
-<!--            <field name="inherit_id" ref="account.view_account_payment_form"/>-->
-<!--            <field name="arch" type="xml">-->
-<!--                <xpath expr="//field[@name='partner_id']" position="attributes">-->
-<!--                    <attribute name="options">{'no_quick_create':True,'no_create_edit':True,'no_open': True,}</attribute>-->
-<!--                </xpath>-->
-<!--            </field>-->
-<!--        </record>-->
+        <!--        <record id="view_move_form_account_payment" model="ir.ui.view">-->
+        <!--            <field name="name">account.payment.form</field>-->
+        <!--            <field name="model">account.payment</field>-->
+        <!--            <field name="inherit_id" ref="account.view_account_payment_form"/>-->
+        <!--            <field name="arch" type="xml">-->
+        <!--                <xpath expr="//field[@name='partner_id']" position="attributes">-->
+        <!--                    <attribute name="options">{'no_quick_create':True,'no_create_edit':True,'no_open': True,}</attribute>-->
+        <!--                </xpath>-->
+        <!--            </field>-->
+        <!--        </record>-->
     </data>
 </odoo>

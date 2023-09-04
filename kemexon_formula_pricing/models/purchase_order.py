@@ -1,8 +1,8 @@
 from odoo import fields, models, api
 
 
-class AccountMove(models.Model):
-    _inherit = 'account.move'
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
 
     show_formula_pricing = fields.Boolean('Show Formula Pricing')
 

@@ -10,18 +10,21 @@
                     <field name="deal_ref"/>
                     <field name="delivery_location"/>
                     <label for="delivery_from" string="Period"/>
-                     <div name="date_edit_only" class="o_row oe_edit_only">
-                        <span><strong>From </strong>
+                    <div name="date_edit_only" class="o_row oe_edit_only">
+                        <span>
+                            <strong>From</strong>
                             <field name="delivery_from" class='oe_inline'/>
                         </span>
-                        <span><strong>To </strong>
+                        <span>
+                            <strong>To</strong>
                             <field name="delivery_to" class='oe_inline'/>
                         </span>
                     </div>
                 </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="attributes">
-                    <attribute name="options">{'no_quick_create':True,'no_create_edit':True,'no_open': True,}</attribute>
+                    <attribute name="options">{'no_quick_create':True,'no_create_edit':True,'no_open': True,}
+                    </attribute>
                 </xpath>
 
                 <xpath expr="//tree//field[@name='product_uom_qty']"
@@ -30,12 +33,13 @@
                     <field name="tolerance_percentage"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="after">
-                    <field name="incoterm_location_custom" />
-                      <field name="status_custom" />
+                    <field name="incoterm_location_custom"/>
+                    <field name="status_custom"/>
                     <field name="legal_entity"/>
                     <field name="show_vat_ids"/>
+                    <field name="en_plus"/>
                 </xpath>
-                  <xpath expr="//form//field[@name='team_id']"
+                <xpath expr="//form//field[@name='team_id']"
                        position="before">
                     <field name="trader"/>
                 </xpath>
@@ -53,12 +57,13 @@
                 </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="attributes">
-                    <attribute name="options">{'no_quick_create':True,'no_create_edit':True,'no_open': True,}</attribute>
+                    <attribute name="options">{'no_quick_create':True,'no_create_edit':True,'no_open': True,}
+                    </attribute>
                 </xpath>
-                 <xpath expr="//field[@name='partner_ref']" position="after">
-                    <field name="incoterm_location_custom" />
+                <xpath expr="//field[@name='partner_ref']" position="after">
+                    <field name="incoterm_location_custom"/>
                     <field name="trader"/>
-                       <field name="status_custom" />
+                    <field name="status_custom"/>
                 </xpath>
             </field>
         </record>

@@ -7,5 +7,3 @@ class SaleOrder(models.Model):
     show_formula_pricing = fields.Boolean('Show Formula Pricing')
     valid_until = fields.Date('Valid until')
     show_validity = fields.Boolean('Show validity')
-    en_plus = fields.Boolean('EN Plus')
-
