@@ -8,6 +8,7 @@
                 <field name="ref_no"/>
                 <field name="type"/>
                 <field name="lc_type"/>
+                <field name="sub_limit"/>
                 <field name="issuance_date"/>
                 <field name="expiry_date"/>
                 <field name="beneficiary"/>
@@ -36,6 +37,7 @@
                             <field name="ref_no"/>
                             <field name="type"/>
                             <field name="lc_type"/>
+                            <field name="sub_limit"/>
                             <field name="issuance_date"/>
                             <field name="expiry_date"/>
                         </group>

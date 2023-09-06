@@ -16,6 +16,18 @@ class PurchaseOrderLine(models.Model):
         compute='_compute_to_invoice',
         store=True
     )
+    received_value = fields.Float(
+        string='Received Value',
+        digits=(6, 3),  # set 6 as the total number of digits and 3 as the number of decimal places
+        compute='_compute_received_value',
+        store=True
+    )
+    invoiced_value = fields.Float(
+        string='Billed Value',
+        digits=(6, 3),  # set 6 as the total number of digits and 3 as the number of decimal places
+        compute='_compute_invoiced_value',
+        store=True
+    )
 
     @api.depends('product_qty', 'qty_received')
     def _compute_to_billed(self):
@@ -59,4 +71,15 @@ class PurchaseOrderLine(models.Model):
                 res['qty_to_billed'] = total_qty_to_billed
 
         return result
+
+    @api.depends('price_unit', 'qty_received')
+    def _compute_received_value(self):
+        for line in self:
+            line.received_value = line.price_unit * line.qty_received
+
+    @api.depends('price_unit', 'qty_invoiced')
+    def _compute_invoiced_value(self):
+        for line in self:
+            line.invoiced_value = line.price_unit * line.qty_invoiced
+
 

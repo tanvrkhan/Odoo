@@ -16,6 +16,7 @@
                     <field name="is_formula_pricing"/>
                     <field name="formula_price" attrs="{'invisible': [('is_formula_pricing', '=', False)]}"/>
                     <field name="premium" attrs="{'invisible': [('is_formula_pricing', '=', False)]}"/>
+                    <field name="formula_description"/>
                 </xpath>
             </field>
         </record>

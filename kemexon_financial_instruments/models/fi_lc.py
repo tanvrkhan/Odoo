@@ -11,6 +11,8 @@ class FiLc(models.Model):
     ref_no = fields.Char('Reference', required=True)
     type = fields.Selection([('sblc', 'SBLC'), ('lc', 'LC')], string="Type")
     lc_type = fields.Selection([('import', 'Import(Purchase)'), ('export', 'Export(Sale)')], string="LC Type")
+    sub_limit = fields.Selection(
+        [('backtoback', 'Back To Back'), ('fronttoback', 'Front To Back'), ('intank', 'Intank')], string="Sub Limit")
     issuance_date = fields.Date(string='Issuance Date')
     expiry_date = fields.Date(string='Expiry Date')
     beneficiary = fields.Many2one('res.partner', string='Beneficiary')

@@ -17,6 +17,18 @@ class SaleOrderLine(models.Model):
         compute='_compute_to_invoiced',
         store=True
     )
+    delivered_value = fields.Float(
+        string='Delivered Value',
+        digits=(6, 3),  # set 6 as the total number of digits and 3 as the number of decimal places
+        compute='_compute_delivered_value',
+        store=True
+    )
+    invoiced_value = fields.Float(
+        string='Invoiced Value',
+        digits=(6, 3),  # set 6 as the total number of digits and 3 as the number of decimal places
+        compute='_compute_invoiced_value',
+        store=True
+    )
 
     @api.depends('product_uom_qty', 'qty_delivered')
     def _compute_to_delivered(self):
@@ -35,5 +47,16 @@ class SaleOrderLine(models.Model):
                 line.qty_to_invoiced = line.qty_delivered - line.qty_invoiced
             else:
                 line.qty_to_invoiced = 0.0
+
+    @api.depends('price_unit', 'qty_delivered')
+    def _compute_delivered_value(self):
+        for line in self:
+            line.delivered_value = line.price_unit * line.qty_delivered
+
+    @api.depends('price_unit', 'qty_invoiced')
+    def _compute_invoiced_value(self):
+        for line in self:
+            line.invoiced_value = line.price_unit * line.qty_invoiced
+
 
 
