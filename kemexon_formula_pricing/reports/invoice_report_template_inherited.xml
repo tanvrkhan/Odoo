@@ -297,7 +297,7 @@
                 <br/>
                 <br/>
                 <br/>
-                <t t-if="o.vessel_information_id or o.delivery_notes or o.tt_date or o.delivery_location or o.invoice_incoterm_id">
+                <t t-if="o.vessel_information_id or o.delivery_notes or o.tt_date or o.incoterm_location_custom or o.invoice_incoterm_id">
                     <strong>Delivery Information</strong>
                     <div style="border-top: 2px solid black;"/>
                     <br/>
@@ -410,19 +410,6 @@
                                         </div>
                                     </div>
                                 </t>
-                                <t t-if="o.nor_date">
-                                    <div class="row">
-                                        <div class="col-5">
-                                            <strong>NOR Date</strong>
-                                        </div>
-                                        <br/>
-                                        <!--                                    <div class="col-1"/>-->
-                                        <div class="col-7">
-                                            <span class="m-0" t-field="o.nor_date"
-                                                  t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
-                                        </div>
-                                    </div>
-                                </t>
                                 <t t-if="o.cod_date">
                                     <div class="row">
                                         <div class="col-5">
@@ -472,7 +459,7 @@
                                         </div>
                                     </div>
                                 </t>
-                                <t t-if="o.delivery_location">
+                                <t t-if="o.incoterm_location_custom">
                                     <!--                        faizan 5,7-->
                                     <div class="row">
                                         <div class="col-5">
@@ -481,7 +468,7 @@
                                         <br/>
                                         <!--                                <div class="col-1"/>-->
                                         <div class="col-7">
-                                            <span class="m-0" t-field="o.delivery_location"/>
+                                            <span class="m-0" t-field="o.incoterm_location_custom"/>
                                         </div>
 
                                     </div>
