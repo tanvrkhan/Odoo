@@ -15,6 +15,7 @@ class FiLc(models.Model):
         [('backtoback', 'Back To Back'), ('fronttoback', 'Front To Back'), ('intank', 'Intank')], string="Sub Limit")
     issuance_date = fields.Date(string='Issuance Date')
     expiry_date = fields.Date(string='Expiry Date')
+    is_active = fields.Boolean(string='Is Active')
     beneficiary = fields.Many2one('res.partner', string='Beneficiary')
     beneficiary_bank = fields.Many2one('res.bank', string='Beneficiary Bank')
     beneficiary_bank_reference = fields.Char(string='Beneficiary Bank Reference')

@@ -18,6 +18,7 @@
                 <field name="applicant_bank"/>
                 <field name="applicant_bank_reference"/>
                 <field name="advising_confirming_bank"/>
+                <field name="is_active"/>
             </tree>
         </field>
     </record>
@@ -40,6 +41,7 @@
                             <field name="sub_limit"/>
                             <field name="issuance_date"/>
                             <field name="expiry_date"/>
+                            <field name="is_active"/>
                         </group>
 
                         <group>
