@@ -1,5 +1,4 @@
-from odoo import models, fields
-from odoo.odoo import api
+from odoo import models, fields, api
 
 
 class ProformaInvoice(models.Model):
@@ -21,7 +20,6 @@ class ProformaInvoice(models.Model):
     legal_entity = fields.Many2one(related='sale_order_id.legal_entity', string='Representing Entity')
     show_vat_ids = fields.Boolean(related='sale_order_id.show_vat_ids', string='Show VAT ID')
     en_plus = fields.Boolean(related='sale_order_id.en_plus', string='EN Plus')
-    # show_hs_code = fields.Boolean(related='sale_order_id.show_hs_code', string='Show HS Code')
     date_order = fields.Datetime(related='sale_order_id.date_order', string="Order Date")
     pfi_date = fields.Datetime(string='PFI Date')
     expected_date = fields.Datetime(related='sale_order_id.expected_date', string='Expected Date')
