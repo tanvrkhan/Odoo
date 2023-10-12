@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_proforma_invoice_tree" model="ir.ui.view">
+        <field name="name">proforma.invoice.tree</field>
+        <field name="model">proforma.invoice</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="pfi_date"/>
+                <field name="commitment_date"/>
+                <field name="expected_date"/>
+                <field name="partner_id"/>
+                <field name="trader"/>
+                <field name="team_id"/>
+                <field name="warehouse_id"/>
+                <field name="company_id"/>
+                <field name="amount_untaxed"/>
+                <field name="amount_tax"/>
+                <field name="amount_total"/>
+                <field name="analytic_account_id"/>
+                <field name="analytic_accounts_summary"/>
+                <field name="fi_lc_ids"/>
+                <field name="currency_id"/>
+                <field name="effective_date"/>
+                <field name="pricelist_id"/>
+                <field name="delivery_status"/>
+                <field name="invoice_status"/>
+                <field name="tag_ids"/>
+                <field name="state"/>
+                <field name="sale_order_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_proforma_invoice_form" model="ir.ui.view">
+        <field name="name">proforma.invoice.form</field>
+        <field name="model">proforma.invoice</field>
+        <field name="arch" type="xml">
+            <form string="Proforma Invoice">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group name="proforma_invoice_group">
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="fi_lc_ids"/>
+                            <field name="analytic_accounts_summary"/>
+                            <field name="incoterm"/>
+                            <field name="incoterm_location_custom"/>
+                            <field name="status_custom"/>
+                            <field name="legal_entity"/>
+                            <field name="show_vat_ids"/>
+                            <field name="en_plus"/>
+                            <field name="show_hs_code"/>
+                        </group>
+                        <group>
+                            <field name="pfi_date"/>
+                            <field name="pricelist_id"/>
+                            <field name="payment_term_id"/>
+                            <field name="deal_ref"/>
+                            <label for="delivery_from" string="Period"/>
+                            <div name="date_edit_only" class="o_row oe_edit_only">
+                                <span>
+                                    <strong>From</strong>
+                                    <field name="delivery_from" class='oe_inline'/>
+                                </span>
+                                <span>
+                                    <strong>To</strong>
+                                    <field name="delivery_to" class='oe_inline'/>
+                                </span>
+                            </div>
+                            <field name="analytic_account_id"/>
+                            <field name="sale_order_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="proforma_invoice_line_view" string="Proforma Invoice Lines">
+                            <field name="proforma_invoice_line_ids"/>
+                            <group name="note_group" col="6" class="mt-2 mt-md-0">
+                                <group colspan="4">
+                                    <field colspan="2" name="notes" nolabel="1" placeholder="Terms and conditions..."/>
+                                </group>
+                                <group class="oe_subtotal_footer oe_right" colspan="2" name="lines_total">
+                                    <field name="total_amount" widget="monetary"
+                                           options="{'currency_field': 'currency_id'}"
+                                           style="font-size: 14px; font-weight: bold;">
+                                    </field>
+                                    <field name="total_quantity"
+                                           style="font-size: 14px; font-weight: bold;"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </group>
+                                <div class="clearfix"/>
+                            </group>
+                        </page>
+                        <page string="Other Info" name="other_information">
+                            <group>
+                                <group name="sales_person" string="Sales">
+                                    <field name="trader" widget="many2one_avatar_user"/>
+                                    <field name="team_id" kanban_view_ref="%(sales_team.crm_team_view_kanban)s"
+                                           options="{'no_create': True}"/>
+                                    <field name="company_id"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group name="sale_shipping" string="Delivery">
+                                    <field name="warehouse_id"/>
+                                    <field name="show_formula_pricing"/>
+                                    <field name="show_validity"/>
+                                    <field name="valid_until"/>
+                                    <label for="commitment_date" string="Delivery Date"/>
+                                    <div name="commitment_date_div" class="o_row">
+                                        <field name="commitment_date"/>
+                                        <span name="expected_date_span" class="text-muted">Expected:
+                                            <field name="expected_date" class="oe_inline" widget="date"/>
+                                        </span>
+                                    </div>
+                                    <field name="delivery_status"/>
+                                </group>
+                                <group string="Tracking" name="sale_reporting">
+
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Customer Signature" name="customer_signature">
+                            <group>
+                                <field name="signed_by"/>
+                                <field name="signed_on"/>
+                                <field name="signature" widget="image"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_proforma_invoice" model="ir.actions.act_window">
+        <field name="name">Proforma Invoices</field>
+        <field name="res_model">proforma.invoice</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_proforma_invoice" name="Proforma Invoices" parent="sale.sale_order_menu" sequence="30"
+              action="action_proforma_invoice"/>
+</odoo>

@@ -50,6 +50,7 @@ class AccountMove(models.Model):
     trader = fields.Many2one('hr.employee', string='Trader', related='picking_id.trader')
     legal_entity = fields.Many2one('legal.entity', string='Representing Entity')
     en_plus = fields.Boolean('EN Plus')
+    show_hs_code = fields.Boolean('Show HS Code')
 
     @api.depends('invoice_line_ids.sale_line_ids.move_ids.picking_id')
     def _compute_picking_id2(self):
@@ -231,7 +232,7 @@ class AccountMove(models.Model):
         invoices_1_day = self.env['account.move'].search(
             [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'),
              ('state', '=', 'posted'),
-             ('invoice_date_due', '=', yesterday)])
+             ('invoice_date_due', '=', yesterday), ('company_id', '=', 1)])
         for invoice1 in invoices_1_day:
             if invoice1.partner_id.id not in over_due_template.not_send_ids.ids:
                 # email_values = {
@@ -248,7 +249,7 @@ class AccountMove(models.Model):
         invoices_3_day = self.env['account.move'].search(
             [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'),
              ('state', '=', 'posted'),
-             ('invoice_date_due', '=', after_three_day)])
+             ('invoice_date_due', '=', after_three_day), ('company_id', '=', 1)])
         for invoice3 in invoices_3_day:
             if invoice3.partner_id.id not in friendly_reminder_template.not_send_ids.ids:
                 # email_values = {
@@ -257,6 +258,42 @@ class AccountMove(models.Model):
                 friendly_reminder_template.send_mail(invoice3.id, force_send=True)
             else:
                 continue
+
+    def action_send_customer_reminder_sa(self):
+        yesterday = fields.Date.today() - datetime.timedelta(days=1)
+        after_three_day = fields.Date.today() + datetime.timedelta(days=3)
+        over_due_template = self.env.ref('oe_kemoxon_delivery_custom.email_template_customer_reminder_sa')
+
+        invoices_1_day = self.env['account.move'].search(
+            [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'),
+             ('state', '=', 'posted'),
+             ('invoice_date_due', '=', yesterday), ('company_id', '=', 2)])
+        for invoice1 in invoices_1_day:
+            if invoice1.partner_id.id not in over_due_template.not_send_ids.ids:
+                # email_values = {
+                #     'email_to': invoice1.partner_id.email or 'abcd@gmail.com'
+                # }
+                over_due_template.send_mail(invoice1.id, force_send=True)
+            else:
+                continue
+
+        # # friendly_reminder
+        friendly_reminder_template = self.env.ref(
+            'oe_kemoxon_delivery_custom.email_template_friendly_reminder_reminder_sa')
+
+        invoices_3_day = self.env['account.move'].search(
+            [('amount_residual', '>', 0), ('move_type', '=', 'out_invoice'),
+             ('state', '=', 'posted'),
+             ('invoice_date_due', '=', after_three_day), ('company_id', '=', 2)])
+        for invoice3 in invoices_3_day:
+            if invoice3.partner_id.id not in friendly_reminder_template.not_send_ids.ids:
+                # email_values = {
+                #     'email_to': invoice1.partner_id.email or 'abcd@gmail.com'
+                # }
+                friendly_reminder_template.send_mail(invoice3.id, force_send=True)
+            else:
+                continue
+
 
     @api.depends('needed_terms', 'invoice_date_due')
     def _compute_invoice_date_due(self):

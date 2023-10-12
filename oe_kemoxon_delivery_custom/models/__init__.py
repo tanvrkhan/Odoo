@@ -13,5 +13,6 @@ from . import stock_valuation_layer
 from . import incoterm_location
 from . import region
 from . import legal_entity
+from . import product_template
 
 

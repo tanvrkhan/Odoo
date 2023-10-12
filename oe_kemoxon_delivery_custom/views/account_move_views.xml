@@ -22,6 +22,7 @@
                         <!--                            #<attribute name="domain"></attribute>-->
                     </field>
                     <field name="en_plus"/>
+                    <field name="show_hs_code"/>
                     <field name="vessel_name" invisible="0"/>
                     <field name="imo" invisible="0"/>
                     <field name="bl_date" invisible="0"/>

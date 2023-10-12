@@ -94,6 +94,11 @@
                     <!-- In case we want to repeat the header, remove "display: table-row-group" -->
                     <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
                         <th name="th_description" class="text-start">Description</th>
+                        <t t-if="doc.show_hs_code">
+                            <th name="th_hs_code" class="text-start">
+                                <span>HS Code</span>
+                            </th>
+                        </t>
                         <th name="th_quantity" class="text-end col col-md-3">Quantity</th>
                         <t t-if="doc.show_formula_pricing">
                             <th name="th_formula_price" class="text-end">
@@ -130,6 +135,11 @@
                                 <td name="td_name">
                                     <span t-field="line.name"/>
                                 </td>
+                                <t t-if="doc.show_hs_code">
+                                    <td class="text-start">
+                                        <span t-field="line.product_id.hs_code_custom"/>
+                                    </td>
+                                </t>
                                 <td name="td_quantity" class="text-end  col col-md-3">
                                     <t t-if="line.product_id.name != 'Down payment'">
                                         <span t-field="line.product_uom_qty"/>

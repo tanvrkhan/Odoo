@@ -29,7 +29,7 @@ class SaleOrder(models.Model):
     legal_entity = fields.Many2one('legal.entity', string='Representing Entity')
     show_vat_ids = fields.Boolean('Show VAT ID')
     en_plus = fields.Boolean('EN Plus')
-
+    show_hs_code = fields.Boolean('Show HS Code')
 
     def _prepare_invoice(self):
         res = super(SaleOrder, self)._prepare_invoice()

@@ -38,6 +38,7 @@
                     <field name="legal_entity"/>
                     <field name="show_vat_ids"/>
                     <field name="en_plus"/>
+                    <field name="show_hs_code"/>
                 </xpath>
                 <xpath expr="//form//field[@name='team_id']"
                        position="before">

@@ -1,0 +1,505 @@
+<odoo>
+    <template id="proforma_invoice_screen_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="doc">
+                    <div style="border-top: 2px solid black; margin-top: -12px;"/>
+                    <center>
+                        <b style="font-size:35px;" class="text-center">PROFORMA INVOICE</b>
+                    </center>
+                    <div style="border-top: 2px solid black;"/>
+                    <br/>
+                    <br/>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="row">
+                                <div class="col-5">
+                                    <strong>PFI No</strong>
+                                    <br/>
+                                    <p t-if="doc.deal_ref">
+                                        <strong>Deal Ref</strong>
+                                    </p>
+                                </div>
+                                <div class="col-2"/>
+                                <br/>
+                                <div class="col-5">
+                                    <span t-field="doc.name"/>
+                                    <br/>
+                                    <span class="m-0" t-field="doc.deal_ref"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2"/>
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-5" style="padding-left: 10px;">
+                                    <strong>Date</strong>
+                                </div>
+                                <div class="col-7" style="padding-left: 23px;">
+                                    <span class="m-0" t-field="doc.pfi_date"
+                                          t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <strong>Customer</strong>
+                    <br/>
+                    <span t-field="doc.partner_id"/>
+                    <t t-if="doc.partner_id.street">
+                        <br/>
+                        <span t-field="doc.partner_id.street"/>
+                    </t>
+                    <t t-if="doc.partner_id.street2">
+                        <br/>
+                        <span t-field="doc.partner_id.street2"/>
+                    </t>
+                    <t t-if="doc.partner_id.city">
+                        <br/>
+                        <span t-field="doc.partner_id.city"/>
+                    </t>
+                    <t t-if="doc.partner_id.state_id">
+                        <br/>
+                        <span t-field="doc.partner_id.state_id.name"/>
+                    </t>
+                    <t t-if="doc.show_vat_ids">
+                        <br/>
+                        <t t-if="doc.partner_id.vat">
+                            VAT ID:&#160;&#160;<span t-field="doc.partner_id.vat"/>
+                        </t>
+                    </t>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <t t-set="lines_to_report" t-value="doc._get_order_lines_to_report()"/>
+                    <style>
+                        .my_data_table th {border-right: 1px solid white;border-left: 1px solid white;padding-top:
+                        5px;padding-bottom: 5px;}
+                        .my_data_table td {border-right: 1px solid white;border-left: 1px solid white;padding-top:
+                        5px;padding-bottom: 5px;}
+
+                    </style>
+                    <table width="100%" class="my_data_table">
+                        <!-- In case we want to repeat the header, remove "display: table-row-group" -->
+                        <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
+                            <th name="th_description" class="text-start">Description</th>
+                            <t t-if="doc.show_hs_code">
+                                <th name="th_hs_code" class="text-start">
+                                    <span>HS Code</span>
+                                </th>
+                            </t>
+                            <th name="th_quantity" class="text-end col col-md-3">Quantity</th>
+                            <t t-if="doc.show_formula_pricing">
+                                <th name="th_formula_price" class="text-end">
+                                    <span>Formula Price</span>
+                                </th>
+                                <th name="th_premium" class="text-end">
+                                    <span>Premium</span>
+                                </th>
+                            </t>
+                            <th name="th_priceunit" class="text-end">Rate</th>
+                            <th name="th_discount" t-if="display_discount" class="text-end"
+                                groups="product.group_discount_per_so_line">
+                                <span>Disc.%</span>
+                            </th>
+                            <!--                        <th name="th_taxes" class="text-end">Taxes</th>-->
+                            <th name="th_subtotal" class="text-end">
+                                <span groups="account.group_show_line_subtotals_tax_excluded">Amount</span>
+                                <span groups="account.group_show_line_subtotals_tax_included">Total Price</span>
+                            </th>
+                        </tr>
+
+                        <t t-set="current_subtotal" t-value="0"/>
+
+                        <t t-foreach="lines_to_report" t-as="line">
+
+                            <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"
+                               groups="account.group_show_line_subtotals_tax_excluded"/>
+                            <t t-set="current_subtotal" t-value="current_subtotal + line.price_total"
+                               groups="account.group_show_line_subtotals_tax_included"/>
+
+                            <tr style="border-bottom:2px solid #d4d6d9"
+                                t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                <t t-if="not line.display_type">
+                                    <td name="td_name">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <t t-if="doc.show_hs_code">
+                                        <td class="text-start">
+                                            <span t-field="line.product_id.hs_code_custom"/>
+                                        </td>
+                                    </t>
+                                    <td name="td_quantity" class="text-end  col col-md-3">
+                                        <t t-if="line.product_id.name != 'Down payment'">
+                                            <span t-field="line.pfi_product_uom_qty"/>
+
+                                            <span t-if="line.tolerance_type=='min_max'">
+                                                <span>
+                                                    <span>+/-</span>
+                                                    <span t-field="line.tolerance_percentage"/>
+                                                    <span>%</span>
+                                                </span>
+                                            </span>
+                                            <span t-elif="line.tolerance_type=='max'">
+                                                <span>Max</span>
+                                            </span>
+                                            <span t-elif="line.tolerance_type=='min'">
+                                                <span>Min</span>
+                                            </span>
+                                            <span t-field="line.product_uom"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span></span>
+                                        </t>
+                                    </td>
+                                    <t t-if="line.order_id.show_formula_pricing">
+                                        <td class="text-end">
+                                            <t t-if="line.product_id.name != 'Down payment'">
+                                                <span t-field="line.formula_price"/>
+                                            </t>
+                                            <t t-else="">
+                                                <span></span>
+                                            </t>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-if="line.product_id.name != 'Down payment'">
+                                                <span t-field="line.premium"/>
+                                            </t>
+                                            <t t-else="">
+                                                <span></span>
+                                            </t>
+                                        </td>
+                                    </t>
+
+                                    <td name="td_priceunit" class="text-end">
+                                        <t t-if="line.product_id.name != 'Down payment'">
+                                            <span t-field="line.pfi_price_unit"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span></span>
+                                        </t>
+                                    </td>
+                                    <td t-if="display_discount" class="text-end"
+                                        groups="product.group_discount_per_so_line">
+                                        <t t-if="line.product_id.name != 'Down payment'">
+                                            <span t-field="line.discount"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span></span>
+                                        </t>
+                                    </td>
+                                    <td name="td_subtotal"
+                                        class="text-end o_price_total">
+                                        <t t-if="line.product_id.name != 'Down payment'">
+                                            <span class="text-nowrap" t-field="line.price_subtotal"
+                                                  groups="account.group_show_line_subtotals_tax_excluded"/>
+                                            <span class="text-nowrap" t-field="line.price_total"
+                                                  groups="account.group_show_line_subtotals_tax_included"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="text-nowrap" t-field="line.pfi_price_unit"/>
+                                        </t>
+                                    </td>
+                                </t>
+                                <t t-elif="line.display_type == 'line_section'">
+                                    <td name="td_section_line" colspan="99">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                </t>
+                                <t t-elif="line.display_type == 'line_note'">
+                                    <td name="td_note_line" colspan="99">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                        <tr style="border-bottom:2px solid #d4d6d9">
+                            <td name="td_section_subtotal">
+                                <strong class="mr16">Total</strong>
+
+                            </td>
+                            <td colspan="99" class="is-subtotal text-end">
+                                <span t-out="current_subtotal"
+                                      t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
+                            </td>
+
+                        </tr>
+                        <t t-if="len(doc.payment_term_id.line_ids)>1">
+                            <t t-foreach="doc.payment_term_id.line_ids" t-as="line">
+                                <t t-if="line.value=='percent'">
+
+
+                                    <tr style="border-bottom:2px solid #d4d6d9">
+                                        <td name="td_section_subtotal">
+                                            <t t-if="line.days==0">
+                                                <strong>
+                                                    <span class="mr16"
+                                                          t-out="line.document_description"></span>
+                                                </strong>
+                                            </t>
+                                            <t t-else="0">
+                                                <span class="mr16" t-out="line.document_description"></span>
+                                            </t>
+                                        </td>
+                                        <td colspan="99" class="is-subtotal text-end mr16">
+
+                                            <t t-if="line.days==0">
+                                                <strong>
+                                                    <span t-out="current_subtotal*line.value_amount/100"
+                                                          t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
+                                                </strong>
+                                            </t>
+                                            <t t-else="0">
+                                                <span t-out="current_subtotal*line.value_amount/100"
+                                                      t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
+                                            </t>
+                                        </td>
+                                    </tr>
+
+                                </t>
+                            </t>
+                        </t>
+                    </table>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <strong>Delivery Information</strong>
+                    <div style="border: 1px solid black;"/>
+                    <br/>
+                    <div class="row" t-if="doc.delivery_from or doc.delivery_to">
+                        <div class="col-2">
+                            <strong>Delivery Period</strong>
+                        </div>
+                        <div class="col-4" style="padding-left: 37px;">
+                            <span class="m-0" t-field="doc.delivery_from"
+                                  t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                            to
+                            <span class="m-0" t-field="doc.delivery_to"
+                                  t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2" t-if="doc.incoterm_location_custom">
+                            <strong>Delivery Location</strong>
+                        </div>
+                        <br/>
+                        <div class="col-4" style="padding-left: 37px;">
+                            <t t-if="doc.incoterm_location_custom">
+                                <span class="m-0" t-field="doc.incoterm_location_custom"/>
+                            </t>
+                        </div>
+                    </div>
+                    <div class="row" t-if="doc.incoterm">
+                        <div class="col-2">
+                            <strong>Incoterms</strong>
+                        </div>
+                        <div class="col-4" style="padding-left: 37px;">
+                            <span class="m-0" t-field="doc.incoterm"/>
+                        </div>
+                    </div>
+                    <div class="row" t-if="doc.show_validity">
+                        <div class="col-2">
+                            <strong>PFI Valid until</strong>
+                        </div>
+                        <div class="col-4" style="padding-left: 37px;">
+                            <span class="m-0" t-field="doc.valid_until"
+                                  t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                        </div>
+                    </div>
+
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <strong>Financial Information</strong>
+                    <div style="border-top: 2px solid black;"/>
+                    <br/>
+                    <!--                <table width="100%">-->
+                    <div class="row">
+                        <div class="col-12 row">
+                            <!-- left div start from here -->
+                            <div class="col-6">
+                                <div class="col-12 row">
+                                    <div class="col-4">
+                                        <strong>Currency</strong>
+                                    </div>
+                                    <div class="col-8" style="padding-left: 38px;">
+                                        <span class="m-0" t-field="doc.pricelist_id.currency_id.name"/>
+                                    </div>
+                                </div>
+                                <div class="col-12 row" t-if="doc.payment_term_id">
+                                    <div class="col-4">
+                                        <strong>Payment Terms</strong>
+                                    </div>
+                                    <div class="col-8" style="padding-left: 38px;">
+                                        <span class="text-content" t-esc="doc.payment_term_id.name"
+                                              t-options="{'widget': 'html'}"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Left div ended Here -->
+
+                            <!-- Right Div started from here -->
+                            <div class="col-6">
+                                <div class="col-12 row" t-if="doc.partner_id.company_bank_account_id.bank_id.name">
+                                    <div class="col-5" style="padding-left: 4px;">
+                                        <strong>Bank</strong>
+                                    </div>
+                                    <div class="col-7" style="padding-left: 0px;">
+                                        <t t-if="doc.partner_id.company_bank_account_id">
+                                            <span style="text-align:left;" class="m-0"
+                                                  t-field="doc.partner_id.company_bank_account_id.bank_id.name"/>
+                                        </t>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-12 row" t-if="doc.partner_id.company_bank_account_id.acc_holder_name">
+                                    <div class="col-5" style="padding-left: 4px;">
+                                        <strong>In favour of</strong>
+                                    </div>
+                                    <div class="col-7" style="padding-left: 0px;">
+                                        <t t-if="doc.partner_id.company_bank_account_id">
+                                            <span style="text-align:left;" class="m-0"
+                                                  t-field="doc.partner_id.company_bank_account_id.acc_holder_name"/>
+                                        </t>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-12 row" t-if="doc.partner_id.company_bank_account_id.acc_number">
+                                    <div class="col-5" style="padding-left: 4px;">
+                                        <strong>A/C No</strong>
+                                    </div>
+                                    <div class="col-7" style="padding-left: 0px;">
+                                        <t t-if="doc.partner_id.company_bank_account_id">
+                                            <span style="text-align:left;" class="m-0"
+                                                  t-field="doc.partner_id.company_bank_account_id.acc_number"/>
+                                        </t>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-12 row" t-if="doc.partner_id.company_bank_account_id.bank_id.bic">
+                                    <div class="col-5" style="padding-left: 4px;">
+                                        <strong>Swift Code</strong>
+                                    </div>
+                                    <div class="col-7" style="padding-left: 0px;">
+                                        <t t-if="doc.partner_id.company_bank_account_id">
+                                            <span class="m-0"
+                                                  t-field="doc.partner_id.company_bank_account_id.bank_id.bic"/>
+                                        </t>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-12 row"
+                                     t-if="doc.partner_id.company_bank_account_id.inter_mediatory_bank_id">
+                                    <div class="col-5" style="padding-left: 4px;">
+                                        <strong>Intermediary Bank</strong>
+                                    </div>
+                                    <div class="col-7" style="padding-left: 0px;">
+                                        <t t-if="doc.partner_id.company_bank_account_id">
+                                            <span class="m-0"
+                                                  t-field="doc.partner_id.company_bank_account_id.inter_mediatory_bank_id.name"/>
+                                        </t>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 row"
+                                     t-if="doc.partner_id.company_bank_account_id.inter_mediatory_swift">
+                                    <div class="col-5" style="padding-left: 4px;">
+                                        <strong>Intermediary Swift</strong>
+                                    </div>
+                                    <div class="col-7" style="padding-left: 0px;">
+                                        <t t-if="doc.partner_id.company_bank_account_id">
+                                            <span class="m-0"
+                                                  t-field="doc.partner_id.company_bank_account_id.inter_mediatory_swift"/>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Right Div Ended Here -->
+                        </div>
+                    </div>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <strong>Terms And Conditions</strong>
+                    <div style="border-top: 2px solid black;"/>
+                    <br/>
+                    <ul style="font-size:18px;">
+                        <t t-if="doc.legal_entity">
+                            <li>Kemexon follows a detailed process as per the company policy for informing any change
+                                in
+                                bank account/ remittance process. We request you to not rely on any isolated email
+                                communication
+                                informing the change of bank account etc. If you do so, the same shall be at your risk
+                                and
+                                consequences.
+                            </li>
+                            <li>Fiscal representation of KEMEXON SA in France: RM BOULANGER SA (17A rue du
+                                Vertuquet, 59960 Neuville-en-Ferrain, no SIREN: 321252827)
+                            </li>
+                            <li>Kemexon terms and conditions apply.</li>
+                        </t>
+                        <t t-else="">
+                            <li>Kemexon follows a detailed process as per the company policy for informing any change
+                                in
+                                bank account/ remittance process. We request you to not rely on any isolated email
+                                communication
+                                informing the change of bank account etc. If you do so, the same shall be at your risk
+                                and
+                                consequences.
+                            </li>
+                            <li>Kemexon terms and conditions apply.</li>
+                        </t>
+                    </ul>
+                </t>
+            </t>
+        </t>
+
+    </template>
+    <record id="paperformat_pfi_portrait" model="report.paperformat">
+        <field name="name">Proforma Invoice Format</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="page_height">297</field>
+        <field name="page_width">210</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">11</field>
+        <field name="margin_bottom">18</field>
+        <field name="margin_left">3</field>
+        <field name="margin_right">3</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">6</field>
+        <field name="dpi">110</field>
+    </record>
+    <record id="action_report_proforma_invoice_screen" model="ir.actions.report">
+        <field name="name">Proforma Invoice</field>
+        <field name="model">proforma.invoice</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="binding_model_id" ref="model_proforma_invoice"/>
+        <field name="report_name">kemexon_proforma_invoice.proforma_invoice_screen_template</field>
+        <field name="report_file">kemexon_proforma_invoice.proforma_invoice_screen_template</field>
+        <field name="print_report_name">'PRO-FORMA - %s' % (object.name)</field>
+        <field name="paperformat_id" ref="paperformat_pfi_portrait"/>
+    </record>
+    <record id="kemexon_proforma_invoice.action_report_proforma_invoice_screen" model="ir.actions.report">
+        <field name="paperformat_id" ref="paperformat_pfi_portrait"/>
+    </record>
+</odoo>

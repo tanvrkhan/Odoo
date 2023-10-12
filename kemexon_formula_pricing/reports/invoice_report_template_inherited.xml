@@ -122,6 +122,11 @@
                         <th name="th_description" class="text-start">
                             <span>Description</span>
                         </th>
+                        <t t-if="o.show_hs_code">
+                            <th name="th_hs_code" class="text-start">
+                                <span>HS Code</span>
+                            </th>
+                        </t>
                         <th name="th_quantity" class="text-end">
                             <span>Quantity</span>
                         </th>
@@ -166,6 +171,11 @@
                                 <td name="account_invoice_line_name">
                                     <span t-field="line.name" t-options="{'widget': 'text'}"/>
                                 </td>
+                                <t t-if="o.show_hs_code">
+                                    <td class="text-start">
+                                        <span t-field="line.product_id.hs_code_custom"/>
+                                    </td>
+                                </t>
                                 <td class="text-end">
                                     <t t-if="line.product_id.name != 'Down payment'">
                                         <span t-field="line.quantity"/>

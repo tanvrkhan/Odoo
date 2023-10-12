@@ -29,4 +29,14 @@
         <field name="numbercall">-1</field>
         <field name="active">True</field>
     </record>
+    <record id="ir_cron_customer_reminde_sar" model="ir.cron">
+        <field name="name">Customer Reminder SA</field>
+        <field name="model_id" ref="model_account_move"/>
+        <field name="state">code</field>
+        <field name="code">model.action_send_customer_reminder_sa()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
 </odoo>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_proforma_invoice_line_tree" model="ir.ui.view">
+        <field name="name">proforma.invoice.line.tree</field>
+        <field name="model">proforma.invoice.line</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+
+                <field name="sale_order_line_id"/>
+                <field name="product_template_id"/>
+                <field name="name"/>
+                <field name="analytic_distribution_formatted"/>
+                <field name="analytic_distribution"/>
+                <field name="pfi_product_uom_qty"/>
+                <field name="tolerance_type"/>
+                <field name="tolerance_percentage"/>
+                <field name="product_uom"/>
+                <field name="is_formula_pricing"/>
+                <field name="formula_price"/>
+                <field name="premium"/>
+                <field name="formula_description"/>
+                <field name="pfi_price_unit"/>
+                <field name="tax_id"/>
+                <field name="margin"/>
+                <field name="margin_percent"/>
+                <field name="price_subtotal"/>
+                <field name="currency_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_proforma_invoice_line_form" model="ir.ui.view">
+        <field name="name">proforma.invoice.line.form</field>
+        <field name="model">proforma.invoice.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="sale_order_line_id"/>
+                <field name="product_template_id"/>
+                <field name="name"/>
+                <field name="analytic_distribution_formatted"/>
+                <field name="analytic_distribution"/>
+                <field name="pfi_product_uom_qty"/>
+                <field name="tolerance_type"/>
+                <field name="tolerance_percentage"/>
+                <field name="product_uom"/>
+                <field name="is_formula_pricing"/>
+                <field name="formula_price"/>
+                <field name="premium"/>
+                <field name="formula_description"/>
+                <field name="pfi_price_unit"/>
+                <field name="tax_id"/>
+                <field name="margin"/>
+                <field name="margin_percent"/>
+                <field name="price_subtotal"/>
+                <field name="currency_id"/>
+            </form>
+        </field>
+    </record>
+</odoo>
