@@ -41,6 +41,9 @@ class AccountMove(models.Model):
                                  states={'draft': [('readonly', False)]},
                                  check_company=True)
     show_delivery_to = fields.Boolean(string="Show Delivery To", default=False)
+    delivery_to = fields.Date(string="Delivery Till", default=False)
+    delivery_from = fields.Date(string="Delivery From", default=False)
+    show_delivery_to = fields.Boolean(string="Show Delivery To", default=False)
     show_vat_ids = fields.Boolean(string="Show VAT Ids")
     transporter_details_id = fields.Many2one('stock.picking', 'Transporter Delivery')
 
