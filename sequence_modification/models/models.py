@@ -29,9 +29,9 @@ class AccountMoveInheritModel(models.Model):
                 elif rec.move_type == 'out_refund':
                     rec.generate_sequence('credit.sequence', 'credit')
 
-                elif rec.move_type == 'entry':
-                    if not rec.move_sequence_done and rec.name == '/':
-                        rec.set_entry_seq()
+                # elif rec.move_type == 'entry':
+                #     if not rec.move_sequence_done and rec.name == '/':
+                #         rec.set_entry_seq()
         return super().action_post()
 
     def is_entry_sequence_exits(self, seq=None):
@@ -41,14 +41,14 @@ class AccountMoveInheritModel(models.Model):
         else:
             return False
 
-    def set_entry_seq(self):
-        seq = self.env['ir.sequence'].next_by_code('journal.entry.sequence')
-        is_exists = self.is_entry_sequence_exits(seq)
-        if is_exists:
-            self.set_entry_seq()
-        else:
-            self.name = seq
-            self.move_sequence_done = True
+    # def set_entry_seq(self):
+    #     seq = self.env['ir.sequence'].next_by_code('journal.entry.sequence')
+    #     is_exists = self.is_entry_sequence_exits(seq)
+    #     if is_exists:
+    #         self.set_entry_seq()
+    #     else:
+    #         self.name = seq
+    #         self.move_sequence_done = True
 
     def generate_sequence(self, code=None, move_type=None):
         seq = self.env['ir.sequence'].next_by_code(code).split("-")
