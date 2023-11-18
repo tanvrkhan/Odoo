@@ -8,12 +8,6 @@ class ResPartner(models.Model):
     res_partner_id = fields.Many2one('res.partner', string='Group', tracking=True)
     short_name = fields.Char(string='Short Name')
 
-    @api.constrains('short_name')
-    def _check_unique_short_name(self):
-        for record in self:
-            if self.search([('short_name', '=', record.short_name), ('active', '=', True), ('id', '!=', record.id)]):
-                raise ValidationError('Short Name must be unique.')
-
 
     def write(self, vals):
         if 'short_name' in vals:
