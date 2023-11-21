@@ -40,10 +40,9 @@
                     <field name="legal_entity"/>
                     <field name="show_vat_ids"/>
                     <field name="show_delivery_to"/>
-                     <field name="delivery_from"/>
+                    <field name="delivery_from"/>
                     <field name="delivery_to"/>
-
-
+                    <field name="fusion_reference"/>
                 </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="attributes">

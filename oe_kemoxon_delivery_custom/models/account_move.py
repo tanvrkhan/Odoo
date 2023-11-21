@@ -11,7 +11,7 @@ from operator import itemgetter
 
 class AccountMove(models.Model):
     _inherit = "account.move"
-
+    fusion_reference = fields.Char("Fusion Ref")
     deal_ref = fields.Char("Deal Ref")
     bill_date = fields.Date("B/L Date", related='picking_id.bill_date')
     tt_date = fields.Date("TT Date", related='picking_id.tt_date')
