@@ -24,10 +24,11 @@ class AccountMove(models.Model):
 
     show_vat_ids = fields.Boolean(string="Show VAT Ids")
     transporter_details_id = fields.Many2one('stock.picking','Transporter Delivery')
-
+    fusion_reference = fields.Char()
     def get_invoice_details(self):
         invoices = self.env['account.move'].search(
             [('amount_residual', '>', 0), ('move_type', '=', self.move_type), ('state', '=', 'posted')])
+        
         today_date = fields.Date.today()
         'short_name'
         result = []

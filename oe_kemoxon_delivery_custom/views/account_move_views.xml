@@ -21,6 +21,7 @@
                     <field name="delivery_location" invisible="0"/>
                     <field name="picking_id"/>
                     <field name="transporter_details_id" invisible="1"/>
+                    <field name="fusion_reference" invisible="1"/>
                 </xpath>
                 <xpath expr="//group/group[@id='header_left_group']" position="inside">
                     <field name="show_vat_ids"/>
