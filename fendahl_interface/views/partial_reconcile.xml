@@ -13,7 +13,7 @@
             </field>
         </record>
         <!-- Inherit Form View to Modify it -->
-         <record id="view_account_partial_reconcile_view" model="ir.ui.view">
+         <record id="view_account_partial_reconcile" model="ir.ui.view">
             <field name="name">partial.reconcile.tree</field>
             <field name="model">account.partial.reconcile</field>
             <field name="arch" type="xml">
@@ -28,10 +28,11 @@
                 </tree>
             </field>
          </record>
-        <menuitem id="menu_lc_Lines"
+
+        <menuitem id="menu_partial_reconcile"
               name="Account partial reconcile"
               action="action_account_partial_reconcile"
               parent="account.menu_finance_receivables"
-              sequence="100"/>
+              sequence="101"/>
     </data>
 </odoo>

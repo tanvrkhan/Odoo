@@ -54,7 +54,7 @@ class AccountMove(models.Model):
     legal_entity = fields.Many2one('legal.entity', string='Representing Entity')
     en_plus = fields.Boolean('EN Plus')
     show_hs_code = fields.Boolean('Show HS Code')
-
+    contract_ref = fields.Char('Contract Reference')
     @api.depends('invoice_line_ids.sale_line_ids.move_ids.picking_id')
     def _compute_picking_id2(self):
         for invoice in self:

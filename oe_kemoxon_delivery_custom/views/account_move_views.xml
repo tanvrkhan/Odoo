@@ -43,6 +43,7 @@
                     <field name="delivery_from"/>
                     <field name="delivery_to"/>
                     <field name="fusion_reference"/>
+                    <field name="contract_ref"/>
                 </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="attributes">
