@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dev_invoice_form_cancel_inherit" model="ir.ui.view">
+        <field name="name">dev.invoice.form.cancel.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='button_cancel'][1]" position="attributes">
+                <attribute name="groups"></attribute>
+                <attribute name="groups">dev_account_cancel_rights.group_cancel_invoice</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_cancel'][2]" position="attributes">
+                <attribute name="groups"></attribute>
+                <attribute name="groups">dev_account_cancel_rights.group_cancel_invoice</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
