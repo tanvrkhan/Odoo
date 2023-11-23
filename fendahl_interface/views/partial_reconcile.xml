@@ -1,0 +1,37 @@
+<odoo>
+    <data>
+         <record id="action_account_partial_reconcile" model="ir.actions.act_window">
+            <field name="name">Partial Reconcile</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.partial.reconcile</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_account_partial_reconcile_view"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Accounts reconcilliations.
+              </p>
+            </field>
+        </record>
+        <!-- Inherit Form View to Modify it -->
+         <record id="view_account_partial_reconcile_view" model="ir.ui.view">
+            <field name="name">partial.reconcile.tree</field>
+            <field name="model">account.partial.reconcile</field>
+            <field name="arch" type="xml">
+                <tree string="Estimate">
+                    <field name="debit_move_id"/>
+                     <field name="credit_move_id"/>
+                     <field name="debit_currency_id"/>
+                     <field name="credit_currency_id"/>
+                     <field name="debit_amount_currency"/>
+                     <field name="credit_amount_currency"/>
+                     <field name="amount"/>
+                </tree>
+            </field>
+         </record>
+        <menuitem id="menu_lc_Lines"
+              name="Account partial reconcile"
+              action="action_account_partial_reconcile"
+              parent="account.menu_finance_receivables"
+              sequence="100"/>
+    </data>
+</odoo>
