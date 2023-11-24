@@ -1,18 +1,5 @@
 <odoo>
     <data>
-         <record id="action_account_partial_reconcile" model="ir.actions.act_window">
-            <field name="name">Partial Reconcile</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">account.partial.reconcile</field>
-            <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="view_account_partial_reconcile"/>
-            <field name="help" type="html">
-              <p class="o_view_nocontent_smiling_face">
-                Accounts reconcilliations.
-              </p>
-            </field>
-        </record>
-        <!-- Inherit Form View to Modify it -->
          <record id="view_account_partial_reconcile" model="ir.ui.view">
             <field name="name">partial.reconcile.tree</field>
             <field name="model">account.partial.reconcile</field>
@@ -28,6 +15,20 @@
                 </tree>
             </field>
          </record>
+         <record id="action_account_partial_reconcile" model="ir.actions.act_window">
+            <field name="name">Partial Reconcile</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.partial.reconcile</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_account_partial_reconcile"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Accounts reconcilliations.
+              </p>
+            </field>
+        </record>
+        <!-- Inherit Form View to Modify it -->
+
 
         <menuitem id="menu_partial_reconcile"
               name="Account partial reconcile"
