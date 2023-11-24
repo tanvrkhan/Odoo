@@ -75,7 +75,7 @@ class PostReconciledPayments(models.Model):
             
         if(self.debit_move_id.move_type=="out_invoice"):
             json_data = {
-                "Accounting_System_Payment_ID": self.credit_move_id,
+                "Accounting_System_Payment_ID": self.credit_move_id.id,
                 "Internal_Company_Code": company,
                 "CounterParty_Code": self.debit_move_id.partner_id.short_name,
                 "Payment_Made_Date": self.credit_move_id.date,
@@ -88,7 +88,7 @@ class PostReconciledPayments(models.Model):
             response = requests.post(url, data=json.dumps(json_data), headers=headers)
         elif (self.credit_move_id.move_type == "in_invoice"):
             json_data = {
-                "Accounting_System_Payment_ID": self.debit_move_id,
+                "Accounting_System_Payment_ID": self.debit_move_id.id,
                 "Internal_Company_Code": company,
                 "CounterParty_Code": self.credit_move_id.partner_id.short_name,
                 "Payment_Made_Date": self.debit_move_id.move_id.date,
