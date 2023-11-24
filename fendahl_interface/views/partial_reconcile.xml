@@ -12,6 +12,10 @@
                      <field name="debit_amount_currency"/>
                      <field name="credit_amount_currency"/>
                      <field name="amount"/>
+                     <field name="debit_move_id"/>
+                     <field name="debit_move_type"/>
+                     <field name="credit_move_type"/>
+                     <field name="sent_to_fendahl"/>
                 </tree>
             </field>
          </record>
@@ -28,7 +32,25 @@
             </field>
         </record>
         <!-- Inherit Form View to Modify it -->
-
+ <record id="view_account_partial_reconcile_search" model="ir.ui.view">
+        <field name="name">account.partial.reconcile.filter.search</field>
+        <field name="model">account.partial.reconcile</field>
+        <field name="arch" type="xml">
+            <search>
+                 <filter name="debit_move_id" string="Debit move type"/>
+                     <filter name="credit_move_id" string="Credit move"/>
+                     <filter name="debit_currency_id" string="Debit Currency"/>
+                     <filter name="credit_currency_id" string="Credit Currency"/>
+                     <filter name="debit_amount_currency" string="Debit amount Currency"/>
+                     <filter name="credit_amount_currency" string="Credit amount Currency"/>
+                     <filter name="amount" string="Amount"/>
+                     <filter name="debit_move_id" string="Debit move"/>
+                     <filter name="debit_move_type" string="Debit move type"/>
+                     <filter name="credit_move_type" string="Credit move type"/>
+                     <field name="sent_to_fendahl"  string="Sent to Fendahl"/>
+            </search>
+        </field>
+    </record>
 
         <menuitem id="menu_partial_reconcile"
               name="Account partial reconcile"
