@@ -82,7 +82,7 @@ class PostReconciledPayments(models.Model):
                 "Payment_Due_Date": self.credit_move_id.date,
                 "Payment_Amount": self.credit_move_id.balance,
                 "Payment_Currency": self.credit_move_id.currency_id.name,
-                "Payment_Allocations": self.debit_move_id.fusion_reference,
+                "Payment_Allocations": self.debit_move_id.move_id.fusion_reference,
                 "Allocated_Amount": self.amount,
             }
             response = requests.post(url, data=json.dumps(json_data), headers=headers)
@@ -91,11 +91,11 @@ class PostReconciledPayments(models.Model):
                 "Accounting_System_Payment_ID": self.debit_move_id,
                 "Internal_Company_Code": company,
                 "CounterParty_Code": self.credit_move_id.partner_id.short_name,
-                "Payment_Made_Date": self.debit_move_id.date,
-                "Payment_Due_Date": self.debit_move_id.date,
+                "Payment_Made_Date": self.debit_move_id.move_id.date,
+                "Payment_Due_Date": self.debit_move_id.move_id.date,
                 "Payment_Amount": self.debit_move_id.balance,
                 "Payment_Currency": self.debit_move_id.currency_id.name,
-                "Payment_Allocations": self.credit_move_id,
+                "Payment_Allocations": self.credit_move_id.move_id.fusion_reference,
                 "Allocated_Amount": self.amount,
             }
             response = requests.post(url, data=json.dumps(json_data), headers=headers)
