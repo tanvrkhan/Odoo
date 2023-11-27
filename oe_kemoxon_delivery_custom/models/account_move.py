@@ -23,11 +23,11 @@ class AccountMove(models.Model):
     picking_domain_ids = fields.Many2many('stock.picking', compute='_compute_picking_id2', invisible=True)
 
     vessel_information_id = fields.Many2one('vessel.information', "Vessel Details")
-    vessel_name = fields.Char("Vessel Name", related='vessel_information_id.vessel_id.vessel_name')
+    vessel_name = fields.Char("Vessel Name", related='vessel_information_id.vessel_id.vessel_name', store=True, readonly=False)
     imo = fields.Char("IMO", related='vessel_information_id.vessel_id.imo')
     ncv = fields.Char("NCV")
-    loadport = fields.Many2one("delivery.location", "Load port", related='vessel_information_id.loadport')
-    disport = fields.Many2one("delivery.location", "Discharge port", related='vessel_information_id.disport')
+    loadport = fields.Many2one("delivery.location", "Load port", related='vessel_information_id.loadport', store=True, readonly=False)
+    disport = fields.Many2one("delivery.location", "Discharge port", related='vessel_information_id.disport', store=True, readonly=False)
     country_of_origin = fields.Many2one("res.country", "COO", related='vessel_information_id.country_of_origin')
     payment_notes = fields.Char("Payment Notes")
     bl_date = fields.Date("BL Date", related='vessel_information_id.bl_date')
@@ -50,7 +50,7 @@ class AccountMove(models.Model):
     payment_terms_id2 = fields.Many2one('account.payment.term', 'Payment terms')
     incoterm_location_custom = fields.Many2one('incoterm.location', string='Incoterm Location',
                                                related='picking_id.incoterm_location_custom')
-    trader = fields.Many2one('hr.employee', string='Trader', related='picking_id.trader')
+    trader = fields.Many2one('hr.employee', string='Trader', related='picking_id.trader', store=True, readonly=False)
     legal_entity = fields.Many2one('legal.entity', string='Representing Entity')
     en_plus = fields.Boolean('EN Plus')
     show_hs_code = fields.Boolean('Show HS Code')
