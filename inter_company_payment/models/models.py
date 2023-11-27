@@ -71,12 +71,12 @@ class InheritAccountPayment(models.Model):
             # paired_amount = move_obj.browse(paired_payment.line_ids.ids[0]).balance * paired_currency.rate
             # paired_amount_2 = move_obj.browse(paired_payment.line_ids.ids[1]).balance * paired_currency.rate
             paired_payment.move_id.line_ids = [
-                (1, paired_payment.line_ids.ids[0], {'amount_currency': payment.contraBankAmount,
+                (1, paired_payment.line_ids.ids[0], {'amount_currency': payment.contraBankAmount*-1,
                                                      'currency_id': paired_currency,
-                                                     'balance':convertedamount}),
-                (1, paired_payment.line_ids.ids[1], {'amount_currency': payment.contraBankAmount*-1,
+                                                     'balance':convertedamount*-1}),
+                (1, paired_payment.line_ids.ids[1], {'amount_currency': payment.contraBankAmount,
                                                      'currency_id': paired_currency,
-                                                     'balance':convertedamount*-1})
+                                                     'balance':convertedamount})
             ]
             payment.move_id.line_ids = [
                 (1, payment.line_ids.ids[0], {'amount_currency': payment.amount,
