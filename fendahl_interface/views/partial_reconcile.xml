@@ -1,0 +1,61 @@
+<odoo>
+    <data>
+         <record id="view_account_partial_reconcile" model="ir.ui.view">
+            <field name="name">partial.reconcile.tree</field>
+            <field name="model">account.partial.reconcile</field>
+            <field name="arch" type="xml">
+                <tree string="Estimate">
+                    <field name="debit_move_id"/>
+                     <field name="credit_move_id"/>
+                     <field name="debit_currency_id"/>
+                     <field name="credit_currency_id"/>
+                     <field name="debit_amount_currency"/>
+                     <field name="credit_amount_currency"/>
+                     <field name="amount"/>
+                     <field name="debit_move_id"/>
+                     <field name="debit_move_type"/>
+                     <field name="credit_move_type"/>
+                     <field name="sent_to_fendahl"/>
+                </tree>
+            </field>
+         </record>
+         <record id="action_account_partial_reconcile" model="ir.actions.act_window">
+            <field name="name">Partial Reconcile</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.partial.reconcile</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_account_partial_reconcile"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Accounts reconcilliations.
+              </p>
+            </field>
+        </record>
+        <!-- Inherit Form View to Modify it -->
+ <record id="view_account_partial_reconcile_search" model="ir.ui.view">
+        <field name="name">account.partial.reconcile.filter.search</field>
+        <field name="model">account.partial.reconcile</field>
+        <field name="arch" type="xml">
+            <search>
+                 <filter name="debit_move_id" string="Debit move type"/>
+                     <filter name="credit_move_id" string="Credit move"/>
+                     <filter name="debit_currency_id" string="Debit Currency"/>
+                     <filter name="credit_currency_id" string="Credit Currency"/>
+                     <filter name="debit_amount_currency" string="Debit amount Currency"/>
+                     <filter name="credit_amount_currency" string="Credit amount Currency"/>
+                     <filter name="amount" string="Amount"/>
+                     <filter name="debit_move_id" string="Debit move"/>
+                     <filter name="debit_move_type" string="Debit move type"/>
+                     <filter name="credit_move_type" string="Credit move type"/>
+                     <field name="sent_to_fendahl"  string="Sent to Fendahl"/>
+            </search>
+        </field>
+    </record>
+
+        <menuitem id="menu_partial_reconcile"
+              name="Account partial reconcile"
+              action="action_account_partial_reconcile"
+              parent="account.menu_finance_receivables"
+              sequence="101"/>
+    </data>
+</odoo>

@@ -8,7 +8,8 @@ from odoo.tools.misc import format_date, formatLang
 
 class InheritAccountPayment(models.Model):
     _inherit = 'account.payment'
-
+    contraBankAmount = fields.Float("Contra amount")
+    contraBankCurrency = fields.Many2one('res.currency', related="destination_journal_id.currency_id")
     def _create_paired_internal_transfer_payment(self):
         ''' When an internal transfer is posted, a paired payment is created
         with opposite payment_type and swapped journal_id & destination_journal_id.
@@ -23,6 +24,7 @@ class InheritAccountPayment(models.Model):
                 'ref': payment.ref,
                 'paired_internal_transfer_payment_id': payment.id,
                 'date': payment.date,
+             
             })
             paired_payment.move_id._post(soft=False)
             payment.paired_internal_transfer_payment_id = paired_payment
@@ -49,30 +51,58 @@ class InheritAccountPayment(models.Model):
 
             # custom logic starts here
             move_obj = self.env['account.move.line']
-
-            paired_currency = paired_payment.journal_id.currency_id or payment.env.company.currency_id
-            paired_amount = move_obj.browse(paired_payment.line_ids.ids[0]).balance * paired_currency.rate
-            paired_amount_2 = move_obj.browse(paired_payment.line_ids.ids[1]).balance * paired_currency.rate
-
-            paired_payment.move_id.line_ids = [
-                (1, paired_payment.line_ids.ids[0], {'amount_currency': paired_amount,
-                                                     'currency_id': paired_currency}),
-                (1, paired_payment.line_ids.ids[1], {'amount_currency': paired_amount_2,
-                                                     'currency_id': paired_currency})
-            ]
-
-            # inter payment which we create
-
+            
             payment_currency = payment.journal_id.currency_id or payment.env.company.currency_id
-            payment_amount = move_obj.browse(payment.line_ids.ids[0]).balance * payment_currency.rate
-            payment_amount_2 = move_obj.browse(payment.line_ids.ids[1]).balance * payment_currency.rate
-
-            payment.move_id.line_ids = [
-                (1, payment.line_ids.ids[0], {'amount_currency': payment_amount,
-                                              'currency_id': payment_currency}),
-                (1, payment.line_ids.ids[1], {'amount_currency': payment_amount_2,
-                                              'currency_id': payment_currency})
+            paired_currency = paired_payment.journal_id.currency_id or payment.env.company.currency_id
+            
+            
+            origin_amount=payment.amount
+            destination_amount=payment.contraBankAmount
+            if(payment_currency.id==2):
+                convertedamount=origin_amount
+            elif(paired_currency.id==2):
+                convertedamount=destination_amount
+             
+            else:
+                convertedamount=payment.amount * payment_currency.rate
+            
+            
+            
+            # paired_amount = move_obj.browse(paired_payment.line_ids.ids[0]).balance * paired_currency.rate
+            # paired_amount_2 = move_obj.browse(paired_payment.line_ids.ids[1]).balance * paired_currency.rate
+            paired_payment.move_id.line_ids = [
+                (1, paired_payment.line_ids.ids[0], {'amount_currency': payment.contraBankAmount,
+                                                     'currency_id': paired_currency,
+                                                     'balance':convertedamount}),
+                (1, paired_payment.line_ids.ids[1], {'amount_currency': payment.contraBankAmount*-1,
+                                                     'currency_id': paired_currency,
+                                                     'balance':convertedamount*-1})
             ]
+            payment.move_id.line_ids = [
+                (1, payment.line_ids.ids[0], {'amount_currency': payment.amount,
+                                              'currency_id': payment_currency,
+                                              'balance':convertedamount}),
+                (1, payment.line_ids.ids[1], {'amount_currency': payment.amount*-1,
+                                              'currency_id': payment_currency,
+                                               'balance':convertedamount*-1})
+            ]
+            
+            
+
+            # paired_payment.move_id.line_ids = [
+            #     (1, paired_payment.line_ids.ids[0], {'amount_currency': paired_amount,
+            #                                          'currency_id': paired_currency}),
+            #     (1, paired_payment.line_ids.ids[1], {'amount_currency': paired_amount_2,
+            #                                          'currency_id': paired_currency})
+            # ]
+            #
+            # # inter payment which we create
+            #
+            #
+            # payment_amount = move_obj.browse(payment.line_ids.ids[0]).balance * payment_currency.rate
+            # payment_amount_2 = move_obj.browse(payment.line_ids.ids[1]).balance * payment_currency.rate
+
+           
 
             lines.reconcile()
 

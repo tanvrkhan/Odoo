@@ -14,4 +14,7 @@
     'category': 'Uncategorized',
     'version': '0.1',
     'depends': ['base', 'account', 'account_reports'],
+    'data': [
+          'views/account_move_views.xml'
+    ],
 }
