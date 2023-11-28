@@ -1,0 +1,126 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sh_warehouse_avg_costing
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 15.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-06-29 04:22+0000\n"
+"PO-Revision-Date: 2022-06-29 04:22+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_sh_warehouse_cost__cost
+msgid "Cost"
+msgstr "成本"
+
+#. module: sh_warehouse_avg_costing
+#: code:addons/sh_warehouse_avg_costing/models/sh_inherit.py:0
+#, python-format
+msgid ""
+"Cost and adjustments lines do not match. You should maybe recompute the "
+"landed costs."
+msgstr ""
+"成本和調整線不匹配。你應該重新計算 "
+"降落成本。"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_sh_warehouse_cost__create_uid
+msgid "Created by"
+msgstr "由...製作"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_sh_warehouse_cost__create_date
+msgid "Created on"
+msgstr "創建於"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_sh_warehouse_cost__display_name
+msgid "Display Name"
+msgstr "顯示名稱"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_sh_warehouse_cost__id
+msgid "ID"
+msgstr "ID"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model,name:sh_warehouse_avg_costing.model_account_move_line
+msgid "Journal Item"
+msgstr "期刊項目"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_sh_warehouse_cost____last_update
+msgid "Last Modified on"
+msgstr "最後修改"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_sh_warehouse_cost__write_uid
+msgid "Last Updated by"
+msgstr "最後更新"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_sh_warehouse_cost__write_date
+msgid "Last Updated on"
+msgstr "最後更新"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model,name:sh_warehouse_avg_costing.model_product_product
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_sh_warehouse_cost__product_id
+msgid "Product"
+msgstr "產品"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model,name:sh_warehouse_avg_costing.model_product_template
+msgid "Product Template"
+msgstr "產品模板"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model,name:sh_warehouse_avg_costing.model_stock_landed_cost
+msgid "Stock Landed Cost"
+msgstr "股票成本"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model,name:sh_warehouse_avg_costing.model_stock_move
+msgid "Stock Move"
+msgstr "庫存移動"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model,name:sh_warehouse_avg_costing.model_stock_quantity_history
+msgid "Stock Quantity History"
+msgstr "庫存歷史記錄"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model,name:sh_warehouse_avg_costing.model_stock_valuation_layer
+msgid "Stock Valuation Layer"
+msgstr "庫存評估層"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model,name:sh_warehouse_avg_costing.model_sh_warehouse_cost
+msgid "Stores Cost warehouse Wise"
+msgstr "商店成本倉庫明智"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_sh_warehouse_cost__warehouse_id
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_stock_quantity_history__warehouse_id
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_stock_valuation_layer__warehouse_id
+msgid "Warehouse"
+msgstr "倉庫"
+
+#. module: sh_warehouse_avg_costing
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_product_product__warehouse_cost_lines
+#: model:ir.model.fields,field_description:sh_warehouse_avg_costing.field_product_template__warehouse_cost_lines
+msgid "Warehouse Cost Lines"
+msgstr "倉庫成本線"
+
+#. module: sh_warehouse_avg_costing
+#: model_terms:ir.ui.view,arch_db:sh_warehouse_avg_costing.sh_warehouse_avg_product_product_form
+#: model_terms:ir.ui.view,arch_db:sh_warehouse_avg_costing.sh_warehouse_avg_product_template_form
+msgid "Warehouse-Wise Cost"
+msgstr "倉庫成本"
