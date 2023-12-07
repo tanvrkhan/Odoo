@@ -95,7 +95,7 @@ class PostContactsModel(models.Model):
         
             response = requests.post(url, data=json.dumps(json_data), headers=headers)
             if(response.status_code!=200):
-                raise ValidationError(response.text)
+                raise ValidationError(self.name + response.text)
     
     def action_post_contacts_prod(self):
         for record in self:
@@ -141,7 +141,7 @@ class PostContactsModel(models.Model):
             
             response = requests.post(url, data=json.dumps(json_data), headers=headers)
             if (response.status_code != 200):
-                raise ValidationError(response.text)
+                raise ValidationError(self.name + response.text)
     def emptyFalse(self,value):
         if value:
             return value
