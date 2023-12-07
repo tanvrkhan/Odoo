@@ -9,6 +9,13 @@ from odoo.exceptions import ValidationError
 class PostContactsModel(models.Model):
     _inherit = 'res.partner'
     
+    sent_to_fendahl_sandpit=fields.Boolean()
+    sent_to_fendahl_uat=fields.Boolean()
+    sent_to_fendahl_prod=fields.Boolean()
+    message_fendahl_sandpit = fields.Char()
+    message_fendahl_uat = fields.Char()
+    message_fendahl_prod = fields.Char()
+
     def action_post_contacts(self):
         headers = {"Content-Type": "application/json", "Accept": "application/json", "Catch-Control": "no-cache","Apikey": "268d72e6-5013-4687-8cfa-66d2b633b115"}
         url = "https://kemexonsandpit1.fendahl.in:9002/kemexon/Integration/api/Company/CreateCompany"
@@ -95,7 +102,11 @@ class PostContactsModel(models.Model):
         
             response = requests.post(url, data=json.dumps(json_data), headers=headers)
             if(response.status_code!=200):
+                self.message_fendahl_uat = response.text
+                self.sent_to_fendahl_uat= False
                 raise ValidationError(self.name + response.text)
+            else:
+                self.sent_to_fendahl_uat =True
     
     def action_post_contacts_prod(self):
         for record in self:
@@ -141,7 +152,11 @@ class PostContactsModel(models.Model):
             
             response = requests.post(url, data=json.dumps(json_data), headers=headers)
             if (response.status_code != 200):
+                self.message_fendahl_prod = response.text
+                self.sent_to_fendahl_prod = False
                 raise ValidationError(self.name + response.text)
+            else:
+                self.sent_to_fendahl_prod = True
     def emptyFalse(self,value):
         if value:
             return value
