@@ -31,7 +31,7 @@ class AccountMove(models.Model):
     disport = fields.Many2one("delivery.location", "Discharge port", related='vessel_information_id.disport', store=True, readonly=False)
     country_of_origin = fields.Many2one("res.country", "COO", related='vessel_information_id.country_of_origin')
     payment_notes = fields.Char("Payment Notes")
-    bl_date = fields.Date("BL Date", related='vessel_information_id.bl_date')
+    bl_date = fields.Date("BL Date", related='vessel_information_id.bl_date', store=True, readonly=False)
     cod_date = fields.Date("COD Date", related='vessel_information_id.cod_date')
     nor_date = fields.Date("NOR Date", related='vessel_information_id.nor_date')
     # bill_date = fields.Date("B/L Date", related='picking_id.bill_date')
