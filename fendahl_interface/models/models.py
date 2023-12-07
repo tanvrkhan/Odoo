@@ -102,11 +102,11 @@ class PostContactsModel(models.Model):
         
             response = requests.post(url, data=json.dumps(json_data), headers=headers)
             if(response.status_code!=200):
-                self.message_fendahl_uat = response.text
-                self.sent_to_fendahl_uat= False
-                raise ValidationError(self.name + response.text)
+                record.message_fendahl_uat = response.text
+                record.sent_to_fendahl_uat= False
+                raise ValidationError(record.name + response.text)
             else:
-                self.sent_to_fendahl_uat =True
+                record.sent_to_fendahl_uat =True
     
     def action_post_contacts_prod(self):
         for record in self:
@@ -152,11 +152,11 @@ class PostContactsModel(models.Model):
             
             response = requests.post(url, data=json.dumps(json_data), headers=headers)
             if (response.status_code != 200):
-                self.message_fendahl_prod = response.text
-                self.sent_to_fendahl_prod = False
-                raise ValidationError(self.name + response.text)
+                record.message_fendahl_prod = response.text
+                record.sent_to_fendahl_prod = False
+                raise ValidationError(record.name + response.text)
             else:
-                self.sent_to_fendahl_prod = True
+                record.sent_to_fendahl_prod = True
     def emptyFalse(self,value):
         if value:
             return value
