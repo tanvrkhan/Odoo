@@ -214,8 +214,8 @@ class PostReconciledPayments(models.Model):
                     company = "KEMEXON UK LIMITED"
             
             if (record.debit_move_id.move_type == "out_invoice"):
-                if record.debit_move_id.fusion_reference:
-                    invoiceid = record.debit_move_id.fusion_reference.split(",")[0]
+                if record.debit_move_id.move_id.fusion_reference:
+                    invoiceid = record.debit_move_id.move_id.fusion_reference.split(",")[0]
                     json_data = {
                         "Accounting_System_Payment_ID": record.credit_move_id.id,
                         "Internal_Company_Code": company,
@@ -240,8 +240,8 @@ class PostReconciledPayments(models.Model):
                 else:
                     raise ValidationError("Invoice doesn't have fusion reference")
             elif (self.credit_move_id.move_type == "in_invoice"):
-                if record.credit_move_id.fusion_reference:
-                    invoiceid = record.credit_move_id.fusion_reference.split(",")[0]
+                if record.credit_move_id.move_id.fusion_reference:
+                    invoiceid = record.credit_move_id.move_id.fusion_reference.split(",")[0]
                     json_data = {
                         "Accounting_System_Payment_ID": record.debit_move_id.id,
                         "Internal_Company_Code": company,
@@ -290,8 +290,8 @@ class PostReconciledPayments(models.Model):
                     company = "KEMEXON UK LIMITED"
         
             if (record.debit_move_id.move_type == "out_invoice"):
-                if record.debit_move_id.fusion_reference:
-                    invoiceid = record.debit_move_id.fusion_reference.split(",")[0]
+                if record.debit_move_id.move_id.fusion_reference:
+                    invoiceid = record.debit_move_id.move_id.fusion_reference.split(",")[0]
                     json_data = {
                         "Accounting_System_Payment_ID": record.credit_move_id.id,
                         "Internal_Company_Code": company,
@@ -316,8 +316,8 @@ class PostReconciledPayments(models.Model):
                 else:
                     raise ValidationError("Invoice doesn't have fusion reference")
             elif (self.credit_move_id.move_type == "in_invoice"):
-                if record.credit_move_id.fusion_reference:
-                    invoiceid = record.credit_move_id.fusion_reference.split(",")[0]
+                if record.credit_move_id.move_id.fusion_reference:
+                    invoiceid = record.credit_move_id.move_id.fusion_reference.split(",")[0]
                     json_data = {
                         "Accounting_System_Payment_ID": record.debit_move_id.id,
                         "Internal_Company_Code": company,
@@ -363,8 +363,8 @@ class PostReconciledPayments(models.Model):
                     company = "KEMEXON UK LIMITED"
             
             if (record.debit_move_id.move_type == "out_invoice"):
-                if record.debit_move_id.fusion_reference:
-                    invoiceid = record.debit_move_id.fusion_reference.split(",")[0]
+                if record.debit_move_id.move_id.fusion_reference:
+                    invoiceid = record.debit_move_id.move_id.fusion_reference.split(",")[0]
                     json_data = {
                         "Accounting_System_Payment_ID": record.credit_move_id.id,
                         "Internal_Company_Code": company,
@@ -390,8 +390,8 @@ class PostReconciledPayments(models.Model):
                 else:
                     raise ValidationError("Invoice doesn't have fusion reference")
             elif (self.credit_move_id.move_type == "in_invoice"):
-                if record.credit_move_id.fusion_reference:
-                    invoiceid = record.credit_move_id.fusion_reference.split(",")[0]
+                if record.credit_move_id.move_id.fusion_reference:
+                    invoiceid = record.credit_move_id.move_id.fusion_reference.split(",")[0]
                     json_data = {
                         "Accounting_System_Payment_ID": record.debit_move_id.id,
                         "Internal_Company_Code": company,
