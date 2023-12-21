@@ -26,6 +26,7 @@ class AccountMove(models.Model):
     fusion_imo = fields.Char('Fusion IMO')
     fusion_vessel_name = fields.Char('Fusion Vessel Name')
     fusion_deal_ref = fields.Char('Fusion Deal Ref')
+    contract_ref = fields.Char('Contract Reference')
     deal_ref = fields.Char("Deal Ref")
     bill_date = fields.Date("B/L Date", related='picking_id.bill_date')
     tt_date = fields.Date("TT Date", related='picking_id.tt_date')
