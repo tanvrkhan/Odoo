@@ -213,7 +213,7 @@ class PostReconciledPayments(models.Model):
                 case 5:
                     company = "KEMEXON UK LIMITED"
             
-            if (record.debit_move_id.move_type == "out_invoice"):
+            if (record.debit_move_id.move_id.move_type == "out_invoice"):
                 if record.debit_move_id.move_id.fusion_reference:
                     invoiceid = record.debit_move_id.move_id.fusion_reference.split(",")[0]
                     json_data = {
@@ -239,7 +239,7 @@ class PostReconciledPayments(models.Model):
                         raise ValidationError(response.text)
                 else:
                     raise ValidationError("Invoice doesn't have fusion reference")
-            elif (self.credit_move_id.move_type == "in_invoice"):
+            elif (self.credit_move_id.move_id.move_type == "in_invoice"):
                 if record.credit_move_id.move_id.fusion_reference:
                     invoiceid = record.credit_move_id.move_id.fusion_reference.split(",")[0]
                     json_data = {
@@ -289,7 +289,7 @@ class PostReconciledPayments(models.Model):
                 case 5:
                     company = "KEMEXON UK LIMITED"
         
-            if (record.debit_move_id.move_type == "out_invoice"):
+            if (record.debit_move_id.move_id.move_type == "out_invoice"):
                 if record.debit_move_id.move_id.fusion_reference:
                     invoiceid = record.debit_move_id.move_id.fusion_reference.split(",")[0]
                     json_data = {
@@ -315,7 +315,7 @@ class PostReconciledPayments(models.Model):
                         raise ValidationError(response.text)
                 else:
                     raise ValidationError("Invoice doesn't have fusion reference")
-            elif (self.credit_move_id.move_type == "in_invoice"):
+            elif (self.credit_move_id.move_id.move_type == "in_invoice"):
                 if record.credit_move_id.move_id.fusion_reference:
                     invoiceid = record.credit_move_id.move_id.fusion_reference.split(",")[0]
                     json_data = {
@@ -362,7 +362,7 @@ class PostReconciledPayments(models.Model):
                 case 5:
                     company = "KEMEXON UK LIMITED"
             
-            if (record.debit_move_id.move_type == "out_invoice"):
+            if (record.debit_move_id.move_id.move_type == "out_invoice"):
                 if record.debit_move_id.move_id.fusion_reference:
                     invoiceid = record.debit_move_id.move_id.fusion_reference.split(",")[0]
                     json_data = {
@@ -389,7 +389,7 @@ class PostReconciledPayments(models.Model):
                         raise ValidationError(response.text)
                 else:
                     raise ValidationError("Invoice doesn't have fusion reference")
-            elif (self.credit_move_id.move_type == "in_invoice"):
+            elif (self.credit_move_id.move_id.move_type == "in_invoice"):
                 if record.credit_move_id.move_id.fusion_reference:
                     invoiceid = record.credit_move_id.move_id.fusion_reference.split(",")[0]
                     json_data = {

@@ -11,9 +11,21 @@ from operator import itemgetter
 
 class AccountMove(models.Model):
     _inherit = "account.move"
+
     fusion_reference = fields.Char("Fusion Ref")
     fusion_location = fields.Char('Fusion Location')
-    contract_ref = fields.Char('Contract Reference')
+    fusion_trader = fields.Char('Fusion Trader')
+    fusion_bl_date = fields.Date('Fusion BL Date')
+    fusion_delivery_from = fields.Date('Fusion Delivery From')
+    fusion_delivery_to = fields.Date('Fusion Delivery To')
+    fusion_ncv = fields.Char('Fusion NCV')
+    fusion_loadport = fields.Char('Fusion Load Port')
+    fusion_disport = fields.Char('Fusion Discharge Port')
+    fusion_country_of_origin = fields.Char('Fusion COO')
+    fusion_contract_ref = fields.Char('Fusion Contract Ref')
+    fusion_imo = fields.Char('Fusion IMO')
+    fusion_vessel_name = fields.Char('Fusion Vessel Name')
+    fusion_deal_ref = fields.Char('Fusion Deal Ref')
     deal_ref = fields.Char("Deal Ref")
     bill_date = fields.Date("B/L Date", related='picking_id.bill_date')
     tt_date = fields.Date("TT Date", related='picking_id.tt_date')
