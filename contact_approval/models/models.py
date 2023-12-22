@@ -37,7 +37,13 @@ class InheritResPartner(models.Model):
 
     @api.model
     def create(self, vals_list):
-        res = super().create(vals_list)
-        res.active = False
-        res.status = 'draft'
-        return res
+        if vals_list['type']=='contact':
+            res = super().create(vals_list)
+            res.active = False
+            res.status = 'draft'
+            return res
+        else:
+            res = super().create(vals_list)
+            res.active = True
+            res.status = 'approved'
+            return res
