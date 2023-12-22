@@ -56,6 +56,20 @@ class PostContactsModel(models.Model):
                     }
                 ]
             }
+            altaddresses = record.env['res.partner'].search([('parent_id', '=', record.id)])
+            if altaddresses:
+                for address in altaddresses:
+                    new_address = {
+                        "Address_Type": record.emptyFalse(address.type),
+                        "Address_Line1": record.emptyFalse(address.street),
+                        "Contact_Person": "",
+                        "City_Name": record.emptyFalse(address.city),
+                        "Country": record.emptyFalse(address.country_id.name),
+                        "County": record.emptyFalse(address.state_id.name),
+                        "Phone": record.emptyFalse(address.phone),
+                        "Mobile_Number": record.emptyFalse(address.mobile)
+                    }
+                    json_data['Company_Address_Models'].append(new_address)
             
             response = requests.post(url, data=json.dumps(json_data), headers=headers)
             if (response.status_code != 200):
@@ -103,10 +117,24 @@ class PostContactsModel(models.Model):
                         "County": record.emptyFalse(record.state_id.name),
                         "Phone": record.emptyFalse(record.phone),
                         "Mobile_Number": record.emptyFalse(record.mobile)
-                    }
+                    },
                 ]
             }
-        
+            altaddresses= record.env['res.partner'].search([('parent_id', '=', record.id)])
+            if altaddresses:
+                for address in altaddresses:
+                    new_address= {
+                        "Address_Type": record.emptyFalse(address.type),
+                        "Address_Line1": record.emptyFalse(address.street),
+                        "Contact_Person": "",
+                        "City_Name": record.emptyFalse(address.city),
+                        "Country": record.emptyFalse(address.country_id.name),
+                        "County": record.emptyFalse(address.state_id.name),
+                        "Phone": record.emptyFalse(address.phone),
+                        "Mobile_Number": record.emptyFalse(address.mobile)
+                    }
+                    json_data['Company_Address_Models'].append(new_address)
+                    
             response = requests.post(url, data=json.dumps(json_data), headers=headers)
             if(response.status_code!=200):
                 record.message_fendahl_uat = response.text
@@ -156,7 +184,20 @@ class PostContactsModel(models.Model):
                     }
                 ]
             }
-            
+            altaddresses = record.env['res.partner'].search([('parent_id', '=', record.id)])
+            if altaddresses:
+                for address in altaddresses:
+                    new_address = {
+                        "Address_Type": record.emptyFalse(address.type),
+                        "Address_Line1": record.emptyFalse(address.street),
+                        "Contact_Person": "",
+                        "City_Name": record.emptyFalse(address.city),
+                        "Country": record.emptyFalse(address.country_id.name),
+                        "County": record.emptyFalse(address.state_id.name),
+                        "Phone": record.emptyFalse(address.phone),
+                        "Mobile_Number": record.emptyFalse(address.mobile)
+                    }
+                    json_data['Company_Address_Models'].append(new_address)
             response = requests.post(url, data=json.dumps(json_data), headers=headers)
             if (response.status_code != 200):
                 record.message_fendahl_prod = response.text
