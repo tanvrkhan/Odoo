@@ -4,20 +4,52 @@
         <!-- International-->
 
         <record id="model_res_partner_send_to_Fendahl" model="ir.actions.server">
-            <field name="name">Send to fendahl</field>
+            <field name="name">Send to fendahl Sandpit</field>
             <field name="model_id" ref="base.model_res_partner"/>
             <field name="binding_model_id" ref="base.model_res_partner"/>
             <field name="binding_view_types">form,list</field>
             <field name="state">code</field>
             <field name="code">records.action_post_contacts()</field>
         </record>
+        <record id="model_res_partner_send_to_Fendahl_UAT" model="ir.actions.server">
+            <field name="name">Send to fendahl UAT</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="binding_model_id" ref="base.model_res_partner"/>
+            <field name="binding_view_types">form,list</field>
+            <field name="state">code</field>
+            <field name="code">records.action_post_contacts_uat()</field>
+        </record>
+        <record id="model_res_partner_send_to_Fendahl_prod" model="ir.actions.server">
+            <field name="name">Send to fendahl Prod</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="binding_model_id" ref="base.model_res_partner"/>
+            <field name="binding_view_types">form,list</field>
+            <field name="state">code</field>
+            <field name="code">records.action_post_contacts_prod()</field>
+        </record>
          <record id="model_partial_reconcile_send_to_Fendahl" model="ir.actions.server">
-            <field name="name">Send to fendahl</field>
+            <field name="name">Send to fendahl Sandpit</field>
             <field name="model_id" ref="account.model_account_partial_reconcile"/>
             <field name="binding_model_id" ref="account.model_account_partial_reconcile"/>
             <field name="binding_view_types">list</field>
             <field name="state">code</field>
             <field name="code">records.action_post_payments()</field>
+        </record>
+        <record id="model_partial_reconcile_send_to_Fendahl_UAT" model="ir.actions.server">
+            <field name="name">Send to fendahl UAT</field>
+            <field name="model_id" ref="account.model_account_partial_reconcile"/>
+            <field name="binding_model_id" ref="account.model_account_partial_reconcile"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.action_post_payments_UAT()</field>
+        </record>
+         <record id="model_partial_reconcile_send_to_Fendahl_Prod" model="ir.actions.server">
+            <field name="name">Send to fendahl Prod</field>
+            <field name="model_id" ref="account.model_account_partial_reconcile"/>
+            <field name="binding_model_id" ref="account.model_account_partial_reconcile"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.action_post_payments_Prod()</field>
         </record>
 
     </data>

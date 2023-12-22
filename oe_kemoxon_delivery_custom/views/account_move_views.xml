@@ -42,13 +42,35 @@
                     <field name="show_delivery_to"/>
                     <field name="delivery_from"/>
                     <field name="delivery_to"/>
-                    <field name="fusion_reference"/>
-                     <field name="posted_before"/>
                 </xpath>
 
                 <xpath expr="//field[@name='partner_id']" position="attributes">
                     <attribute name="options">{'no_quick_create':True,'no_create_edit':True,'no_open': True,}
                     </attribute>
+                </xpath>
+                <xpath expr="//page[@name='other_info']" position="after">
+                    <page string="Fusion Info" name="fusion_info">
+                        <group string="Fusion Fields" name="fusion_group">
+                            <group>
+                                <field name="fusion_reference"/>
+                                <field name="fusion_contract_ref"/>
+                                <field name="fusion_location"/>
+                                <field name="fusion_trader"/>
+                                <field name="fusion_ncv"/>
+                                <field name="fusion_loadport"/>
+                                <field name="fusion_disport"/>
+                            </group>
+                            <group>
+                                <field name="fusion_bl_date"/>
+                                <field name="fusion_delivery_from"/>
+                                <field name="fusion_delivery_to"/>
+                                <field name="fusion_country_of_origin"/>
+                                <field name="fusion_imo"/>
+                                <field name="fusion_vessel_name"/>
+                                <field name="fusion_deal_ref"/>
+                            </group>
+                        </group>
+                    </page>
                 </xpath>
             </field>
         </record>
