@@ -53,6 +53,7 @@
                         <group string="Fusion Fields" name="fusion_group">
                             <group>
                                 <field name="fusion_reference"/>
+                                <field name="fusion_invoice_ref"/>
                                 <field name="fusion_contract_ref"/>
                                 <field name="fusion_location"/>
                                 <field name="fusion_trader"/>
