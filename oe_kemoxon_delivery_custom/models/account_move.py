@@ -13,6 +13,7 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     fusion_reference = fields.Char("Fusion Ref")
+    fusion_invoice_ref = fields.Char("Fusion Invoice Ref")
     fusion_location = fields.Char('Fusion Location')
     fusion_trader = fields.Char('Fusion Trader')
     fusion_bl_date = fields.Date('Fusion BL Date')
