@@ -102,16 +102,21 @@ class StockValuationLayer(models.Model):
                     ae.line_ids.unlink()
                     self.env['account.move'].search([('id', '=', ae.id)]).unlink()
             record.unlink()
-
+    
     def update_date_to_schedule_date(self):
         for record in self:
             record.stock_move_id.picking_id.date_done = record.stock_move_id.picking_id.scheduled_date
             record.stock_move_id.date = record.stock_move_id.picking_id.scheduled_date
             for line in record.stock_move_id.move_line_ids:
-                line.date=line.move_id.picking_id.scheduled_date
-            record.create_date=record.stock_move_id.picking_id.scheduled_date
-            record.account_move_id.date=record.stock_move_id.picking_id.scheduled_date
-            record.account_move_line_id.date=record.stock_move_id.picking_id.scheduled_date
+                line.date = line.move_id.picking_id.scheduled_date
+            record.create_date = record.stock_move_id.picking_id.scheduled_date
+            
+            record.account_move_id.state = 'draft'
+            record.account_move_id.date = record.stock_move_id.picking_id.scheduled_date
+            record.account_move_line_id.date = record.stock_move_id.picking_id.scheduled_date
+            next_number = self.env['ir.sequence'].next_by_code('stock.valuation')
+            record.account_move_id.sequence_number = next_number
+            record.account_move_id.state = 'posted'
 
 
 
