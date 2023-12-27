@@ -105,29 +105,28 @@ class StockValuationLayer(models.Model):
     
     def update_date_to_schedule_date(self):
         for record in self:
-           
-            
-            record.account_move_id.state = 'draft'
-            record.account_move_line_id.parent_state = 'draft'
             next_number = self.env['ir.sequence'].next_by_code('stock.valuation')
-            next_number= '000'+ str(next_number)
-            next_number=next_number[-3:]
-            year= record.stock_move_id.picking_id.scheduled_date.year
+            next_number = '000' + str(next_number)
+            next_number = next_number[-3:]
+            year = record.stock_move_id.picking_id.scheduled_date.year
             month = record.stock_move_id.picking_id.scheduled_date.month
-            sequence= 'STJ/'+str(year)+'/'+str(month)+'/'+next_number
-            record.account_move_id.posted_before = False
-            record.account_move_id.sequence_number=0
-            record.account_move_id.sequence_number = next_number
-            record.account_move_id.name = sequence
-            record.account_move_id.date = record.stock_move_id.picking_id.scheduled_date
-            record.account_move_line_id.date = record.stock_move_id.picking_id.scheduled_date
-            record.account_move_id.state = 'posted'
-            record.account_move_line_id.parent_state = 'posted'
-            record.stock_move_id.picking_id.date_done = record.stock_move_id.picking_id.scheduled_date
-            record.stock_move_id.date = record.stock_move_id.picking_id.scheduled_date
+            sequence = 'STJ/' + str(year) + '/' + str(month) + '/' + next_number
+            
             for line in record.stock_move_id.move_line_ids:
                 line.date = line.move_id.picking_id.scheduled_date
             record.create_date = record.stock_move_id.picking_id.scheduled_date
+            record.stock_move_id.picking_id.date_done = record.stock_move_id.picking_id.scheduled_date
+            record.stock_move_id.date = record.stock_move_id.picking_id.scheduled_date
+            
+            record.account_move_id.state = 'draft'
+            record.account_move_line_id.parent_state = 'draft'
+            record.account_move_id.name = 'draft'
+            record.account_move_id.date = record.stock_move_id.picking_id.scheduled_date
+            record.account_move_id.name = sequence
+            record.account_move_line_id.date = record.stock_move_id.picking_id.scheduled_date
+            record.account_move_id.state = 'posted'
+            record.account_move_line_id.parent_state = 'posted'
+           
 
     # def recalculate_stock_value(self):
     #     for record in self:
