@@ -115,7 +115,9 @@ class StockValuationLayer(models.Model):
             record.account_move_id.date = record.stock_move_id.picking_id.scheduled_date
             record.account_move_line_id.date = record.stock_move_id.picking_id.scheduled_date
             next_number = self.env['ir.sequence'].next_by_code('stock.valuation')
+            record.account_move_id.sequence_number=0
             record.account_move_id.sequence_number = next_number
+            record.account_move_id.name=next_number
             record.account_move_id.state = 'posted'
 
 
