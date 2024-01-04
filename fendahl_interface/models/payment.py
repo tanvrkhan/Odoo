@@ -88,12 +88,12 @@ class PostReconciledPayments(models.Model):
                         "CounterParty_Code": record.emptyFalse(record.credit_move_id.partner_id.name),
                         "Payment_Made_Date": record.debit_move_id.move_id.date.strftime("%d-%m-%Y"),
                         "Payment_Due_Date": record.debit_move_id.move_id.date.strftime("%d-%m-%Y"),
-                        "Payment_Amount": record.credit_amount_currency,
+                        "Payment_Amount": record.credit_amount_currency*-1,
                         "Payment_Currency": record.emptyFalse(record.credit_currency_id.name),
                         "Payment_Allocations": [
                             {
                                 "Invoice_Master_ID": record.emptyFalse(invoiceid),
-                                "Allocated_Amount": record.credit_amount_currency,
+                                "Allocated_Amount": record.credit_amount_currency*-1,
                             }
                         ],
                         

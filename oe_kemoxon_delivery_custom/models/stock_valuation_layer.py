@@ -93,15 +93,16 @@ class StockValuationLayer(models.Model):
 
     def remove_from_valuation(self):
         for record in self:
-            record.unit_cost = 0
-            record.value = 0
-            record.quantity = 0
-            if record.account_move_id:
-                for ae in record.account_move_id:
-                    ae.state = 'draft'
-                    ae.line_ids.unlink()
-                    self.env['account.move'].search([('id', '=', ae.id)]).unlink()
-            record.unlink()
+            if record.stock_move_id.quantity_done==0:
+                record.unit_cost = 0
+                record.value = 0
+                record.quantity = 0
+                if record.account_move_id:
+                    for ae in record.account_move_id:
+                        ae.state = 'draft'
+                        ae.line_ids.unlink()
+                        self.env['account.move'].search([('id', '=', ae.id)]).unlink()
+                record.unlink()
     
     def update_date_to_schedule_date(self):
         for record in self:
@@ -126,8 +127,69 @@ class StockValuationLayer(models.Model):
             record.account_move_line_id.date = record.stock_move_id.picking_id.scheduled_date
             record.account_move_id.state = 'posted'
             record.account_move_line_id.parent_state = 'posted'
-           
-
+    
+    def recalculate_stock_value(self):
+        self.update_date_to_schedule_date()
+        wrong=0
+        for record in self:
+            if record.stock_move_id.quantity_done==0:
+                record.remove_from_valuation()
+            else:
+                all_valuations = self.env['stock.valuation.layer'].search(
+                    ['&', '&', '&',
+                     ('product_id', '=', record.product_id.id),
+                     ('stock_move_id.date', '<=', record.stock_move_id.date),
+                     ('id', '!=', record.id),
+                     ('warehouse_id', '=', record.warehouse_id.id),
+                     ('company_id', '=', record.company_id.id)
+                     ])
+                totalquantity = 0
+                totalamount = 0
+                
+                base_currency = record.company_id.currency_id
+                
+                if record.quantity > 0:
+                    totalquantity += record.quantity
+                    # porateusd2 = record.stock_move_id.purchase_line_id.order_id.currency_id.compute(
+                    #     record.stock_move_id.purchase_line_id.price_unit, record.stock_move_id.purchase_line_id.currency_id)
+                    porateusd =record.stock_move_id.purchase_line_id.order_id.currency_id._convert( record.stock_move_id.purchase_line_id.price_unit,
+                                                                                        base_currency, record.company_id, record.stock_move_id.date, True)
+                    totalamount += (porateusd * record.quantity)
+                if all_valuations:
+                    for valuation in all_valuations:
+                        totalquantity+=valuation.quantity
+                        totalamount+=valuation.value
+                else:
+                    totalquantity += record.quantity
+                    totalamount += record.value
+                if totalquantity>0:
+                    unit_cost = round(totalamount/totalquantity,2)
+                    if round(record.unit_cost,2)==unit_cost:
+                        a=1
+                    else:
+                        wrong += 1
+                        record.unit_cost = unit_cost
+                        record.value = record.quantity * record.unit_cost
+                        record.account_move_id.state = 'draft'
+                        for ae in record.account_move_id.line_ids:
+                            ae.remove_move_reconcile()
+                            if ae.amount_currency != 0:
+                                if ae.amount_currency > 0:
+                                    ae.with_context(
+                                        check_move_validity=False).amount_currency = record.unit_cost * record.quantity
+                                    ae.with_context(
+                                        check_move_validity=False).debit = record.unit_cost * record.quantity
+                                elif ae.amount_currency < 0:
+                                    ae.with_context(
+                                        check_move_validity=False).amount_currency = -1 * record.unit_cost * record.quantity
+                                    ae.with_context(
+                                        check_move_validity=False).credit = record.unit_cost * record.quantity
+                        record.account_move_id.state = 'posted'
+                else:
+                    raise ValidationError("Quantity in the warehouse is negative for this transaction.")
+                if wrong>0:
+                    self.recalculate_stock_value()
+                    
     # def recalculate_stock_value(self):
     #     for record in self:
     #         all_valuations = self.env['stock.valuation.layer'].search(
