@@ -16,11 +16,12 @@ class WarehouseAccountMoveLine(models.Model):
         query = """SELECT order_line_id FROM sale_order_line_invoice_rel WHERE invoice_line_id = %s"""
         so_query = self._cr.execute(query, [self.id])
         result = self._cr.fetchone()
-        so = result[0]
-        if so:
-            domain = [('id', '=', so)]
-            sale_order_line = self.env['sale.order.line'].search(domain)
-            warehouse = sale_order_line.order_id.warehouse_id.id
+        if result:
+            so = result[0]
+            if so:
+                domain = [('id', '=', so)]
+                sale_order_line = self.env['sale.order.line'].search(domain)
+                warehouse = sale_order_line.order_id.warehouse_id.id
         if not self.product_id:
             return self.price_unit
         original_line = self.move_id.reversed_entry_id.line_ids.filtered(
