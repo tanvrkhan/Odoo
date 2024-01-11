@@ -31,6 +31,8 @@ class StockPicking(models.Model):
                                                related='sale_id.incoterm_location_custom')
     trader = fields.Many2one('hr.employee', string='Trader', related='sale_id.trader')
     en_plus = fields.Boolean('EN Plus')
+    
+    updatestatus=fields.Char()
     def fix_unmatching_lots(self):
         for rec in self:
             for mv in rec.move_ids:
@@ -47,6 +49,7 @@ class StockPicking(models.Model):
 
     def button_validate(self):
         for rec in self:
+            
             r= super(StockPicking,rec)._action_done()
     def button_confirm(self):
         for rec in self:
@@ -280,6 +283,7 @@ class StockPicking(models.Model):
                                                                                location_id=line.location_dest_id,
                                                                                quantity=-1 * line.qty_done,
                                                                                lot_id=line.lot_id, in_date=None)
+            record.updatestatus="waspostedbefore"
 
     def sync_stock_quant(self):
         company = self.env.company.id
