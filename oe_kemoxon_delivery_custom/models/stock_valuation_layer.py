@@ -90,28 +90,38 @@ class StockValuationLayer(models.Model):
                     ae.with_context(
                         check_move_validity=False).credit = amount_to_post
         accounting_header.state = 'posted'
-
+    
     def remove_from_valuation(self):
         for record in self:
-            if record.stock_move_id.quantity_done==0:
-                record.unit_cost = 0
-                record.value = 0
-                record.quantity = 0
-                if record.account_move_id:
-                    for ae in record.account_move_id:
-                        ae.state = 'draft'
-                        ae.line_ids.unlink()
-                        self.env['account.move'].search([('id', '=', ae.id)]).unlink()
-                record.unlink()
+            if record.quantity == 0 or record.value == 0:
+                record.delete_valuation(record)
+            if record.stock_move_id.picking_id:
+                if record.stock_move_id.quantity_done == 0:
+                    record.delete_valuation(record)
+            else:
+                record.delete_valuation(record)
+    
+    def delete_valuation(self,record):
+            record.unit_cost = 0
+            record.value = 0
+            record.quantity = 0
+            if record.account_move_id:
+                for ae in record.account_move_id:
+                    for ael in ae.line_ids:
+                        ael.remove_move_reconcile()
+                    ae.state = 'draft'
+                    ae.line_ids.unlink()
+                    self.env['account.move'].search([('id', '=', ae.id)]).unlink()
+            self.env['stock.valuation.layer'].search([('id', '=', record.id)]).unlink()
     
     def update_date_to_schedule_date(self):
         for record in self:
             next_number = self.env['ir.sequence'].next_by_code('stock.valuation')
-            next_number = '1000' + str(next_number)
-            next_number = next_number[-3:]
+            next_number = str(next_number)
+            # next_number = next_number[-5:]
             year = record.stock_move_id.picking_id.scheduled_date.year
             month = record.stock_move_id.picking_id.scheduled_date.month
-            sequence = 'STJ/' + str(year) + '/' + str(month) + '/' + next_number
+            sequence = 'STJU/' + str(year) + '/' + str(month) + '/' + next_number
             
             for line in record.stock_move_id.move_line_ids:
                 line.date = line.move_id.picking_id.scheduled_date
@@ -122,17 +132,28 @@ class StockValuationLayer(models.Model):
             record.account_move_id.state = 'draft'
             record.account_move_line_id.parent_state = 'draft'
             record.account_move_id.name = 'draft'
-            record.account_move_id.date = record.stock_move_id.picking_id.scheduled_date
+            record.account_move_id.date = record.stock_move_id.picking_id.scheduled_date.date()
             record.account_move_id.name = sequence
-            record.account_move_line_id.date = record.stock_move_id.picking_id.scheduled_date
+            record.account_move_line_id.date = record.stock_move_id.picking_id.scheduled_date.date()
             record.account_move_id.state = 'posted'
             record.account_move_line_id.parent_state = 'posted'
+        return self
     
     def recalculate_stock_value(self):
-        self.update_date_to_schedule_date()
-        wrong=0
-        for record in self:
-            if record.stock_move_id.quantity_done==0:
+        selfupdated = self.update_date_to_schedule_date()
+        wrong = 0
+        # sorted = self.env['stock.valuation.layer'].search([('id', 'in', [self.id])],order="id desc")
+        # sorted = self.search([],order="id asc")
+        # sorted={}
+        # for rec in self
+        # orderingdate= date.min
+        # sortedself= sorted(self,key=lambda x:x["create_date"],reverse=True)
+        sortedself = self.sorted(key=lambda r: r.create_date)
+        
+        for record in sortedself:
+            if record.stock_move_id.quantity_done == 0:
+                for acce in record.account_move_id.line_ids:
+                    acce.remove_move_reconcile()
                 record.remove_from_valuation()
             else:
                 all_valuations = self.env['stock.valuation.layer'].search(
@@ -152,20 +173,27 @@ class StockValuationLayer(models.Model):
                     totalquantity += record.quantity
                     # porateusd2 = record.stock_move_id.purchase_line_id.order_id.currency_id.compute(
                     #     record.stock_move_id.purchase_line_id.price_unit, record.stock_move_id.purchase_line_id.currency_id)
-                    porateusd =record.stock_move_id.purchase_line_id.order_id.currency_id._convert( record.stock_move_id.purchase_line_id.price_unit,
-                                                                                        base_currency, record.company_id, record.stock_move_id.date, True)
+                    porateusd = record.stock_move_id.purchase_line_id.order_id.currency_id._convert(
+                        record.stock_move_id.purchase_line_id.price_unit,
+                        base_currency, record.company_id, record.stock_move_id.date, True)
                     totalamount += (porateusd * record.quantity)
                 if all_valuations:
                     for valuation in all_valuations:
-                        totalquantity+=valuation.quantity
-                        totalamount+=valuation.value
+                        totalquantity += valuation.quantity
+                        totalamount += valuation.value
                 else:
                     totalquantity += record.quantity
                     totalamount += record.value
-                if totalquantity>0:
-                    unit_cost = round(totalamount/totalquantity,2)
-                    if round(record.unit_cost,2)==unit_cost:
-                        a=1
+                if totalquantity==0 and record.quantity>0:
+                    totalquantity =record.quantity
+                    porateusd = record.stock_move_id.purchase_line_id.order_id.currency_id._convert(
+                        record.stock_move_id.purchase_line_id.price_unit,
+                        base_currency, record.company_id, record.stock_move_id.date, True)
+                    totalamount = (porateusd * record.quantity)
+                elif totalquantity > 0:
+                    unit_cost = round(totalamount / totalquantity, 2)
+                    if round(record.unit_cost, 2) == unit_cost:
+                        a = 1
                     else:
                         wrong += 1
                         record.unit_cost = unit_cost
@@ -175,20 +203,28 @@ class StockValuationLayer(models.Model):
                             ae.remove_move_reconcile()
                             if ae.amount_currency != 0:
                                 if ae.amount_currency > 0:
+                                    if record.quantity<0:
+                                        newquantity= record.quantity*-1
+                                    else:
+                                        newquantity=record.quantity
                                     ae.with_context(
-                                        check_move_validity=False).amount_currency = record.unit_cost * record.quantity
+                                        check_move_validity=False).amount_currency = record.unit_cost * newquantity
                                     ae.with_context(
-                                        check_move_validity=False).debit = record.unit_cost * record.quantity
+                                        check_move_validity=False).debit = record.unit_cost * newquantity
                                 elif ae.amount_currency < 0:
+                                    if record.quantity > 0:
+                                        newquantity = record.quantity * -1
+                                    else:
+                                        newquantity = record.quantity
                                     ae.with_context(
-                                        check_move_validity=False).amount_currency = -1 * record.unit_cost * record.quantity
+                                        check_move_validity=False).amount_currency =  record.unit_cost * newquantity
                                     ae.with_context(
-                                        check_move_validity=False).credit = record.unit_cost * record.quantity
+                                        check_move_validity=False).credit = record.unit_cost * newquantity *-1
                         record.account_move_id.state = 'posted'
                 else:
                     raise ValidationError("Quantity in the warehouse is negative for this transaction.")
-                if wrong>0:
-                    self.recalculate_stock_value()
+        if wrong > 0:
+            self.recalculate_stock_value()
                     
     # def recalculate_stock_value(self):
     #     for record in self:

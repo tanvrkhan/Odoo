@@ -47,17 +47,14 @@ class StockPicking(models.Model):
 
     def button_validate(self):
         for rec in self:
-            for mv in rec.move_ids:
-                mv.date = rec.scheduled_date
-            if rec.move_ids and rec.env.context.get('check_condition'):
-                if self.check_is_return():
-                    return super().button_validate()
-                else:
-
-                    return rec.check_tolerance_condition()
-
-            else:
-                return super().button_validate()
+            r= super(StockPicking,rec)._action_done()
+    def button_confirm(self):
+        for rec in self:
+            return super().action_confirm()
+        
+    def button_cancel(self):
+        for rec in self:
+            return super().action_cancel()
 
     def check_is_return(self):
         for rec in self:
@@ -240,11 +237,11 @@ class StockPicking(models.Model):
 
             for line in record.move_ids.move_line_ids:
                 if line.qty_done != 0:
-                    location_quant = self.env['stock.quant'].search(['&', ('product_id', '=', self.product_id.id)
+                    location_quant = record.env['stock.quant'].search(['&', ('product_id', '=', record.product_id.id)
                                                                         , ('lot_id', '=', line.lot_id.id)
                                                                         , ('location_id', '=', line.location_id.id)
                                                                      ])
-                    location_dest_quant = self.env['stock.quant'].search(['&', ('product_id', '=', self.product_id.id)
+                    location_dest_quant = record.env['stock.quant'].search(['&', ('product_id', '=', record.product_id.id)
                                                                              , ('lot_id', '=', line.lot_id.id)
                                                                              ,
                                                                           ('location_id', '=', line.location_dest_id.id)
@@ -253,7 +250,7 @@ class StockPicking(models.Model):
                     if len(location_quant) == 1:
                         if (location_quant.location_id.usage == 'internal'):
                             # SALES REVERSAL
-                            self.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+                            record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
                                                                                package_id=None, owner_id=None,
                                                                                location_id=line.location_id,
                                                                                quantity=line.qty_done,
@@ -261,7 +258,7 @@ class StockPicking(models.Model):
                         # location_quant.quantity=location_quant.quantity-line.qty_done
                         else:
                             # PURCHASE REVERSAL
-                            self.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+                            record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
                                                                                package_id=None, owner_id=None,
                                                                                location_id=line.location_id,
                                                                                quantity=line.qty_done,
@@ -270,7 +267,7 @@ class StockPicking(models.Model):
                     if len(location_dest_quant) == 1:
                         if (location_quant.location_id.usage == 'internal'):
                             # PURCHASE REVERSAL
-                            self.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+                            record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
                                                                                package_id=None, owner_id=None,
                                                                                location_id=line.location_dest_id,
                                                                                quantity=-1 * line.qty_done,
@@ -278,7 +275,7 @@ class StockPicking(models.Model):
                         # location_dest_quant.quantity=location_dest_quant.quantity-line.qty_done
                         else:
                             # PURCHASE REVERSAL
-                            self.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+                            record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
                                                                                package_id=None, owner_id=None,
                                                                                location_id=line.location_dest_id,
                                                                                quantity=-1 * line.qty_done,

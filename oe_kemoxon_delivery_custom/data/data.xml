@@ -58,6 +58,22 @@
             <field name="state">code</field>
             <field name="code">records.set_stock_move_to_draft()</field>
         </record>
+        <record id="model_stock_picking_action_set_as_todo" model="ir.actions.server">
+            <field name="name">Mark as Todo</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">records.button_confirm()</field>
+        </record>
+         <record id="model_stock_picking_action_set_as_cancelled" model="ir.actions.server">
+            <field name="name">Cancel move</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">records.button_cancel()</field>
+        </record>
 <!--        <record id="model_stock_picking_action_set_quant_0" model="ir.actions.server">-->
 <!--            <field name="name">Set All Quant to 0</field>-->
 <!--            <field name="model_id" ref="stock.model_stock_picking"/>-->
@@ -105,6 +121,14 @@
             <field name="binding_view_types">list</field>
             <field name="state">code</field>
             <field name="code">records.fix_incoming_outgoing_locations()</field>
+        </record>
+        <record id="model_a_move_action_update_transit_account_from_product_categories" model="ir.actions.server">
+            <field name="name">Update transit accounts</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="binding_model_id" ref="account.model_account_move"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">records.update_transit_account_from_product_categories()</field>
         </record>
 
 
