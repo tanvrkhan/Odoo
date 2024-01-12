@@ -95,7 +95,7 @@ class StockValuationLayer(models.Model):
         for record in self:
             if record.quantity == 0 or record.value == 0:
                 record.delete_valuation(record)
-            if record.stock_move_id.picking_id:
+            elif record.stock_move_id.picking_id:
                 if record.stock_move_id.quantity_done == 0:
                     record.delete_valuation(record)
             else:
