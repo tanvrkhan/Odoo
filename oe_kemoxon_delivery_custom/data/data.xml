@@ -58,6 +58,14 @@
             <field name="state">code</field>
             <field name="code">records.set_stock_move_to_draft()</field>
         </record>
+        <record id="model_stock_picking_action_set_reserved_zero" model="ir.actions.server">
+            <field name="name">Set Reserved zero</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">records.set_reserved_zero()</field>
+        </record>
 <!--        <record id="model_stock_picking_action_set_quant_0" model="ir.actions.server">-->
 <!--            <field name="name">Set All Quant to 0</field>-->
 <!--            <field name="model_id" ref="stock.model_stock_picking"/>-->
