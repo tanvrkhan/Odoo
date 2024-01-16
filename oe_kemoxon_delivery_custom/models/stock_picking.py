@@ -201,7 +201,7 @@ class StockPicking(models.Model):
             for move in record.move_ids:
                 for line in move.move_line_ids:
                     line.reserved_uom_qty=0
-                    line.reserved_qty = 0
+
     def action_view_transporter_invoice(self):
         action = {
             'domain': [('transporter_details_id', '=', self.id)],
