@@ -1,7 +1,8 @@
 import datetime
 from odoo import api, fields, models, _
 from dateutil import parser
-
+from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 
 class AccountMoveInheritModel(models.Model):
     _inherit = 'account.move'
@@ -11,17 +12,23 @@ class AccountMoveInheritModel(models.Model):
     def action_post(self):
         for rec in self:
             if not rec.move_sequence_done and rec.name == '/':
-                if rec.move_type == 'out_invoice' and rec.journal_id == 2:
+                if rec.move_type == 'out_invoice' and ((rec.journal_id.id == 2  and rec.company_id.id==1) or(rec.journal_id.id == 36  and rec.company_id.id==2)):
                     rec.generate_sequence('invoice.sequence', 'invoice')
 
-                elif rec.move_type == 'out_invoice' and rec.journal_id != 2:
+                elif rec.move_type == 'out_invoice' and ((rec.journal_id.id != 2  and rec.company_id.id==1) or(rec.journal_id.id != 36  and rec.company_id.id==2)):
                     rec.generate_sequence('invoice.provisional.sequence', 'invoice')
 
-                elif rec.move_type == 'in_invoice' and rec.journal_id == 3:
+                elif rec.move_type == 'in_invoice' and ((rec.journal_id.id == 3  and rec.company_id.id==1) or(rec.journal_id.id == 37  and rec.company_id.id==2)):
                     rec.generate_sequence('bill.sequence', 'bill')
 
-                elif rec.move_type == 'in_invoice' and rec.journal_id != 3:
+                elif rec.move_type == 'in_invoice' and ((rec.journal_id.id != 3  and rec.company_id.id==1) or(rec.journal_id.id != 37  and rec.company_id.id==2)):
                     rec.generate_sequence('bill.provisional.sequence', 'bill')
+                
+                elif rec.move_type == 'out_invoice' and rec.company_id!=1 and rec.company_id!=2:
+                    rec.generate_sequence('invoice.sequence', 'invoice')
+                    
+                elif rec.move_type == 'in_invoice' and rec.company_id!=1 and rec.company_id!=2:
+                    rec.generate_sequence('bill.sequence', 'invoice')
 
                 elif rec.move_type == 'in_refund':
                     rec.generate_sequence('debit.sequence', 'refund')
@@ -33,7 +40,25 @@ class AccountMoveInheritModel(models.Model):
                 #     if not rec.move_sequence_done and rec.name == '/':
                 #         rec.set_entry_seq()
         return super().action_post()
-
+    
+    @api.returns('self', lambda value: value.id)
+    def copy(self, default=None):
+        self.move_sequence_done=False
+        default = dict(default or {})
+        if (fields.Date.to_date(default.get('date')) or self.date) <= self.company_id._get_user_fiscal_lock_date():
+            default['date'] = self.company_id._get_user_fiscal_lock_date() + timedelta(days=1)
+        if self.move_type == 'entry':
+            default['partner_id'] = False
+        copied_am = super().copy(default)
+        message_origin = '' if not copied_am.auto_post_origin_id else \
+            '<br/>' + _('This recurring entry originated from %s', copied_am.auto_post_origin_id._get_html_link())
+        copied_am._message_log(body=_(
+            'This entry has been duplicated from %s%s',
+            self._get_html_link(),
+            message_origin,
+        ))
+        
+        return copied_am
     def is_entry_sequence_exits(self, seq=None):
         seq = self.env['account.move'].search([('name', '=', seq)])
         if seq:
