@@ -27,7 +27,6 @@ OdooERP Sales
         'views/sale_order_view.xml',
         'views/stock_picking_view.xml',
         'views/trucktransportdetails.xml',
-        
         'wizard/kemexon_aging_balance_report_view.xml',
         'views/res_partner_bank_view.xml',
         'views/vessel_views.xml',
