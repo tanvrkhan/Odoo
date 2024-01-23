@@ -4,7 +4,6 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessError
 from odoo.exceptions import UserError, Warning
-from datetime import date
 
 
 class StockValuationLayer(models.Model):
@@ -98,26 +97,25 @@ class StockValuationLayer(models.Model):
     def remove_from_valuation(self):
         for record in self:
             if record.quantity == 0 or record.value == 0:
-                record.delete_valuation()
+                record.delete_valuation(record)
             if record.stock_move_id.picking_id:
                 if record.stock_move_id.quantity_done == 0:
-                    record.delete_valuation()
+                    record.delete_valuation(record)
             else:
-                record.delete_valuation()
+                record.delete_valuation(record)
     
-    def delete_valuation(self):
-        for record in self:
-            record.unit_cost = 0
-            record.value = 0
-            record.quantity = 0
-            if record.account_move_id:
-                for ae in record.account_move_id:
-                    for ael in ae.line_ids:
-                        ael.remove_move_reconcile()
-                    ae.state = 'draft'
-                    ae.line_ids.unlink()
-                    self.env['account.move'].search([('id', '=', ae.id)]).unlink()
-            self.env['stock.valuation.layer'].search([('id', '=', record.id)]).unlink()
+    def delete_valuation(self, record):
+        record.unit_cost = 0
+        record.value = 0
+        record.quantity = 0
+        if record.account_move_id:
+            for ae in record.account_move_id:
+                for ael in ae.line_ids:
+                    ael.remove_move_reconcile()
+                ae.state = 'draft'
+                ae.line_ids.unlink()
+                self.env['account.move'].search([('id', '=', ae.id)]).unlink()
+        self.env['stock.valuation.layer'].search([('id', '=', record.id)]).unlink()
     
     def update_date_to_schedule_date(self):
         for record in self:
@@ -137,9 +135,9 @@ class StockValuationLayer(models.Model):
             record.account_move_id.state = 'draft'
             record.account_move_line_id.parent_state = 'draft'
             record.account_move_id.name = 'draft'
-            record.account_move_id.date = record.stock_move_id.picking_id.scheduled_date
+            record.account_move_id.date = record.stock_move_id.picking_id.scheduled_date.date()
             record.account_move_id.name = sequence
-            record.account_move_line_id.date = record.stock_move_id.picking_id.scheduled_date
+            record.account_move_line_id.date = record.stock_move_id.picking_id.scheduled_date.date()
             record.account_move_id.state = 'posted'
             record.account_move_line_id.parent_state = 'posted'
         return self
@@ -155,7 +153,7 @@ class StockValuationLayer(models.Model):
         # sortedself= sorted(self,key=lambda x:x["create_date"],reverse=True)
         sortedself = self.sorted(key=lambda r: r.create_date)
         
-        for record in selfupdated:
+        for record in sortedself:
             if record.stock_move_id.quantity_done == 0:
                 for acce in record.account_move_id.line_ids:
                     acce.remove_move_reconcile()
@@ -189,7 +187,13 @@ class StockValuationLayer(models.Model):
                 else:
                     totalquantity += record.quantity
                     totalamount += record.value
-                if totalquantity > 0:
+                if totalquantity == 0 and record.quantity > 0:
+                    totalquantity = record.quantity
+                    porateusd = record.stock_move_id.purchase_line_id.order_id.currency_id._convert(
+                        record.stock_move_id.purchase_line_id.price_unit,
+                        base_currency, record.company_id, record.stock_move_id.date, True)
+                    totalamount = (porateusd * record.quantity)
+                elif totalquantity > 0:
                     unit_cost = round(totalamount / totalquantity, 2)
                     if round(record.unit_cost, 2) == unit_cost:
                         a = 1
@@ -202,15 +206,23 @@ class StockValuationLayer(models.Model):
                             ae.remove_move_reconcile()
                             if ae.amount_currency != 0:
                                 if ae.amount_currency > 0:
+                                    if record.quantity < 0:
+                                        newquantity = record.quantity * -1
+                                    else:
+                                        newquantity = record.quantity
                                     ae.with_context(
-                                        check_move_validity=False).amount_currency = record.unit_cost * record.quantity
+                                        check_move_validity=False).amount_currency = record.unit_cost * newquantity
                                     ae.with_context(
-                                        check_move_validity=False).debit = record.unit_cost * record.quantity
+                                        check_move_validity=False).debit = record.unit_cost * newquantity
                                 elif ae.amount_currency < 0:
+                                    if record.quantity > 0:
+                                        newquantity = record.quantity * -1
+                                    else:
+                                        newquantity = record.quantity
                                     ae.with_context(
-                                        check_move_validity=False).amount_currency = -1 * record.unit_cost * record.quantity
+                                        check_move_validity=False).amount_currency = record.unit_cost * newquantity
                                     ae.with_context(
-                                        check_move_validity=False).credit = record.unit_cost * record.quantity
+                                        check_move_validity=False).credit = record.unit_cost * newquantity * -1
                         record.account_move_id.state = 'posted'
                 else:
                     raise ValidationError("Quantity in the warehouse is negative for this transaction.")
@@ -323,5 +335,3 @@ class StockValuationLayer(models.Model):
         if total_amount and total_quantity:
             avco = total_amount / total_quantity
             self.update_valuation(avco, record)
-
-
