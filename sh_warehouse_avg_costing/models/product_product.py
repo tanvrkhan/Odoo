@@ -58,13 +58,15 @@ class ProductTmpl(models.Model):
         # In case of AVCO, fix rounding issue of standard price when needed.
         if self.cost_method == 'average':
             if warehouse:
+                vals.update({
+                    'warehouse_id': warehouse.id
+                })
                 price = self.warehouse_cost_lines.filtered(
                     lambda x: x.warehouse_id.id == warehouse.id).cost
                 if price:                   
                     vals.update({
                         'value': quantity * price,
-                        'unit_cost': price,
-                        'warehouse_id': warehouse.id
+                        'unit_cost': price
                     })               
             rounding_error = currency.round(self.standard_price * self.quantity_svl - self.value_svl)
             if rounding_error:
