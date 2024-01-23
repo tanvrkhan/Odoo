@@ -70,7 +70,7 @@ class AccountMove(models.Model):
     legal_entity = fields.Many2one('legal.entity', string='Representing Entity')
     en_plus = fields.Boolean('EN Plus')
     show_hs_code = fields.Boolean('Show HS Code')
-
+    updatestatus=fields.Char()
     @api.depends('invoice_line_ids.sale_line_ids.move_ids.picking_id')
     def _compute_picking_id2(self):
         for invoice in self:
@@ -81,7 +81,11 @@ class AccountMove(models.Model):
             else:
                 invoice.picking_domain_ids = False
                 invoice.picking_id = False
-
+    def reset_to_draft(self):
+        self.updatestatus='waspostedbefore'
+        res = super().button_draft()
+        
+        return res
     def get_invoice_details(self):
         invoices = self.env['account.move'].search(
             [('amount_residual', '>', 0), ('move_type', '=', self.move_type), ('state', '=', 'posted')])
@@ -146,7 +150,19 @@ class AccountMove(models.Model):
             'partner': 'Customer' if self.move_type == 'out_invoice' else "Vendor"
         }
         return data
-
+    
+    def update_transit_account_from_product_categories(self):
+        for rec in self:
+            for line in rec.line_ids:
+                if line.account_id.id == 2248:
+                    if rec.move_type == 'out_invoice':
+                        if line.product_id.type == 'product':
+                            updated_account = line.product_id.categ_id.property_stock_account_output_categ_id
+                            line.account_id = updated_account.id
+                    if rec.move_type == 'in_invoice':
+                        if line.product_id.type == 'product':
+                            updated_account = line.product_id.categ_id.property_stock_account_input_categ_id
+                            line.account_id = updated_account.id
     def action_send_aged_balance_invoice_report(self, move_type):
         if move_type == 'out_invoice':
             sow_template_id = self.env.ref('oe_kemoxon_delivery_custom.email_template_aged_balance_invoice_report')

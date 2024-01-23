@@ -7,4 +7,6 @@
         <field name="view_mode">kanban,tree,form,activity</field>
         <field name="view_id" ref="view_tree_vessels"/>
     </record>
+
+
 </odoo>
