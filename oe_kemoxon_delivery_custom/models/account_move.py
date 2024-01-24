@@ -102,8 +102,12 @@ class AccountMove(models.Model):
                                             if vl.quantity > 0:
                                                 total_quantity += vl.quantity
                                                 total_amount += vl.value
+                base_currency = record.company_id.currency_id
                 if total_quantity!=0:
-                    cost= total_amount/total_quantity
+                    cost_currency= total_amount/total_quantity
+                    cost_usd = record.currency_id._convert(
+                        cost_currency,
+                        base_currency, record.company_id, record.date, True)
                     record.state = 'draft'
                     self.env['account.move.line'].search([('move_id', '=', record.id),('display_type','=','cogs')]).unlink()
                     for ae in record.line_ids:
@@ -115,18 +119,18 @@ class AccountMove(models.Model):
                                 else:
                                     newquantity = ae.quantity
                                 ae.with_context(
-                                    check_move_validity=False).amount_currency = cost * newquantity
+                                    check_move_validity=False).amount_currency = cost_currency * newquantity
                                 ae.with_context(
-                                    check_move_validity=False).debit = cost * newquantity
+                                    check_move_validity=False).debit = cost_usd * newquantity
                             elif ae.amount_currency < 0:
                                 if ae.quantity > 0:
                                     newquantity = ae.quantity * -1
                                 else:
                                     newquantity = ae.quantity
                                 ae.with_context(
-                                    check_move_validity=False).amount_currency = cost * newquantity
+                                    check_move_validity=False).amount_currency = cost_currency * newquantity
                                 ae.with_context(
-                                    check_move_validity=False).credit = cost * newquantity * -1
+                                    check_move_validity=False).credit = cost_usd * newquantity * -1
                     record.state = 'posted'
             
     def get_invoice_details(self):
