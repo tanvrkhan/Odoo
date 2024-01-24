@@ -94,14 +94,14 @@ class AccountMove(models.Model):
                 total_amount = 0
                 for al in record.line_ids:
                     if al.purchase_line_id:
-                        
-                        for sm in al.purchase_line_id.move_ids:
-                            if sm.stock_valuation_layer_ids:
-                                if sm.state == 'done':
-                                    for vl in sm.stock_valuation_layer_ids:
-                                        if vl.quantity > 0:
-                                            total_quantity += vl.quantity
-                                            total_amount += vl.value
+                        if al.purchase_line_id.move_ids:
+                            for sm in al.purchase_line_id.move_ids:
+                                if sm.stock_valuation_layer_ids:
+                                    if sm.state == 'done':
+                                        for vl in sm.stock_valuation_layer_ids:
+                                            if vl.quantity > 0:
+                                                total_quantity += vl.quantity
+                                                total_amount += vl.value
                 if total_quantity!=0:
                     cost= total_amount/total_quantity
                     record.state = 'draft'
