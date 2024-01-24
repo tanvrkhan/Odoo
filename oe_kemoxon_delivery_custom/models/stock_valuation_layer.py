@@ -98,24 +98,24 @@ class StockValuationLayer(models.Model):
         for record in self:
             if record.quantity == 0 or record.value == 0:
                 record.delete_valuation(record)
-            if record.stock_move_id.picking_id:
+            elif record.stock_move_id.picking_id:
                 if record.stock_move_id.quantity_done == 0:
                     record.delete_valuation(record)
             else:
                 record.delete_valuation(record)
-    
-    def delete_valuation(self, record):
-        record.unit_cost = 0
-        record.value = 0
-        record.quantity = 0
-        if record.account_move_id:
-            for ae in record.account_move_id:
-                for ael in ae.line_ids:
-                    ael.remove_move_reconcile()
-                ae.state = 'draft'
-                ae.line_ids.unlink()
-                self.env['account.move'].search([('id', '=', ae.id)]).unlink()
-        self.env['stock.valuation.layer'].search([('id', '=', record.id)]).unlink()
+
+    def delete_valuation(self,record):
+            record.unit_cost = 0
+            record.value = 0
+            record.quantity = 0
+            if record.account_move_id:
+                for ae in record.account_move_id:
+                    for ael in ae.line_ids:
+                        ael.remove_move_reconcile()
+                    ae.state = 'draft'
+                    ae.line_ids.unlink()
+                    self.env['account.move'].search([('id', '=', ae.id)]).unlink()
+            self.env['stock.valuation.layer'].search([('id', '=', record.id)]).unlink()
     
     def update_date_to_schedule_date(self):
         for record in self:
