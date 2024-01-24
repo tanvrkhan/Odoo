@@ -86,6 +86,49 @@ class AccountMove(models.Model):
         res = super().button_draft()
         
         return res
+    
+    def update_costing_from_svl_to_bill(self):
+        for record in self:
+            if record.move_type == 'in_invoice':
+                total_quantity = 0
+                total_amount = 0
+                for al in record.line_ids:
+                    if al.purchase_line_id:
+                        
+                        for sm in al.purchase_line_id.move_ids:
+                            if sm.stock_valuation_layer_ids:
+                                if sm.state == 'done':
+                                    for vl in sm.stock_valuation_layer_ids:
+                                        if vl.quantity > 0:
+                                            total_quantity += vl.quantity
+                                            total_amount += vl.value
+                if total_quantity!=0:
+                    cost= total_amount/total_quantity
+                    record.state = 'draft'
+                    self.env['account.move.line'].search([('move_id', '=', record.id),('display_type','=','cogs')]).unlink()
+                    for ae in record.line_ids:
+                        ae.remove_move_reconcile()
+                        if ae.amount_currency != 0:
+                            if ae.amount_currency > 0:
+                                if ae.quantity < 0:
+                                    newquantity = ae.quantity * -1
+                                else:
+                                    newquantity = ae.quantity
+                                ae.with_context(
+                                    check_move_validity=False).amount_currency = cost * newquantity
+                                ae.with_context(
+                                    check_move_validity=False).debit = cost * newquantity
+                            elif ae.amount_currency < 0:
+                                if ae.quantity > 0:
+                                    newquantity = ae.quantity * -1
+                                else:
+                                    newquantity = ae.quantity
+                                ae.with_context(
+                                    check_move_validity=False).amount_currency = cost * newquantity
+                                ae.with_context(
+                                    check_move_validity=False).credit = cost * newquantity * -1
+                    record.state = 'posted'
+            
     def get_invoice_details(self):
         invoices = self.env['account.move'].search(
             [('amount_residual', '>', 0), ('move_type', '=', self.move_type), ('state', '=', 'posted')])

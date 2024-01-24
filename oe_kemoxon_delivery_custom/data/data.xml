@@ -122,6 +122,15 @@
     <field name="state">code</field>
     <field name="code">records.update_transit_account_from_product_categories()</field>
 </record>
+         <record id="model_a_move_action_update_costing_of_invoice_from_svl" model="ir.actions.server">
+    <field name="name">Update costing from SVL</field>
+    <field name="model_id" ref="account.model_account_move"/>
+    <field name="binding_model_id" ref="account.model_account_move"/>
+    <field name="binding_view_types">list,form</field>
+    <field name="state">code</field>
+    <field name="code">records.update_costing_from_svl_to_bill()</field>
+</record>
+
       <record id="model_a_move_action_set_draft_tk" model="ir.actions.server">
     <field name="name">Set to draft - kx</field>
     <field name="model_id" ref="account.model_account_move"/>
