@@ -165,67 +165,63 @@ class StockValuationLayer(models.Model):
                      ('stock_move_id.date', '<=', record.stock_move_id.date),
                      ('id', '!=', record.id),
                      ('warehouse_id', '=', record.warehouse_id.id),
-                     ('company_id', '=', record.company_id.id)
+                     ('company_id', '=', record.company_id.id),
+                     ('quantity', '>', 0)
                      ])
                 totalquantity = 0
                 totalamount = 0
                 
                 base_currency = record.company_id.currency_id
-                
+                applicablequantity=0
+                applicableamount =0
+                rate=0
+                rateusd=0
                 if record.quantity > 0:
-                    totalquantity += record.quantity
+                    applicablequantity = record.quantity
                     # porateusd2 = record.stock_move_id.purchase_line_id.order_id.currency_id.compute(
                     #     record.stock_move_id.purchase_line_id.price_unit, record.stock_move_id.purchase_line_id.currency_id)
-                    porateusd = record.stock_move_id.purchase_line_id.order_id.currency_id._convert(
+                    rate=record.stock_move_id.purchase_line_id.price_unit
+                    rateusd = record.stock_move_id.purchase_line_id.order_id.currency_id._convert(
                         record.stock_move_id.purchase_line_id.price_unit,
                         base_currency, record.company_id, record.stock_move_id.date, True)
-                    totalamount += (porateusd * record.quantity)
-                if all_valuations:
-                    for valuation in all_valuations:
-                        totalquantity += valuation.quantity
-                        totalamount += valuation.value
+                    applicableamount += (rateusd * record.quantity)
                 else:
-                    totalquantity += record.quantity
-                    totalamount += record.value
-                if totalquantity == 0 and record.quantity > 0:
-                    totalquantity = record.quantity
-                    porateusd = record.stock_move_id.purchase_line_id.order_id.currency_id._convert(
-                        record.stock_move_id.purchase_line_id.price_unit,
-                        base_currency, record.company_id, record.stock_move_id.date, True)
-                    totalamount = (porateusd * record.quantity)
-                elif totalquantity > 0:
-                    unit_cost = round(totalamount / totalquantity, 2)
-                    if round(record.unit_cost, 2) == unit_cost:
-                        a = 1
-                    else:
-                        wrong += 1
-                        record.unit_cost = unit_cost
-                        record.value = record.quantity * record.unit_cost
-                        record.account_move_id.state = 'draft'
-                        for ae in record.account_move_id.line_ids:
-                            ae.remove_move_reconcile()
-                            if ae.amount_currency != 0:
-                                if ae.amount_currency > 0:
-                                    if record.quantity < 0:
-                                        newquantity = record.quantity * -1
-                                    else:
-                                        newquantity = record.quantity
-                                    ae.with_context(
-                                        check_move_validity=False).amount_currency = record.unit_cost * newquantity
-                                    ae.with_context(
-                                        check_move_validity=False).debit = record.unit_cost * newquantity
-                                elif ae.amount_currency < 0:
-                                    if record.quantity > 0:
-                                        newquantity = record.quantity * -1
-                                    else:
-                                        newquantity = record.quantity
-                                    ae.with_context(
-                                        check_move_validity=False).amount_currency = record.unit_cost * newquantity
-                                    ae.with_context(
-                                        check_move_validity=False).credit = record.unit_cost * newquantity * -1
-                        record.account_move_id.state = 'posted'
-                else:
-                    raise ValidationError("Quantity in the warehouse is negative for this transaction.")
+                    if all_valuations:
+                        for valuation in all_valuations:
+                            totalquantity += valuation.quantity
+                            totalamount += valuation.value
+                    applicablequantity=record.quantity
+                    rateusd=round(totalamount/totalquantity,2)
+                    applicableamount = applicablequantity * rateusd
+                    
+                if applicablequantity!=0 and applicableamount!=0:
+                    if round(record.unit_cost,2)!=round(rateusd,2):
+                        wrong+= 1
+                    record.unit_cost = rateusd
+                    record.value = applicableamount
+                    record.account_move_id.state = 'draft'
+                    for ae in record.account_move_id.line_ids:
+                        ae.remove_move_reconcile()
+                        if ae.amount_currency != 0:
+                            if ae.amount_currency > 0:
+                                if record.quantity < 0:
+                                    newquantity = record.quantity * -1
+                                else:
+                                    newquantity = record.quantity
+                                ae.with_context(
+                                    check_move_validity=False).amount_currency = rate * newquantity
+                                ae.with_context(
+                                    check_move_validity=False).debit = rateusd * newquantity
+                            elif ae.amount_currency < 0:
+                                if record.quantity > 0:
+                                    newquantity = record.quantity * -1
+                                else:
+                                    newquantity = record.quantity
+                                ae.with_context(
+                                    check_move_validity=False).amount_currency = rate * newquantity
+                                ae.with_context(
+                                    check_move_validity=False).credit = rateusd* newquantity * -1
+                    record.account_move_id.state = 'posted'
         if wrong > 0:
             self.recalculate_stock_value()
     
