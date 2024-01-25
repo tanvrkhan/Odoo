@@ -110,23 +110,34 @@ class AccountMove(models.Model):
                         base_currency, record.company_id, record.date, True)
                     record.state = 'draft'
                     self.env['account.move.line'].search([('move_id', '=', record.id),('display_type','=','cogs')]).unlink()
+                    storedquantityrecord= self.env['account.move.line'].search([('move_id', '=', record.id),('quantity','!=','0')])
+                    storedquantity=storedquantityrecord.quantity
                     for ae in record.line_ids:
                         ae.remove_move_reconcile()
+                        
                         if ae.amount_currency != 0:
+                            newquantity=0
                             if ae.amount_currency > 0:
-                                if ae.quantity < 0:
-                                    newquantity = ae.quantity * -1
+                                if ae.quantity == 0:
+                                    newquantity = storedquantity
+                                if newquantity < 0:
+                                    newquantity = newquantity * -1
                                 else:
                                     newquantity = ae.quantity
+                                storedquantity=newquantity
                                 ae.with_context(
                                     check_move_validity=False).amount_currency = cost_currency * newquantity
                                 ae.with_context(
                                     check_move_validity=False).debit = cost_usd * newquantity
                             elif ae.amount_currency < 0:
-                                if ae.quantity > 0:
-                                    newquantity = ae.quantity * -1
+                                newquantity=0
+                                if ae.quantity == 0:
+                                    newquantity = storedquantity
+                                if newquantity > 0:
+                                    newquantity = newquantity * -1
                                 else:
-                                    newquantity = ae.quantity
+                                    newquantity = newquantity
+                               
                                 ae.with_context(
                                     check_move_validity=False).amount_currency = cost_currency * newquantity
                                 ae.with_context(
