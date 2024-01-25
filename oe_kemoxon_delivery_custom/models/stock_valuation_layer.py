@@ -165,8 +165,7 @@ class StockValuationLayer(models.Model):
                      ('stock_move_id.date', '<=', record.stock_move_id.date),
                      ('id', '!=', record.id),
                      ('warehouse_id', '=', record.warehouse_id.id),
-                     ('company_id', '=', record.company_id.id),
-                     ('quantity', '>', 0)
+                     ('company_id', '=', record.company_id.id)
                      ])
                 totalquantity = 0
                 totalamount = 0
@@ -190,10 +189,14 @@ class StockValuationLayer(models.Model):
                         for valuation in all_valuations:
                             totalquantity += valuation.quantity
                             totalamount += valuation.value
-                    applicablequantity=record.quantity
-                    rateusd=round(totalamount/totalquantity,2)
-                    applicableamount = applicablequantity * rateusd
-                    
+                    if totalquantity<0:
+                        raise ValidationError("Quantity in the warehouse is not enough for this transaction.")
+                        
+                    else:
+                        applicablequantity=record.quantity
+                        rateusd=round(totalamount/totalquantity,2)
+                        applicableamount = applicablequantity * rateusd
+                
                 if applicablequantity!=0 and applicableamount!=0:
                     if round(record.unit_cost,2)!=round(rateusd,2):
                         wrong+= 1
