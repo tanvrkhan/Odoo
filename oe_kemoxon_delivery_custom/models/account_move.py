@@ -114,7 +114,7 @@ class AccountMove(models.Model):
                     storedquantity=storedquantityrecord.quantity
                     for ae in record.line_ids:
                         ae.remove_move_reconcile()
-                        
+
                         if ae.amount_currency != 0:
                             newquantity=0
                             if ae.amount_currency > 0:
