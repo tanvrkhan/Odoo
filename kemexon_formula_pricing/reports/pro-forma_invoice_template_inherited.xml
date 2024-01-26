@@ -258,8 +258,10 @@
                                 <tr style="border-bottom:2px solid #d4d6d9">
                                     <td name="td_section_subtotal">
                                         <t t-if="line.days==0">
-                                            <strong><span class="mr16"
-                                                          t-out="line.document_description"></span></strong>
+                                            <strong>
+                                                <span class="mr16"
+                                                      t-out="line.document_description"></span>
+                                            </strong>
                                         </t>
                                         <t t-else="0">
                                             <span class="mr16" t-out="line.document_description"></span>
@@ -268,8 +270,10 @@
                                     <td colspan="99" class="is-subtotal text-end mr16">
 
                                         <t t-if="line.days==0">
-                                            <strong><span t-out="current_subtotal*line.value_amount/100"
-                                                          t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/></strong>
+                                            <strong>
+                                                <span t-out="current_subtotal*line.value_amount/100"
+                                                      t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.pricelist_id.currency_id}"/>
+                                            </strong>
                                         </t>
                                         <t t-else="0">
                                             <span t-out="current_subtotal*line.value_amount/100"
@@ -493,6 +497,14 @@
                 <!--                    <img t-att-src="'oe_kemoxon_delivery_custom/static/src/img/kemexon_seal.jpeg'"-->
                 <!--                         style="max-height: 4cm; max-width: 8cm;"/>-->
                 <!--                </center>-->
+                <t t-if="not o.company_bank_account_id">
+                    <div class="alert alert-danger">
+                        <strong>Error!</strong>
+                        Bank is not selected for this customer. Please select a bank for the customer before printing
+                        the
+                        invoice.
+                    </div>
+                </t>
             </t>
         </xpath>
     </template>

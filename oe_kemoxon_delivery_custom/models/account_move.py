@@ -71,6 +71,21 @@ class AccountMove(models.Model):
     en_plus = fields.Boolean('EN Plus')
     show_hs_code = fields.Boolean('Show HS Code')
     updatestatus=fields.Char()
+    company_bank_account_id = fields.Many2one(
+        'res.partner.bank',
+        string='Company Bank Account',
+        related='partner_id.company_bank_account_id',
+        readonly=True,
+    )
+
+    def action_post(self):
+        for rec in self:
+            if rec.move_type == 'out_invoice':
+                if not rec.partner_id.company_bank_account_id:
+                    raise UserError(
+                        _("Bank is not selected for this customer. Please select a bank for the customer before posting the invoice."))
+            return super(AccountMove, rec).action_post()
+
     @api.depends('invoice_line_ids.sale_line_ids.move_ids.picking_id')
     def _compute_picking_id2(self):
         for invoice in self:

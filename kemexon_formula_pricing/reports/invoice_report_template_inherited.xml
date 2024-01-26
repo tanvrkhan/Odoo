@@ -701,6 +701,14 @@
                     </t>
                 </ul>
                 <!--                <hr style="height:3px; border:none; background-color:black;"/>-->
+                <t t-if="not o.company_bank_account_id">
+                    <div class="alert alert-danger">
+                        <strong>Error!</strong>
+                        Bank is not selected for this customer. Please select a bank for the customer before printing
+                        the
+                        invoice.
+                    </div>
+                </t>
             </t>
         </xpath>
     </template>
