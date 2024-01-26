@@ -497,7 +497,7 @@
                 <!--                    <img t-att-src="'oe_kemoxon_delivery_custom/static/src/img/kemexon_seal.jpeg'"-->
                 <!--                         style="max-height: 4cm; max-width: 8cm;"/>-->
                 <!--                </center>-->
-                <t t-if="not o.company_bank_account_id">
+                <t t-if="not doc.company_bank_account_id">
                     <div class="alert alert-danger">
                         <strong>Error!</strong>
                         Bank is not selected for this customer. Please select a bank for the customer before printing
