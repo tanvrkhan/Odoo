@@ -69,6 +69,7 @@
                                 <field name="fusion_imo"/>
                                 <field name="fusion_vessel_name"/>
                                 <field name="fusion_deal_ref"/>
+                                <field name="fusion_payment_term"/>
                             </group>
                         </group>
                     </page>
