@@ -36,7 +36,7 @@ class AccountMove(models.Model):
     delivery_location = fields.Many2one('delivery.location', "Delivery Location",
                                         related='picking_id.delivery_location')
     picking_id = fields.Many2one('stock.picking', string='Delivery Order', compute='_compute_picking_id2',
-                                 domain="[('id', 'in', picking_domain_ids)]", readonly=False)
+                                 domain="[('id', 'in', picking_domain_ids)]", readonly=False, store=True)
     picking_domain_ids = fields.Many2many('stock.picking', compute='_compute_picking_id2', invisible=True)
 
     vessel_information_id = fields.Many2one('vessel.information', "Vessel Details")
