@@ -21,6 +21,10 @@ class ResPartner(models.Model):
                 [('short_name', '=', contact.short_name), ('active', '=', True), ('id', '!=', contact.id)])
             if existing_contact:
                 raise ValidationError('A contact with the same Short Name already exists.')
+            if not self.company_bank_account_id:
+                raise ValidationError("Bank is not selected for this partner. Please select a bank before approving.")
         return super(ResPartner, self).approve()
+
+
 
 

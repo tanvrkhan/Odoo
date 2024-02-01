@@ -30,6 +30,12 @@ class SaleOrder(models.Model):
     show_vat_ids = fields.Boolean('Show VAT ID')
     en_plus = fields.Boolean('EN Plus')
     show_hs_code = fields.Boolean('Show HS Code')
+    company_bank_account_id = fields.Many2one(
+        'res.partner.bank',
+        string='Company Bank Account',
+        related='partner_id.company_bank_account_id',
+        readonly=True,
+    )
 
     def _prepare_invoice(self):
         res = super(SaleOrder, self)._prepare_invoice()

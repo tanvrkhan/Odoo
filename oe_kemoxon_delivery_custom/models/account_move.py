@@ -27,6 +27,10 @@ class AccountMove(models.Model):
     fusion_imo = fields.Char('Fusion IMO')
     fusion_vessel_name = fields.Char('Fusion Vessel Name')
     fusion_deal_ref = fields.Char('Fusion Deal Ref')
+    fusion_payment_term = fields.Char('Fusion Payment Term')
+    fusion_representing_entity = fields.Char('Fusion Representing Entity')
+    fusion_retermsandconditions = fields.Char('Fusion RE Terms and Conditions')
+    fusion_retaxid = fields.Char('Fusion RE Tax ID')
     contract_ref = fields.Char('Contract Reference')
     deal_ref = fields.Char("Deal Ref")
     bill_date = fields.Date("B/L Date", related='picking_id.bill_date')
@@ -35,7 +39,7 @@ class AccountMove(models.Model):
     delivery_location = fields.Many2one('delivery.location', "Delivery Location",
                                         related='picking_id.delivery_location')
     picking_id = fields.Many2one('stock.picking', string='Delivery Order', compute='_compute_picking_id2',
-                                 domain="[('id', 'in', picking_domain_ids)]", readonly=False)
+                                 domain="[('id', 'in', picking_domain_ids)]", readonly=False, store=True)
     picking_domain_ids = fields.Many2many('stock.picking', compute='_compute_picking_id2', invisible=True)
 
     vessel_information_id = fields.Many2one('vessel.information', "Vessel Details")
@@ -71,6 +75,21 @@ class AccountMove(models.Model):
     en_plus = fields.Boolean('EN Plus')
     show_hs_code = fields.Boolean('Show HS Code')
     updatestatus=fields.Char()
+    company_bank_account_id = fields.Many2one(
+        'res.partner.bank',
+        string='Company Bank Account',
+        related='partner_id.company_bank_account_id',
+        readonly=True,
+    )
+
+    def action_post(self):
+        for rec in self:
+            if rec.move_type == 'out_invoice':
+                if not rec.partner_id.company_bank_account_id:
+                    raise UserError(
+                        _("Bank is not selected for this customer. Please select a bank for the customer before posting the invoice."))
+            return super(AccountMove, rec).action_post()
+
     @api.depends('invoice_line_ids.sale_line_ids.move_ids.picking_id')
     def _compute_picking_id2(self):
         for invoice in self:
