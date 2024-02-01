@@ -61,6 +61,9 @@
                                 <field name="fusion_ncv"/>
                                 <field name="fusion_loadport"/>
                                 <field name="fusion_disport"/>
+                                <field name="fusion_representing_entity"/>
+                                <field name="fusion_retermsandconditions"/>
+                                <field name="fusion_retaxid"/>
                             </group>
                             <group>
                                 <field name="fusion_bl_date"/>
