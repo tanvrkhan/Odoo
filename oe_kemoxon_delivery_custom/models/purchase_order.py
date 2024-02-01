@@ -39,7 +39,8 @@ class InheritPurchaseOrderLine(models.Model):
                     else:
                         res['lot_ids'] = lot_to_add
                         res['lot_id_custom'] = lot_id.id
-                    return res
+        else:
+            return res
 
 
 
