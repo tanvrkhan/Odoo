@@ -237,17 +237,36 @@ class StockPicking(models.Model):
             record.state = 'draft'
             record.move_ids.move_line_ids.state = 'draft'
             record.move_ids.state = 'draft'
+            record.move_ids.state = 'draft'
 
+            for line in record.move_ids.move_line_ids:
+                previous_lot = line.lot_id
+                lotNumbers = self.env['stock.lot'].search(
+                    [('product_id', '=', line.product_id.id), ('name', '=', line.lot_id.name), ('company_id', '=', line.company_id.id)])
+                if lotNumbers:
+                    line.lot_id = lotNumbers[0]
+                else:
+                    new_lot= self.env['stock.lot'].create({
+                        'product_id': line.product_id.id,
+                        'name': previous_lot.name,
+                        'company_id': line.company_id.id
+                    })
+                    line.lot_id=new_lot
+                    record.move_ids.move_line_ids.product_id = record.move_ids.product_id
+            
             for line in record.move_ids.move_line_ids:
                 if line.qty_done != 0:
                     location_quant = record.env['stock.quant'].search(['&', ('product_id', '=', record.product_id.id)
                                                                         , ('lot_id', '=', line.lot_id.id)
                                                                         , ('location_id', '=', line.location_id.id)
+                                                                          
+                                                                          , ('company_id', '=', line.company_id.id)
                                                                      ])
                     location_dest_quant = record.env['stock.quant'].search(['&', ('product_id', '=', record.product_id.id)
                                                                              , ('lot_id', '=', line.lot_id.id)
                                                                              ,
                                                                           ('location_id', '=', line.location_dest_id.id)
+                                                                          , ('company_id', '=', line.company_id.id)
                                                                           ])
 
                     if len(location_quant) == 1:
@@ -287,15 +306,16 @@ class StockPicking(models.Model):
 
     def sync_stock_quant(self):
         company = self.env.company.id
-        self.env['stock.quant'].search([]).unlink()
-        pickings = self.env['stock.picking'].search([])
+        self.env['stock.quant'].search([('product_id','=',self.product_id.id),('company_id','=',self.company_id.id)]).unlink()
+        pickings = self.env['stock.picking'].search([('product_id','=',self.product_id.id),('company_id','=',self.company_id.id)])
         for record in pickings:
             for line in record.move_ids.move_line_ids:
                 # check if move is in state done and quantity is not 0.
-                if line.qty_done != 0 and line.state == 'done':
+                if line.qty_done != 0 and line.state == 'done' and line.product_id.type=='product':
                     location_quant = self.env['stock.quant'].search(['&', ('product_id', '=', line.product_id.id)
                                                                         , ('lot_id', '=', line.lot_id.id)
                                                                         , ('location_id', '=', line.location_id.id)
+                                                                     ,('company_id','=',line.company_id.id)
                                                                      ])
                     # if entry already exists, update it.
                     if location_quant:
@@ -310,12 +330,13 @@ class StockPicking(models.Model):
                             'product_id': line.product_id.id,
                             'location_id': line.location_id.id,
                             'lot_id': line.lot_id.id,
-                            'quantity': -1 * line.qty_done
+                            'quantity': -1 * line.qty_done,
+                            'company_id':line.company_id.id
                         })
-                    location_dest_quant = self.env['stock.quant'].search(['&', ('product_id', '=', line.product_id.id)
+                    location_dest_quant = self.env['stock.quant'].search(['&','&', ('product_id', '=', line.product_id.id)
                                                                              , ('lot_id', '=', line.lot_id.id)
-                                                                             ,
-                                                                          ('location_id', '=', line.location_dest_id.id)
+                                                                             ,('company_id','=',line.company_id.id)
+                                                                          ,('location_id', '=', line.location_dest_id.id)
                                                                           ])
                     if location_dest_quant:
                         self.env['stock.quant']._update_available_quantity(product_id=line.product_id,
@@ -329,7 +350,8 @@ class StockPicking(models.Model):
                             'product_id': line.product_id.id,
                             'location_id': line.location_dest_id.id,
                             'lot_id': line.lot_id.id,
-                            'quantity': line.qty_done
+                            'quantity': line.qty_done,
+                            'company_id':line.company_id.id
                         })
 
     def stock_quant_zero(self):

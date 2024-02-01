@@ -179,10 +179,10 @@ class StockValuationLayer(models.Model):
                     applicablequantity = record.quantity
                     # porateusd2 = record.stock_move_id.purchase_line_id.order_id.currency_id.compute(
                     #     record.stock_move_id.purchase_line_id.price_unit, record.stock_move_id.purchase_line_id.currency_id)
-                    rate=record.stock_move_id.purchase_line_id.price_unit
-                    rateusd = record.stock_move_id.purchase_line_id.order_id.currency_id._convert(
+                    rate=round(record.stock_move_id.purchase_line_id.price_unit,2)
+                    rateusd = round(record.stock_move_id.purchase_line_id.order_id.currency_id._convert(
                         record.stock_move_id.purchase_line_id.price_unit,
-                        base_currency, record.company_id, record.stock_move_id.date, True)
+                        base_currency, record.company_id, record.stock_move_id.date, True),2)
                     applicableamount += (rateusd * record.quantity)
                 else:
                     if all_valuations:
