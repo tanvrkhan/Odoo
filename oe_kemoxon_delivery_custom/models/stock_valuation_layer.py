@@ -4,6 +4,7 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessError
 from odoo.exceptions import UserError, Warning
+from datetime import datetime, timedelta
 
 
 class StockValuationLayer(models.Model):
@@ -121,27 +122,49 @@ class StockValuationLayer(models.Model):
         for record in self:
             next_number = self.env['ir.sequence'].next_by_code('stock.valuation')
             next_number = str(next_number)
+            datetocheck=record.stock_move_id.picking_id.scheduled_date
+            datetouse=datetocheck
+            datetouse=self.verify_picking_date(record,datetocheck)
+            
+            
             # next_number = next_number[-5:]
-            year = record.stock_move_id.picking_id.scheduled_date.year
-            month = record.stock_move_id.picking_id.scheduled_date.month
+            year = datetouse.year
+            month = datetouse.month
             sequence = 'STJU/' + str(year) + '/' + str(month) + '/' + next_number
             
             for line in record.stock_move_id.move_line_ids:
-                line.date = line.move_id.picking_id.scheduled_date
-            record.create_date = record.stock_move_id.picking_id.scheduled_date
-            record.stock_move_id.picking_id.date_done = record.stock_move_id.picking_id.scheduled_date
-            record.stock_move_id.date = record.stock_move_id.picking_id.scheduled_date
+                line.date = datetouse
+            record.create_date = datetouse
+            record.stock_move_id.picking_id.date_done = datetouse
+            record.stock_move_id.date = datetouse
             
             record.account_move_id.state = 'draft'
             record.account_move_line_id.parent_state = 'draft'
             record.account_move_id.name = 'draft'
-            record.account_move_id.date = record.stock_move_id.picking_id.scheduled_date.date()
+            record.account_move_id.date = datetouse.date()
             record.account_move_id.name = sequence
-            record.account_move_line_id.date = record.stock_move_id.picking_id.scheduled_date.date()
+            record.account_move_line_id.date = datetouse.date()
             record.account_move_id.state = 'posted'
             record.account_move_line_id.parent_state = 'posted'
         return self
-    
+    def verify_picking_date(self, record,datetocheck):
+        result=datetocheck
+        while record.check_if_exists(record,result):
+            result = result + timedelta(minutes=5)
+            # record.verify_picking_date( record, result)
+        return result
+    def check_if_exists(self,record,datetocheck):
+        all_pickings = record.env['stock.picking'].search(
+            ['&', '&',
+            ('date_done', '=', datetocheck),
+            ('id', '!=', record.stock_move_id.picking_id.id),
+            ('company_id', '=', record.company_id.id)
+            ])
+        if all_pickings:
+            return True
+        else:
+            return False
+
     def recalculate_stock_value(self):
         selfupdated = self.update_date_to_schedule_date()
         wrong = 0

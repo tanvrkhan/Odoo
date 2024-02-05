@@ -306,7 +306,11 @@ class StockPicking(models.Model):
 
     def sync_stock_quant(self):
         company = self.env.company.id
-        self.env['stock.quant'].search([('product_id','=',self.product_id.id),('company_id','=',self.company_id.id)]).unlink()
+        quants=self.env['stock.quant'].search([('product_id','=',self.product_id.id),('company_id','=',self.company_id.id)])
+        if quants:
+            for quant in quants:
+                quant.unlink()
+        
         pickings = self.env['stock.picking'].search([('product_id','=',self.product_id.id),('company_id','=',self.company_id.id)])
         for record in pickings:
             for line in record.move_ids.move_line_ids:
