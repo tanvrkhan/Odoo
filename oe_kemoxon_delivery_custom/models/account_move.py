@@ -38,8 +38,8 @@ class AccountMove(models.Model):
     vessel_name = fields.Char("Vessel Name", related='picking_id.vessel_name')
     delivery_location = fields.Many2one('delivery.location', "Delivery Location",
                                         related='picking_id.delivery_location')
-    picking_id = fields.Many2one('stock.picking', string='Delivery Order', compute='_compute_picking_id2',
-                                 domain="[('id', 'in', picking_domain_ids)]", readonly=False, store=True)
+    picking_id = fields.Many2one('stock.picking', string='Delivery Order', domain="[('id', 'in', picking_domain_ids)]",
+                                 readonly=False, store=True)
     picking_domain_ids = fields.Many2many('stock.picking', compute='_compute_picking_id2', invisible=True)
 
     vessel_information_id = fields.Many2one('vessel.information', "Vessel Details")
@@ -94,12 +94,7 @@ class AccountMove(models.Model):
     def _compute_picking_id2(self):
         for invoice in self:
             pickings = invoice.invoice_line_ids.sale_line_ids.move_ids.mapped('picking_id')
-            if pickings:
-                invoice.picking_domain_ids = pickings
-                invoice.picking_id = pickings[0]
-            else:
-                invoice.picking_domain_ids = False
-                invoice.picking_id = False
+            invoice.picking_domain_ids = pickings
     def reset_to_draft(self):
         self.updatestatus='waspostedbefore'
         res = super().button_draft()
