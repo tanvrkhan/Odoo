@@ -240,19 +240,20 @@ class StockPicking(models.Model):
             record.move_ids.state = 'draft'
 
             for line in record.move_ids.move_line_ids:
-                previous_lot = line.lot_id
-                lotNumbers = self.env['stock.lot'].search(
-                    [('product_id', '=', line.product_id.id), ('name', '=', line.lot_id.name), ('company_id', '=', line.company_id.id)])
-                if lotNumbers:
-                    line.lot_id = lotNumbers[0]
-                else:
-                    new_lot= self.env['stock.lot'].create({
-                        'product_id': line.product_id.id,
-                        'name': previous_lot.name,
-                        'company_id': line.company_id.id
-                    })
-                    line.lot_id=new_lot
-                    record.move_ids.move_line_ids.product_id = record.move_ids.product_id
+                if line.lot_id:
+                    previous_lot = line.lot_id
+                    lotNumbers = self.env['stock.lot'].search(
+                        [('product_id', '=', line.product_id.id), ('name', '=', line.lot_id.name), ('company_id', '=', line.company_id.id)])
+                    if lotNumbers:
+                        line.lot_id = lotNumbers[0]
+                    else:
+                        new_lot= self.env['stock.lot'].create({
+                            'product_id': line.product_id.id,
+                            'name': previous_lot.name,
+                            'company_id': line.company_id.id
+                        })
+                        line.lot_id=new_lot
+                        record.move_ids.move_line_ids.product_id = record.move_ids.product_id
             
             for line in record.move_ids.move_line_ids:
                 if line.qty_done != 0:
