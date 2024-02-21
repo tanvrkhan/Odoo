@@ -49,7 +49,7 @@ class PurchaseOrderLine(models.Model):
                 picking = pickings and pickings[0] or False
                 if not picking:
                     res = line.order_id.with_context(
-                        sh_warehouse_id=line.picking_type_id.warehouse_id.id)._prepare_picking()
+                        sh_warehouse_id=line.order_id.picking_type_id.warehouse_id.id)._prepare_picking()
                     picking = self.env['stock.picking'].create(res)
                 moves = line._create_stock_moves(picking)
                 moves._action_confirm()._action_assign()
