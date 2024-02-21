@@ -586,39 +586,39 @@
 
                     <!-- Right Div started from here -->
                     <div class="col-6">
-                        <div class="col-12 row" t-if="o.partner_id.company_bank_account_id.bank_id.name">
+                        <div class="col-12 row" t-if="o.company_bank_account_id.bank_id.name">
                             <div class="col-5" style="padding-left: 4px;">
                                 <strong>BANK</strong>
                             </div>
                             <div class="col-7" style="padding-left: 0px;">
-                                <t t-if="o.partner_id.company_bank_account_id">
+                                <t t-if="o.company_bank_account_id">
                                     <span style="text-align:left;" class="m-0"
-                                          t-field="o.partner_id.company_bank_account_id.bank_id.name"/>
+                                          t-field="o.company_bank_account_id.bank_id.name"/>
                                 </t>
                             </div>
                         </div>
 
-                        <div class="col-12 row" t-if="o.partner_id.company_bank_account_id.acc_holder_name">
+                        <div class="col-12 row" t-if="o.company_bank_account_id.acc_holder_name">
                             <div class="col-5" style="padding-left: 4px;">
                                 <strong>In favour of</strong>
                             </div>
                             <div class="col-7" style="padding-left: 0px;">
-                                <t t-if="o.partner_id.company_bank_account_id">
+                                <t t-if="o.company_bank_account_id">
                                     <span style="text-align:left;" class="m-0"
-                                          t-field="o.partner_id.company_bank_account_id.acc_holder_name"/>
+                                          t-field="o.company_bank_account_id.acc_holder_name"/>
                                 </t>
                             </div>
                         </div>
 
 
-                        <div class="col-12 row" t-if="o.partner_id.company_bank_account_id.acc_number">
+                        <div class="col-12 row" t-if="o.company_bank_account_id.acc_number">
                             <div class="col-5" style="padding-left: 4px;">
                                 <strong>A/C No</strong>
                             </div>
                             <div class="col-7" style="padding-left: 0px;">
-                                <t t-if="o.partner_id.company_bank_account_id">
+                                <t t-if="o.company_bank_account_id">
                                     <span style="text-align:left;" class="m-0"
-                                          t-field="o.partner_id.company_bank_account_id.acc_number"/>
+                                          t-field="o.company_bank_account_id.acc_number"/>
                                 </t>
                             </div>
                         </div>

@@ -69,19 +69,32 @@ class AccountMove(models.Model):
 
     payment_terms_id2 = fields.Many2one('account.payment.term', 'Payment terms')
     incoterm_location_custom = fields.Many2one('incoterm.location', string='Incoterm Location',
-                                               related='picking_id.incoterm_location_custom')
+                                               readonly=False,
+                                               stored=True)
     trader = fields.Many2one('hr.employee', string='Trader', related='picking_id.trader', store=True, readonly=False)
     legal_entity = fields.Many2one('legal.entity', string='Representing Entity')
     en_plus = fields.Boolean('EN Plus')
     show_hs_code = fields.Boolean('Show HS Code')
     updatestatus=fields.Char()
+    
+    
+    
     company_bank_account_id = fields.Many2one(
         'res.partner.bank',
         string='Company Bank Account',
-        related='partner_id.company_bank_account_id',
-        readonly=True,
+        readonly=False,
+        stored=True
     )
-
+    
+    @api.onchange('picking_id')
+    def on_change_picking_id(self):
+        for record in self:
+            record.incoterm_location_custom = record.picking_id.incoterm_location_custom
+    @api.onchange('partner_id')
+    def on_change_partner_id(self):
+        for record in self:
+            record.company_bank_account_id= record.partner_id.company_bank_account_id
+    
     def action_post(self):
         for rec in self:
             if rec.move_type == 'out_invoice':

@@ -43,6 +43,7 @@ class PostContactsModel(models.Model):
                 "GL_Code": record.id,
                 "GL_Customer_Code": record.emptyFalse(record.property_account_receivable_id.code),
                 "GL_Vendor_Code": record.emptyFalse(record.property_account_payable_id.code),
+                "Tax_Number": record.vat,
                 "Company_Address_Models": [
                     {
                         "Address_Type": record.emptyFalse(record.type),
@@ -107,6 +108,7 @@ class PostContactsModel(models.Model):
                 "GL_Code": record.id,
                 "GL_Customer_Code": record.emptyFalse(record.property_account_receivable_id.code),
                 "GL_Vendor_Code": record.emptyFalse(record.property_account_payable_id.code),
+                "Tax_Number": record.vat,
                 "Company_Address_Models": [
                     {
                         "Address_Type": record.emptyFalse(record.type),
@@ -171,6 +173,7 @@ class PostContactsModel(models.Model):
                 "GL_Code": record.id,
                 "GL_Customer_Code": record.emptyFalse(record.property_account_receivable_id.code),
                 "GL_Vendor_Code": record.emptyFalse(record.property_account_payable_id.code),
+                "Tax_Number": record.vat,
                 "Company_Address_Models": [
                     {
                         "Address_Type": record.emptyFalse(record.type),
