@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="view_bio_cost_type_tree" model="ir.ui.view">
+        <field name="name">bio.nomination.cost.type.tree</field>
+        <field name="model">bio.nomination.cost.type</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="name"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_bio_cost_type" model="ir.actions.act_window">
+        <field name="name">Cost type</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">bio.nomination.cost.type</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new cpst
+            </p>
+            <p>
+                Odoo helps you easily track all activities related to a cost.
+            </p>
+        </field>
+    </record>
+
+</odoo>

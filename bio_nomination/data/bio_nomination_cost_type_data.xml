@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+
+        <!-- bio.nomination.type -->
+        <record id="bio_nomination_cost_type_1" model="bio.nomination.cost.type">
+            <field name="name">Transport</field>
+        </record>
+
+        <record id="bio_nomination_cost_type_2" model="bio.nomination.cost.type">
+            <field name="name">Broker</field>
+        </record>
+        <record id="bio_nomination_cost_type_3" model="bio.nomination.cost.type">
+            <field name="name">Agent</field>
+        </record>
+    <record id="bio_nomination_cost_type_4" model="bio.nomination.cost.type">
+            <field name="name">Demurrage</field>
+
+        </record>
+     <record id="bio_nomination_cost_type_5" model="bio.nomination.cost.type">
+            <field name="name">Inspection (suveys)</field>
+        </record>
+    <record id="bio_nomination_cost_type_6" model="bio.nomination.cost.type">
+            <field name="name">Inspection (analyses)</field>
+        </record>
+     <record id="bio_nomination_cost_type_7" model="bio.nomination.cost.type">
+            <field name="name">Other</field>
+        </record>
+</odoo>

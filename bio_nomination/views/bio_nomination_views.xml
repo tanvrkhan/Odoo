@@ -1,0 +1,773 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="view_bio_nomination_tree" model="ir.ui.view">
+        <field name="name">bio.nomination.truck.tree</field>
+        <field name="model">bio.nomination</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="type" invisible="1"/>
+                <field name="partner_id"/>
+                <field name="delivery_date_from"/>
+                <field name="container_reference"/>
+                <field name="container_returns_date_from"/>
+                <field name="palettes_qty"/>
+                <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_bio_nomination_tree_vessels" model="ir.ui.view">
+        <field name="name">bio.nomination.vessel.tree</field>
+        <field name="model">bio.nomination</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="type" invisible="1"/>
+                <field name="partner_id"/>
+                <field name="laycan_from"/>
+                <field name="laycan_to"/>
+                <field name="vessel_id"/>
+                <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+    <record id="bio_nomination_view_form_trucks_vessels" model="ir.ui.view">
+        <field name="name">bio.nomination.view.form.trucks.vessels</field>
+        <field name="model">bio.nomination</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_nomination_sent"
+                            type="object"
+                            string="Send Nomination"
+                            class="oe_highlight"
+                            data-hotkey="y"/>
+                </header>
+                <sheet>
+
+                    <field name="type" invisible="1"/>
+                    <field name="nomination_type_id" invisible="1"/>
+                    <field name="company_id" invisible="1"/>
+                    <field name="seq_reference" invisible="1"/>
+
+                    <field name="partner_id" invisible="1"/>
+
+
+                    <table class="table table-bordered">
+                        <tr>
+                            <h2>
+                                <field name="reference" class="col-8 " nolabel="1"/>
+                            </h2>
+                        </tr>
+                        <tr>
+
+                            <td colspan="2" class="text-center" align="center">
+                                <field name="logo" widget="image" class="text-center oe_avatar"
+                                       style="text-align: center;"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <label for="partner_id" string="Supplier" style="padding-right:0px;font-weight:bold;"
+                                       attrs="{'invisible': [('type', 'in', ('sale_trucks', 'sale_vessels'))]}"/>
+                                <label for="partner_id" string="Customer" style="padding-right:0px;font-weight:bold;"
+                                       attrs="{'invisible': [('type', 'in', ('purchase_trucks', 'purchase_vessels'))]}"/>
+
+                                <field name="partner_id" nolabel="1" class="oe_inline"/>
+                                <label for="purchase_id" string="" style="padding-right:0px;font-weight:bold;"/>
+                                <field name="purchase_id" nolabel="1" class="oe_inline" placeholder="Purchase Order"/>
+                                <label for="sale_ids" style="padding:0px 0px 0px 0px;font-weight:bold;" string=""
+                                       attrs="{'invisible': [('type', 'in', ('sale_trucks', 'sale_vessels'))]}"/>
+                                <field name="sale_ids" placeholder="Sales Orders" widget="many2many_tags"
+                                       class="oe_inline"
+                                       attrs="{'invisible': [('type', 'in', ('sale_trucks', 'sale_vessels'))]}"/>
+                                <label for="sale_id" style="padding:0px 0px 0px 0px;font-weight:bold;" string=""
+                                       attrs="{'invisible': [('type', 'in', ('purchase_trucks', 'purchase_vessels'))]}"/>
+                                <field name="sale_id" placeholder="Sale Order" class="oe_inline"
+                                       attrs="{'invisible': [('type', 'in', ('purchase_trucks', 'purchase_vessels'))]}"/>
+
+                                <label for="picking_ids" string="To" style="padding-right:0px;font-weight:bold;"/>
+                                <field name="picking_ids" placeholder="Stock Picking" widget="many2many_tags"
+                                       class="oe_inline"/>
+                                <label for="account_analytic_id" style="padding:0px 0px 0px 0px;font-weight:bold;"
+                                       string=""/>
+                                <field name="account_analytic_id" class="oe_inline" placeholder="Account analytic"/>
+
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="create_date"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="create_date"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="recipient_ids"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="recipient_ids" widget="many2many_tags"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="email_cc"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="email_cc"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="attn_ids" string="Attn"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="attn_ids" widget="many2many_tags"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="email_from"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="email_from"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+
+                                <div class="o_row">
+                                    <label for="reference" class="col-4 text-right"/>
+                                    <field name="reference" class="col-8 "/>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="text-center">
+                            <td colspan="2" class="text-center">
+                                <div class="o_row">
+                                    <label for="phone" string="Direct tel." class="col-4 text-right"/>
+                                    <field name="phone" class="col-8 "/>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="o_row" attrs="{'invisible': [('type', 'in', ('purchase_trucks', 'purchase_vessels'))]}">
+                        <h5>Please note following nomination (For delivery):</h5>
+                    </div>
+                    <div class="o_row" attrs="{'invisible': [('type', 'in', ('sale_trucks', 'sale_vessels'))]}">
+                        <h5>Please note following nomination (For loading):</h5>
+                    </div>
+
+                    <table class="table table-bordered">
+                        <tr>
+                            <td>
+                                <label for="freight_charges"/>
+                            </td>
+                            <td colspan="2">
+                                <field nolabel='1' name="freight_charges"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="vat"/>
+                            </td>
+                            <td colspan="2">
+                                <field nolabel='1' name="vat"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="contract_ref"/>
+                            </td>
+                            <td colspan="2">
+                                <field nolabel='1' name="contract_ref"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="nomination_lines" string="Products"/>
+                            </td>
+                            <td colspan="2">
+                                <field nolabel='1' name="nomination_lines">
+                                    <tree editable="bottom" create="1" delete="0">
+                                        <field name="product_id"  options="{'no_create': True, 'no_edit': True}" />
+                                        <field name="qty" />
+                                              <field name="product_packaging_qty"  attrs="{'invisible': ['|', ('product_id', '=', False), ('product_packaging_id', '=', False)],'column_invisible': [('parent.type', 'in', ('sale_vessels', 'purchase_vessels'))]}" groups="product.group_stock_packaging" optional="show"/>
+                                    <field name="product_packaging_id"  attrs="{'invisible': [('product_id', '=', False)],'column_invisible': [('parent.type', 'in', ('sale_vessels', 'purchase_vessels'))]}" context="{'default_product_id': product_id, 'tree_view_ref':'product.product_packaging_tree_view', 'form_view_ref':'product.product_packaging_form_view'}" groups="product.group_stock_packaging" optional="show"/>
+                                        <field name="qty_done" />
+                                    </tree>
+                                </field>
+                            </td>
+                        </tr>
+
+                    </table>
+                    <!-- fields for Trucks-->
+                    <table class="table table-bordered"
+                           attrs="{'invisible': [('type', 'in', ('sale_vessels', 'purchase_vessels'))]}">
+                        <tr>
+                            <td>
+                                <label for="container_reference"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="container_reference"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="container_pin_code"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="container_pin_code"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="container_returns_date_from" string="Container returns date"/>
+                            </td>
+                            <td>
+                                <field name="container_returns_date_from"/>
+                                To
+                                <field name="container_returns_date_to"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <label for="palettes_type"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="palettes_type"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="palettes_qty"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="palettes_qty"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="caution" string="Palettes Caution"/>
+                            </td>
+                            <td>
+                                <field name="caution"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="transporter_id"/>
+                            </td>
+                            <td>
+                                <field name="transporter_id"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered"
+                           attrs="{'invisible': [('type', 'in', ('sale_vessels', 'purchase_vessels'))]}">
+                        <tr>
+                            <td>
+                                <label for="pickup_place"/>
+                            </td>
+                            <td colspan="2">
+                                <field nolabel='1' name="pickup_place"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="pickup_date_from" string="Pickup date"/>
+                            </td>
+                            <td colspan="2">
+                                <field name="pickup_date_from"/>
+                                To
+                                <field name="pickup_date_to"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="delivery_date_from" string="Delivery date"/>
+                            </td>
+                            <td colspan="2">
+                                <field name="delivery_date_from"/>
+                                To
+                                <field name="delivery_date_to"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="origin"/>
+                            </td>
+                            <td>
+                                <field name="origin" placeholder="Country"/>
+                            </td>
+                            <td>
+                                <field name="origin_state" placeholder="City"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="destination"/>
+                            </td>
+                            <td colspan="2">
+                                <field nolabel='1' name="destination"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="receiver_id"/>
+                            </td>
+                            <td colspan="2">
+                                <field name="receiver_id"/>
+
+                                <div class="o_address_format" name="div_address">
+                                    <field name="street" placeholder="Street..." class="o_address_street" readonly="0"/>
+                                    <field name="street2" placeholder="Street 2..." class="o_address_street"
+                                           readonly="0"/>
+                                    <field name="city" placeholder="City" class="o_address_city" readonly="0"/>
+                                    <field name="state_id" class="o_address_state" readonly="0" placeholder="State"
+                                           options="{'no_open': True, 'no_quick_create': True}"
+                                           context="{'country_id': country_id, 'default_country_id': country_id, 'zip': zip}"/>
+                                    <field name="zip" placeholder="ZIP" class="o_address_zip" readonly="0"/>
+                                    <field name="country_id" placeholder="Country" class="o_address_country"
+                                           readonly="0" options='{"no_open": True, "no_create": True}'/>
+                                </div>
+                                <label for="receiver_vat"/>
+                                <field name="receiver_vat" readonly="0"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-bordered"
+                           attrs="{'invisible': [('type', 'in', ('sale_trucks', 'purchase_trucks'))]}">
+                        <tr>
+                            <td>
+                                <label for="vessel_id"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="vessel_id"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <label for="vessel_num"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="vessel_num"/>
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <label for="vessel_owner_id"/>
+                            </td>
+                            <td>
+                                <field name="vessel_owner_id"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <label for="previous_cargo"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="previous_cargo"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="loading_terms"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="loading_terms" widget="many2many_tags"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="demurrage_rate"/>
+                            </td>
+                            <td>
+                                <div class="o_row">
+                                    <field name="demurrage_rate"/>
+                                    <field name="currency_id"/>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="transport_arranger"/>
+                            </td>
+                            <td>
+                                <field name="transport_arranger"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <label for="transporter_id"/>
+                            </td>
+                            <td>
+                                <field name="transporter_id"/>
+                            </td>
+                        </tr>
+
+                    </table>
+
+                    <table class="table table-bordered"
+                           attrs="{'invisible': [('type', 'in', ('sale_trucks', 'purchase_trucks'))]}">
+                        <tr>
+                            <td>
+                                <label for="laycan_from" string="Laycan At Disport"
+                                       attrs="{'invisible': [('type', 'in', ('purchase','purchase_vessels'))]}"/>
+                                <label for="laycan_from" string="Laycan At Loadport"
+                                       attrs="{'invisible': [('type', 'in', ('sale','sale_vessels'))]}"/>
+                            </td>
+                            <td colspan="2">
+                                <field name="laycan_from"/>
+                                to
+                                <field name="laycan_to"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <label for="origin"/>
+                            </td>
+                            <td>
+                                <field name="origin" placeholder="Country"/>
+                            </td>
+                            <td>
+                                <field name="origin_state" placeholder="City"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="destination"/>
+                            </td>
+                            <td colspan="2">
+                                <field nolabel='1' name="destination"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="receiver_id"/>
+                            </td>
+                            <td colspan="2">
+
+                                <field name="receiver_id"/>
+
+                                <div class="o_address_format" name="div_address">
+                                    <field name="street" placeholder="Street..." class="o_address_street" readonly="0"/>
+                                    <field name="street2" placeholder="Street 2..." class="o_address_street"
+                                           readonly="0"/>
+                                    <field name="city" placeholder="City" class="o_address_city" readonly="0"/>
+                                    <field name="state_id" class="o_address_state" readonly="0" placeholder="State"
+                                           options="{'no_open': True, 'no_quick_create': True}"
+                                           context="{'country_id': country_id, 'default_country_id': country_id, 'zip': zip}"/>
+                                    <field name="zip" placeholder="ZIP" class="o_address_zip" readonly="0"/>
+                                    <field name="country_id" placeholder="Country" class="o_address_country"
+                                           readonly="0" options='{"no_open": True, "no_create": True}'/>
+                                </div>
+                                <label for="receiver_vat"/>
+                                <field name="receiver_vat" readonly="0"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="surveyor_id" string="Surveyor at disport"
+                                       attrs="{ 'invisible': [('type', 'in', ('purchase','purchase_vessels'))]}"/>
+                                <label for="surveyor_id" string="Surveyor at loadport"
+                                       attrs="{ 'invisible': [('type', 'in', ('sale','sale_vessels'))]}"/>
+                            </td>
+                            <td colspan="2">
+                                <field name="surveyor_id"/>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <label for="surveyor_product_ids"/>
+                            </td>
+                            <td colspan="2">
+                                <field name="surveyor_product_ids" widget="many2many_tags"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="surveyor_code"/>
+                            </td>
+                            <td colspan="2">
+                                <field name="surveyor_code"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="agent_id"/>
+                            </td>
+                            <td colspan="2">
+                                <div class="o_row">
+                                    <field name="agent_id"/>
+                                    <label for="agent_email"/>
+                                    <field name="agent_email"/>
+                                    <label for="agent_phone"/>
+                                    <field name="agent_phone"/>
+                                </div>
+
+
+                            </td>
+                        </tr>
+                    </table>
+
+
+                    <table class="table table-bordered">
+                        <!-- <tr>
+                             <td><label for="documents"/></td>
+                             <td><field nolabel='1' name="documents" /></td>
+                         </tr> -->
+                        <tr groups="sales_team.group_sale_manager">
+                            <td>
+                                <label for="cost_ids"/>
+                            </td>
+                            <td>
+                                <field name="cost_ids" nolabel="1">
+                                    <tree editable="bottom" create="0" delete="0">
+                                        <field name="name"/>
+                                        <field name="price"/>
+                                        <field name="qty"/>
+                                        <field name="uom_id"/>
+
+                                        <field name="currency_id"/>
+
+
+                                    </tree>
+
+
+                                </field>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="documents_provide"/>
+                            </td>
+                            <td>
+                                <field name="documents_provide"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="comments"/>
+                            </td>
+                            <td>
+                                <field nolabel='1' name="comments"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label for="attachment_ids"/>
+                            </td>
+                            <td>
+                                <field name="attachment_ids" widget="many2many_binary" string="Attach a file"
+                                       nolabel="1" colspan="2"/>
+                            </td>
+                        </tr>
+                    </table>
+
+
+                </sheet>
+                <!-- Attachment preview -->
+                <div class="o_attachment_preview"/>
+                <!-- Chatter -->
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+
+        </field>
+    </record>
+
+    <record id="view_bio_nomination_filter" model="ir.ui.view">
+        <field name="name">bio.nomination.select</field>
+        <field name="model">bio.nomination</field>
+        <field name="arch" type="xml">
+            <search string="Search Move">
+                <field name="name" string="Journal Entry"
+                       filter_domain="['|', '|', ('name', 'ilike', self), ('sale_id', 'ilike', self), ('purchase_id', 'ilike', self)]"/>
+                <field name="partner_id"/>
+                <separator/>
+                <filter string="Customer" name="customer" domain="[('partner_id.customer_rank','>', 0)]"/>
+                <filter string="Supplier" name="supplier" domain="[('partner_id.supplier_rank','>', 0)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Partner" name="partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--nomination trucks (sale)-->
+    <record id="action_bio_nomination_for_sale_order_trucks" model="ir.actions.act_window">
+        <field name="name">Nomination Trucks</field>
+        <field name="res_model">bio.nomination</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_bio_nomination_tree"/>
+        <field name="search_view_id" ref="view_bio_nomination_filter"/>
+        <field name="domain">[('type', '=', 'sale_trucks')]</field>
+        <field name="context">{'default_type': 'sale_trucks'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new document nomination
+            </p>
+        </field>
+    </record>
+
+    <!--nomination vessels (sale)-->
+    <record id="action_bio_nomination_for_sale_order_vessels" model="ir.actions.act_window">
+        <field name="name">Nomination Vessels</field>
+        <field name="res_model">bio.nomination</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_bio_nomination_tree_vessels"/>
+        <field name="search_view_id" ref="view_bio_nomination_filter"/>
+        <field name="domain">[('type', '=', 'sale_vessels')]</field>
+        <field name="context">{'default_type': 'sale_vessels'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new document nomination
+            </p>
+        </field>
+    </record>
+
+    <!--nomination trucks (purchase)-->
+    <record id="action_bio_nomination_for_purchase_order_trucks" model="ir.actions.act_window">
+        <field name="name">Nomination Trucks</field>
+        <field name="res_model">bio.nomination</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_bio_nomination_tree"/>
+        <field name="search_view_id" ref="view_bio_nomination_filter"/>
+        <field name="domain">[('type', '=', 'purchase_trucks')]</field>
+        <field name="context">{'default_type': 'purchase_trucks'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new document nomination
+            </p>
+        </field>
+    </record>
+
+    <!--nomination vessels (purchase)-->
+    <record id="action_bio_nomination_for_purchase_order_vessels" model="ir.actions.act_window">
+        <field name="name">Nomination Vessels</field>
+        <field name="res_model">bio.nomination</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_bio_nomination_tree_vessels"/>
+        <field name="search_view_id" ref="view_bio_nomination_filter"/>
+        <field name="domain">[('type', '=', 'purchase_vessels')]</field>
+        <field name="context">{'default_type': 'purchase_vessels'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new document nomination
+            </p>
+        </field>
+    </record>
+
+    <!--bio.nomination.type views-->
+
+    <record id="bio_nomination_type_kanban" model="ir.ui.view">
+        <field name="name">bio.nomination.type.kanban</field>
+        <field name="model">bio.nomination.type</field>
+        <field name="arch" type="xml">
+            <kanban class="oe_background_grey o_kanban_dashboard o_emphasize_colors o_stock_kanban" create="0"
+                    group_create="false">
+                <field name="name" readonly="1"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div name="bio_nomination">
+                            <div>
+                                <div t-attf-class="o_kanban_card_header">
+                                    <div class="o_kanban_card_header_title">
+
+                                        <div class="o_primary">
+                                            <field name="name"/>
+
+                                            <field name="code" invisible="1"/>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="container o_kanban_card_content" t-if="!selection_mode">
+                                    <div class="row">
+                                        <div class="col-6 o_kanban_primary_right">
+
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <a name="get_action_bio_nomination_sale_trucks_tree" type="object"
+                                                       t-if="record.code.raw_value =='trucks'">
+                                                        Sales
+                                                    </a>
+
+                                                    <a name="get_action_bio_nomination_sale_vessels_tree" type="object"
+                                                       t-if="record.code.raw_value =='vessels'">
+                                                        Sales
+                                                    </a>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <a class="oe_kanban_stock_picking_type_list"
+                                                       name="get_action_bio_nomination_purchase_trucks_tree"
+                                                       type="object" t-if="record.code.raw_value =='trucks'">
+                                                        Purchases
+                                                    </a>
+                                                    <a class="oe_kanban_stock_picking_type_list"
+                                                       name="get_action_bio_nomination_purchase_vessels_tree"
+                                                       type="object" t-if="record.code.raw_value =='vessels'">
+                                                        Purchases
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="container o_kanban_card_manage_pane dropdown-menu" role="menu">
+                                    <div class="row">
+
+                                    </div>
+
+                                    <div t-if="widget.editable" class="o_kanban_card_manage_settings row">
+                                        <div class="col-8" role="menuitem" aria-haspopup="true">
+                                            <ul class="oe_kanban_colorpicker" data-field="color" role="menu"/>
+                                        </div>
+                                        <div role="menuitem" class="col-4">
+                                            <a class="dropdown-item" role="menuitem" type="edit">Configuration</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+
+    <record id="bio_nomination_type_action" model="ir.actions.act_window">
+        <field name="name">Nomination Overview</field>
+        <field name="res_model">bio.nomination.type</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">kanban,form</field>
+    </record>
+
+</odoo>

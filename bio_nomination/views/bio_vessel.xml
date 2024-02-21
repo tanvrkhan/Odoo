@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="view_bio_vessel_tree" model="ir.ui.view">
+        <field name="name">bio.vessel.tree</field>
+        <field name="model">bio.vessel</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="partner_id" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_bio_vessel" model="ir.actions.act_window">
+        <field name="name">Vessels</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">bio.vessel</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new vessel
+            </p>
+            <p>
+                Odoo helps you easily track all activities related to a vessel.
+            </p>
+        </field>
+    </record>
+
+</odoo>

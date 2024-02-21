@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+
+        <!-- bio.nomination.type -->
+        <record id="bio_nomination_trucks" model="bio.nomination.type">
+            <field name="name">Trucks</field>
+            <field name="code">trucks</field>
+        </record>
+
+        <record id="bio_nomination_vessels" model="bio.nomination.type">
+            <field name="name">Vessels</field>
+            <field name="code">vessels</field>
+        </record>
+</odoo>

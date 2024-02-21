@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="bio_stock_picking_view_form" model="ir.ui.view">
+        <field name="name">bio.stock.picking.view.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group/group/field[@name='owner_id']" position="after">
+                <field name="financial_conditions" />
+                <field name="business_uom_id" />
+                  <label for="origin_country_id" />
+                            <div>
+                                <field name="origin_country_id" class="oe_inline" placeholder="Country"/>
+                                 <field name="origin_state_id" class="oe_inline" placeholder="City"/>
+                            </div>
+                <field name="destination_partner_id" />
+                  <label for="laycan_from" string="Laycan"/>
+                            <div>
+                                <field name="laycan_from" class="oe_inline"/>
+                                <span>To</span>
+                                 <field name="laycan_to" class="oe_inline"/>
+                            </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

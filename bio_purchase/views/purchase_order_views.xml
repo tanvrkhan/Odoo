@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="bio_purchase_order_view_form" model="ir.ui.view">
+        <field name="name">bio.purchase.order.view.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="priority" eval="99"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="business_uom_id" />
+                <label for="origin_country_id" />
+                <div>
+                            <div>
+                                <field name="origin_country_id" class="oe_inline" placeholder="Country"/>
+                                 <field name="origin_state_id" class="oe_inline" placeholder="City" domain="[('country_id','=',origin_country_id)]" context="{'default_country_id':origin_country_id}"/>
+                            </div></div>
+                <field name="destination_partner_id" />
+                  <label for="laycan_from" string="Laycan"/>
+                            <div>
+                                <field name="laycan_from" class="oe_inline"/>
+                                <span>To</span>
+                                 <field name="laycan_to" class="oe_inline"/>
+                            </div>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="replace"/>
+            <xpath expr="//field[@name='incoterm_id']" position="replace"/>
+            <xpath expr="//div[@name='reminder']" position="after">
+                <field name="financial_conditions" />
+                <field name="incoterm_id" />
+                <field name="payment_term_id" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

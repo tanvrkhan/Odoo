@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_bio_nomination_doc_trucks_vessels">
+           <t t-call="web.basic_layout">
+
+            <t t-set="partner" t-value="doc.partner_id or (doc.user_id and doc.user_id.partner_id)"/>
+            <t t-set="company" t-value="doc.company_id"/>
+            <t t-set="doc" t-value="doc.with_context(lang=partner.lang)"/>
+
+
+            <div class="page">
+                <table class="table table-sm" style="border: 1px solid black;">
+                      <tr class="border-black" >
+                        <td colspan="4" align="middle">
+
+     <img src="/bio_nomination/static/src/img/bio.png" />
+
+
+                        </td>
+                    </tr>
+                    <tr class="border-black" >
+                        <td><b>Date</b></td>
+                        <td style="border: 1px solid black;" colspan="3">
+                            <span t-field="doc.create_date"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td style="width: 100px;" ><b>To</b>
+                            <br/>
+                            <b> CC</b>
+                        </td>
+                        <td style="border: 1px solid black;width: 200px;" >
+
+                            <span t-esc="', '.join(doc.recipient_ids.mapped('name'))" />
+
+                            <br/>
+
+                            <span t-field="doc.email_cc"/>
+                        </td>
+                        <td  style="border: 1px solid black;width: 50px;" ></td>
+                        <td style="width: 50px;" ></td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Attn</b></td>
+                        <td style="border: 1px solid black;" >
+                             <span t-esc="', '.join(doc.attn_ids.mapped('name'))" />
+                        </td>
+                        <td style="border: 1px solid black;" ></td>
+                        <td></td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>From</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.create_date"/>
+                        </td>
+                        <td style="border: 1px solid black;"></td>
+                        <td></td>
+                    </tr>
+                    <tr class="border-black">
+                        <td style="height:20px" colspan="4" valign="middle" align="middle">
+                            <b>Reference:</b>
+                            <span t-field="doc.reference"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td style="height:20px;" colspan="4" valign="middle" align="middle">
+                            <b>Direct Tel.:</b>
+                            <span t-field="doc.phone"/>
+                        </td>
+                    </tr>
+                </table>
+
+
+
+
+                <div class="oe_structure"/>
+
+                <div class="row mt32 mb32" t-if="doc.type in ('sale_trucks', 'sale_vessels')">
+                    <h4 class="col-12 mt16">Please note following nomination (FOR DELIVERY):</h4>
+                </div>
+                <div class="row mt32 mb32" t-if="doc.type in ('purchase_trucks', 'purchase_vessels')">
+                    <h4 class="col-12 mt16">Please note following nomination (FOR LOADING):</h4>
+                </div>
+
+
+<table class="table table-sm" style="border: 1px solid black;">
+    <tr class="border-black">
+        <td style="width: 200px;"><b>Incoterms</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.freight_charges"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Contract Ref</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.contract_ref"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Our VAT number</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.vat"/>
+                        </td>
+                    </tr>
+
+                    <tr t-if="doc.type in ('purchase_trucks', 'purchase_vessels')" class="border-black">
+                        <td><b>Transporter</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.transporter_id.name"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td>
+                            <b>Products</b>
+                        </td>
+                        <td style="border: 1px solid black;" >
+                            <t t-foreach="doc.nomination_lines" t-as="s">
+
+                                    <b>Product: </b><span t-field="s.product_id.name"/>
+                                    <b>Qty:</b><span t-field="s.qty_done"/>
+                                <t t-if="s.product_packaging_id">
+                                    <b>Packaging: </b><span t-field="s.product_packaging_id.name" />
+                                    <b>Packaging Qty: </b><span t-field="s.product_packaging_qty" /></t>
+
+
+                            </t>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- fields for Trucks-->
+                <table class="table table-sm" style="border: 1px solid black;"
+                       t-if="doc.type in ('sale_trucks', 'purchase_trucks')">
+                    <tr class="border-black">
+                        <td style="width: 200px;"><b>Container Reference</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.container_reference"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Container Pin Code</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.container_pin_code"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Container returns date</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.container_returns_date_from"/>
+                            To
+                            <span t-field="doc.container_returns_date_to"/>
+                        </td>
+                    </tr>
+
+                    <tr class="border-black">
+                        <td><b>Palettes Type</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.palettes_type.name"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Palettes Qty</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.palettes_qty"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Palettes Caution</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.caution"/>
+                        </td>
+                    </tr>
+                </table>
+
+ <table class="table table-sm" style="border: 1px solid black;"
+       t-if="doc.type in ('sale_trucks', 'purchase_trucks')">
+                    <tr class="border-black">
+                        <td style="width: 200px;"><b>Pickup Place</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.pickup_place"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Pickup date</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.pickup_date_from"/>
+                            To
+                            <span t-field="doc.pickup_date_to"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Delivery date</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.delivery_date_from"/>
+                            To
+                            <span t-field="doc.delivery_date_to"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Destination</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.destination"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Receiver</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.receiver_id.name"/>
+                            <t t-if="doc.street">   <br/> </t>
+                            <span t-field="doc.street"/>
+                            <t t-if="doc.street2">  <br/> </t>
+                            <span t-field="doc.street2"/>
+                           <t t-if="doc.zip or doc.city or doc.state_id">  <br/> </t>
+                            <span t-field="doc.zip"/>
+                            <span t-field="doc.city"/>
+                            <span t-field="doc.state_id.name"/>
+<t t-if="doc.country_id">  <br/> </t>
+                            <span t-field="doc.country_id.name"/>
+                        <t t-if="doc.receiver_vat">  <br/> </t>
+                            <b> VAT</b>
+                            <span t-field="doc.receiver_vat"/>
+                        </td>
+
+                    </tr>
+                </table>
+
+
+                <!-- fields for Vessels-->
+                <table class="table table-sm" style="border: 1px solid black;"
+                       t-if="doc.type in ('sale_vessels', 'purchase_vessels')">
+                    <tr t-if="doc.vessel_id" class="border-black">
+                        <td style="width: 200px;"><b>Vessel Name</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.vessel_id.name"/>
+                        </td>
+                    </tr>
+
+                    <tr class="border-black">
+                        <td><b>Vessel reg. No</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.vessel_num"/>
+                        </td>
+                    </tr>
+
+
+                    <tr class="border-black">
+                        <td><b>Vessel Owner</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.vessel_owner_id.name"/>
+                        </td>
+                    </tr>
+
+                    <tr class="border-black">
+                        <td><b>Previous Cargo</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.previous_cargo"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Loading Terms</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-esc="', '.join(doc.loading_terms.mapped('name'))" />
+
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Demurrage Rate</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.demurrage_rate"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black" t-if="doc.transport_arranger">
+                        <td><b>Transport Arranger</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.transport_arranger.name"/>
+                        </td>
+                    </tr>
+
+                </table>
+
+                <table class="table table-sm" style="border: 1px solid black;"
+                       t-if="doc.type in ('sale_vessels', 'purchase_vessels')">
+                    <tr t-if="doc.laycan_to or doc.laycan_from" class="border-black">
+                        <td t-if="doc.type in ('sale_vessels')" style="width: 200px;"><b>Laycan AT Disport</b></td>
+                        <td t-if="doc.type in ('purchase_vessels')" style="width: 200px;"><b>Laycan AT Loadport</b></td>
+
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.laycan_from"/> to  <span t-field="doc.laycan_to"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Origin</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.origin"/>
+                            <span t-field="doc.origin_state"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Destination</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.destination"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Receiver</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.receiver_id.name"/>
+                            <t t-if="doc.street">   <br/> </t>
+                            <span t-field="doc.street"/>
+                            <t t-if="doc.street2">  <br/> </t>
+                            <span t-field="doc.street2"/>
+                           <t t-if="doc.zip or doc.city or doc.state_id">  <br/> </t>
+                            <span t-field="doc.zip"/>
+                            <span t-field="doc.city"/>
+                            <span t-field="doc.state_id.name"/>
+<t t-if="doc.country_id">  <br/> </t>
+                            <span t-field="doc.country_id.name"/>
+                        <t t-if="doc.receiver_vat">  <br/> </t>
+                            <b> VAT</b>
+                            <span t-field="doc.receiver_vat"/>
+                        </td>
+                    </tr>
+                    <tr t-if="doc.surveyor_id" class="border-black">
+                        <td t-if="doc.type in ('sale_vessels')" style="width: 200px;"><b>Surveyor AT Disport</b></td>
+                        <td t-if="doc.type in ('purchase_vessels')" style="width: 200px;"><b>Surveyor AT Loadport</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.surveyor_id.name"/>
+                        </td>
+                    </tr>
+
+                    <tr class="border-black">
+                        <td><b>Surveyor Code</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-esc="', '.join(doc.surveyor_product_ids.mapped('name'))" />
+
+
+                        </td>
+
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Agents</b></td>
+                        <td style="border: 1px solid black;" >
+                                                        <span t-field="doc.agent_id.name"/>
+
+
+
+                        </td>
+
+                    </tr>
+                </table>
+
+
+                <table class="table table-sm" style="border: 1px solid black;"     >
+
+                    <tr class="border-black">
+                        <td style="width: 200px;"><b>Documents to provide</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.documents_provide"/>
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Upload Document</b></td>
+                        <td style="border: 1px solid black;" >
+                               <span t-esc="', '.join(doc.attachment_ids.mapped('name'))" />
+
+                        </td>
+                    </tr>
+                    <tr class="border-black">
+                        <td><b>Comments</b></td>
+                        <td style="border: 1px solid black;" >
+                            <span t-field="doc.comments"/>
+                        </td>
+                    </tr>
+
+                </table>
+
+
+            </div>
+        </t>
+    </template>
+
+    <template id="report_bio_nomination">
+       <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="bio_nomination.report_bio_nomination_doc_trucks_vessels"
+                   t-lang="(doc.sale_id and doc.sale_id.partner_id.lang) or (doc.purchase_id and doc.purchase_id.partner_id.lang) "/>
+            </t>
+        </t>
+    </template>
+    <record id="paperformat_bio" model="report.paperformat">
+            <field name="name">A4</field>
+            <field name="default" eval="True" />
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">10</field>
+            <field name="margin_bottom">0</field>
+            <field name="margin_left">7</field>
+            <field name="margin_right">7</field>
+            <field name="header_line" eval="False" />
+            <field name="header_spacing">0</field>
+            <field name="dpi">90</field>
+        </record>
+    <record id="action_report_bio_nomination" model="ir.actions.report">
+        <field name="name">Nomination document</field>
+        <field name="model">bio.nomination</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">bio_nomination.report_bio_nomination</field>
+        <field name="report_file">bio_nomination.report_bio_nomination</field>
+        <field name="print_report_name">(object.type=='sale' and 'Nomination Sale - %s' % (object.name)) or 'Nomination Purchase - %s' % (object.name)
+        </field>
+        <field name="paperformat_id" ref="paperformat_bio"/>
+
+        <field name="binding_model_id" ref="model_bio_nomination"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>
