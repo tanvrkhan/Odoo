@@ -670,6 +670,11 @@
                 <br/>
                 <br/>
                 <br/>
+                 <div class="row" style="padding-left: 0px;">
+                                <t t-if="o.payment_reference">
+                                   <p>Please use the reference <strong><span class="m-0" t-field="o.payment_reference"/></strong> for your payment.</p>
+                                </t>
+                 </div>
                 <br/>
                 <strong>Terms And Conditions</strong>
                 <div style="border: 1px solid black;"/>

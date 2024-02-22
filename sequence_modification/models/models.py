@@ -88,7 +88,8 @@ class AccountMoveInheritModel(models.Model):
                     self.generate_sequence(code, move_type)
                 else:
                     self.name = name
-                    self.payment_reference = name
+                    if self.company_id.id != 4:
+                        self.payment_reference = name
             elif move_type == "invoice" and code == 'invoice.provisional.sequence':
                 self.partner_id.inv_prov_partner_seq += 1
                 next_num = self.partner_id.inv_prov_partner_seq
@@ -98,7 +99,8 @@ class AccountMoveInheritModel(models.Model):
                     self.generate_sequence(code, move_type)
                 else:
                     self.name = name
-                    self.payment_reference = name
+                    if self.company_id.id != 4:
+                        self.payment_reference = name
             elif move_type == "bill" and code == 'bill.sequence':
                 self.partner_id.bill_partner_seq += 1
                 next_num = self.partner_id.bill_partner_seq

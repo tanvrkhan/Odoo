@@ -124,7 +124,7 @@ class AccountMove(models.Model):
             refs = [ref for ref in refs if ref]
             self.ref = ",".join(refs)
             # Compute payment_reference. invoice_payment_ref
-            if len(refs) == 1:
+            if len(refs) == 1 and self.company_id.id!=4:
                 self.payment_reference = refs[0]
             return {}
         elif self._context.get("without_downpayment", False):
@@ -176,7 +176,7 @@ class AccountMove(models.Model):
             refs = [ref for ref in refs if ref]
             self.ref = ",".join(refs)
             # Compute payment_reference.
-            if len(refs) == 1:
+            if len(refs) == 1 and self.company_id.id!=4:
                 self.payment_reference = refs[0]
             return {}
         else:
