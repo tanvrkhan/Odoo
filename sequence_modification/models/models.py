@@ -11,34 +11,35 @@ class AccountMoveInheritModel(models.Model):
 
     def action_post(self):
         for rec in self:
-            if not rec.move_sequence_done and rec.name == '/':
-                if rec.move_type == 'out_invoice' and ((rec.journal_id.id == 2  and rec.company_id.id==1) or(rec.journal_id.id == 36  and rec.company_id.id==2)):
-                    rec.generate_sequence('invoice.sequence', 'invoice')
-
-                elif rec.move_type == 'out_invoice' and ((rec.journal_id.id != 2  and rec.company_id.id==1) or(rec.journal_id.id != 36  and rec.company_id.id==2)):
-                    rec.generate_sequence('invoice.provisional.sequence', 'invoice')
-
-                elif rec.move_type == 'in_invoice' and ((rec.journal_id.id == 3  and rec.company_id.id==1) or(rec.journal_id.id == 37  and rec.company_id.id==2)):
-                    rec.generate_sequence('bill.sequence', 'bill')
-
-                elif rec.move_type == 'in_invoice' and ((rec.journal_id.id != 3  and rec.company_id.id==1) or(rec.journal_id.id != 37  and rec.company_id.id==2)):
-                    rec.generate_sequence('bill.provisional.sequence', 'bill')
-                
-                elif rec.move_type == 'out_invoice' and rec.company_id!=1 and rec.company_id!=2:
-                    rec.generate_sequence('invoice.sequence', 'invoice')
+            if self.company_id.id!=4:
+                if not rec.move_sequence_done and rec.name == '/':
+                    if rec.move_type == 'out_invoice' and ((rec.journal_id.id == 2  and rec.company_id.id==1) or(rec.journal_id.id == 36  and rec.company_id.id==2)):
+                        rec.generate_sequence('invoice.sequence', 'invoice')
+    
+                    elif rec.move_type == 'out_invoice' and ((rec.journal_id.id != 2  and rec.company_id.id==1) or(rec.journal_id.id != 36  and rec.company_id.id==2)):
+                        rec.generate_sequence('invoice.provisional.sequence', 'invoice')
+    
+                    elif rec.move_type == 'in_invoice' and ((rec.journal_id.id == 3  and rec.company_id.id==1) or(rec.journal_id.id == 37  and rec.company_id.id==2)):
+                        rec.generate_sequence('bill.sequence', 'bill')
+    
+                    elif rec.move_type == 'in_invoice' and ((rec.journal_id.id != 3  and rec.company_id.id==1) or(rec.journal_id.id != 37  and rec.company_id.id==2)):
+                        rec.generate_sequence('bill.provisional.sequence', 'bill')
                     
-                elif rec.move_type == 'in_invoice' and rec.company_id!=1 and rec.company_id!=2:
-                    rec.generate_sequence('bill.sequence', 'invoice')
-
-                elif rec.move_type == 'in_refund':
-                    rec.generate_sequence('debit.sequence', 'refund')
-
-                elif rec.move_type == 'out_refund':
-                    rec.generate_sequence('credit.sequence', 'credit')
-
-                # elif rec.move_type == 'entry':
-                #     if not rec.move_sequence_done and rec.name == '/':
-                #         rec.set_entry_seq()
+                    elif rec.move_type == 'out_invoice' and rec.company_id!=1 and rec.company_id!=2:
+                        rec.generate_sequence('invoice.sequence', 'invoice')
+                        
+                    elif rec.move_type == 'in_invoice' and rec.company_id!=1 and rec.company_id!=2:
+                        rec.generate_sequence('bill.sequence', 'invoice')
+    
+                    elif rec.move_type == 'in_refund':
+                        rec.generate_sequence('debit.sequence', 'refund')
+    
+                    elif rec.move_type == 'out_refund':
+                        rec.generate_sequence('credit.sequence', 'credit')
+    
+                    # elif rec.move_type == 'entry':
+                    #     if not rec.move_sequence_done and rec.name == '/':
+                    #         rec.set_entry_seq()
         return super().action_post()
     
     @api.returns('self', lambda value: value.id)
