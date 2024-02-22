@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+
+         <!--Email template -->
+        <record id="email_template_bio_nomination" model="mail.template">
+            <field name="name">Nomination: Send by email</field>
+            <field name="model_id" ref="bio_nomination.model_bio_nomination"/>
+            <field name="email_from">{{ (object.email_from) }}</field>
+            <field name="email_cc">{{ object.email_cc }}</field>
+            <field name="subject">BIOFIN -NOMINATION FOR {{ 'DELIVERY' if object.type in ('sale_trucks', 'sale_vessels') else 'LOADING' }} {{ 'TRUCK' if object.type in ('sale_trucks', 'purchase_trucks') else 'VESSEL' }} {{ object.partner_id.name if object.partner_id else '' }} {{ format_datetime(dt=object.create_date, dt_format='dd MMMM y ', lang_code=object.env.lang) }}</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+        Dear
+        <t t-if="object.partner_id.parent_id">
+            <t t-out="object.partner_id.name or ''">Brandon Freeman</t> (<t t-out="object.partner_id.parent_id.name or ''">Azure Interior</t>),
+        </t>
+        <t t-else="">
+            <t t-out="object.partner_id.name or ''">Brandon Freeman</t>,
+        </t>
+        <br /><br />
+        Here is your Nomination.
+
+        
+        <br /><br />
+        Do not hesitate to contact us if you have any questions.
+        Best Regards,
+        <t t-if="object.user_id.signature">
+            <br />
+            <t t-out="object.user_id.signature or ''">--<br/>Mitchell Admin</t>
+        </t>
+        <t t-if="object.company_id">
+            <br />
+            <t t-out="object.company_id.name or ''">--<br/>BIOFIN SRL</t>
+        </t>
+    </p>
+</div>
+            </field>
+            <field name="report_template" ref="bio_nomination.action_report_bio_nomination"/>
+            <field name="report_name">Nomination {{ (object.nomination_type_id and object.nomination_type_id.name or '') }}</field>
+            <field name="lang">{{ object.user_id.partner_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+</odoo>

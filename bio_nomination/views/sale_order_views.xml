@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<odoo>
+     <record id="add_truck_sale" model="ir.actions.act_window">
+            <field name="name">Add truck</field>
+            <field name="res_model">bio.nomination</field>
+            <field name="view_mode">form</field>
+            <field name="context">{'default_sale_id': active_id,'default_sale_ids': [active_id],'default_type': 'sale_trucks'}</field>
+            <field name="view_id" ref="bio_nomination.bio_nomination_view_form_trucks_vessels"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Record a new truck nomination
+                </p>
+            </field>
+        </record>
+     <record id="add_vessel_sale" model="ir.actions.act_window">
+            <field name="name">Add vessel</field>
+            <field name="res_model">bio.nomination</field>
+            <field name="view_mode">form</field>
+            <field name="context">{'default_sale_id': active_id,'default_sale_ids': [active_id],'default_type': 'sale_vessels'}</field>
+            <field name="view_id" ref="bio_nomination.bio_nomination_view_form_trucks_vessels"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Record a new vessel nomination
+                </p>
+            </field>
+        </record>
+    <record id="bio_nomination_sale_order_view_form" model="ir.ui.view">
+        <field name="name">bio.nomination.sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header">
+                <button name="%(bio_nomination.add_truck_sale)d" type="action" string="Add truck nomination" class="oe_highlight"/>
+                 <button name="%(bio_nomination.add_vessel_sale)d" type="action" string="Add vessel nomination" class="oe_highlight"/>
+
+            </xpath>
+            <xpath expr="//button[@name='action_view_invoice']" position="after">
+                <button type="object"
+                    name="action_view_nomination"
+                    class="oe_stat_button"
+                    icon="fa-document"
+                    attrs="{'invisible': [('nomination_count', '=', 0)]}">
+                    <field name="nomination_count" widget="statinfo" string="Nomination"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

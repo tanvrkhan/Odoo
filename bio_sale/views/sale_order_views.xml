@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="bio_sale_order_view_form" model="ir.ui.view">
+        <field name="name">bio.sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group/group[@name='order_details']/field[last()]" position="before">
+                <field name="financial_conditions" />
+                <field name="business_uom_id" />
+                     <label for="origin_country_id" />
+                      <div>
+                            <div>
+                                <field name="origin_country_id" class="oe_inline" placeholder="Country"/>
+                                 <field name="origin_state_id" class="oe_inline" placeholder="City" domain="[('country_id','=',origin_country_id)]" context="{'default_country_id':origin_country_id}"/>
+                            </div></div>
+                <field name="warehouse_id" />
+                  <label for="laycan_from" string="Laycan"/>
+                            <div>
+                                <field name="laycan_from" class="oe_inline"/>
+                                <span>To</span>
+                                 <field name="laycan_to" class="oe_inline"/>
+                            </div>
+                 <field name="incoterm" options="{'no_open': True, 'no_create': True}" groups="sale_stock.group_display_incoterm"/>
+                <field name="certificate_id" />
+            </xpath>
+        </field>
+    </record>
+    <record id="bio_view_order_form_inherit_sale_stock" model="ir.ui.view">
+        <field name="name">bio.sale.order.sale_stock.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="priority" eval="99"/>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='incoterm']" position="replace"/>
+        </field>
+    </record>
+</odoo>

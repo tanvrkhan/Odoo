@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <!-- menuitem-->
+    <menuitem name="Nomination"
+              id="menu_nomination"
+              web_icon="bio_nomination,static/description/icon.png"
+              sequence="100">
+
+        <menuitem
+                action="bio_nomination_type_action"
+                id="bio_nomination_type_menu"
+                sequence="0"
+                name="Overview"/>
+
+        <menuitem id="menu_nomination_sales" name="Documents Sales" sequence="1">
+
+            <menuitem id="menu_nomination_sale_trucks" name="Nominations Trucks" sequence="2"
+                      action="action_bio_nomination_for_sale_order_trucks"/>
+            <menuitem id="menu_nomination_sale_vessels" name="Nominations Vessels" sequence="3"
+                      action="action_bio_nomination_for_sale_order_vessels"/>
+        </menuitem>
+        <menuitem id="menu_nomination_purchases" name="Documents Purchases" sequence="2">
+            <menuitem id="menu_nomination_purchase_trucks" name="Nominations Trucks" sequence="2"
+                      action="action_bio_nomination_for_purchase_order_trucks"/>
+            <menuitem id="menu_nomination_purchase_vessels" name="Nominations Vessels" sequence="3"
+                      action="action_bio_nomination_for_purchase_order_vessels"/>
+        </menuitem>
+        <menuitem id="menu_nomination_configuration_main" name="Configuration" sequence="3">
+            <menuitem id="menu_nomination_configuration_contact" name="Contacts" sequence="1">
+                <menuitem id="menu_nomination_vessel_owner" name="Vessel Owner" sequence="1"
+                          action="res_partner_action_vessel_owner"/>
+                <menuitem id="menu_nomination_inspector" name="Inspector" sequence="2"
+                          action="res_partner_action_inspector"/>
+                <menuitem id="menu_nomination_transporter" name="Transporter" sequence="3"
+                          action="res_partner_action_transporter"/>
+                <menuitem id="menu_nomination_receiver" name="Receiver" sequence="4"
+                          action="res_partner_action_receiver"/>
+                <menuitem id="menu_nomination_agent" name="Agent" sequence="5" action="res_partner_action_agent"/>
+
+            </menuitem>
+            <menuitem id="menu_nomination_configuration" name="Configuration" sequence="2">
+
+                <menuitem id="menu_nomination_vessel" name="Vessel" sequence="6" action="action_bio_vessel"/>
+                <menuitem id="menu_nomination_cost_type" name="Nomination Costs type" sequence="7"
+                          action="action_bio_cost_type"/>
+
+
+            </menuitem>
+        </menuitem>
+    </menuitem>
+
+</odoo>

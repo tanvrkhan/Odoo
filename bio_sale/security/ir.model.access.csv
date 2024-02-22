@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sale_certficate_user,sale_certficate user,model_sale_certificate,base.group_user,1,0,0,0
+access_sale_certficate_manager,sale_certficate manager,model_sale_certificate,sales_team.group_sale_manager,1,1,1,1
+
+
+
+

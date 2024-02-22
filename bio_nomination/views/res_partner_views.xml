@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- Vessel action button box -->
+    <record id="act_vessel" model="ir.actions.act_window">
+            <field name="name">Vessels</field>
+            <field name="res_model">bio.vessel</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[('partner_id','=',active_id)]</field>
+            <field name="context">{'default_partner_id': active_id}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Record a new vessel
+                </p>
+            </field>
+        </record>
+    <record id="bio_view_partner_form" model="ir.ui.view">
+        <field name="name">bio.res.partner.view.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='sales_purchases']/group[@name='container_row_2']" position="inside">
+                <group string="Role">
+                    <field name="vessel_owner"/>
+                    <field name="inspector"/>
+                    <field name="transporter"/>
+                    <field name="receiver"/>
+                    <field name="agent"/>
+                    <field name="broker"/>
+                </group>
+            </xpath>
+             <div  name="button_box" position="inside">
+                  <button class="oe_stat_button" name="%(bio_nomination.act_vessel)d" type="action"
+                        icon="fa-ship" help="Vessels">
+                        <field string="Vessels" name="vessel_count" widget="statinfo"/>
+                    </button>
+
+             </div>
+
+        </field>
+    </record>
+
+    <record id="bio_res_partner_view_search_inherit" model="ir.ui.view">
+        <field name="name">bio.res.partner.search.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="before">
+                <filter string="Vessel Owner" name="vessel_owner" domain="[('vessel_owner','=', True)]"/>
+                <filter string="Inspector" name="inspector" domain="[('inspector','=', True)]"/>
+                <filter string="Transporter" name="transporter" domain="[('transporter','=', True)]"/>
+                <filter string="Receiver" name="receiver" domain="[('receiver','=', True)]"/>
+                <filter string="Agent" name="agent" domain="[('agent','=', True)]"/>
+                <filter string="Broker" name="broker" domain="[('broker','=', True)]"/> 
+               <separator/>
+            </xpath>
+        </field>
+    </record>
+ 
+    <record id="res_partner_action_vessel_owner" model="ir.actions.act_window">
+        <field name="name">Vessel Owner</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_vessel_owner': 1,'res_partner_search_mode': 'vessel_owner', 'default_vessel_owner': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new Vessel Owner in your address book
+            </p><p>
+                Odoo helps you easily track all activities related to a Vessel Owner.
+            </p>
+        </field>
+    </record>   
+ 
+    <record id="res_partner_action_inspector" model="ir.actions.act_window">
+        <field name="name">Inspector</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_inspector': 1,'res_partner_search_mode': 'inspector', 'default_inspector': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new inspector in your address book
+            </p><p>
+                Odoo helps you easily track all activities related to a inspector.
+            </p>
+        </field>
+    </record>
+ 
+    <record id="res_partner_action_transporter" model="ir.actions.act_window">
+        <field name="name">Transporter</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_transporter': 1,'res_partner_search_mode': 'transporter', 'default_inspector': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new transporter in your address book
+            </p><p>
+                Odoo helps you easily track all activities related to a transporter.
+            </p>
+        </field>
+    </record>
+
+    <record id="res_partner_action_receiver" model="ir.actions.act_window">
+        <field name="name">Receiver</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_receiver': 1,'res_partner_search_mode': 'receiver', 'default_receiver': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new receiver in your address book
+            </p><p>
+                Odoo helps you easily track all activities related to a receiver.
+            </p>
+        </field>
+    </record>
+     
+    <record id="res_partner_action_agent" model="ir.actions.act_window">
+        <field name="name">Agent</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_agent': 1,'res_partner_search_mode': 'agent', 'default_agent': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new agent in your address book
+            </p><p>
+                Odoo helps you easily track all activities related to a agent.
+            </p>
+        </field>
+    </record>
+
+</odoo>
