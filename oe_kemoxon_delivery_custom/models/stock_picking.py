@@ -31,7 +31,7 @@ class StockPicking(models.Model):
                                                related='sale_id.incoterm_location_custom')
     trader = fields.Many2one('hr.employee', string='Trader', related='sale_id.trader')
     en_plus = fields.Boolean('EN Plus')
-    
+    custom_delivery_date=fields.Date(string="Delivery Date")
     updatestatus=fields.Char()
     def fix_unmatching_lots(self):
         for rec in self:
