@@ -45,11 +45,11 @@ class PurchaseOrderLine(models.Model):
 
                 # If the user increased quantity of existing line or created a new line
                 pickings = line.order_id.picking_ids.filtered(lambda x: x.state not in ('done', 'cancel') and x.location_dest_id.usage in (
-                    'internal', 'transit', 'customer') and x.picking_type_id.id == line.picking_type_id.id)
+                    'internal', 'transit', 'customer') and x.picking_type_id.id == line.sh_warehouse_id.in_type_id.id)
                 picking = pickings and pickings[0] or False
                 if not picking:
                     res = line.order_id.with_context(
-                        sh_warehouse_id=line.order_id.picking_type_id.warehouse_id.id)._prepare_picking()
+                        sh_warehouse_id=line.sh_warehouse_id.id)._prepare_picking()
                     picking = self.env['stock.picking'].create(res)
                 moves = line._create_stock_moves(picking)
                 moves._action_confirm()._action_assign()
