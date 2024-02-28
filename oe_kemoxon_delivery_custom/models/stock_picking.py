@@ -4,7 +4,7 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessError
 from odoo.exceptions import UserError, Warning
-
+import datetime
 
 class StockPicking(models.Model):
     _inherit = "stock.picking"
@@ -46,11 +46,54 @@ class StockPicking(models.Model):
 
             else:
                 return super().button_validate()
-
+    
+    def update_purchase_date_from_corresponding_Lot(self):
+        for rec in self:
+            if rec.move_ids.quantity_done>0:
+                if rec.move_ids.move_line_ids.lot_id:
+                    earliest_sale = self.env['stock.move.line'].search([('lot_id','=',rec.move_ids.move_line_ids.lot_id),('quantity_done','<',0)], order = "date asc",limit=1)
+                    earliest_date=earliest_sale.date
+                    if rec.custom_delivery_date:
+                        a=1
+                    else:
+                        rec.custom_delivery_date = earliest_date + datetime.timedelta(Hours=-1)
+            else:
+                if rec.move_ids.quantity_done < 0:
+                    if rec.move_ids.move_line_ids.lot_id:
+                        earliest_sale = self.env['stock.move.line'].search(
+                            [('lot_id', '=', rec.move_ids.move_line_ids.lot_id), ('quantity_done', '>', 0)],
+                            order="date asc", limit=1)
+                        earliest_date = earliest_sale.date
+                        if rec.custom_delivery_date:
+                            a = 1
+                        else:
+                            rec.custom_delivery_date = earliest_date + datetime.timedelta(Hours=1)
+    def set_delivery_date(self):
+        for rec in self:
+            if rec.scheduled_date and rec.date_deadline:
+                if rec.scheduled_date<rec.date_deadline:
+                    rec.custom_delivery_date = rec.scheduled_date
+                elif rec.date_deadline< rec.scheduled_date:
+                    rec.scheduled_date = rec.date_deadline
+                    rec.custom_delivery_date = rec.date_deadline
+                
     def button_validate(self):
         for rec in self:
-            
-            r= super(StockPicking,rec)._action_done()
+            if rec.move_ids.move_line_ids.lot_id:
+                r= super(StockPicking,rec)._action_done()
+            else:
+                lot_name='NA'
+                found_lot = self.env['stock.lot'].search([('name','=','NA'),('product_id','=',rec.product_id.id)])
+                if found_lot:
+                    rec.move_ids.move_line_ids.lot_id =found_lot
+                else:
+                    new_lot = self.env['stock.lot'].create(
+                        {
+                            'product_id': rec.product_id.id,
+                            'name': 'NA'
+                        })
+                    rec.move_ids.move_line_ids.lot_id = new_lot
+                r = super(StockPicking, rec)._action_done()
     def button_confirm(self):
         for rec in self:
             return super().action_confirm()

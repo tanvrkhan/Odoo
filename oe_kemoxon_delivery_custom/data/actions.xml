@@ -7,6 +7,12 @@
         <field name="view_mode">kanban,tree,form,activity</field>
         <field name="view_id" ref="view_tree_vessels"/>
     </record>
-
+   <record id="action_stock_move_line" model="ir.actions.act_window">
+        <field name="name">Stock move lines</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.move.line</field>
+        <field name="view_mode">kanban,tree,form,activity</field>
+        <field name="view_id" ref="view_tree_stock_move_line_custom"/>
+    </record>
 
 </odoo>

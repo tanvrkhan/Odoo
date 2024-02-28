@@ -117,12 +117,26 @@ class StockValuationLayer(models.Model):
                     ae.line_ids.unlink()
                     self.env['account.move'].search([('id', '=', ae.id)]).unlink()
             self.env['stock.valuation.layer'].search([('id', '=', record.id)]).unlink()
-    
+    def delete_valuation_force(self):
+            self.unit_cost = 0
+            self.value = 0
+            self.quantity = 0
+            if self.account_move_id:
+                for ae in self.account_move_id:
+                    for ael in ae.line_ids:
+                        ael.remove_move_reconcile()
+                    ae.state = 'draft'
+                    ae.line_ids.unlink()
+                    self.env['account.move'].search([('id', '=', ae.id)]).unlink()
+            self.env['stock.valuation.layer'].search([('id', '=', self.id)]).unlink()
     def update_date_to_schedule_date(self):
         for record in self:
             next_number = self.env['ir.sequence'].next_by_code('stock.valuation')
             next_number = str(next_number)
-            datetocheck=record.stock_move_id.picking_id.scheduled_date
+            if record.stock_move_id.picking_id.custom_delivery_date:
+                datetocheck=record.stock_move_id.picking_id.custom_delivery_date
+            else:
+                datetocheck=record.stock_move_id.picking_id.scheduled_date
             datetouse=datetocheck
             datetouse=self.verify_picking_date(record,datetocheck)
             
@@ -141,9 +155,9 @@ class StockValuationLayer(models.Model):
             record.account_move_id.state = 'draft'
             record.account_move_line_id.parent_state = 'draft'
             record.account_move_id.name = 'draft'
-            record.account_move_id.date = datetouse.date()
+            record.account_move_id.date = datetouse
             record.account_move_id.name = sequence
-            record.account_move_line_id.date = datetouse.date()
+            record.account_move_line_id.date = datetouse
             record.account_move_id.state = 'posted'
             record.account_move_line_id.parent_state = 'posted'
         return self
@@ -182,14 +196,23 @@ class StockValuationLayer(models.Model):
                     acce.remove_move_reconcile()
                 record.remove_from_valuation()
             else:
-                all_valuations = self.env['stock.valuation.layer'].search(
-                    ['&', '&', '&',
-                     ('product_id', '=', record.product_id.id),
-                     ('stock_move_id.date', '<=', record.stock_move_id.date),
-                     ('id', '!=', record.id),
-                     ('warehouse_id', '=', record.warehouse_id.id),
-                     ('company_id', '=', record.company_id.id)
-                     ])
+                if record.company_id.id == 1:
+                    all_valuations = self.env['stock.valuation.layer'].search(
+                        ['&', '&', '&',
+                         ('product_id', '=', record.product_id.id),
+                         ('stock_move_id.date', '<', record.stock_move_id.date),
+                         ('id', '!=', record.id),
+                         ('company_id', '=', record.company_id.id)
+                         ])
+                else:
+                    all_valuations = self.env['stock.valuation.layer'].search(
+                        ['&', '&', '&',
+                         ('product_id', '=', record.product_id.id),
+                         ('stock_move_id.date', '<=', record.stock_move_id.date),
+                         ('id', '!=', record.id),
+                         ('warehouse_id', '=', record.warehouse_id.id),
+                         ('company_id', '=', record.company_id.id)
+                         ])
                 totalquantity = 0
                 totalamount = 0
                 

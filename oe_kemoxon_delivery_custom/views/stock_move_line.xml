@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_tree_stock_move_line" model="ir.ui.view">
+        <field name="name">tree.stock.move.line</field>
+        <field name="model">stock.move.line</field>
+        <field name="arch" type="xml">
+            <tree multi_edit="1" editable="bottom">
+            </tree>
+        </field>
+    </record>
+</odoo>

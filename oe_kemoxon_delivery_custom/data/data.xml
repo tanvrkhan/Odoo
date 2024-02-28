@@ -19,12 +19,20 @@
             <field name="code">records.update_stock_value_to_match_initial_if_cancelled_out()</field>
         </record>
         <record id="model_stock_valuation_action_unset_value" model="ir.actions.server">
-            <field name="name">Remove stock valuation</field>
+            <field name="name">Remove extra stock valuation</field>
             <field name="model_id" ref="stock_account.model_stock_valuation_layer"/>
             <field name="binding_model_id" ref="stock_account.model_stock_valuation_layer"/>
             <field name="binding_view_types">list</field>
             <field name="state">code</field>
             <field name="code">records.remove_from_valuation()</field>
+        </record>
+        <record id="model_stock_valuation_action_delete_custom_2" model="ir.actions.server">
+            <field name="name">DELETE!!!</field>
+            <field name="model_id" ref="stock_account.model_stock_valuation_layer"/>
+            <field name="binding_model_id" ref="stock_account.model_stock_valuation_layer"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">records.delete_valuation_force()</field>
         </record>
          <record id="model_stock_valuation_action_recalculate_value" model="ir.actions.server">
             <field name="name">Recalculate Product Valuation</field>
@@ -105,6 +113,39 @@
             <field name="binding_view_types">list</field>
             <field name="state">code</field>
             <field name="code">records.set_reserved_zero()</field>
+        </record>
+          <record id="model_stock_picking_action_cancel_transfer" model="ir.actions.server">
+            <field name="name">Kx Cancel</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.button_cancel()</field>
+        </record>
+          <record id="model_stock_picking_action_sync_lot_date" model="ir.actions.server">
+            <field name="name">Sync Lot date</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.update_purchase_date_from_corresponding_Lot()</field>
+        </record>
+
+          <record id="model_stock_picking_action_update_delivery_date1" model="ir.actions.server">
+            <field name="name">Sync Delivery Date</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">records.set_delivery_date()</field>
+        </record>
+           <record id="model_stock_picking_action_custom_confirm_list" model="ir.actions.server">
+            <field name="name">Custom Mark as todo</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.button_confirm()</field>
         </record>
         <record id="model_stock_move_action_fix_unmatching_locations" model="ir.actions.server">
             <field name="name">Fix unmatching locations</field>
