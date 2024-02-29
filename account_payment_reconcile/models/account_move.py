@@ -45,7 +45,23 @@ class AccountMove(models.Model):
                                         lines= self.env['account.move.line'].browse(line1.id)
                                         lines += matchingpayment.line_ids.filtered(lambda line: line.account_id == lines[0].account_id and not line.reconciled)
                                         lines.reconcile()
-                                        
+    def reset_invoice(self):
+        for rec in self:
+            payment= self.env['account.payment'].search([]).filtered(lambda p: rec.id in p.reconciled_invoice_ids.ids)
+            rec.button_draft()
+            if payment:
+                lines = self.env['account.move.line'].search([]).filtered(lambda p: payment.move_id in p.move_id and (p.account_id == rec.partner_id.property_account_payable_id or p.account_id  == rec.partner_id.property_account_receivable_id)) \
+                    # ('ids','in',payment.move_id.line_ids)
+            # lines= self.env['account.move'].search('id','in',payment_ids)
+                rec._post()
+                invoice_payment_line = self.env['account.move.line'].search(
+                    [('move_id', '=', rec.id), ('display_type', '=', 'payment_term')])
+                lines += invoice_payment_line
+                lines.reconcile()
+            else:
+                rec._post()
+            # rec.payment_ids= [(6,0,payment_ids)]
+            
                                 
                                 # self.env['account.partial.reconcile'].create({
                                 #         'debit_move_id':rec.id,

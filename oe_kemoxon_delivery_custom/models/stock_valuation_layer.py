@@ -162,7 +162,7 @@ class StockValuationLayer(models.Model):
             record.account_move_line_id.parent_state = 'posted'
         return self
     def verify_picking_date(self, record,datetocheck):
-        result=datetocheck
+        result=datetime.combine(datetocheck, datetime.min.time())
         while record.check_if_exists(record,result):
             result = result + timedelta(minutes=5)
             # record.verify_picking_date( record, result)
