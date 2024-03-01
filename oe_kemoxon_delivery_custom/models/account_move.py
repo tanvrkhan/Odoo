@@ -424,7 +424,52 @@ class AccountMove(models.Model):
                     (k['date_maturity'] for k in move.needed_terms.keys() if k),
                     default=False,
                 ) or today
-
+    
+    def update_costing(self):
+        for record in self:
+            avg_price = 0
+            sale_line_ids=[]
+            for line in record.line_ids:
+                if line.sale_line_ids:
+                    sale_line_ids += line.sale_line_ids
+            for line in record.line_ids:
+                if line.display_type =='cogs' and line.price_unit>0:
+                    if sale_line_ids:
+                        total_quantity = 0
+                        total_amount = 0
+                        for soline in sale_line_ids:
+                            if line.product_id == soline.product_id:
+                                if soline.move_ids:
+                                    for sm in soline.move_ids:
+                                        if sm.stock_valuation_layer_ids:
+                                            if sm.state == 'done':
+                                                for vl in sm.stock_valuation_layer_ids:
+                                                    if vl.quantity < 0:
+                                                        total_quantity += vl.quantity
+                                                        total_amount += vl.value
+                        if total_quantity != 0:
+                            avg_price = round(total_amount / total_quantity, 2)
+                        if record.reversed_entry_id:
+                            original_line = record.move_id.reversed_entry_id.line_ids.filtered(
+                            lambda l: l.display_type == 'cogs' and l.product_id == self.product_id and
+                                      l.product_uom_id == self.product_uom_id and l.price_unit >= 0)
+                            original_line = original_line and original_line[0]
+                            avg_price = original_line.price_unit if original_line \
+                                else avg_price
+                if avg_price:
+                    to_change_lines = self.env['account.move.line'].search([('product_id','=',line.product_id.id),('move_id','=',line.move_id.id),('display_type','=','cogs')])
+                    for cline in to_change_lines:
+                        cline.remove_move_reconcile()
+                        if cline.amount_currency > 0:
+                            cline.with_context(
+                                check_move_validity=False).amount_currency = avg_price * cline.quantity
+                            cline.with_context(
+                                check_move_validity=False).price_unit = avg_price
+                        elif cline.amount_currency < 0:
+                            cline.with_context(
+                                check_move_validity=False).amount_currency = avg_price * cline.quantity * -1
+                            cline.with_context(
+                                check_move_validity=False).price_unit = avg_price * -1
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
@@ -453,7 +498,7 @@ class AccountMoveLine(models.Model):
                 line.price_total = taxes_res['total_included'] - line.deduction
             else:
                 line.price_total = line.price_subtotal = subtotal - line.deduction
-
+    
 
 class DeliveryLocation(models.Model):
     _name = "delivery.location"

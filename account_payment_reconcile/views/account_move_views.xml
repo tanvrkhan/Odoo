@@ -13,13 +13,13 @@
     <field name="state">code</field>
     <field name="code">records.match_invoice()</field>
 </record>
-        <record id="account_move_reset_invoice" model="ir.actions.server">
-    <field name="name">Reset invoice</field>
-    <field name="model_id" ref="account.model_account_move"/>
-    <field name="binding_model_id" ref="account.model_account_move"/>
-    <field name="binding_view_types">list,form</field>
-    <field name="state">code</field>
-    <field name="code">records.reset_invoice()</field>
-</record>
+<!--        <record id="account_move_reset_invoice" model="ir.actions.server">-->
+<!--    <field name="name">Reset invoice</field>-->
+<!--    <field name="model_id" ref="account.model_account_move"/>-->
+<!--    <field name="binding_model_id" ref="account.model_account_move"/>-->
+<!--    <field name="binding_view_types">list,form</field>-->
+<!--    <field name="state">code</field>-->
+<!--    <field name="code">records.reset_invoice()</field>-->
+<!--</record>-->
 
 </odoo>
