@@ -425,7 +425,81 @@ class AccountMove(models.Model):
                     default=False,
                 ) or today
     
+    def update_costing_purchase(self):
+        for record in self:
+            duplicate_reference = self.env['account.move'].search([('ref','=',record.ref),('id','!=',record.id)])
+            if duplicate_reference:
+                record.ref=record.ref + '..'
+            record.state='draft'
+            record._post()
+            # avg_price = 0
+            # purchase_line_ids=[]
+            # for line in record.line_ids:
+            #     if line.purchase_line_id:
+            #         purchase_line_ids += line.purchase_line_id
+            # for line in record.line_ids:
+            #     if line.display_type =='product' and line.price_unit>0:
+            #         if purchase_line_ids:
+            #             total_quantity = 0
+            #             total_amount = 0
+            #             for soline in purchase_line_ids:
+            #                 if line.product_id == soline.product_id:
+            #                     if soline.move_ids:
+            #                         for sm in soline.move_ids:
+            #                             if sm.stock_valuation_layer_ids:
+            #                                 if sm.state == 'done':
+            #                                     for vl in sm.stock_valuation_layer_ids:
+            #                                         if vl.quantity > 0:
+            #                                             total_quantity += vl.quantity
+            #                                             total_amount += vl.value
+            #             if total_quantity != 0:
+            #                 avg_price = round(total_amount / total_quantity, 2)
+            #             if record.reversed_entry_id:
+            #                 original_line = record.move_id.reversed_entry_id.line_ids.filtered(
+            #                 lambda l: l.display_type == 'cogs' and l.product_id == self.product_id and
+            #                           l.product_uom_id == self.product_uom_id and l.price_unit >= 0)
+            #                 original_line = original_line and original_line[0]
+            #                 avg_price = original_line.price_unit if original_line \
+            #                     else avg_price
+            #     if avg_price:
+            #         to_change_lines1 = self.env['account.move.line'].search([('product_id','=',line.product_id.id),('move_id','=',line.move_id.id),('display_type','=','product')])
+            #         for cline in to_change_lines1:
+            #             cline.remove_move_reconcile()
+            #             if cline.amount_currency > 0:
+            #                 cline.with_context(
+            #                     check_move_validity=False).amount_currency = avg_price * cline.quantity
+            #                 cline.with_context(
+            #                     check_move_validity=False).price_unit = avg_price
+            #             elif cline.amount_currency < 0:
+            #                 cline.with_context(
+            #                     check_move_validity=False).amount_currency = avg_price * cline.quantity * -1
+            #                 cline.with_context(
+            #                     check_move_validity=False).price_unit = avg_price * -1
+            #             to_change_lines2 = self.env['account.move.line'].search(
+            #                 [ ('move_id', '=', line.move_id.id),
+            #                  ('display_type', '=', 'payable'),
+            #                   ('amount_currency', '=', cline.amount_currency*-1),
+            #                   ])
+            #             for cline2 in to_change_lines2:
+            #                 cline2.remove_move_reconcile()
+            #                 if cline2.amount_currency > 0:
+            #                     cline2.with_context(
+            #                         check_move_validity=False).amount_currency = avg_price * cline.quantity
+            #                     cline2.with_context(
+            #                         check_move_validity=False).price_unit = avg_price
+            #                 elif cline2.amount_currency < 0:
+            #                     cline2.with_context(
+            #                         check_move_validity=False).amount_currency = avg_price * cline.quantity * -1
+            #                     cline2.with_context(
+            #                         check_move_validity=False).price_unit = avg_price * -1
+
     def update_costing(self):
+        for rec in self:
+            if rec.move_type=='in_invoice':
+                rec.update_costing_purchase()
+            else:
+                rec.update_costing_sale()
+    def update_costing_sale(self):
         for record in self:
             avg_price = 0
             sale_line_ids=[]
