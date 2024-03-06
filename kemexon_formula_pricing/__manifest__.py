@@ -25,6 +25,7 @@
         'security/ir.model.access.csv',
         'reports/pro-forma_invoice_template_inherited.xml',
         'reports/invoice_report_template_inherited.xml',
+        'reports/fusion_invoice_report_template.xml',
         'views/product_template_field_view.xml',
         'views/account_move_view.xml',
         'views/sale_order_view.xml',
