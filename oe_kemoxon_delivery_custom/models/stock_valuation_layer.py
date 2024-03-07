@@ -221,29 +221,48 @@ class StockValuationLayer(models.Model):
                 applicableamount =0
                 rate=0
                 rateusd=0
-                if record.quantity > 0:
-                    applicablequantity = record.quantity
-                    # porateusd2 = record.stock_move_id.purchase_line_id.order_id.currency_id.compute(
-                    #     record.stock_move_id.purchase_line_id.price_unit, record.stock_move_id.purchase_line_id.currency_id)
-                    rate=round(record.stock_move_id.purchase_line_id.price_unit,2)
-                    rateusd = round(record.stock_move_id.purchase_line_id.order_id.currency_id._convert(
-                        record.stock_move_id.purchase_line_id.price_unit,
-                        base_currency, record.company_id, record.stock_move_id.date, True),2)
-                    applicableamount += (rateusd * record.quantity)
-                else:
-                    if all_valuations:
+                
+                if record.stock_move_id.location_id.usage == 'internal' and record.stock_move_id.location_dest_id.usage == 'internal':
+                    if record.quantity > 0:
+                        all_valuations = self.env['stock.valuation.layer'].search(
+                        [
+                            ('stock_move_id', '=', record.stock_move_id.id),
+                            ('quantity', '=', record.quantity * -1)
+                        ])
                         for valuation in all_valuations:
                             totalquantity += valuation.quantity
                             totalamount += valuation.value
-                    if totalquantity<0:
-                        raise ValidationError("Quantity in the warehouse is not enough for this transaction.")
-                        
+                        applicablequantity = record.quantity
+                        temprate = totalamount / totalquantity
+                        applicableamount = applicablequantity * temprate
+                  
+                else:
+                    if record.quantity > 0:
+                     applicablequantity = record.quantity
+                     # porateusd2 = record.stock_move_id.purchase_line_id.order_id.currency_id.compute(
+                     #     record.stock_move_id.purchase_line_id.price_unit, record.stock_move_id.purchase_line_id.currency_id)
+                     rate=round(record.stock_move_id.purchase_line_id.price_unit,2)
+                     rateusd = round(record.stock_move_id.purchase_line_id.order_id.currency_id._convert(
+                         record.stock_move_id.purchase_line_id.price_unit,
+                         base_currency, record.company_id, record.stock_move_id.date, True),2)
+                     applicableamount += (rateusd * record.quantity)
+                
+                    
+                
                     else:
-                        applicablequantity=record.quantity
-                        rateusd=round(totalamount/totalquantity,2)
-                        applicableamount = applicablequantity * rateusd
+                        if all_valuations:
+                            for valuation in all_valuations:
+                                totalquantity += valuation.quantity
+                                totalamount += valuation.value
+                        if totalquantity<0:
+                            raise ValidationError("Quantity in the warehouse is not enough for this transaction.")
+                            
+                        else:
+                            applicablequantity=record.quantity
+                            applicableamount = applicablequantity * rateusd
                 
                 if applicablequantity!=0 and applicableamount!=0:
+                    rateusd = round(applicableamount / applicablequantity, 2)
                     if round(record.unit_cost,2)!=round(rateusd,2):
                         wrong+= 1
                     record.unit_cost = rateusd
