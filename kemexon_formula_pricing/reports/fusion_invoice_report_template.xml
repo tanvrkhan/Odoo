@@ -1,0 +1,837 @@
+<odoo>
+    <template id="fusion_invoice_report_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+                    <div style="border-top: 2px solid black; margin-top: -12px;"/>
+                    <center>
+                        <b>
+                            <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'" style="font-size:35px;"
+                                  class="text-center">INVOICE
+                            </span>
+                            <span t-if="o.move_type == 'out_invoice' and o.state == 'draft'" style="font-size:35px;"
+                                  class="text-center">DRAFT INVOICE
+                            </span>
+                            <span t-if="o.move_type == 'out_invoice' and o.state == 'cancel'" style="font-size:35px;"
+                                  class="text-center">CANCELLED INVOICE
+                            </span>
+                            <span t-if="o.move_type == 'out_refund'" style="font-size:35px;" class="text-center">CREDIT
+                                NOTE
+                            </span>
+                            <span t-if="o.move_type == 'in_refund'" style="font-size:35px;" class="text-center">VENDOR
+                                CREDIT NOTE
+                            </span>
+                            <span t-if="o.move_type == 'in_invoice'" style="font-size:35px;" class="text-center">VENDOR
+                                BILL
+                            </span>
+                            <!--                            <span t-if="o.name != '/'" t-field="o.name"/>-->
+                        </b>
+                    </center>
+                    <div style="border: 1px solid black;"/>
+                    <br/>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="row">
+                                <!--                            changed col-4 to col-5-->
+                                <div class="col-5">
+                                    <t t-if="o.fusion_invoice_ref">
+                                        <strong>Invoice Ref</strong>
+                                    </t>
+                                    <t t-else="">
+                                        <strong>Invoice No.</strong>
+                                    </t>
+                                    <br/>
+                                    <p t-if="o.fusion_deal_ref">
+                                        <strong>Deal Ref</strong>
+                                    </p>
+                                </div>
+                                <div class="col-2"/>
+                                <br/>
+                                <div class="col-6">
+                                    <t t-if="o.fusion_invoice_ref">
+                                        <span t-field="o.fusion_invoice_ref" style="white-space: nowrap; overflow: hidden;"/>
+                                    </t>
+                                    <t t-else="">
+                                        <span t-field="o.name"/>
+                                    </t>
+                                    <br/>
+                                    <span class="m-0" t-field="o.fusion_deal_ref"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2"/>
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-4">
+                                    <strong>Date</strong>
+                                    <br/>
+                                    <strong>Due Date</strong>
+                                </div>
+                                <div class="col-1"/>
+                                <br/>
+                                <div class="col-4">
+                                    <span class="m-0" t-field="o.invoice_date"
+                                          t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                                    <br/>
+                                    <span class="m-0" t-field="o.invoice_date_due"
+                                          t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <strong>Customer</strong>
+                    <br/>
+                    <span t-field="o.partner_id"/>
+                    <t t-if="o.partner_id.street">
+                        <br/>
+                        <span t-field="o.partner_id.street"/>
+                    </t>
+                    <t t-if="o.partner_id.street2">
+                        <br/>
+                        <span t-field="o.partner_id.street2"/>
+                    </t>
+                    <t t-if="o.partner_id.city">
+                        <br/>
+                        <span t-field="o.partner_id.city"/>
+                    </t>
+                    <t t-if="o.partner_id.state_id">
+                        <br/>
+                        <span t-field="o.partner_id.state_id.name"/>
+                    </t>
+                    <t t-if="o.show_vat_ids">
+                        <br/>
+                        <t t-if="o.partner_id.vat">
+                            VAT ID:&#160;&#160;<span t-field="o.partner_id.vat"/>
+                        </t>
+                    </t>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <t t-if="o.show_delivery_to">
+                        <strong>Delivery To</strong>
+                        <br/>
+                        <span t-field="o.partner_shipping_id.name"/>
+                        <br/>
+                        <span t-field="o.partner_shipping_id.street"/>
+                        <br t-if="o.partner_shipping_id.street2"/>
+                        <span t-field="o.partner_shipping_id.street2"/>
+                        <br/>
+                        <br/>
+                        <br/>
+                    </t>
+                    <style>
+                        .my_data_table th {border-right: 1px solid white;border-left: 1px solid white;padding-top:
+                        5px;padding-bottom: 5px;}
+                        .my_data_table td {border-right: 1px solid white;border-left: 1px solid white;padding-top:
+                        5px;padding-bottom: 5px;}
+                    </style>
+                    <table width="100%" class="my_data_table" name="invoice_line_table">
+                        <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
+                            <th name="th_description" class="text-start">
+                                <span>Description</span>
+                            </th>
+                            <t t-if="o.show_hs_code">
+                                <th name="th_hs_code" class="text-start">
+                                    <span>HS Code</span>
+                                </th>
+                            </t>
+                            <th name="th_quantity" class="text-end">
+                                <span>Quantity</span>
+                            </th>
+                            <t t-if="o.show_formula_pricing">
+                                <th name="th_formula_price" class="text-end">
+                                    <span>Formula Price</span>
+                                </th>
+                                <th name="th_premium" class="text-end">
+                                    <span>Premium</span>
+                                </th>
+                            </t>
+                            <th name="th_priceunit"
+                                t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                                <span>Rate</span>
+                            </th>
+                            <th name="th_price_unit" t-if="display_discount"
+                                t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                                <span>Disc.%</span>
+                            </th>
+                            <!--                            <th name="th_taxes"-->
+                            <!--                                t-attf-class="text-start {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">-->
+                            <!--                                <span>Taxes</span>-->
+                            <!--                            </th>-->
+                            <th name="th_subtotal" class="text-end">
+                                <span groups="account.group_show_line_subtotals_tax_excluded">Amount</span>
+                                <span groups="account.group_show_line_subtotals_tax_included">Total Price</span>
+                            </th>
+                        </tr>
+                        <t t-set="current_subtotal" t-value="0"/>
+                        <t t-set="lines"
+                           t-value="o.invoice_line_ids.sorted(key=lambda l: (-l.sequence, l.date, l.move_name, -l.id), reverse=True)"/>
+
+                        <t t-foreach="lines" t-as="line">
+                            <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"
+                               groups="account.group_show_line_subtotals_tax_excluded"/>
+                            <t t-set="current_subtotal" t-value="current_subtotal + line.price_total"
+                               groups="account.group_show_line_subtotals_tax_included"/>
+
+                            <tr style="border-bottom:2px solid #d4d6d9"
+                                t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                <t t-if="line.display_type == 'product'" name="account_invoice_line_accountable">
+                                    <td name="account_invoice_line_name">
+                                        <span t-field="line.name" t-options="{'widget': 'text'}"/>
+                                    </td>
+                                    <t t-if="o.show_hs_code">
+                                        <td class="text-start">
+                                            <span t-field="line.product_id.hs_code_custom"/>
+                                        </td>
+                                    </t>
+                                    <td class="text-end">
+                                        <t t-if="line.product_id.name != 'Down payment'">
+                                            <span t-field="line.quantity"/>
+                                            <span t-field="line.product_uom_id" groups="uom.group_uom"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span></span>
+                                        </t>
+                                    </td>
+                                    <t t-if="o.show_formula_pricing">
+                                        <td class="text-end">
+                                            <t t-if="line.product_id.name != 'Down payment'">
+                                                <span t-field="line.formula_price"/>
+                                            </t>
+                                            <t t-else="">
+                                                <span></span>
+                                            </t>
+
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-if="line.product_id.name != 'Down payment'">
+                                                <span t-field="line.premium"/>
+                                            </t>
+                                            <t t-else="">
+                                                <span></span>
+                                            </t>
+                                        </td>
+                                    </t>
+
+                                    <td t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                                        <t t-if="line.product_id.name != 'Down payment'">
+                                            <span class="text-nowrap" t-field="line.price_unit"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span></span>
+                                        </t>
+                                    </td>
+                                    <td t-if="display_discount"
+                                        t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                                        <t t-if="line.product_id.name != 'Down payment'">
+                                            <span class="text-nowrap" t-field="line.discount"/>
+                                        </t>
+                                        <t t-else="">
+                                            <span></span>
+                                        </t>
+                                    </td>
+                                    <!--                                    <td t-attf-class="text-start {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">-->
+                                    <!--                                        <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_ids))"-->
+                                    <!--                                              id="line_tax_ids"/>-->
+                                    <!--                                    </td>-->
+                                    <td class="text-end o_price_total">
+                                        <span class="text-nowrap" t-field="line.price_subtotal"
+                                              groups="account.group_show_line_subtotals_tax_excluded"/>
+                                        <span class="text-nowrap" t-field="line.price_total"
+                                              groups="account.group_show_line_subtotals_tax_included"/>
+                                    </td>
+                                </t>
+                                <t t-if="line.display_type == 'line_section'">
+                                    <td colspan="99">
+                                        <span t-field="line.name" t-options="{'widget': 'text'}"/>
+                                    </td>
+                                    <!--                                <t t-set="current_section" t-value="line"/>-->
+                                    <!--                                <t t-set="current_subtotal" t-value="0"/>-->
+                                </t>
+                                <t t-if="line.display_type == 'line_note'">
+                                    <td colspan="99">
+                                        <span t-field="line.name" t-options="{'widget': 'text'}"/>
+                                    </td>
+                                </t>
+                            </tr>
+
+                            <t t-if="current_section and (line_last or lines[line_index+1].display_type == 'line_section')">
+                                <tr class="is-subtotal text-end">
+                                    <td colspan="99">
+                                        <strong class="mr16">Subtotal</strong>
+                                        <span t-esc="current_subtotal"
+                                              t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </t>
+
+
+                        </t>
+
+                        <tr style="border-bottom:2px solid #d4d6d9">
+                            <td name="td_section_subtotal">
+                                <strong class="mr16">Total (<span t-field="o.currency_id"/>)
+                                </strong>
+
+                            </td>
+                            <td colspan="99" class="is-subtotal text-end">
+                                <span style="text-align:right;" class="m-0" t-field="o.amount_total"/>
+                            </td>
+                        </tr>
+                        <!--                        <t t-if="len(o.fusion_payment_term.line_ids)>1">-->
+                        <!--                            <t t-foreach="o.fusion_payment_term.line_ids" t-as="line">-->
+                        <!--                                <t t-if="line.value=='percent'">-->
+                        <!--                                    <tr style="border-bottom:2px solid #d4d6d9">-->
+                        <!--                                        <td name="td_section_subtotal">-->
+                        <!--                                            <t t-if="line.days==0">-->
+                        <!--                                                <strong>-->
+                        <!--                                                    <span class="mr16" t-out="line.document_description"></span>-->
+                        <!--                                                </strong>-->
+                        <!--                                            </t>-->
+                        <!--                                            <t t-else="0">-->
+                        <!--                                                <span class="mr16" t-out="line.document_description"></span>-->
+                        <!--                                            </t>-->
+                        <!--                                        </td>-->
+                        <!--                                        <td colspan="99" class="is-subtotal text-end mr16">-->
+                        <!--                                            <t t-if="line.days==0">-->
+                        <!--                                                <strong>-->
+                        <!--                                                    <span t-out="current_subtotal*line.value_amount/100"-->
+                        <!--                                                          t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>-->
+                        <!--                                                </strong>-->
+                        <!--                                            </t>-->
+                        <!--                                            <t t-else="0">-->
+                        <!--                                                <span t-out="current_subtotal*line.value_amount/100"-->
+                        <!--                                                      t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>-->
+                        <!--                                            </t>-->
+                        <!--                                        </td>-->
+                        <!--                                    </tr>-->
+
+                        <!--                                </t>-->
+                        <!--                            </t>-->
+                        <!--                        </t>-->
+
+                    </table>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <t t-if="o.vessel_information_id or o.delivery_notes or o.tt_date or o.incoterm_location_custom or o.invoice_incoterm_id">
+                        <strong>Delivery Information</strong>
+                        <div style="border-top: 2px solid black;"/>
+                        <br/>
+                        <!--                        faizan 5,7-->
+                        <t t-if="o.vessel_information_id">
+                            <div class="row">
+                                <div class="col-6">
+                                    <t t-if="o.fusion_bl_date">
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <strong>B/L Date</strong>
+                                            </div>
+                                            <br/>
+                                            <!--                                    <div class="col-1"/>-->
+                                            <div class="col-7">
+                                                <span class="m-0" t-field="o.fusion_bl_date"
+                                                      t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    <!--                        faizan 5,7-->
+                                    <t t-if="o.fusion_loadport">
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <strong>Port of Loading</strong>
+                                            </div>
+                                            <br/>
+                                            <!--                                    <div class="col-1"/>-->
+                                            <div class="col-7">
+                                                <span class="m-0" t-field="o.fusion_loadport"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    <!--                        faizan 5,7-->
+                                    <t t-if="o.fusion_vessel_name">
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <strong>Vessel</strong>
+                                            </div>
+                                            <br/>
+                                            <!--                                    <div class="col-1"/>-->
+                                            <div class="col-7">
+                                                <span class="m-0" t-field="o.fusion_vessel_name"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    <t t-if="o.fusion_disport">
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <strong>Port of Discharge</strong>
+                                            </div>
+                                            <br/>
+                                            <!--                                    <div class="col-1"/>-->
+                                            <div class="col-7">
+                                                <span class="m-0" t-field="o.fusion_disport"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                                <!--                        faizan 5,7-->
+                                <div class="col-6">
+                                    <t t-if="o.country_of_origin">
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <strong>Country of Origin</strong>
+                                            </div>
+                                            <br/>
+                                            <!--                                    <div class="col-1"/>-->
+                                            <div class="col-7">
+                                                <span class="m-0" t-field="o.country_of_origin"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    <!--                        faizan 5,7-->
+                                    <t t-if="o.invoice_incoterm_id">
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <strong>Incoterm</strong>
+                                            </div>
+                                            <br/>
+                                            <!--                                    <div class="col-1"/>-->
+                                            <div class="col-7">
+                                                <span class="m-0" t-field="o.invoice_incoterm_id"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    <!--                        faizan 5,7-->
+                                    <t t-if="o.fusion_ncv">
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <strong>Net Caloric Value</strong>
+                                            </div>
+                                            <br/>
+                                            <!--                                    <div class="col-1"/>-->
+                                            <div class="col-7">
+                                                <span class="m-0" t-field="o.fusion_ncv"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    <!--                        faizan 5,7-->
+                                    <t t-if="o.delivery_notes">
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <strong>Delivery Notes</strong>
+                                            </div>
+                                            <br/>
+                                            <!--                                    <div class="col-1"/>-->
+                                            <div class="col-7">
+                                                <span class="m-0" t-field="o.delivery_notes"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    <t t-if="o.cod_date">
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <strong>Completion of Discharge</strong>
+                                            </div>
+                                            <br/>
+                                            <!--                                    <div class="col-1"/>-->
+                                            <div class="col-7">
+                                                <span class="m-0" t-field="o.cod_date"
+                                                      t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="row">
+                                <div class="col-6">
+                                    <t t-if="o.delivery_notes">
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <strong>Delivery Notes</strong>
+                                            </div>
+                                            <br/>
+                                            <!--                                    <div class="col-1"/>-->
+                                            <div class="col-7">
+                                                <span class="m-0" t-field="o.delivery_notes"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    <t t-if="o.tt_date">
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <t t-if="o.invoice_incoterm_id.name == 'ITT'">
+                                                    <strong>ITT Date</strong>
+                                                </t>
+                                                <t t-else="">
+                                                    <strong>Title Transfer Date</strong>
+                                                </t>
+                                            </div>
+                                            <br/>
+                                            <!--                                    <div class="col-1"/>-->
+                                            <div class="col-7">
+                                                <span class="m-0" t-field="o.tt_date"
+                                                      t-options='{"widget": "date","format": "dd-MMM-yyyy"}'/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                    <t t-if="o.incoterm_location_custom">
+                                        <!--                        faizan 5,7-->
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <strong>Delivery Location</strong>
+                                            </div>
+                                            <br/>
+                                            <!--                                <div class="col-1"/>-->
+                                            <div class="col-7">
+                                                <span class="m-0" t-field="o.incoterm_location_custom"/>
+                                            </div>
+
+                                        </div>
+
+                                    </t>
+                                    <!--                        faizan 5,7-->
+                                    <t t-if="o.invoice_incoterm_id">
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <strong>Incoterms</strong>
+                                            </div>
+                                            <br/>
+                                            <!--                                <div class="col-1"/>-->
+                                            <div class="col-7">
+                                                <span class="m-0" t-field="o.invoice_incoterm_id"/>
+                                            </div>
+                                        </div>
+
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                    <t t-else=""></t>
+
+
+                    <!--                        <t t-if="o.bill_date">-->
+                    <!--                            <div class="row">-->
+                    <!--                                <div class="col-3">-->
+                    <!--                                    <strong>B/L Date</strong>-->
+                    <!--                                </div>-->
+                    <!--                                <br/>-->
+                    <!--                                <div class="col-1"/>-->
+                    <!--                                <div class="col-6">-->
+                    <!--                                    <span class="m-0" t-field="o.bill_date"-->
+                    <!--                                          t-options='{"widget": "date","format": "dd/MM/yyyy"}'/>-->
+                    <!--                                </div>-->
+                    <!--                            </div>-->
+                    <!--                        </t>-->
+
+                    <!--                        <t t-if="o.fusion_vessel_name
+">-->
+                    <!--                            <div class="row" id="vesselrow">-->
+                    <!--                                <div class="col-3">-->
+                    <!--                                    <strong>Vessel Name</strong>-->
+                    <!--                                </div>-->
+                    <!--                                <br/>-->
+                    <!--                                <div class="col-1"/>-->
+                    <!--                                <div class="col-6">-->
+                    <!--                                    <span class="m-0" t-field="o.fusion_vessel_name
+"/>-->
+                    <!--                                </div>-->
+                    <!--                            </div>-->
+                    <!--                        </t>-->
+
+
+                    <!--                    <div class="col-2"/>-->
+                    <!--                    <div class="col-5">-->
+                    <!--                        <img t-att-src="'oe_kemoxon_delivery_custom/static/src/img/kemexon_seal.jpeg'"-->
+                    <!--                             style="max-height: 2cm; max-width: 4cm;"/>-->
+                    <!--                    </div>-->
+
+
+                    <br/>
+                    <br/>
+                    <br/>
+                    <strong>Financial Information</strong>
+                    <div style="border: 1px solid black;"/>
+                    <br/>
+                    <div class="row">
+
+
+                        <!-- left div start from here -->
+                        <!--                        faizan 5,7-->
+                        <div class="col-6">
+                            <div class="col-12 row">
+                                <div class="col-5">
+                                    <strong>Currency</strong>
+                                </div>
+                                <div class="col-7">
+                                    <span class="m-0" t-field="o.currency_id.name"/>
+                                </div>
+                            </div>
+                            <!--                        faizan 5,7-->
+                            <div class="col-12 row">
+                                <div class="col-5">
+                                    <strong t-if="o.fusion_payment_term">Payment Term</strong>
+                                </div>
+                                <div class="col-7">
+                                    <span class="m-0" style="borders:none;border-style=none;"
+                                          t-esc="o.fusion_payment_term"/>
+                                </div>
+                            </div>
+                            <!--                        faizan 5,7-->
+                            <t t-if="o.payment_notes">
+                                <div class="row col-12">
+                                    <div class="col-5">
+                                        <strong>Payment Notes</strong>
+                                    </div>
+                                    <div class="col-7">
+                                        <span class="m-0" t-field="o.payment_notes"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                        <!-- Left div ended Here -->
+
+                        <!-- Right Div started from here -->
+                        <div class="col-6">
+                            <div class="col-12 row" t-if="o.partner_id.company_bank_account_id.bank_id.name">
+                                <div class="col-5" style="padding-left: 4px;">
+                                    <strong>BANK</strong>
+                                </div>
+                                <div class="col-7" style="padding-left: 0px;">
+                                    <t t-if="o.partner_id.company_bank_account_id">
+                                        <span style="text-align:left;" class="m-0"
+                                              t-field="o.partner_id.company_bank_account_id.bank_id.name"/>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <div class="col-12 row" t-if="o.partner_id.company_bank_account_id.acc_holder_name">
+                                <div class="col-5" style="padding-left: 4px;">
+                                    <strong>In favour of</strong>
+                                </div>
+                                <div class="col-7" style="padding-left: 0px;">
+                                    <t t-if="o.partner_id.company_bank_account_id">
+                                        <span style="text-align:left;" class="m-0"
+                                              t-field="o.partner_id.company_bank_account_id.acc_holder_name"/>
+                                    </t>
+                                </div>
+                            </div>
+
+
+                            <div class="col-12 row" t-if="o.partner_id.company_bank_account_id.acc_number">
+                                <div class="col-5" style="padding-left: 4px;">
+                                    <strong>A/C No</strong>
+                                </div>
+                                <div class="col-7" style="padding-left: 0px;">
+                                    <t t-if="o.partner_id.company_bank_account_id">
+                                        <span style="text-align:left;" class="m-0"
+                                              t-field="o.partner_id.company_bank_account_id.acc_number"/>
+                                    </t>
+                                </div>
+                            </div>
+
+
+                            <div class="col-12 row" t-if="o.partner_id.company_bank_account_id.bank_id.bic">
+                                <div class="col-5" style="padding-left: 4px;">
+                                    <strong>Swift Code</strong>
+                                </div>
+                                <div class="col-7" style="padding-left: 0px;">
+                                    <t t-if="o.partner_id.company_bank_account_id">
+                                        <span class="m-0" t-field="o.partner_id.company_bank_account_id.bank_id.bic"/>
+                                    </t>
+                                </div>
+                            </div>
+
+
+                            <div class="col-12 row" t-if="o.partner_id.company_bank_account_id.inter_mediatory_bank_id">
+                                <div class="col-5" style="padding-left: 4px;">
+                                    <strong>Intermediary Bank</strong>
+                                </div>
+                                <div class="col-7" style="padding-left: 0px;">
+                                    <t t-if="o.partner_id.company_bank_account_id">
+                                        <span class="m-0"
+                                              t-field="o.partner_id.company_bank_account_id.inter_mediatory_bank_id.name"/>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <div class="col-12 row" t-if="o.partner_id.company_bank_account_id.inter_mediatory_swift">
+                                <div class="col-5" style="padding-left: 4px;">
+                                    <strong>Intermediary Swift</strong>
+                                </div>
+                                <div class="col-7" style="padding-left: 0px;">
+                                    <t t-if="o.partner_id.company_bank_account_id">
+                                        <span class="m-0"
+                                              t-field="o.partner_id.company_bank_account_id.inter_mediatory_swift"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Right Div Ended Here -->
+
+
+                    </div>
+                    <b/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <strong>Terms And Conditions</strong>
+                    <div style="border: 1px solid black;"/>
+                    <br/>
+                    <!--                <span class="m-0" t-field="o.narration"/>-->
+                    <ul style="font-size:18px;">
+                        <t t-if="o.fusion_representing_entity">
+                            <li>Kemexon follows a detailed process as per the company policy for informing any change
+                                in
+                                bank account/ remittance process. We request you to not rely on any isolated email
+                                communication
+                                informing the change of bank account etc. If you do so, the same shall be at your risk
+                                and
+                                consequences.
+                            </li>
+                            <li>
+                                <span t-field="o.fusion_retermsandconditions"/>
+                            </li>
+                            <li>Kemexon terms and conditions apply.</li>
+                        </t>
+                        <t t-else="">
+                            <li>Kemexon follows a detailed process as per the company policy for informing any change
+                                in
+                                bank account/ remittance process. We request you to not rely on any isolated email
+                                communication
+                                informing the change of bank account etc. If you do so, the same shall be at your risk
+                                and
+                                consequences.
+                            </li>
+                            <li>Kemexon terms and conditions apply.</li>
+                        </t>
+                    </ul>
+                    <!--                <hr style="height:3px; border:none; background-color:black;"/>-->
+                    <t t-if="not o.company_bank_account_id">
+                        <div class="alert alert-danger">
+                            <strong>Error!</strong>
+                            Bank is not selected for this customer. Please select a bank for the customer before
+                            printing
+                            the
+                            invoice.
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+    <template id="web.external_layout_standard">
+        <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+            <div class="row">
+                <!-- <div class="">
+                    <img t-att-src="'cdx_custom_reports/static/src/img/barajeel_final.png'" width="500px"/>
+                </div> -->
+                <div class="col-6">
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" width="320px" alt="Logo"
+                         height="45px" style="margin-left:0px;margin-right:50px;"/>
+                </div>
+                <t t-if="o.en_plus">
+                    <div class="col-6" style="text-align: right;">
+                        <img t-att-src="'kemexon_formula_pricing/static/src/img/ENplus_A1_CH316_4c_Logo.png'"
+                             width="80px" alt="Logo"
+                             height="55px" style="margin-right: 50px;"/>
+                    </div>
+                </t>
+            </div>
+            <br/>
+            <!--            <hr style="height:5px; border:none; background-color:#5AA2F9;margin-left:-1px;margin-top:4px;"/>-->
+        </div>
+        <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}"
+             t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}});"
+             t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+             t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <div class="pt-5">
+                <!-- This div ensures that the address is not cropped by the header. -->
+                <t t-call="web.address_layout"/>
+            </div>
+            <t t-out="0"/>
+        </div>
+        <div class="footer">
+
+            <div class="text-center" style="border-top: 2px solid black;">
+                <!--                <strong>-->
+                <!--                    <center>'This is a system generated document and does not require a signature'</center>-->
+                <!--                </strong>-->
+                <ul class="list-inline mb4">
+                    <li t-if="company.name">
+                        <span class="o_force_ltr" t-field="company.name"/>
+                    </li>
+                    <li t-if="company.street">
+                        <span class="o_force_ltr" t-field="company.street"/>
+                    </li>
+                    <li>
+                        <span class="o_force_ltr" t-field="company.phone"/>
+                        -
+                        <span t-field="company.email"/>
+                        <t t-if="o.show_vat_ids">
+                            <t t-if="o.fusion_representing_entity">
+                                &#160;-&#160;<t t-out="company.country_id.vat_label or 'VAT ID'"/>:
+                                <span t-field="o.fusion_representing_entity.vat_id"/>
+                            </t>
+                            <t t-else="">
+                                &#160;-&#160;<t t-out="company.country_id.vat_label or 'VAT ID'"/>:
+                                <span t-field="company.vat"/>
+                            </t>
+                        </t>
+
+                    </li>
+                    <!--                                    <li t-if="company.website" >-->
+                    <!--                                        <span t-field="company.website"/>-->
+                    <!--                                    </li>-->
+                    <!-- <t t-if="o.show_vat_ids">
+                        <li t-if="company.vat"><t t-out="company.country_id.vat_label or 'VAT ID'"/>:
+                            <span t-field="company.vat"/>
+                        </li>
+                    </t> -->
+                </ul>
+                <div t-if="report_type == 'pdf'" class="text-muted" style="margin-top: -20px; text-align: right;">
+                    Page:
+                    <span class="page"/>
+                    <span class="topage"/>
+                </div>
+            </div>
+        </div>
+    </template>
+    <record id="paperformat_fusion_invoice_portrait" model="report.paperformat">
+        <field name="name">Fusion Invoice Format</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="page_height">297</field>
+        <field name="page_width">210</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">18</field>
+        <field name="margin_left">3</field>
+        <field name="margin_right">3</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">6</field>
+        <field name="dpi">110</field>
+    </record>
+    <record id="action_report_fusion_invoice" model="ir.actions.report">
+        <field name="name">Fusion Invoice</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="binding_model_id" ref="model_account_move"/>
+        <field name="report_name">kemexon_formula_pricing.fusion_invoice_report_template</field>
+        <field name="report_file">kemexon_formula_pricing.fusion_invoice_report_template</field>
+        <field name="print_report_name">'%s' % (object.name)</field>
+        <field name="paperformat_id" ref="paperformat_fusion_invoice_portrait"/>
+    </record>
+    <record id="kemexon_formula_pricing.action_report_fusion_invoice" model="ir.actions.report">
+        <field name="paperformat_id" ref="paperformat_fusion_invoice_portrait"/>
+    </record>
+</odoo>
