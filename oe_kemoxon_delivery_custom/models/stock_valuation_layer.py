@@ -254,11 +254,15 @@ class StockValuationLayer(models.Model):
                             for valuation in all_valuations:
                                 totalquantity += valuation.quantity
                                 totalamount += valuation.value
+                                # rateusd=totalquantity
+                            # applicablequantity= totalquantity
+                            # applicableamount = totalamount
                         if totalquantity<0:
                             raise ValidationError("Quantity in the warehouse is not enough for this transaction.")
                             
                         else:
-                            applicablequantity=record.quantity
+                            rateusd = round(totalamount/totalquantity, 2)
+                            applicablequantity = record.quantity
                             applicableamount = applicablequantity * rateusd
                 
                 if applicablequantity!=0 and applicableamount!=0:
