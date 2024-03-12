@@ -222,19 +222,18 @@ class StockValuationLayer(models.Model):
                 rate=0
                 rateusd=0
                 
-                if record.stock_move_id.location_id.usage == 'internal' and record.stock_move_id.location_dest_id.usage == 'internal':
-                    if record.quantity > 0:
-                        all_valuations = self.env['stock.valuation.layer'].search(
-                        [
-                            ('stock_move_id', '=', record.stock_move_id.id),
-                            ('quantity', '=', record.quantity * -1)
-                        ])
-                        for valuation in all_valuations:
-                            totalquantity += valuation.quantity
-                            totalamount += valuation.value
-                        applicablequantity = record.quantity
-                        temprate = totalamount / totalquantity
-                        applicableamount = applicablequantity * temprate
+                if record.stock_move_id.location_id.usage == 'internal' and record.stock_move_id.location_dest_id.usage == 'internal' and record.quantity > 0:
+                    all_valuations = self.env['stock.valuation.layer'].search(
+                    [
+                        ('stock_move_id', '=', record.stock_move_id.id),
+                        ('quantity', '=', record.quantity * -1)
+                    ])
+                    for valuation in all_valuations:
+                        totalquantity += valuation.quantity
+                        totalamount += valuation.value
+                    applicablequantity = record.quantity
+                    temprate = totalamount / totalquantity
+                    applicableamount = applicablequantity * temprate
                   
                 else:
                     if record.quantity > 0:
