@@ -57,17 +57,23 @@
                     <br/>
                     <span t-field="doc.partner_id.street"/>
                 </t>
-                <t t-if="doc.partner_id.street2">
+                <t t-if="o.partner_id.zip or o.partner_id.city or o.partner_id.state_id">
                     <br/>
-                    <span t-field="doc.partner_id.street2"/>
+                    <t t-if="o.partner_id.zip">
+                        <span t-field="o.partner_id.zip"/>
+                    </t>
+                    <t t-if="o.partner_id.city">
+                        <span>,</span>
+                        <span t-field="o.partner_id.city"/>
+                    </t>
+                    <t t-if="o.partner_id.state_id">
+                        <span>,</span>
+                        <span t-field="o.partner_id.state_id.name"/>
+                    </t>
                 </t>
-                <t t-if="doc.partner_id.city">
+                <t t-if="o.partner_id.country_id">
                     <br/>
-                    <span t-field="doc.partner_id.city"/>
-                </t>
-                <t t-if="doc.partner_id.state_id">
-                    <br/>
-                    <span t-field="doc.partner_id.state_id.name"/>
+                    <span t-field="o.partner_id.country_id.name"/>
                 </t>
                 <t t-if="doc.show_vat_ids">
                     <br/>
