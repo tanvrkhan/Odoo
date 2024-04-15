@@ -78,17 +78,23 @@
                     <br/>
                     <span t-field="o.partner_id.street"/>
                 </t>
-                <t t-if="o.partner_id.street2">
+                <t t-if="o.partner_id.zip or o.partner_id.city or o.partner_id.state_id">
                     <br/>
-                    <span t-field="o.partner_id.street2"/>
+                    <t t-if="o.partner_id.zip">
+                        <span t-field="o.partner_id.zip"/>
+                    </t>
+                    <t t-if="o.partner_id.city">
+                        <span>,</span>
+                        <span t-field="o.partner_id.city"/>
+                    </t>
+                    <t t-if="o.partner_id.state_id">
+                        <span>,</span>
+                        <span t-field="o.partner_id.state_id.name"/>
+                    </t>
                 </t>
-                <t t-if="o.partner_id.city">
+                <t t-if="o.partner_id.country_id">
                     <br/>
-                    <span t-field="o.partner_id.city"/>
-                </t>
-                <t t-if="o.partner_id.state_id">
-                    <br/>
-                    <span t-field="o.partner_id.state_id.name"/>
+                    <span t-field="o.partner_id.country_id.name"/>
                 </t>
                 <t t-if="o.show_vat_ids">
                     <br/>
@@ -262,47 +268,50 @@
 
                     </t>
                     <t t-if="o.amount_tax >0">
-                         <tr style="border-bottom:2px solid #d4d6d9">
-                         <td name="td_section_subtotal" >
-                        </td>
+                        <tr style="border-bottom:2px solid #d4d6d9">
+                            <td name="td_section_subtotal">
+                            </td>
 
-                               <td name="td_section_subtotal" >
-                        </td>
-                        <td name="td_section_subtotal" class="text-end">
-                            <strong class="mr16">Amount without tax (<span t-field="o.currency_id"/>)
-                            </strong>
+                            <td name="td_section_subtotal">
+                            </td>
+                            <td name="td_section_subtotal" class="text-end">
+                                <strong class="mr16">Amount without tax (<span t-field="o.currency_id"/>)
+                                </strong>
 
-                        </td>
-                        <td colspan="99" class="is-subtotal text-end">
-                            <span style="text-align:right;" class="m-0" t-field="o.amount_untaxed"/>
-                        </td>
-                         </tr>
-                        <t  t-foreach="o.line_ids" t-as="line">
-<t t-if="line.display_type=='tax'">
-      <tr style="border-bottom:2px solid #d4d6d9">
-                                 <td name="td_section_subtotal_tax" >
-                                </td>
+                            </td>
+                            <td colspan="99" class="is-subtotal text-end">
+                                <span style="text-align:right;" class="m-0" t-field="o.amount_untaxed"/>
+                            </td>
+                        </tr>
+                        <t t-foreach="o.line_ids" t-as="line">
+                            <t t-if="line.display_type=='tax'">
+                                <tr style="border-bottom:2px solid #d4d6d9">
+                                    <td name="td_section_subtotal_tax">
+                                    </td>
 
-                                       <td name="td_section_subtotal_tax" >
-                                </td>
-                                <td name="td_section_subtotal_tax" class="text-end">
-                                    <strong class="mr16">Tax <span t-esc="round(line.balance/line.tax_base_amount *-100,2)"/> %
-                                    </strong>
+                                    <td name="td_section_subtotal_tax">
+                                    </td>
+                                    <td name="td_section_subtotal_tax" class="text-end">
+                                        <strong class="mr16">Tax
+                                            <span t-esc="round(line.balance/line.tax_base_amount *-100,2)"/>
+                                            %
+                                        </strong>
 
-                                </td>
-                                <td colspan="99" class="is-subtotal text-end">
-                                    <span style="text-align:right;" class="m-0" t-esc="line.balance*-1" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
-                                </td>
-                            </tr>
-</t>
+                                    </td>
+                                    <td colspan="99" class="is-subtotal text-end">
+                                        <span style="text-align:right;" class="m-0" t-esc="line.balance*-1"
+                                              t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </t>
 
+                        </t>
                     </t>
-                </t>
                     <tr style="border-bottom:2px solid #d4d6d9">
-                         <td name="td_section_subtotal" >
+                        <td name="td_section_subtotal">
                         </td>
 
-                               <td name="td_section_subtotal" >
+                        <td name="td_section_subtotal">
                         </td>
                         <td name="td_section_subtotal" class="text-end">
                             <strong class="mr16">Total (<span t-field="o.currency_id"/>)
@@ -713,11 +722,16 @@
                 <br/>
                 <br/>
                 <br/>
-                 <div class="row" style="padding-left: 0px;">
-                                <t t-if="o.payment_reference">
-                                   <p>Please use the reference <strong><span class="m-0" t-field="o.payment_reference"/></strong> for your payment.</p>
-                                </t>
-                 </div>
+                <div class="row" style="padding-left: 0px;">
+                    <t t-if="o.payment_reference">
+                        <p>Please use the reference
+                            <strong>
+                                <span class="m-0" t-field="o.payment_reference"/>
+                            </strong>
+                            for your payment.
+                        </p>
+                    </t>
+                </div>
                 <br/>
                 <strong>Terms And Conditions</strong>
                 <div style="border: 1px solid black;"/>
