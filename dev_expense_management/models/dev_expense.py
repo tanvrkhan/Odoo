@@ -249,7 +249,7 @@ class dev_expense(models.Model):
         return line_data
 
     name = fields.Char('Name', required="1", default='/')
-    company_id = fields.Many2one('res.company', default=lambda self: self.env.user.company_id, required="1")
+    company_id = fields.Many2one('res.company', default=lambda self: self.env.company, required="1")
     user_id = fields.Many2one('res.users', string='User', default=lambda self: self.env.user, readonly="1")
     date = fields.Date('Bill Date', default=fields.Date.today(), copy=False, required=True)
     journal_id = fields.Many2one('account.journal', string='Expense Journal', required="1")
