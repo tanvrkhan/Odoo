@@ -46,6 +46,9 @@ For Module Support : devintelle@gmail.com  or Skype : devintelle
                         <group>
                             <field name="date" attrs="{'readonly':[('state','!=','draft')]}"/>
                             <field name="user_id"/>
+                            <field name="submitted_by"/>
+
+
                         </group>
                     </group>
                     <notebook>
@@ -55,6 +58,7 @@ For Module Support : devintelle@gmail.com  or Skype : devintelle
                                     <field name="product_id" domain="[('misc_expense','=',True)]" context="{'default_misc_expense':True}"/>
                                     <field name="name"/>
                                     <field name="account_id"/>
+                                    <field name="attachment_id" widget="many2many_binary" />
                                     <field name="quantity"/>
                                     <field name="unit_price"/>
                                     <field name="tax_ids" widget="many2many_tags" options="{'no_create': True}" domain="[('type_tax_use','=','purchase'),('company_id', '=', parent.company_id)]"/>
@@ -95,6 +99,11 @@ For Module Support : devintelle@gmail.com  or Skype : devintelle
                         </page>
                     </notebook>
                 </sheet>
+                 <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
             </form>
         </field>
     </record>

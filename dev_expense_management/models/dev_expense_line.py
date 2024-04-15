@@ -23,7 +23,8 @@ class dev_expense_line(models.Model):
     expense_id = fields.Many2one('dev.expense', string='Expense')
     currency_id = fields.Many2one("res.currency", string='Currency')
     amount_total = fields.Monetary('Total', compute='get_total_amount', currency_field = 'currency_id')
-    
+    attachment_id = fields.Many2many('ir.attachment', string="Bill Attachment")
+ 
     @api.depends('quantity','unit_price','tax_ids')
     def get_total_amount(self):
         for line in self:

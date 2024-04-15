@@ -20,7 +20,7 @@
         
     """,
     'summary': 'Expense Management', 
-    'depends': ['product','account'],
+    'depends': ['product','account','hr'],
     'data': [
         'security/ir.model.access.csv',
         'security/security.xml',

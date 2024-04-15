@@ -15,6 +15,7 @@ from odoo import models, fields, api, _
 
 class dev_expense(models.Model):
     _name = 'dev.expense'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'name desc'
     _description = 'Manage Expense'
 
@@ -268,5 +269,6 @@ class dev_expense(models.Model):
                                  store=True, readonly=True, compute='_compute_amount')
     amount_total = fields.Monetary(string='Total',
                                    store=True, readonly=True, compute='_compute_amount')
+    submitted_by = fields.Many2one('hr.employee', string='Submitted By')
 
 # vim:expandtab:smartindent:tabstop=4:4softtabstop=4:shiftwidth=4:
