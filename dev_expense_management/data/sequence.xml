@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2015 DevIntelle Consulting Service Pvt.Ltd (<http://www.devintellecs.com>).
+
+    For Module Support : devintelle@gmail.com  or Skype : devintelle
+ -->
+<odoo>
+    <data noupdate="1">
+        <record id="dev_expense_sequence" model="ir.sequence">
+            <field name="name">Expense Sequence</field>
+            <field name="code">dev.expense</field>
+            <field name="prefix">EXP/%(year)s/</field>
+            <field name="padding">3</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

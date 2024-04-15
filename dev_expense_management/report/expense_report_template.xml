@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2015 DevIntelle Consulting Service Pvt.Ltd (<http://www.devintellecs.com>).
+
+    For Module Support : devintelle@gmail.com  or Skype : devintelle
+-->
+<odoo>
+    <template id="dev_expense_report_template">
+        <t t-call="web.external_layout" style="font-size:12px">
+            <div class="page">
+                <style>
+                    .header_table td{
+                    padding:5px;
+                    font-size:13px;
+                    border:1px solid #f2f2f2;
+                    }
+                    .sub_table th{
+                    background:#ebeced;
+                    padding:5px;
+                    font-size:12px;
+                    border-bottom:1px solid black;
+                    border-top:1px solid black;
+                    }
+                    .sub_table td{
+                    padding:5px;
+                    font-size:12px;
+                    border-top:1px solid #f2f2f2;
+                    }
+                </style>
+                <div class="row">
+                    <div class="col-12" style="font-size:18px;">
+                        <center>
+                            <strong><span t-esc="o.name"/></strong>
+                        </center>
+                    </div>
+                </div>
+                <br/><br/>
+                <div class="row mt16 mb16">
+                    <div class="col-12">
+                        <table class="header_table" width="100%">
+                            <tr>
+                                <td class="text-center">
+                                    <b>Bill Date</b>
+                                </td>
+                                <td class="text-center">
+                                    <b>Memo</b>
+                                </td>
+                                <td class="text-center">
+                                    <b>Journal</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    <span t-field="o.date" t-options='{"format": "dd-MM-yyyy"}'/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="o.memo"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="o.journal_id"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <br/><br/>
+                <div class="row mt16 mb16">
+                    <div class="col-12">
+                        <table width="100%" class="sub_table">
+                            <thead>
+                                <tr>
+                                    <th width="20%">Description</th>
+                                    <th width="20%">Account</th>
+                                    <th width="15%" class="text-end">Quantity</th>
+                                    <th width="15%" class="text-end">Unit Price</th>
+                                    <th width="15%" class="text-end">Tax</th>
+                                    <th width="15%" class="text-end">Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody class="sale_tbody">
+                                <tr t-foreach="o.expense_lines" t-as="line" style="page-break-inside: avoid">
+                                    <td>
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="line.account_id.name"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="line.quantity"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="line.unit_price"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_ids))"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="line.amount_total"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="clearfix">
+                    <div id="total" class="row">
+                        <div class="col-8">
+                            <div>
+                                <p t-if="o.note">
+                                    <span t-esc="o.note"/>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-4 ml-auto pull-end">
+                            <table class="table table-sm" style="font-size:12px">
+                                <tr class="border-black o_subtotal" style="">
+                                    <td>
+                                        <strong>Subtotal</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="o.amount_untaxed"/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black" style="border-bottom:1px solid #dddddd;">
+                                    <td>
+                                        <strong>Tax</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="o.amount_tax" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                </tr>
+                                <tr class="border-black o_total">
+                                    <td>
+                                        <strong>Total</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="o.amount_total"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="exp_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="dev_expense_management.dev_expense_report_template"/>
+            </t>
+        </t>
+    </template>
+</odoo>

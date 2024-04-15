@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2015 DevIntelle Consulting Service Pvt.Ltd (<http://www.devintellecs.com>).
+
+For Module Support : devintelle@gmail.com  or Skype : devintelle 
+ -->
+<odoo>
+    <record id="rule_dev_expense_multi_company" model="ir.rule">
+        <field name="name">Expense Multi Company</field>
+        <field name="model_id" ref="model_dev_expense"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',user.company_id.id)]</field>
+    </record>
+
+    <record id="rule_group_own_expense" model="ir.rule">
+        <field name="name">Rule Own Expense</field>
+        <field ref="model_dev_expense" name="model_id"/>
+        <field name="domain_force">[('user_id','=',user.id)]</field>
+        <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+    </record>
+
+    <record id="rule_group_all_expense" model="ir.rule">
+        <field name="name">Rule All Expense</field>
+        <field ref="model_dev_expense" name="model_id"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('account.group_account_manager'))]"/>
+    </record>
+</odoo>

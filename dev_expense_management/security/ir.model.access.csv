@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_dev_expense_user,dev.expense.user,model_dev_expense,account.group_account_invoice,1,1,1,1
+access_dev_expense_manager,dev.expense.manager,model_dev_expense,account.group_account_manager,1,1,1,1
+access_dev_expense_line_user,dev.expense.line.user,model_dev_expense_line,account.group_account_invoice,1,1,1,1
+access_dev_expense_line_manager,dev.expense.line.manager,model_dev_expense_line,account.group_account_manager,1,1,1,1
+access_dev_expense_reject_reason,dev.expense.reject.reason,model_dev_expense_reject_reason,,1,1,1,1

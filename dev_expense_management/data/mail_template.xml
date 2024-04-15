@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2015 DevIntelle Consulting Service Pvt.Ltd (<http://www.devintellecs.com>).
+
+For Module Support : devintelle@gmail.com  or Skype : devintelle 
+ -->
+<odoo>
+    <record id="dev_expense_account_manager_mail_template" model="mail.template">
+        <field name="name">Request to Account Manager to Validate Expense</field>
+        <field name="subject">{{object.name or '' }} : Expense needs your approval</field>
+        <field name="model_id" ref="dev_expense_management.model_dev_expense"/>
+        <field name="auto_delete" eval="True"/>
+        <field name="body_html"><![CDATA[
+            	<p>Hello,</b></p>
+            	<p>
+            	<p><b><t t-out="object.name"></b> Expense requires your approval</p>
+            	<p>Expense details are as below : </p>
+            	<table border=1 width=80% style='margin-top: 20px;border-collapse: collapse;'>
+                    <tr>
+                        <th width=40% style='text-align:left; background:#e0e1e2;padding:5px'>
+                            Name
+                        </th>
+                        <th width=10% style='text-align:left;background:#e0e1e2;padding:5px'>
+                            Quantity
+                        </th>
+                        <th width=25% style='text-align:right;background:#e0e1e2; padding:5px'>
+                            Price Unit
+                        </th>
+                        <th width=25% style='text-align:right;background:#e0e1e2;padding:5px'>
+                            Total Amount
+                        </th>
+                    </tr>
+                    <span t-set="line_data" t-value="object.get_expense_detail()"/>
+                    <t t-if="line_data">
+                        <tr t-foreach="line_data" t-as="data">
+                            <td width=40% style='text-align:left;padding:5px'>
+                                <span t-esc="data['name']"/>
+                            </td>
+                            <td width=10% style='text-align:left;padding:5px'>
+                                <span t-esc="'%.2f'% data['quantity']"/>
+                            </td>
+                            <td width=25% style='text-align:right;padding:5px'>
+                                <span t-esc="'%.2f'% data['price']"/>&#160;<t t-out="object.currency_id and object.currency_id.symbol or ''">
+                            </td>
+                            <td width=25% style='text-align:right;padding:5px'>
+                                <span t-esc="'%.2f'% data['total']"/>&#160;<t t-out="object.currency_id and object.currency_id.symbol or ''">
+                            </td>
+                        </tr>
+                    </t>
+                </table>
+            	<p></p>
+            	<br/>
+            	<b>Regards,</b>
+            	<br/>
+            	<t t-out="object.user_id.name">
+                ]]></field>
+    </record>
+
+    <record id="dev_expense_reject_mail_template" model="mail.template">
+        <field name="name">Reject Expense Email</field>
+        <field name="subject">{{object.name or '' }} : Expense is Rejected</field>
+        <field name="model_id" ref="dev_expense_management.model_dev_expense"/>
+        <field name="auto_delete" eval="True"/>
+        <field name="body_html"><![CDATA[
+            	<p>Hello <b><t t-out="object.user_id.name">,</b></p>
+            	<br/>
+            	<p>Your <b><t t-out="object.name"></b> expense is rejected</p>
+            	<br/>
+            	<p><b>Reject Reason : </b><t t-out="object.reject_reason"></p>
+            	<br/>
+            	<b>Regards,</b><br/>
+            	<t t-out="object.reject_user_id.name">
+                ]]></field>
+    </record>
+</odoo>

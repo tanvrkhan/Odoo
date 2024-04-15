@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2015 DevIntelle Consulting Service Pvt.Ltd (<http://www.devintellecs.com>).
+
+For Module Support : devintelle@gmail.com  or Skype : devintelle 
+ -->
+<odoo>
+    
+    <record id="view_dev_expense_reject_reason_form" model="ir.ui.view">
+	    <field name="name">view.dev.expense.reject.reason.form</field>
+	    <field name="model">dev.expense.reject.reason</field>
+	    <field name="arch" type="xml">
+	     <form string="Reject Reason">
+		     <label for="reason"/>
+             <field name="reason"/>
+	        <footer>
+                    <button string="Reject" name="reject_expense_request" type="object" class="oe_highlight"/>
+                    or
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+	     </form>
+	   </field>
+	</record>
+	
+    <record id="action_expense_reject_reason" model="ir.actions.act_window">
+	    <field name="name">Expense Reject Reason</field>
+	    <field name="type">ir.actions.act_window</field>
+	    <field name="res_model">dev.expense.reject.reason</field>
+	    <field name="view_id" ref="view_dev_expense_reject_reason_form"/>
+	    <field name="view_mode">form</field>
+	    <field name="target">new</field>
+	</record>
+	
+
+</odoo>

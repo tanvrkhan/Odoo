@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+    Copyright (C) 2015 DevIntelle Consulting Service Pvt.Ltd (<http://www.devintellecs.com>).
+
+    For Module Support : devintelle@gmail.com  or Skype : devintelle
+-->
+<odoo>
+    <record id="view_dev_res_config_adv_salary_account_form" model="ir.ui.view">
+        <field name="name">view.res.config.adv.salary.account.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@data-key='account']/h2[1]" position="before">
+                <h2>Expense Management</h2>
+                <div class="row mt16 o_settings_container">
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div class="o_setting_right_pane">
+                            <label for="exp_journal_id"/>
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="exp_journal_id" class="o_light_label"
+                                           domain="[('company_id','=',company_id),('type','in',['purchase','general'])]"
+                                           context="{'default_type':'general'}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div class="o_setting_right_pane">
+                            <label for="exp_payment_journal"/>
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="exp_payment_journal" class="o_light_label" domain="[('company_id','=',company_id),('type','in',['bank','cash'])]"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div class="o_setting_right_pane">
+                            <label for="exp_approval_amount"/>
+                            <div class="row">
+                                <div class="text-muted col-md-8">
+                                    Account Manager confirm when expense amount greater or equal approval amount.
+                                </div>
+                            </div>
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="exp_approval_amount" class="o_light_label"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

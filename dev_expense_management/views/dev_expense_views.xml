@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2015 DevIntelle Consulting Service Pvt.Ltd (<http://www.devintellecs.com>).
+
+For Module Support : devintelle@gmail.com  or Skype : devintelle 
+ -->
+<odoo>
+    <!-- Expense Form View -->
+    <record id="view_dev_expense_form" model="ir.ui.view">
+        <field name="name">view.dev.expense.form</field>
+        <field name="model">dev.expense</field>
+        <field name="arch" type="xml">
+            <form string="Expense">
+                <header>
+                    <button name="send_request" states="draft" string="Confirm"
+                            class="btn-primary" type="object" groups="account.group_account_invoice"/>
+
+                    <button name="done_expense" states="approve" string="Validate"
+                            class="btn-primary" type="object" groups="account.group_account_manager"/>
+
+                    <button name="%(action_expense_reject_reason)d" states="approve" string="Reject"
+                            class="btn-primary" type="action" groups="account.group_account_manager"/>
+
+                    <button name="cancel_expense" states="approve" string="Cancel"
+                            type="object" groups="account.group_account_invoice"/>
+
+                    <button name="set_to_draft" states="reject" string="Set To Draft"
+                            type="object" groups="account.group_account_manager"/>
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,request,confirm,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="move_id" invisible="1"/>
+                        <button class="oe_stat_button" name="button_journal_entries" string="Journal Entry" type="object" groups="account.group_account_invoice"
+                                attrs="{'invisible':[('move_id','=',False)]}" icon="fa-bars"/>
+                    </div>
+                    <label for="name" string="Expense Receipt" class="oe_edit_only"/>
+                    <h3>
+                        <field name="name" readonly="1"/>
+                    </h3>
+                    <group>
+                        <group>
+                            <field name="memo" attrs="{'readonly':[('state','!=','draft')]}"/>
+                        </group>
+                        <group>
+                            <field name="date" attrs="{'readonly':[('state','!=','draft')]}"/>
+                            <field name="user_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string='Expense Lines'>
+                            <field name="expense_lines" context="{'journal_id': journal_id, 'default_expense_id': id,'default_currency_id':currency_id}" attrs="{'readonly':[('state','!=','draft')]}">
+                                <tree editable="bottom">
+                                    <field name="product_id" domain="[('misc_expense','=',True)]" context="{'default_misc_expense':True}"/>
+                                    <field name="name"/>
+                                    <field name="account_id"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price"/>
+                                    <field name="tax_ids" widget="many2many_tags" options="{'no_create': True}" domain="[('type_tax_use','=','purchase'),('company_id', '=', parent.company_id)]"/>
+                                    <field name="amount_total"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </tree>
+                            </field>
+
+                            <group>
+                                <group class="oe_subtotal_footer oe_right">
+                                    <field name="amount_untaxed"/>
+                                    <field name="amount_tax"/>
+                                    <field name="amount_total" class="oe_subtotal_footer_separator"/>
+                                </group>
+                                <field name="note" placeholder="Internal Notes" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page string="Other Info" name="expense_other_info">
+                            <group>
+                                <group>
+                                    <field name="journal_id" domain="[('company_id','=',company_id),('type','in',['purchase','general'])]"
+                                           attrs="{'readonly':[('state','!=','draft')]}"/>
+                                    <field name="payment_journal_id" domain="[('company_id','=',company_id),('type','in',['bank','cash'])]"
+                                           attrs="{'readonly':[('state','!=','draft')]}"/>
+                                    <field name="currency_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                </group>
+                                <group>
+                                    <field name="date" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                    <field name="company_id" attrs="{'readonly':[('state','!=','draft')]}"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string='Reject Reason' name="reject_reason" attrs="{'invisible':[('state','!=','reject')]}">
+                            <group>
+                                <field name="reject_user_id" readonly="1"/>
+                            </group>
+                            <field name="reject_reason"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Expense Tree View -->
+    <record id="view_dev_expense_tree" model="ir.ui.view">
+        <field name="name">view.dev.expense.tree</field>
+        <field name="model">dev.expense</field>
+        <field name="arch" type="xml">
+            <tree string="Expense">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="memo"/>
+                <field name="amount_total"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_dev_expense_filter" model="ir.ui.view">
+        <field name="name">view.dev.expense.filter</field>
+        <field name="model">dev.expense</field>
+        <field name="arch" type="xml">
+            <search string="Search Expense">
+                <field name="name" string="Expense" filter_domain="['|',('name','ilike',self),('memo','ilike',self)]"/>
+                <field name="user_id"/>
+                <field name="payment_journal_id" string="Payment journal"/>
+                <field name="journal_id" string="Payment journal"/>
+                <field name="product_id"/>
+                <filter string="My Expense" domain="[('user_id','=',uid)]" name="my_expenses_filter"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Payment Journal" name="payment_journal_id" domain="[]" context="{'group_by':'payment_journal_id'}"/>
+                    <filter string="Expense Journal" name="journal_id" domain="[]" context="{'group_by':'journal_id'}"/>
+                    <filter string="State" name="state" domain="[]" context="{'group_by':'state'}"/>
+                    <filter string="Expense Month" name="date" domain="[]" context="{'group_by':'date'}"/>
+                    <filter string="User" name="user_id" domain="[]" context="{'group_by':'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+    <!-- Expense Action -->
+    <record id="action_dev_expense" model="ir.actions.act_window">
+        <field name="name">Expense</field>
+        <field name="res_model">dev.expense</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!--  Menu Items-->
+    <menuitem name="Expense Management" id="menu_dev_expense_management" parent="account.menu_finance" sequence="3"
+              groups="account.group_account_invoice"/>
+    <menuitem name="Expense" id="menu_dev_expense" parent="menu_dev_expense_management" action="action_dev_expense" sequence="1"/>
+
+</odoo>
