@@ -17,5 +17,4 @@
 
 
     ],
-    'external_dependencies': {'python' : ['pyodbc']}
 }
