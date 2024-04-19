@@ -84,7 +84,7 @@ class DbSync(models.Model):
         return connection.close()
 
     def connection_open(self):
-        connSTR="Driver={ODBC Driver 17 for SQL Server};SERVER=%s,1433;DATABASE=%s;UID=%s;PWD=%s" % (self.source_host, self.source_db_name, self.source_user_id, self.source_password)
+        connSTR="Driver={SQL Server};SERVER=%s,1433;DATABASE=%s;UID=%s;PWD=%s" % (self.source_host, self.source_db_name, self.source_user_id, self.source_password)
         # raise ValidationError(
         #     _("Error:\n" "Here is what we got instead:\n%s")
         #     % connSTR
