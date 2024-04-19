@@ -17,5 +17,5 @@
 
 
     ],
-    'external_dependencies': {'python' : ['unixodbc','unixodbc-dev','pyodbc']}
+    'external_dependencies': {'python' : ['pyodbc']}
 }
