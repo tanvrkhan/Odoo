@@ -75,7 +75,7 @@ class TradeControllerBI(models.Model):
     business_unit = fields.Char(string='Business Unit', size=250)
     portfolio_segment = fields.Char(string='Portfolio Segment', size=250)
     trade_admin = fields.Char(string='Trade Admin', size=752)
-    Operator = fields.Char(string='Operator', size=752)
+    Operator = fields.Char(string='perator', size=752)
     mot = fields.Char(string='MOT', size=250)
     bill_to_party_counterpart = fields.Char(string='Bill To Party Counterpart', size=250)
     payer_counterpart = fields.Char(string='Payer Counterpart', size=250)
