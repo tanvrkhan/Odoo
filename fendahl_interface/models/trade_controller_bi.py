@@ -181,6 +181,7 @@ class TradeControllerBI(models.Model):
     bi_record_creation_date = fields.Datetime(string='BI Record Creation Date')
     
     # Datetime Fields
+    trade_date = fields.Datetime(string='Trade Date')
     trade_input_date = fields.Datetime(string='Trade Input Date')
     trigger_allocation_method = fields.Char(string='Trigger Allocation Method', size=250)
     financing_transfer_date = fields.Datetime(string='Financing Transfer Date')
