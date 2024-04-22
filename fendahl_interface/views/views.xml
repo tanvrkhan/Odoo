@@ -1,7 +1,7 @@
 <odoo>
     <data>
         <!-- Inherit Form View to Modify it -->
-        <record id="picking_form_inherit" model="ir.ui.view">
+          <record id="picking_form_inherit" model="ir.ui.view">
             <field name="name">picking_form_inherit</field>
             <field name="model">stock.picking</field>
             <field name="inherit_id" ref="stock.view_picking_form"/>
@@ -11,5 +11,37 @@
                 </xpath>
             </field>
         </record>
+
+
+        <record id="view_fusion_trades" model="ir.ui.view">
+            <field name="name">fusion.trades.view</field>
+            <field name="model">trade.controller.bi</field>
+            <field name="arch" type="xml">
+                <tree string="Estimate">
+                    <field name="deal_master_id"/>
+                     <field name="segment_id"/>
+                     <field name="reference_number"/>
+                </tree>
+            </field>
+         </record>
+
+            <record id="action_fusion_trade_controller" model="ir.actions.act_window">
+            <field name="name">Fusion Trade Controller</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">trade.controller.bi</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_fusion_trades"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Fusion Trade Controller
+              </p>
+            </field>
+        </record>
+          <menuitem id="menu_fusion_Trades"
+              name="Fusion Trade Controller"
+              action="action_fusion_trade_controller"
+              parent="account.menu_finance_receivables"
+              sequence="110"/>
     </data>
+
 </odoo>

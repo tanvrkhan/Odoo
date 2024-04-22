@@ -51,6 +51,14 @@
             <field name="state">code</field>
             <field name="code">records.action_post_payments_Prod()</field>
         </record>
-
+  <record id="model_po_import_sql_order" model="ir.actions.server">
+    <field name="name">Import Fusion Purchase</field>
+    <field name="model_id" ref="purchase.model_purchase_order"/>
+    <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+    <field name="binding_view_types">list,form</field>
+    <field name="state">code</field>
+    <field name="code">records.sql_purchase_orders_import()</field>
+</record>
     </data>
 </odoo>
+
