@@ -10,7 +10,8 @@
     'depends': ['base', 'account', 'sale', 'stock', 'purchase', 'oe_kemoxon_delivery_custom'],
     'data': [
         'data/data.xml',
-        'views/partial_reconcile.xml'
+        'views/partial_reconcile.xml',
+        'views/views.xml'
     ],
 
 }
