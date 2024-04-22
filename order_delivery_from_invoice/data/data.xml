@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <!-- International-->
+
+<!--         <record id="model_po_import_sql_order" model="ir.actions.server">-->
+<!--    <field name="name">Import Fusion Purchase</field>-->
+<!--    <field name="model_id" ref="purchase.model_purchase_order"/>-->
+<!--    <field name="binding_model_id" ref="purchase.model_purchase_order"/>-->
+<!--    <field name="binding_view_types">list,form</field>-->
+<!--    <field name="state">code</field>-->
+<!--    <field name="code">records.get_rows_process()</field>-->
+<!--</record>-->
+
+              <record id="model_po_create_order_delivery_from_invoice" model="ir.actions.server">
+    <field name="name">Create order and delivery</field>
+    <field name="model_id" ref="account.model_account_move"/>
+    <field name="binding_model_id" ref="account.model_account_move"/>
+    <field name="binding_view_types">list,form</field>
+    <field name="state">code</field>
+    <field name="code">records.create_sales_order()</field>
+</record>
+    </data>
+</odoo>
