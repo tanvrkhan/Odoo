@@ -256,3 +256,4 @@ class TradeControllerBI(models.Model):
     last_modify_date = fields.Datetime(string='Last Modify Date')
     customer_id = fields.Integer(string='Customer ID')
     bi_record_creation_date = fields.Datetime(string='BI Record Creation Date')
+    Id = fields.Integer("Identity")
