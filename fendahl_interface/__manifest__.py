@@ -12,10 +12,10 @@
         'data/data.xml',
         'views/partial_reconcile.xml',
         'views/trade_controller.xml',
-        # 'views/cashflow_controller.xml',
-        # 'views/transfer_controller.xml',
-        # 'views/invoice_controller.xml',
-        # 'views/nomination_controller.xml',
+        'views/cashflow_controller.xml',
+        'views/transfer_controller.xml',
+        'views/invoice_controller.xml',
+        'views/nomination_controller.xml',
     ],
 
 }
