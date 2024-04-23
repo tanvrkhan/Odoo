@@ -192,20 +192,20 @@ class dev_expense(models.Model):
         return action
 
 
-    def send_approval_mail(self):
-        group_id = self.env.ref('account.group_account_manager')
-        company_email = self.company_id and self.company_id.email or ''
-        if not company_email:
-            company_email = self.env.company and self.env.company.email or ''
-        if company_email:
-            if group_id and group_id.users:
-                template_id = self.env.ref('dev_expense_management.dev_expense_account_manager_mail_template')
-                if template_id:
-                    for user in group_id.users:
-                        if user.partner_id and user.partner_id.email:
-                            template_id.write({'email_to': user.partner_id.email,
-                                               'email_from': self.company_id.email})
-                            template_id.send_mail(self.id, True)
+    # def send_approval_mail(self):
+    #     group_id = self.env.ref('account.group_account_manager')
+    #     company_email = self.company_id and self.company_id.email or ''
+    #     if not company_email:
+    #         company_email = self.env.company and self.env.company.email or ''
+    #     if company_email:
+    #         if group_id and group_id.users:
+    #             template_id = self.env.ref('dev_expense_management.dev_expense_account_manager_mail_template')
+    #             if template_id:
+    #                 for user in group_id.users:
+    #                     if user.partner_id and user.partner_id.email:
+    #                         template_id.write({'email_to': user.partner_id.email,
+    #                                            'email_from': self.company_id.email})
+    #                         template_id.send_mail(self.id, True)
 
     def send_request(self):
         self.state = 'approve'
@@ -213,8 +213,9 @@ class dev_expense(models.Model):
             self.done_expense()
         else:
             if self.company_id.exp_approval_amount <= self.amount_total:
-                self.send_approval_mail()
+                # self.send_approval_mail()
                 self.state = 'approve'
+                self.done_expense()
             else:
                 self.done_expense()
 
@@ -225,15 +226,15 @@ class dev_expense(models.Model):
     def set_to_draft(self):
         self.state = 'draft'
 
-    def reject_expense(self):
-        self.state = 'reject'
-        template_id = self.env.ref('dev_expense_management.dev_expense_reject_mail_template')
-        email_from = self.env.user and self.env.user.partner_id and self.env.user.partner_id.email or ''
-        email_to =  self.user_id and self.user_id.partner_id and self.user_id.partner_id.email or ''
-        if template_id and email_from and email_to:
-            template_id.write({'email_to': email_to,
-                               'email_from': email_from})
-            template_id.send_mail(self.id, True)
+    # def reject_expense(self):
+    #     self.state = 'reject'
+    #     template_id = self.env.ref('dev_expense_management.dev_expense_reject_mail_template')
+    #     email_from = self.env.user and self.env.user.partner_id and self.env.user.partner_id.email or ''
+    #     email_to =  self.user_id and self.user_id.partner_id and self.user_id.partner_id.email or ''
+    #     if template_id and email_from and email_to:
+    #         template_id.write({'email_to': email_to,
+    #                            'email_from': email_from})
+    #         template_id.send_mail(self.id, True)
 
     def cancel_expense(self):
         self.state = 'cancel'
