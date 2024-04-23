@@ -207,16 +207,16 @@ class dev_expense(models.Model):
     #                                            'email_from': self.company_id.email})
     #                         template_id.send_mail(self.id, True)
 
-    def send_request(self):
-        self.state = 'approve'
-        if self.env.user.has_group('account.group_account_manager'):
-            self.done_expense()
-        else:
-            if self.company_id.exp_approval_amount <= self.amount_total:
-                self.send_approval_mail()
-                self.state = 'approve'
-            else:
-                self.done_expense()
+    # def send_request(self):
+    #     self.state = 'approve'
+    #     if self.env.user.has_group('account.group_account_manager'):
+    #         self.done_expense()
+    #     else:
+    #         if self.company_id.exp_approval_amount <= self.amount_total:
+    #             self.send_approval_mail()
+    #             self.state = 'approve'
+    #         else:
+    #             self.done_expense()
 
     def done_expense(self):
         self.create_expense_journal_entry()
