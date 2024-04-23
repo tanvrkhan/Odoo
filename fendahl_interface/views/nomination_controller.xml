@@ -1,0 +1,35 @@
+<odoo>
+    <data>
+        <!-- Inherit Form View to Modify it -->
+
+        <record id="view_fusion_nomination" model="ir.ui.view">
+            <field name="name">fusion.nomination.view</field>
+            <field name="model">nomination.controller.bi</field>
+            <field name="arch" type="xml">
+                <tree string="Estimate">
+                    <field name="itinerary_id"/>
+                     <field name="itinerary_name"/>
+                </tree>
+            </field>
+         </record>
+
+            <record id="action_fusion_nomination_controller" model="ir.actions.act_window">
+            <field name="name">Fusion nomination Controller</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">nomination.controller.bi</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_fusion_nomination"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Fusion nomination Controller
+              </p>
+            </field>
+        </record>
+          <menuitem id="menu_fusion_nomination"
+              name="Fusion nomination Controller"
+              action="action_fusion_nomination_controller"
+              parent="account.menu_finance_receivables"
+              sequence="113"/>
+    </data>
+
+</odoo>

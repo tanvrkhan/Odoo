@@ -192,20 +192,20 @@ class dev_expense(models.Model):
         return action
 
 
-    def send_approval_mail(self):
-        group_id = self.env.ref('account.group_account_manager')
-        company_email = self.company_id and self.company_id.email or ''
-        if not company_email:
-            company_email = self.env.company and self.env.company.email or ''
-        if company_email:
-            if group_id and group_id.users:
-                template_id = self.env.ref('dev_expense_management.dev_expense_account_manager_mail_template')
-                if template_id:
-                    for user in group_id.users:
-                        if user.partner_id and user.partner_id.email:
-                            template_id.write({'email_to': user.partner_id.email,
-                                               'email_from': self.company_id.email})
-                            template_id.send_mail(self.id, True)
+    # def send_approval_mail(self):
+    #     group_id = self.env.ref('account.group_account_manager')
+    #     company_email = self.company_id and self.company_id.email or ''
+    #     if not company_email:
+    #         company_email = self.env.company and self.env.company.email or ''
+    #     if company_email:
+    #         if group_id and group_id.users:
+    #             template_id = self.env.ref('dev_expense_management.dev_expense_account_manager_mail_template')
+    #             if template_id:
+    #                 for user in group_id.users:
+    #                     if user.partner_id and user.partner_id.email:
+    #                         template_id.write({'email_to': user.partner_id.email,
+    #                                            'email_from': self.company_id.email})
+    #                         template_id.send_mail(self.id, True)
 
     def send_request(self):
         self.state = 'approve'

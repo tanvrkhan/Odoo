@@ -1,0 +1,36 @@
+<odoo>
+    <data>
+        <!-- Inherit Form View to Modify it -->
+
+        <record id="view_fusion_transfers" model="ir.ui.view">
+            <field name="name">fusion.transfers.view</field>
+            <field name="model">transfer.controller.bi</field>
+            <field name="arch" type="xml">
+                <tree string="Estimate">
+                    <field name="transfer_controller_bi_id"/>
+                     <field name="segment_id"/>
+                     <field name="reference_number"/>
+                </tree>
+            </field>
+         </record>
+
+            <record id="action_fusion_transfer_controller" model="ir.actions.act_window">
+            <field name="name">Fusion Transfer Controller</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">transfer.controller.bi</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_fusion_transfers"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Fusion Transfers Controller
+              </p>
+            </field>
+        </record>
+          <menuitem id="menu_fusion_Transfer"
+              name="Fusion Transfer Controller"
+              action="action_fusion_transfer_controller"
+              parent="account.menu_finance_receivables"
+              sequence="111"/>
+    </data>
+
+</odoo>

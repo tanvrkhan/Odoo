@@ -1,0 +1,34 @@
+<odoo>
+    <data>
+        <!-- Inherit Form View to Modify it -->
+
+        <record id="view_fusion_invoice" model="ir.ui.view">
+            <field name="name">fusion.invoice.view</field>
+            <field name="model">invoice.controller.bi</field>
+            <field name="arch" type="xml">
+                <tree string="Estimate">
+                    <field name="invoice_number"/>
+                </tree>
+            </field>
+         </record>
+
+            <record id="action_fusion_invoice_controller" model="ir.actions.act_window">
+            <field name="name">Fusion Invoice Controller</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">invoice.controller.bi</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_fusion_invoice"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Fusion Invoice Controller
+              </p>
+            </field>
+        </record>
+          <menuitem id="menu_fusion_Invoice"
+              name="Fusion Invoice Controller"
+              action="action_fusion_invoice_controller"
+              parent="account.menu_finance_receivables"
+              sequence="112"/>
+    </data>
+
+</odoo>
