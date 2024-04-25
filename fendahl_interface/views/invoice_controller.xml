@@ -7,7 +7,7 @@
             <field name="model">invoice.controller.bi</field>
             <field name="arch" type="xml">
                 <tree string="Estimate">
-                    <field name="invoice_number"/>
+                    <field name="invoicenumber"/>
                 </tree>
             </field>
          </record>

@@ -7,9 +7,9 @@
             <field name="model">transfer.controller.bi</field>
             <field name="arch" type="xml">
                 <tree string="Estimate">
-                    <field name="transfer_controller_bi_id"/>
-                     <field name="segment_id"/>
-                     <field name="reference_number"/>
+                    <field name="transfercontrollerbiid"/>
+                     <field name="segmentid"/>
+                     <field name="referencenumber"/>
                 </tree>
             </field>
          </record>

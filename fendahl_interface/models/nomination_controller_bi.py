@@ -1,40 +1,118 @@
 from odoo import models, fields
+import requests
+import logging
 
+_logger = logging.getLogger(__name__)
 class NominationControllerBI(models.Model):
     _name = 'nomination.controller.bi'
     _description = 'Nomination Controller Business Intelligence'
-
-    itinerary_id = fields.Integer(string='Itinerary ID', index=True, help="Primary identifier for the Itinerary")
-    itinerary_name = fields.Char(string='Itinerary Name')
-    itinerary_status_enum = fields.Char(string='Itinerary Status')
-    movement_id = fields.Integer(string='Movement ID')
-    mot_type_enum = fields.Char(string='MOT Type')
-    mot_id = fields.Integer(string='MOT ID')
-    mot_code = fields.Char(string='MOT Code')
-    depart_location_code = fields.Char(string='Departure Location Code')
-    arrive_location_code = fields.Char(string='Arrival Location Code')
-    depart_date = fields.Datetime(string='Departure Date')
-    arrive_date = fields.Datetime(string='Arrival Date')
-    itinerary_type_enum = fields.Char(string='Itinerary Type')
-    material_id = fields.Integer(string='Material ID')
-    transport_carriage_type_enum = fields.Char(string='Transport Carriage Type')
-    inter_comp_enum = fields.Boolean(string='Intercompany')
-    nomination_number = fields.Char(string='Nomination Number')
-    sap_document_id = fields.Char(string='SAP Document ID')
-    sap_status_enum = fields.Char(string='SAP Status')
-    nomination_key = fields.Integer(string='Nomination Key')
-    is_finalized = fields.Boolean(string='Is Finalized')
-    finalized_date = fields.Datetime(string='Finalized Date')
-    is_finalized_movement = fields.Boolean(string='Is Finalized Movement')
-    finalized_date_movement = fields.Datetime(string='Finalized Movement Date')
-    sample_required_enum_display_text = fields.Char(string='Sample Required Display Text')
-    sampling_process_code = fields.Char(string='Sampling Process Code')
-    weight_final_at_display_text = fields.Char(string='Weight Final At Display Text')
-    delivery_basis_of_display_text = fields.Char(string='Delivery Basis of Display Text')
-    status_enum = fields.Boolean(string='Status')
-    modify_person_id = fields.Integer(string='Modify Person ID')
-    last_modify_date = fields.Datetime(string='Last Modify Date')
-    modify_person = fields.Char(string='Modify Person')
-    customer_id = fields.Integer(string='Customer ID')
-    lock_id = fields.Integer(string='Lock ID')
-    bi_record_creation_date = fields.Datetime(string='BI Record Creation Date')
+    
+    nominationcontrollerbiid = fields.Integer(string="NominationControllerBiId")
+    itineraryid = fields.Char(string="ItineraryId")
+    itineraryname = fields.Char(string="ItineraryName")
+    itinerarystatusenum = fields.Char(string="ItineraryStatusEnum")
+    movementid = fields.Char(string="MovementId")
+    mottypeenum = fields.Char(string="MotTypeEnum")
+    motid = fields.Char(string="MotId")
+    motcode = fields.Char(string="MotCode")
+    departlocationcode = fields.Char(string="DepartLocationCode")
+    arrivelocationcode = fields.Char(string="ArriveLocationCode")
+    departdate = fields.Char(string="DepartDate")
+    arrivedate = fields.Char(string="ArriveDate")
+    itinerarytypeenum = fields.Char(string="ItineraryTypeEnum")
+    materialid = fields.Char(string="MaterialId")
+    transportcarriagetypeenum = fields.Char(string="TransportCarriageTypeEnum")
+    intercompenum = fields.Char(string="InterCompEnum")
+    nominationnumber = fields.Char(string="NominationNumber")
+    sapdocumentid = fields.Char(string="SapDocumentId")
+    sapstatusenum = fields.Char(string="SapStatusEnum")
+    nominationkey = fields.Char(string="NominationKey")
+    isfinalized = fields.Char(string="IsFinalized")
+    finalizeddate = fields.Char(string="FinalizedDate")
+    isfinalizedmovement = fields.Char(string="IsFinalizedMovement")
+    finalizeddatemovement = fields.Char(string="FinalizedDateMovement")
+    samplerequiredenumdisplaytext = fields.Char(string="SampleRequiredEnumDisplayText")
+    samplingprocesscode = fields.Char(string="SamplingProcessCode")
+    weightfinalatdisplaytext = fields.Char(string="WeightFinalAtDisplayText")
+    deliverybasisofdisplaytext = fields.Char(string="DeliveryBasisOfDisplayText")
+    statusenum = fields.Char(string="StatusEnum")
+    modifypersonid = fields.Char(string="ModifyPersonId")
+    lastmodifydate = fields.Char(string="LastModifyDate")
+    modifyperson = fields.Char(string="ModifyPerson")
+    customerid = fields.Char(string="CustomerId")
+    lockid = fields.Char(string="LockId")
+    birecordcreationdate = fields.Char(string="BiRecordCreationDate")
+    
+    def import_nomination(self):
+        interface = self.env['fusion.sync.history']
+        last_sync = '2023-01-01'
+        url = "https://fusionsqlmirrorapi.azure-api.net/api/nomination"
+        headers = {
+            'Ocp-Apim-Subscription-Key': '38cb5797102f4b1f852ae8ff6e8482e5',
+            'Content-Type': 'application/json',
+        }
+        params = {
+            'date': last_sync
+        }
+        
+        response = requests.get(url, headers=headers, params=params)
+        if response.status_code == 200:
+            try:
+                json_data = response.json()
+                json_data = interface.lowercase_keys(json_data)
+                for data in json_data:
+                    self.create_update_nomination('nomination', data)
+                interface.update_sync_interface('nomination')
+            except Exception as e:
+                _logger.error('Error processing API data: %s', str(e))
+        else:
+            _logger.error('Failed to fetch data from external API: %s', response.status_code)
+    
+    def sync_nomination(self):
+        interface = self.env['fusion.sync.history']
+        last_sync = interface.get_last_sync('nomination')
+        url = "https://fusionsqlmirrorapi.azure-api.net/api/nomination"
+        headers = {
+            'Ocp-Apim-Subscription-Key': '38cb5797102f4b1f852ae8ff6e8482e5',
+            'Content-Type': 'application/json',
+        }
+        params = {
+            'date': last_sync
+        }
+        response = requests.get(url, headers=headers, params=params)
+        if response.status_code == 200:
+            try:
+                json_data = response.json()
+                json_data = interface.lowercase_keys(json_data)
+                for data in json_data:
+                    self.regular_update_nomination('nomination', data)
+                interface.update_sync_interface('nomination')
+            except Exception as e:
+                _logger.error('Error processing API data: %s', str(e))
+        else:
+            _logger.error('Failed to fetch data from external API: %s', response.status_code)
+    
+    def create_update_nomination(self, interface_type, data):
+        if interface_type == 'nomination':
+            exists = self.env['nomination.controller.bi'].search([('nominationcontrollerbiid', '=', data['nominationcontrollerbiid'])])
+            if exists:
+                return
+                # if exists:
+                #     return
+                # else:
+                #     self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
+                #     self.env['cashflow.controller.bi'].create(data)
+                #     self.env.cr.commit()
+            else:
+                self.env['nomination.controller.bi'].create(data)
+                self.env.cr.commit()
+    
+    def regular_update_nomination(self, interface_type, data):
+        if interface_type == 'nomination':
+            exists = self.env['nomination.controller.bi'].search([('nominationcontrollerbiid', '=', data['nominationcontrollerbiid'])])
+            if exists:
+                self.env['nomination.controller.bi'].search([('nominationcontrollerbiid', '=', data['nominationcontrollerbiid'])]).unlink()
+                self.env['nomination.controller.bi'].create(data)
+            else:
+                self.env['nomination.controller.bi'].create(data)
+                self.env.cr.commit()

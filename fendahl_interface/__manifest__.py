@@ -16,6 +16,7 @@
         'views/transfer_controller.xml',
         'views/invoice_controller.xml',
         'views/nomination_controller.xml',
+        'views/fusion_sync_history.xml'
     ],
 
 }

@@ -6,9 +6,11 @@
             <field name="name">fusion.cashflow.view</field>
             <field name="model">cashflow.controller.bi</field>
             <field name="arch" type="xml">
+
                 <tree string="Estimate">
-                    <field name="trade_number"/>
-                     <field name="cashflow_id"/>
+                     <field name="cashflowid"/>
+
+
                 </tree>
             </field>
          </record>

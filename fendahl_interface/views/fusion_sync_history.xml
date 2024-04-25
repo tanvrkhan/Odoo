@@ -1,0 +1,86 @@
+<odoo>
+    <data>
+        <!-- Inherit Form View to Modify it -->
+
+        <record id="view_fusion_sync_history" model="ir.ui.view">
+            <field name="name">fusion.sync.history.view</field>
+            <field name="model">fusion.sync.history</field>
+            <field name="arch" type="xml">
+                <tree string="Estimate">
+                     <header><button name="update_sync_interface" string='Sync' type="object" class="btn-primary" /></header>
+                    <field name="interface_type"/>
+                     <field name="last_sync"/>
+                </tree>
+            </field>
+         </record>
+
+            <record id="action_fusion_sync_history" model="ir.actions.act_window">
+            <field name="name">Fusion Sync History Controller</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">fusion.sync.history</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_fusion_sync_history"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Fusion Sync History Controller
+              </p>
+            </field>
+        </record>
+           <record id="model_fusion_sync_history_action_trigger_sync_cashflow" model="ir.actions.server">
+            <field name="name">Initial Update Cashflow Transactions</field>
+            <field name="model_id" ref="model_fusion_sync_history"/>
+            <field name="binding_model_id" ref="model_fusion_sync_history"/>
+            <field name="binding_view_types">tree,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                action = env['cashflow.controller.bi'].import_cashflow()
+            </field>
+        </record>
+           <record id="model_fusion_sync_history_action_trigger_sync_nomination" model="ir.actions.server">
+            <field name="name">Initial Update Nomination</field>
+            <field name="model_id" ref="model_fusion_sync_history"/>
+            <field name="binding_model_id" ref="model_fusion_sync_history"/>
+            <field name="binding_view_types">tree,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                action = env['nomination.controller.bi'].import_nomination()
+            </field>
+        </record>
+         <record id="model_fusion_sync_history_action_trigger_sync_transfer" model="ir.actions.server">
+            <field name="name">Initial Update Transfer </field>
+            <field name="model_id" ref="model_fusion_sync_history"/>
+            <field name="binding_model_id" ref="model_fusion_sync_history"/>
+            <field name="binding_view_types">tree,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                action = env['transfer.controller.bi'].import_nomination()
+            </field>
+        </record>
+         <record id="model_fusion_sync_history_action_trigger_sync_trade" model="ir.actions.server">
+            <field name="name">Initial Update Trade </field>
+            <field name="model_id" ref="model_fusion_sync_history"/>
+            <field name="binding_model_id" ref="model_fusion_sync_history"/>
+            <field name="binding_view_types">tree,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                action = env['trade.controller.bi'].import_trade()
+            </field>
+        </record>
+        <record id="model_fusion_sync_history_action_trigger_sync_invoice" model="ir.actions.server">
+            <field name="name">Initial Update Invoice </field>
+            <field name="model_id" ref="model_fusion_sync_history"/>
+            <field name="binding_model_id" ref="model_fusion_sync_history"/>
+            <field name="binding_view_types">tree,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                action = env['invoice.controller.bi'].import_invoice()
+            </field>
+        </record>
+          <menuitem id="menu_fusion_sync_history"
+              name="Fusion Sync History Controller"
+              action="action_fusion_sync_history"
+              parent="account.menu_finance_receivables"
+              sequence="115"/>
+    </data>
+
+</odoo>
