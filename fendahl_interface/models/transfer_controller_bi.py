@@ -2,6 +2,8 @@ from odoo import models, fields
 import requests
 import logging
 import datetime
+from odoo.exceptions import UserError, Warning
+from decimal import Decimal
 
 _logger = logging.getLogger(__name__)
 
@@ -313,3 +315,94 @@ class TransferControllerBI(models.Model):
             else:
                 self.env['transfer.controller.bi'].create(data)
                 self.env.cr.commit()
+                
+    def create_receipt(self):
+        for rec in self:
+            try:
+                if rec.buyselldisplaytext=="Buy" and rec.deliveryactivestatusdisplayname=="Active":
+                    company = self.env['res.company'].search([('name', '=', rec.frominternalcompany)], limit=1)
+                    pol = self.env['purchase.order.line'].search([('fusion_segment_id', '=', rec.fromsegmentid)],limit=1)
+                    po = self.env['purchase.order'].search([('id', '=', pol.order_id.id)])
+                    
+                    if po:
+                        nomination_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Nomination',
+                                                                                                 rec.itineraryid,
+                                                                                                 company.id)
+                        storage_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Deal Reference',
+                                                                                                 rec.tomotcode,
+                                                                                                 company.id)
+                        # pol.analytic_distribution[nomination_link.id] = 100 #Not working
+                        existing_distribution = pol.analytic_distribution
+                        existing_distribution[str(nomination_link.id)] = 100
+                        existing_distribution[str(storage_link.id)] = 100
+                        
+                        pol['analytic_distribution']=existing_distribution
+                        self.env.cr.commit()
+                        if not po.state=='purchase':
+                            
+                            po.button_confirm()
+                            self.env.cr.commit()
+                        stock_move= self.env['stock.move']
+                        exists = self.env['stock.move'].search(
+                            [('fusion_delivery_id', '=', rec.deliveryid),('purchase_line_id', '=', pol.id)],limit=1)
+                        if exists:
+                            stock_move=self.env['stock.move'].search([('id', '=', exists.id)])
+                        else:
+                            stock_move = self.env['stock.move'].search([('purchase_line_id', '=', pol.id),('state','=','assigned')],limit=1)
+                            if not stock_move:
+                                stock_move_posted = self.env['stock.move'].search([('purchase_line_id', '=', pol.id),('state','=','done')],limit=1)
+                                if stock_move_posted:
+                                    stock_move= stock_move_posted.copy()
+                        if stock_move:
+                            stock_move.picking_id.fusion_delivery_id=rec.deliveryid
+                            stock_move.fusion_delivery_id = rec.deliveryid
+                            stock_move.picking_id.set_stock_move_to_draft()
+                            stock_move.picking_id.deal_ref  = 'moved_to_Draft'
+                            self.env.cr.commit()
+                            stock_move.picking_id.custom_delivery_date = datetime.datetime.strptime(rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
+                            stock_move.picking_id.scheduled_date = datetime.datetime.strptime(rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
+                            stock_move.date = datetime.datetime.strptime(rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
+                            self.env.cr.commit()
+                            warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.tomotcode,
+                                                                                           pol.order_id.company_id.id)
+                            picking_type = self.env['stock.picking.type'].search(
+                                [('code', '=', 'incoming'), ('warehouse_id', '=', warehouse.id)], limit=1)
+                            stock_move.picking_id.picking_type_id = picking_type
+                            stock_move.picking_id.action_confirm()
+                            lot=self.env['fusion.sync.history'].validate_lot(rec.itineraryid, stock_move.picking_id.product_id.id, company.id)
+                            self.env.cr.commit()
+                            quantity    =0
+                            if rec.fromcontractqtyuomcode == pol.product_uom.name:
+                                quantity = rec.fromactualqty
+                            elif rec.toactualqtyuomcode == pol.product_uom.name:
+                                quantity = rec.toactualqty
+                            existing_line =  stock_move.move_line_ids.filtered(lambda ml: ml.lot_id.name == lot.name)
+                            if existing_line:
+                                existing_line.qty_done = quantity
+                            else:
+                                stock_move.move_line_ids.lot_id = lot.id
+                                stock_move.move_line_ids.qty_done=quantity
+                            stock_move.picking_id.button_validate()
+                    else:
+                        log_error = self.env['fusion.sync.history.errors'].log_error('TransferController',
+                                                                                     rec.fromsegmentid,
+                                                                                     'PO Line not found',
+                                                                                     rec.tointernalcompany)
+            except Exception as e:
+                log_error = self.env['fusion.sync.history.errors'].log_error('TransferController', rec.fromsegmentid,
+                                                                             str(e),
+                                                                             rec.tointernalcompany)
+                raise UserError('Error processing API data: %s', str(e))
+                # _logger.error('Error processing API data: %s', str(e))
+                # if pol:
+                #     pol = self.env['purchase.order.line'].search([('fusion_segment_id', '=', pol.termnumber)],limit=1)
+                #     po = self.env['purchase.order'].search([('id', '=', pol.order_id.id)])
+                #       stock_moves = self.env['stock.move'].search([('purchase_line_id', '=', pol.id)])
+                #     picking_ids = set()
+                #     for move in stock_moves:
+                #         if move.picking_id:
+                #             picking_ids.add(move.picking_id.id)
+                #             if len(picking_ids):
+                #                 a=True
+                #
+            

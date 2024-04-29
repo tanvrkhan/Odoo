@@ -44,7 +44,7 @@
             <field name="binding_view_types">tree,form</field>
             <field name="state">code</field>
             <field name="code">
-                action = env['trade.controller.bi'].create_purchase_order()
+                action = records.create_purchase_order()
             </field>
         </record>
           <menuitem id="menu_fusion_Trades"

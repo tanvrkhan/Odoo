@@ -245,3 +245,100 @@ class InvoiceControllerBI(models.Model):
             else:
                 self.env['invoice.controller.bi'].create(data)
                 self.env.cr.commit()
+    
+    
+    def create_bill(self):
+        for rec in self:
+            pol = self.env['purchase.order.line'].search([('custom_section_number', '=', rec.customsectionnumber)])
+            po = pol.order_id
+            # search_pattern = rec.custominvoicenumber[:3] + '%'
+            existing_invoice = self.env['account.move'].search([('fusion_invoice_ref', '=', rec.custominvoicenumber)])
+            # product=self.env['fusion.sync.history'].validate_product(rec.commodity, rec.material,
+            #                                                                                rec.invoiceqtyuom)
+            # uom = self.env['fusion.sync.history'].validate_uom(product,
+            #                                              rec.invoiceqtyuom)
+            if existing_invoice:
+                # link existing invoice
+                existing_invoice.write({'purchase_id': po.id})
+                existing_invoice.write({'invoice_origin': po.name})
+                # existing_invoice.write({'custom_section_number': rec.customsectionnumber})
+                existing_invoice.line_ids.custom_section_number = rec.customsectionnumber
+                
+                if rec.invoicestatus == 'Void':
+                    existing_invoice.action_cancel()
+                elif rec.invoicetype == 'Proforma' or rec.invoicetype == 'Prepayment':
+                    invoice_line_vals = {
+                        'name': rec.material,
+                        'product_id': 312,
+                        'product_uom_id': 1,
+                        'quantity': 1,
+                        'price_unit': rec.invoiceamt if rec.invoiceamt > 0 else rec.invoiceamt * -1,
+                        'purchase_line_id': pol.id,
+                            'analytic_distribution':pol.analytic_distribution
+                        # 'tax_ids': [(6, 0, [tax.id for tax in line.taxes_id])],
+                    }
+                else:
+                    existing_invoice.button_draft()
+                    
+                    invoice_line_vals = {
+                        'name': pol.product_id.name,
+                        'product_id': pol.product_id.id,
+                        'product_uom_id': pol.product_uom.id,
+                        'quantity': rec.invoiceamt / pol.price_unit,
+                        'price_unit': pol.price_unit,
+                        'purchase_line_id': pol.id,
+                            'analytic_distribution':pol.analytic_distribution
+                        # 'tax_ids': [(6, 0, [tax.id for tax in line.taxes_id])],
+                    }
+                    existing_invoice.action_post()
+                    
+            elif rec.invoicestatus == 'Active' and rec.payablereceivable == 'Payable' and not existing_invoice:
+                
+                if po:
+                    #create new invoice
+                    invoice_vals = {
+                        'company_id': self.env['res.company'].search([('name', '=', rec.internalcompany)], limit=1).id,
+                        'move_type': 'in_invoice',
+                        # 'fusion_invoice_ref': rec.invoicenumber, # Vendor bill
+                        'invoice_origin': po.name,
+                        'partner_id': po.partner_id.id,
+                        'invoice_line_ids': [],
+                        'currency_id': self.env['res.currency'].search([('name', '=', rec.amtcurrency)], limit=1).id, #po.currency_id.id, # self.env['res.currency'].search([(rec.material)rec.amtcurrency,
+                        'purchase_id': po.id,
+                        'custom_section_number': rec.customsectionnumber,  # Link back to the purchase order
+                        'invoice_date': rec.invoicedate,
+                        'date': rec.invoicedate,
+                        'ref': rec.theirinvoiceref,
+                        'invoice_date_due': rec.paymentduedate,
+                        'fusion_reference': rec.invoicenumber,
+                        'fusion_invoice_ref' : rec.custominvoicenumber
+                        }
+                    # product = self.env['fusion.sync.history'].validate_product(rec.material)
+                    if rec.invoicetype=='Proforma' or rec.invoicetype=='Prepayment':
+                        invoice_line_vals = {
+                            'name': pol.product_id.name,
+                            'product_id': 312,
+                            'product_uom_id': 1,
+                            'quantity': 1,
+                            'price_unit': rec.invoiceamt if rec.invoiceamt > 0 else rec.invoiceamt*-1,
+                            'purchase_line_id': pol.id,
+                            'analytic_distribution':pol.analytic_distribution
+                            # 'tax_ids': [(6, 0, [tax.id for tax in line.taxes_id])],
+                        }
+                        invoice_vals['invoice_line_ids'].append((0, 0, invoice_line_vals))
+                    elif rec.invoicetype=='Final':
+                        invoice_line_vals = {
+                            'name': pol.product_id.name,
+                            'product_id': pol.product_id.id,
+                            'product_uom_id': pol.product_uom.id,
+                            'quantity': float(rec.invoiceamt if float(rec.invoiceamt) > 0 else float(rec.invoiceamt) * -1)/pol.price_unit,
+                            'price_unit': pol.price_unit,
+                            'purchase_line_id': pol.id,
+                            'analytic_distribution':pol.analytic_distribution
+                            # 'tax_ids': [(6, 0, [tax.id for tax in line.taxes_id])],
+                        }
+                        invoice_vals['invoice_line_ids'].append((0, 0, invoice_line_vals))
+                    vendor_bill =   self.env['account.move'].create(invoice_vals)
+                    vendor_bill.action_post()
+                    
+                

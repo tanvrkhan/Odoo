@@ -271,6 +271,7 @@ class StockPicking(models.Model):
 
     def set_stock_move_to_draft(self):
         for record in self:
+            existingstate= record.state
             record.move_ids.stock_valuation_layer_ids.account_move_id.state = 'draft'
             for ae in record.move_ids.stock_valuation_layer_ids.account_move_id.line_ids:
                 ae.remove_move_reconcile()
@@ -299,7 +300,7 @@ class StockPicking(models.Model):
                         record.move_ids.move_line_ids.product_id = record.move_ids.product_id
             
             for line in record.move_ids.move_line_ids:
-                if line.qty_done != 0:
+                if line.qty_done != 0 and existingstate == 'done':
                     location_quant = record.env['stock.quant'].search(['&', ('product_id', '=', record.product_id.id)
                                                                         , ('lot_id', '=', line.lot_id.id)
                                                                         , ('location_id', '=', line.location_id.id)
@@ -315,16 +316,18 @@ class StockPicking(models.Model):
 
                     if len(location_quant) == 1:
                         if (location_quant.location_id.usage == 'internal'):
+                            if (existingstate == 'done'):
                             # SALES REVERSAL
-                            record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
-                                                                               package_id=None, owner_id=None,
-                                                                               location_id=line.location_id,
-                                                                               quantity=line.qty_done,
-                                                                               lot_id=line.lot_id, in_date=None)
+                                record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+                                                                                   package_id=None, owner_id=None,
+                                                                                   location_id=line.location_id,
+                                                                                   quantity=line.qty_done,
+                                                                                   lot_id=line.lot_id, in_date=None)
                         # location_quant.quantity=location_quant.quantity-line.qty_done
                         else:
                             # PURCHASE REVERSAL
-                            record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+                            if (existingstate == 'done'):
+                                record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
                                                                                package_id=None, owner_id=None,
                                                                                location_id=line.location_id,
                                                                                quantity=line.qty_done,
@@ -333,7 +336,8 @@ class StockPicking(models.Model):
                     if len(location_dest_quant) == 1:
                         if (location_quant.location_id.usage == 'internal'):
                             # PURCHASE REVERSAL
-                            record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+                            if (existingstate == 'done'):
+                                record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
                                                                                package_id=None, owner_id=None,
                                                                                location_id=line.location_dest_id,
                                                                                quantity=-1 * line.qty_done,
@@ -341,7 +345,8 @@ class StockPicking(models.Model):
                         # location_dest_quant.quantity=location_dest_quant.quantity-line.qty_done
                         else:
                             # PURCHASE REVERSAL
-                            record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+                            if (existingstate == 'done'):
+                                record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
                                                                                package_id=None, owner_id=None,
                                                                                location_id=line.location_dest_id,
                                                                                quantity=-1 * line.qty_done,

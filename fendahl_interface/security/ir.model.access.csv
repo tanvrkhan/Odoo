@@ -1,5 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_partner_seq_id,Access Partner Sequence Id,model_partner_sequence,base.group_user,1,1,1,1
 access_trade_controller_bi,Access Trade Controller,model_trade_controller_bi,base.group_user,1,1,1,1
+access_nomination_controller_bi,Access Nomination Controller,model_nomination_controller_bi,base.group_user,1,1,1,1
 access_cashflow_controller_bi,Access Cashflow Controller,model_cashflow_controller_bi,base.group_user,1,1,1,1
 access_trade_controller_bi,Access Trade Controller,model_trade_controller_bi,base.group_user,1,1,1,1
+access_invoice_controller_bi,Access Invoice Controller,model_invoice_controller_bi,base.group_user,1,1,1,1
+access_fusion_sync_history_errors,fusion.sync.history.errors model access,model_fusion_sync_history_errors,base.group_user,1,1,1,1
+

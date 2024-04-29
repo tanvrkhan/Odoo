@@ -26,6 +26,16 @@
               </p>
             </field>
         </record>
+        <record id="model_fusion_trade_controller_create_receipt" model="ir.actions.server">
+            <field name="name">Create Receipt</field>
+            <field name="model_id" ref="model_transfer_controller_bi"/>
+            <field name="binding_model_id" ref="model_transfer_controller_bi"/>
+            <field name="binding_view_types">tree,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                action = records.create_receipt()
+            </field>
+        </record>
           <menuitem id="menu_fusion_Transfer"
               name="Fusion Transfer Controller"
               action="action_fusion_transfer_controller"

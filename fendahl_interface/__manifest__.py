@@ -16,7 +16,10 @@
         'views/transfer_controller.xml',
         'views/invoice_controller.xml',
         'views/nomination_controller.xml',
-        'views/fusion_sync_history.xml'
+        'views/fusion_sync_history.xml',
+        'security/ir.model.access.csv',
+        'views/sync_history_errors.xml',
+        'views/purchase_order.xml'
     ],
 
 }

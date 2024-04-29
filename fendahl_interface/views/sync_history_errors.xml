@@ -1,0 +1,38 @@
+<odoo>
+    <data>
+        <!-- Inherit Form View to Modify it -->
+
+        <record id="view_fusion_sync_history_errors" model="ir.ui.view">
+            <field name="name">fusion.sync.history.errors.view</field>
+            <field name="model">fusion.sync.history.errors</field>
+            <field name="arch" type="xml">
+                <tree string="Estimate">
+
+                    <field name="interface_type"/>
+                     <field name="interface_id"/>
+                     <field name="error"/>
+                </tree>
+            </field>
+         </record>
+
+            <record id="action_fusion_sync_history_errors_2" model="ir.actions.act_window">
+            <field name="name">Fusion Sync History Errors.</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">fusion.sync.history.errors</field>
+            <field name="view_mode">list</field>
+            <field name="view_id" ref="view_fusion_sync_history_errors"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Fusion Sync History Errors
+              </p>
+            </field>
+        </record>
+
+          <menuitem id="menu_fusion_sync_history_errors"
+              name="Fusion Sync History Errors"
+              action="action_fusion_sync_history_errors_2"
+              parent="account.menu_finance_receivables"
+              sequence="116"/>
+    </data>
+
+</odoo>
