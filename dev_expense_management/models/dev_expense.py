@@ -223,8 +223,11 @@ class dev_expense(models.Model):
         self.create_expense_journal_entry()
         self.state = 'done'
 
-    def set_to_draft(self):
-        self.state = 'draft'
+    def reset_to_draft(self):
+        for expense in self:
+            if expense.move_id and expense.move_id.state == 'posted':
+                expense.move_id.button_draft()
+            expense.state = 'draft'
 
     # def reject_expense(self):
     #     self.state = 'reject'
@@ -271,5 +274,7 @@ class dev_expense(models.Model):
     amount_total = fields.Monetary(string='Total',
                                    store=True, readonly=True, compute='_compute_amount')
     submitted_by = fields.Many2one('hr.employee', string='Submitted By')
+    en_plus = fields.Boolean('EN Plus')
+    show_vat_ids = fields.Boolean(string="Show VAT Ids")
 
 # vim:expandtab:smartindent:tabstop=4:4softtabstop=4:shiftwidth=4:

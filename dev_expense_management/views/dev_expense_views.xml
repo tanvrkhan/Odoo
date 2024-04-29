@@ -24,8 +24,7 @@ For Module Support : devintelle@gmail.com  or Skype : devintelle
                     <button name="cancel_expense" states="approve" string="Cancel"
                             type="object" groups="account.group_account_invoice"/>
 
-                    <button name="set_to_draft" states="reject" string="Set To Draft"
-                            type="object" groups="account.group_account_manager"/>
+                    <button name="reset_to_draft" string="Reset to Draft" type="object" states="done" />
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,request,confirm,done"/>
                 </header>
