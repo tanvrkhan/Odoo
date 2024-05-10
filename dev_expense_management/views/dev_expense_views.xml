@@ -57,6 +57,7 @@ For Module Support : devintelle@gmail.com  or Skype : devintelle
                                     <field name="product_id" domain="[('misc_expense','=',True)]" context="{'default_misc_expense':True}"/>
                                     <field name="name"/>
                                     <field name="account_id"/>
+                                    <field name="analytic_account"/>
                                     <field name="attachment_id" widget="many2many_binary" />
                                     <field name="quantity"/>
                                     <field name="unit_price"/>
