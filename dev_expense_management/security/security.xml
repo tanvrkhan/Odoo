@@ -9,7 +9,7 @@ For Module Support : devintelle@gmail.com  or Skype : devintelle
         <field name="name">Expense Multi Company</field>
         <field name="model_id" ref="model_dev_expense"/>
         <field name="global" eval="True"/>
-        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',user.company_id.id)]</field>
+        <field name="domain_force">['|',('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
     </record>
 
     <record id="rule_group_own_expense" model="ir.rule">
