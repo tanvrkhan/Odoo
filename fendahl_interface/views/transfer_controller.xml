@@ -8,8 +8,19 @@
             <field name="arch" type="xml">
                 <tree string="Estimate">
                     <field name="transfercontrollerbiid"/>
+                     <field name="deliveryid"/>
+                     <field name="deliveryactivestatusdisplayname"/>
+                     <field name="bldate"/>
+                     <field name="fromsegmentsectioncode"/>
+                     <field name="fromcounterpartcode"/>
+                     <field name="tocounterpartcode"/>
+                     <field name="frominternalcompany"/>
+                     <field name="tointernalcompany"/>
+                     <field name="frommotcode"/>
+                     <field name="tomotcode"/>
+                     <field name="tosegmentsectioncode"/>
                      <field name="segmentid"/>
-                     <field name="referencenumber"/>
+
                 </tree>
             </field>
          </record>

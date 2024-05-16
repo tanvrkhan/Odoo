@@ -7,13 +7,12 @@
             <field name="model">fusion.sync.history</field>
             <field name="arch" type="xml">
                 <tree string="Estimate">
-                     <header><button name="update_sync_interface" string='Sync' type="object" class="btn-primary" /></header>
+<!--                     <header><button name="update_sync_interface" string='Sync' type="object" class="btn-primary" /></header>-->
                     <field name="interface_type"/>
                      <field name="last_sync"/>
                 </tree>
             </field>
          </record>
-
             <record id="action_fusion_sync_history" model="ir.actions.act_window">
             <field name="name">Fusion Sync History Controller</field>
             <field name="type">ir.actions.act_window</field>

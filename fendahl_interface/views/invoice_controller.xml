@@ -8,6 +8,16 @@
             <field name="arch" type="xml">
                 <tree string="Estimate">
                     <field name="invoicenumber"/>
+                     <field name="invoicestatus"/>
+                     <field name="internalcompany"/>
+                     <field name="counterparty"/>
+                     <field name="payablereceivable"/>
+                     <field name="material"/>
+                     <field name="commodity"/>
+                     <field name="amtcurrency"/>
+                     <field name="invoiceamt"/>
+                     <field name="invoicedate"/>
+                     <field name="customsectionnumber"/>
                 </tree>
             </field>
          </record>

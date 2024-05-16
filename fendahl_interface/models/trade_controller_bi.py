@@ -5,7 +5,7 @@ import datetime
 from odoo.exceptions import UserError, Warning
 from decimal import Decimal
 _logger = logging.getLogger(__name__)
-
+from dateutil import parser
 class TradeControllerBI(models.Model):
     _name = 'trade.controller.bi'
     _description = 'Trade Controller BI'
@@ -336,176 +336,349 @@ class TradeControllerBI(models.Model):
                 self.env['trade.controller.bi'].create(data)
                 self.env.cr.commit()
     
-    def create_purchase_order(self):
-        for rec in self.env['trade.controller.bi'].search([('id','in',self.env.context['active_ids'])]):
+    
+    def validate_payment_term(self,settlementpaymentterm):
+        if settlementpaymentterm:
+            payment_term = self.env['account.payment.term'].search([('name', '=', settlementpaymentterm)])
+            if not payment_term:
+                payment_term = self.env['account.payment.term'].create({
+                    'name': settlementpaymentterm
+                })
+            return payment_term
+        else:
+            return
+    def validate_incoterm_location(self,locationname):
+        if locationname:
+            location = self.env['incoterm.location'].search([('name', '=', locationname)], limit=1)
+            if not location:
+                location = self.env['incoterm.location'].create({
+                    'name': locationname
+                })
+            return location
+        else:
+            return
+    def get_triggered_price(self, rec):
+        if rec.pricingtype == 'Fixed':
+            return float(rec.price)
+        else:
+            cf = self.env['cashflow.controller.bi'].search([('quantitystatus', '=', 'Contractual'),('sectionno', '=', rec.segmentsectioncode)], limit=1)
+            if cf:
+                return float(cf.price1)
+    def update_order(self,type,existing_order,rec,currency,partner,incoterm,location,payment_term):
+        if type=='Purchase order':
+            existing_order.write({'currency_id': currency.id})
+            existing_order.write({'partner_id': partner.id})
+            existing_order.write({'partner_ref': rec.description})
+            existing_order.write({'incoterm_id': incoterm.id})
+            existing_order.write({'incoterm_location_custom': location.id})
+            existing_order.write({'fusion_deal_number': rec.dealmasterid})
+            existing_order.write({'payment_term_id': payment_term.id})
+            self.update_po_lines(existing_order,rec,partner.company_id,existing_order.warehouse_id)
+        elif type=='Sale order':
+            pricelist = self.env['product.pricelist'].search([('currency_id', '=', currency.id)], limit=1)
+            existing_order.write({'pricelist_id': pricelist.id})
+            existing_order.write({'partner_id': partner.id})
+            existing_order.write({'deal_ref': rec.description})
+            existing_order.write({'incoterm': incoterm.id})
+            existing_order.write({'incoterm_location_custom': location.id})
+            existing_order.write({'fusion_deal_number': rec.dealmasterid})
+            existing_order.write({'payment_term_id': payment_term.id})
+            self.update_so_lines(existing_order, rec, partner.company_id, existing_order.warehouse_id)
+    def update_po_lines(self,existing_order,rec,company,warehouse):
+        all_segments = self.env['trade.controller.bi'].search(
+            [('dealmasterid', '=', rec.dealmasterid)])
+        lines = []
+        for segment in all_segments:
+            main_cf = cf = self.env['cashflow.controller.bi'].search(
+                [('sectionno', '=', segment.segmentsectioncode), ('costtype', '=', 'Primary Settlement')], limit=1)
+            tax_cf = self.env['cashflow.controller.bi'].search(
+                [('parentcashflowid', '=', main_cf.cashflowid), ('costtype', '=', 'VAT')], limit=1)
+            tax_rate_record = self.env['fusion.sync.history'].get_tax_record(tax_cf.erptaxcode,
+                                                                             'purchase', company.id)
+            if existing_order.order_line.filtered(
+                    lambda ol: ol.fusion_segment_code == segment.segmentsectioncode):
+                continue
+            else:
+                self.create_new_po_line(existing_order,segment,warehouse,company,tax_rate_record)
+                
+    def update_so_lines(self, existing_order, rec, company, warehouse):
+        all_segments = self.env['trade.controller.bi'].search(
+            [('dealmasterid', '=', rec.dealmasterid)])
+        lines = []
+        for segment in all_segments:
+            main_cf = cf = self.env['cashflow.controller.bi'].search(
+                [('sectionno', '=', segment.segmentsectioncode), ('costtype', '=', 'Primary Settlement')],
+                limit=1)
+            tax_cf = self.env['cashflow.controller.bi'].search(
+                [('parentcashflowid', '=', main_cf.cashflowid), ('costtype', '=', 'VAT')], limit=1)
+            tax_rate_record = self.env['fusion.sync.history'].get_tax_record(tax_cf.erptaxcode,
+                                                                             'sale', company.id)
+            if existing_order.order_line.filtered(
+                    lambda ol: ol.fusion_segment_code == segment.segmentsectioncode):
+                continue
+            else:
+                self.create_new_so_line(existing_order, segment, warehouse, company, tax_rate_record)
+    def create_new_po_line(self,existing_po,segment,warehouse,company,tax_rate_record):
+        product = self.env['fusion.sync.history'].validate_product(segment.commodity,
+                                                                   segment.material,
+                                                                   segment.qtyuom)
+        if product:
+            uom = self.env['fusion.sync.history'].validate_uom(product, segment.qtyuom)
+            
+            commodity_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Commodity',
+                                                                                   segment.commodity,
+                                                                                   company.id)
+            trader_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Trader',
+                                                                                segment.traderperson,
+                                                                                company.id)
+            strategy_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Strategy',
+                                                                                  segment.strategy,
+                                                                                  company.id)
+            
+            price = self.get_triggered_price( segment)
+            line = {
+                'product_id': product.id,
+                'name': product.name + segment.shape if segment.shape else product.name,
+                'sh_warehouse_id': warehouse.id,
+                'product_qty': segment.tradeqty if Decimal(
+                    segment.tradeqty) >= 0 else segment.tradeqty * -1,
+                'product_uom': uom.id,
+                'price_unit': float(segment.price) if self.is_convertible_to_float(price) else 0,
+                'analytic_distribution': {
+                    commodity_ann.id: 100,
+                    trader_ann.id: 100,
+                    strategy_ann.id: 100,
+                    # portfolio_ann.id: 100,
+                },
+                'taxes_id': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])],
+                'fusion_segment_id': segment.segmentid,
+                'custom_section_number': segment.customsectionnumber,
+                'fusion_segment_code': segment.segmentsectioncode
+            }
+            existing_po.write({
+                'order_line': [(0, 0, line)]
+            })
+    
+    def create_new_so(self, rec, warehouse, company, partner, incoterm, location, payment_term, currency):
+        
+        all_segments = self.env['trade.controller.bi'].search(
+            [('dealmasterid', '=', rec.dealmasterid)])
+        lines = []
+        pricelist = self.env['product.pricelist'].search([('currency_id', '=', currency.id)], limit=1)
+        for segment in all_segments:
+            main_cf = cf = self.env['cashflow.controller.bi'].search(
+                [('sectionno', '=', segment.segmentsectioncode)], limit=1)
+            tax_cf = self.env['cashflow.controller.bi'].search(
+                [('parentcashflowid', '=', main_cf.cashflowid), ('costtype', '=', 'VAT')], limit=1)
+            tax_rate_record = self.env['fusion.sync.history'].get_tax_record(tax_cf.erptaxcode,
+                                                                             'sale', company.id)
+            product = self.env['fusion.sync.history'].validate_product(segment.commodity, segment.material,
+                                                                       segment.qtyuom)
+            if product:
+                uom = self.env['fusion.sync.history'].validate_uom(product, segment.qtyuom)
+                
+                commodity_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Commodity', segment.commodity,
+                                                                                       company.id)
+                trader_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Trader', segment.traderperson,
+                                                                                    company.id)
+                strategy_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Strategy', segment.strategy,
+                                                                                      company.id)
+                # portfolio_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Portfolio', segment.portfoliosegment, company.id)
+                
+                lines.append((0, 0, {
+                    'product_id': product.id,
+                    'name': product.name + segment.shape if segment.shape else product.name,
+                    # 'sh_warehouse_id': warehouse.id,
+                    'product_uom_qty': segment.tradeqty if float(segment.tradeqty) >= 0 else float(segment.tradeqty) * -1,
+                    'product_uom': uom.id,
+                    'price_unit': self.get_triggered_price(segment),
+                    'analytic_distribution': {
+                        commodity_ann.id: 100,
+                        trader_ann.id: 100,
+                        strategy_ann.id: 100,
+                        # portfolio_ann.id: 100,
+                    },
+                    'tax_id': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])],
+                    'fusion_segment_id': segment.segmentid,
+                    'custom_section_number': segment.customsectionnumber,
+                    'fusion_segment_code': segment.segmentsectioncode,
+                    
+                }))
+            else:
+                log_error = self.env['fusion.sync.history.errors'].log_error('TradeControllerBI',
+                                                                             rec.segmentid,
+                                                                             'Product not found',
+                                                                             segment.internalcompany)
+        deal = {
+            'pricelist_id': pricelist.id,
+            'partner_id': partner.id,
+            'deal_ref': rec.description,
+            'company_id': company.id,
+            'incoterm': incoterm.id,
+            # 'date_approve': datetime.datetime.strptime(rec.tradedate, '%Y-%m-%dT%H:%M:%S'),
+            'date_order': rec.tradedate.replace('T', ' '),
+            'incoterm_location_custom': location.id,
+            'fusion_deal_number': rec.dealmasterid,
+            'payment_term_id': payment_term.id,
+            
+        }
+        deal['order_line'] = lines
+        so = self.env['sale.order'].create(deal)
+        self.env.cr.commit()
+    def create_new_so_line(self, existing_order, segment, warehouse, company, tax_rate_record):
+        product = self.env['fusion.sync.history'].validate_product(segment.commodity,
+                                                                   segment.material,
+                                                                   segment.qtyuom)
+        if product:
+            uom = self.env['fusion.sync.history'].validate_uom(product, segment.qtyuom)
+            
+            commodity_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Commodity',
+                                                                                   segment.commodity,
+                                                                                   company.id)
+            trader_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Trader',
+                                                                                segment.traderperson,
+                                                                                company.id)
+            strategy_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Strategy',
+                                                                                  segment.strategy,
+                                                                                  company.id)
+            price = self.get_triggered_price(segment)
+            line = {
+                'product_id': product.id,
+                'name': product.name + segment.shape if segment.shape else product.name,
+                # 'sh_warehouse_id': warehouse.id,
+                'product_uom_qty': segment.tradeqty if Decimal(
+                    segment.tradeqty) >= 0 else segment.tradeqty * -1,
+                'product_uom': uom.id,
+                'price_unit': float(price) if self.is_convertible_to_float(price) else 0,
+                'analytic_distribution': {
+                    commodity_ann.id: 100,
+                    trader_ann.id: 100,
+                    strategy_ann.id: 100,
+                    # portfolio_ann.id: 100,
+                },
+                'tax_id': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])],
+                'fusion_segment_id': segment.segmentid,
+                'custom_section_number': segment.customsectionnumber,
+                'fusion_segment_code': segment.segmentsectioncode
+            }
+            existing_order.write({
+                'order_line': [(0, 0, line)]
+            })
+            
+    def create_new_po(self,rec,warehouse,company,partner,incoterm,location,payment_term,currency):
+        
+        all_segments = self.env['trade.controller.bi'].search(
+            [('dealmasterid', '=', rec.dealmasterid)])
+        lines = []
+        for segment in all_segments:
+            main_cf = cf = self.env['cashflow.controller.bi'].search(
+                [('sectionno', '=', segment.segmentsectioncode)], limit=1)
+            tax_cf = self.env['cashflow.controller.bi'].search(
+                [('parentcashflowid', '=', main_cf.cashflowid), ('costtype', '=', 'VAT')], limit=1)
+            tax_rate_record = self.env['fusion.sync.history'].get_tax_record(tax_cf.erptaxcode,
+                                                                             'purchase', company.id)
+            product = self.env['fusion.sync.history'].validate_product(segment.commodity, segment.material,
+                                                                       segment.qtyuom)
+            if product:
+                uom = self.env['fusion.sync.history'].validate_uom(product, segment.qtyuom)
+                
+                commodity_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Commodity', segment.commodity,
+                                                                                       company.id)
+                trader_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Trader', segment.traderperson,
+                                                                                    company.id)
+                strategy_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Strategy', segment.strategy,
+                                                                                      company.id)
+                # portfolio_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Portfolio', segment.portfoliosegment, company.id)
+                
+                lines.append((0, 0, {
+                    'product_id': product.id,
+                    'name': product.name + segment.shape if segment.shape else product.name,
+                    'sh_warehouse_id': warehouse.id,
+                    'product_qty': segment.tradeqty if Decimal(segment.tradeqty) >= 0 else segment.tradeqty * -1,
+                    'product_uom': uom.id,
+                    'price_unit': self.get_triggered_price(segment),
+                    'analytic_distribution': {
+                        commodity_ann.id: 100,
+                        trader_ann.id: 100,
+                        strategy_ann.id: 100,
+                        # portfolio_ann.id: 100,
+                    },
+                    'taxes_id': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])],
+                    'fusion_segment_id': segment.segmentid,
+                    'custom_section_number': segment.customsectionnumber,
+                    'fusion_segment_code': segment.segmentsectioncode,
+                    
+                }))
+            else:
+                log_error = self.env['fusion.sync.history.errors'].log_error('TradeControllerBI',
+                                                                             rec.segmentid,
+                                                                             'Product not found',
+                                                                             segment.internalcompany)
+        deal = {
+            'currency_id': currency.id,
+            'partner_id': partner.id,
+            'partner_ref': rec.description,
+            'company_id': company.id,
+            'incoterm_id': incoterm.id,
+            'date_approve': datetime.datetime.strptime(rec.tradedate, '%Y-%m-%dT%H:%M:%S'),
+            'date_order': datetime.datetime.strptime(rec.tradedate, '%Y-%m-%dT%H:%M:%S'),
+            'incoterm_location_custom': location.id,
+            'fusion_deal_number': rec.dealmasterid,
+            'payment_term_id': payment_term.id,
+            
+        }
+        deal['order_line'] = lines
+        po = purchase_order = self.env['purchase.order'].create(deal)
+        self.env.cr.commit()
+    def get_status(self,rec):
+        status = ''
+        if rec.tradestatus == 'Confirmed':
+            status = 'confirm'
+        elif rec.tradestatus == 'Pending':
+            status = 'draft'
+        elif rec.tradestatus == 'Rejected' or rec.tradestatus == 'Void':
+            status = 'cancel'
+    def create_order(self):
+        for rec in self:
             try:
+                status = self.get_status(rec)
+                partner = self.env['res.partner'].search([('name', '=', rec.counterpartcompany)], limit=1)
+                if not partner:
+                    partner_info = self.env['fusion.sync.history'].get_partner_info(rec.counterpartcompany)
+                    if partner_info:
+                        partner = self.env['res.partner'].search([('short_name', '=', partner_info['configCode'])],
+                                              limit=1)
+                #validation if partner still doesn't exist.
+                currency = self.env['res.currency'].search([('name', '=', rec.settlementcurrency)], limit=1)
+                company = self.env['res.company'].search([('name', '=', rec.internalcompany)], limit=1)
+                warehouse = self.env['stock.warehouse'].search([('company_id', '=', company.id)], limit=1)
+                incoterm = self.env['account.incoterms'].search([('name', '=', rec.deliveryterm)])
+                payment_term = self.validate_payment_term(rec.settlementpaymentterm)
+                location =self.validate_incoterm_location(rec.location)
                 if rec.buysell == 'Buy':
-                    status =''
-                    if rec.tradestatus=='Confirmed':
-                        status='confirm'
-                    elif rec.tradestatus=='Pending':
-                        status='draft'
-                    elif rec.tradestatus=='Rejected' or rec.tradestatus=='Void':
-                        status='cancel'
                     existing_po = self.env['purchase.order'].search([('fusion_deal_number', '=', rec.dealmasterid)])
-                    partner = self.env['res.partner'].search([('name', '=', rec.counterpartcompany)], limit=1)
-                    if not partner:
-                        partner_info = self.env['fusion.sync.history'].get_partner_info(rec.counterpartcompany)
-                        if partner_info:
-                            partner = self.env['res.partner'].search([('short_name', '=', partner_info['configCode'])],
-                                                                     limit=1)
-                    currency = self.env['res.currency'].search([('name', '=', rec.settlementcurrency)], limit=1)
-                    company = self.env['res.company'].search([('name', '=', rec.internalcompany)], limit=1)
-                    warehouse = self.env['stock.warehouse'].search([('company_id', '=', company.id)], limit=1)
-                    incoterm = self.env['account.incoterms'].search([('name', '=', rec.deliveryterm)])
-                    location = self.env['incoterm.location'].search([('name', '=', rec.location)], limit=1)
-                    payment_term = self.env['account.payment.term'].search([('name', '=', rec.settlementpaymentterm)])
-                    if not payment_term:
-                        payment_term = self.env['account.payment.term'].create({
-                            'name': rec.settlementpaymentterm
-                        })
-                    if not location:
-                        location = self.env['incoterm.location'].create({
-                            'name': rec.location
-                        })
                     if existing_po:
-                        existing_po.write({'currency_id': currency.id})
-                        existing_po.write({'partner_id': partner.id})
-                        existing_po.write({'partner_ref': rec.description})
-                        # existing_po.company_id             = company.id,
-                        existing_po.write({'incoterm_id': incoterm.id})
-                        # existing_po.date_approve            = datetime.datetime.strptime(rec.tradedate, '%Y-%m-%dT%H:%M:%S'),
-                        # existing_po.date_order             = datetime.datetime.strptime(rec.tradedate, '%Y-%m-%dT%H:%M:%S'),
-                        existing_po.write({'incoterm_location_custom': location.id})
-                        existing_po.write({'fusion_deal_number': rec.dealmasterid})
-                        existing_po.write({'payment_term_id': payment_term.id})
-                        # existing_po.write({'order_line.fusion_segment_code': rec.segmentsectioncode})
-                        # existing_po.write({'order_line.custom_section_number':  rec.customsectionnumber})
-                        if status == 'confirm':
-                            existing_po.button_confirm()
-                        elif status == 'cancel':
+                        self.update_order('Purchase Order',existing_po,rec,currency,partner,incoterm,location,payment_term)
+                        if status == 'cancel':
                             existing_po.button_cancel()
-                        all_segments = self.env['trade.controller.bi'].search(
-                            [('dealmasterid', '=', rec.dealmasterid)])
-                        lines = []
-                        for segment in all_segments:
-                            if existing_po.order_line.filtered(lambda ol: ol.fusion_segment_code == segment.segmentsectioncode):
-                                continue
-                            else:
-                                product = self.env['fusion.sync.history'].validate_product(segment.commodity,
-                                                                                           segment.material,
-                                                                                           segment.qtyuom)
-                                if product:
-                                    uom = self.env['fusion.sync.history'].validate_uom(product, segment.qtyuom)
-                                    
-                                    commodity_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Commodity',
-                                                                                                           segment.commodity,
-                                                                                                           company.id)
-                                    trader_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Trader',
-                                                                                                        segment.traderperson,
-                                                                                                        company.id)
-                                    strategy_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Strategy',
-                                                                                                          segment.strategy,
-                                                                                                          company.id)
-                                    portfolio_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Portfolio',
-                                                                                                           segment.portfoliosegment,
-                                                                                                           company.id)
-                                    
-                                    line = {
-                                        'product_id': product.id,
-                                        'name': product.name + segment.shape if segment.shape else product.name,
-                                        'sh_warehouse_id': warehouse.id,
-                                        'product_qty': segment.tradeqty if Decimal(
-                                            segment.tradeqty) >= 0 else segment.tradeqty * -1,
-                                        'product_uom': uom.id,
-                                        'price_unit': float(segment.price) if self.is_convertible_to_float(
-                                            segment.price) else 0,
-                                        'analytic_distribution': {
-                                            commodity_ann.id: 100,
-                                            trader_ann.id: 100,
-                                            strategy_ann.id: 100,
-                                            portfolio_ann.id: 100,
-                                        },
-                                        'taxes_id': [(6, 0, [])],
-                                        'fusion_segment_id': segment.segmentid,
-                                        'custom_section_number': segment.customsectionnumber,
-                                        'fusion_segment_code': segment.segmentsectioncode
-                                    }
-                                    existing_po.write({
-                                        'order_line': [(0, 0, line)]
-                                    })
-                                    
-                            
                     else:
-                        
-                        # company=
-                        # match rec.internalcompany:
-                        #     case 'KEMEXON LTD':
-                        #         company= 1
-                        #     case "KEMEXON SA":
-                        #         company= 2
-                        #     case "KEMEXON BELGIUM SRL":
-                        #         company= 4
-                            
                         if partner and company:
-                            
-                            all_segments = self.env['trade.controller.bi'].search(
-                                [('dealmasterid', '=', rec.dealmasterid)])
-                            lines = []
-                            for segment in all_segments:
-                                product = self.env['fusion.sync.history'].validate_product(segment.commodity,segment.material, segment.qtyuom)
-                                if product:
-                                    uom = self.env['fusion.sync.history'].validate_uom(product, segment.qtyuom)
-                                    
-                                    commodity_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Commodity', segment.commodity,company.id)
-                                    trader_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Trader', segment.traderperson,company.id)
-                                    strategy_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Strategy', segment.strategy,company.id)
-                                    portfolio_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Portfolio', segment.portfoliosegment, company.id)
-                                    
-                                    
-                                    lines.append((0, 0, {
-                                        'product_id': product.id,
-                                        'name': product.name + segment.shape if segment.shape else product.name,
-                                        'sh_warehouse_id': warehouse.id,
-                                        'product_qty': segment.tradeqty if Decimal(segment.tradeqty) >= 0 else segment.tradeqty*-1,
-                                        'product_uom': uom.id,
-                                        'price_unit': float(segment.price) if self.is_convertible_to_float(segment.price)  else 0,
-                                        'analytic_distribution':{
-                                            commodity_ann.id:100,
-                                            trader_ann.id:100,
-                                            strategy_ann.id:100,
-                                            portfolio_ann.id: 100,
-                                        },
-                                        'taxes_id': [(6, 0,[])],
-                                        'fusion_segment_id': segment.segmentid,
-                                        'custom_section_number' :  segment.customsectionnumber,
-                                        'fusion_segment_code': segment.segmentsectioncode,
-                                       
-                                    }))
-                                else:
-                                    log_error = self.env['fusion.sync.history.errors'].log_error('TradeControllerBI',
-                                                                                                 rec.segmentid,
-                                                                                                 'Product not found',segment.internalcompany)
-                            deal = {
-                                'currency_id': currency.id,
-                                'partner_id': partner.id,
-                                'partner_ref': rec.description,
-                                'company_id': company.id,
-                                'incoterm_id': incoterm.id,
-                                'date_approve': datetime.datetime.strptime(rec.tradedate, '%Y-%m-%dT%H:%M:%S'),
-                                'date_order': datetime.datetime.strptime(rec.tradedate, '%Y-%m-%dT%H:%M:%S'),
-                                'incoterm_location_custom': location.id,
-                                'fusion_deal_number' :rec.dealmasterid,
-                                'payment_term_id':payment_term.id,
-                                
-                            }
-                            deal['order_line'] = lines
-                            po = purchase_order = self.env['purchase.order'].create(deal)
-                            self.env.cr.commit()
-                            if status =='confirm' and po.state!='purchase':
-                                po.button_confirm()
-                            elif status == 'cancel':
+                            self.create_new_po(rec,warehouse,company,partner,incoterm,location,payment_term,currency)
+                            if status == 'cancel':
                                 existing_po.button_cancel()
+                        else:
+                            log_error = self.env['fusion.sync.history.errors'].log_error('TradeControllerBI', rec.segmentid, 'Partner or Company not found',rec.internalcompany)
+                if rec.buysell == 'Sell':
+                    existing_so = self.env['sale.order'].search([('fusion_deal_number', '=', rec.dealmasterid)])
+                    if existing_so:
+                        self.update_order('Sale Order',existing_so,rec,currency,partner,incoterm,location,payment_term)
+                        if status == 'cancel':
+                            existing_so.button_cancel()
+                    else:
+                        if partner and company:
+                            self.create_new_so(rec,warehouse,company,partner,incoterm,location,payment_term,currency)
+                            if status == 'cancel':
+                                existing_so.button_cancel()
                         else:
                             log_error = self.env['fusion.sync.history.errors'].log_error('TradeControllerBI', rec.segmentid, 'Partner or Company not found',rec.internalcompany)
             except Exception as e:

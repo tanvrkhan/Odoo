@@ -126,56 +126,134 @@ class FusionSyncHistory(models.Model):
                     'interface_type': interface_type,
                     'last_sync': datetime.datetime.now()
                 })
-    def validate_product(self, commodity,name,uom):
+    
+    def validate_cost(self,  name):
         product = self.env['product.template'].search([('name', '=', name)], limit=1)
         if not product:
-            category=''
-            if commodity=='Coal':
-                category = 4
-            elif commodity=="Pellets" or commodity =="Pellets Industrial":
-                category = 27
-            elif commodity=="Refined Products":
-                category = 28
-                
+            product = self.env['product.template'].create({
+                'name': name,
+                'type': 'service',
+                'categ_id': 14,
+                'uom_id': 1,
+                'default_code': 'Fusion - Do not use directly',
+                'invoice_policy': 'order'
+            })
+        if product:
+            product = self.env['product.product'].search([('product_tmpl_id', '=', product.id)], limit=1)
+        return product
+    
+    
+    def validate_product(self, commodity,name,uom):
+        product = self.env['product.template'].search([('id', '=', 0)], limit=1)
+        category=0
+        if commodity=='Coal':
+            category = 4
+            product = self.env['product.template'].search([('name', '=', name)],
+                                                          limit=1)
+        elif commodity=="Pellets" or commodity =="Pellets Industrial":
+            category = 27
+            product = self.env['product.template'].search([('name', '=', name)],
+                                                          limit=1)
+        elif commodity=="Refined Products":
+            category = 28
+            product = self.env['product.template'].search([('name', '=', name), ('default_code', '=', 'I')],
+                                                          limit=1)
+        if not product:
             product = self.env['product.template'].create({
                 'name': name,
                 'type': 'product',
                 'categ_id': category,
                 'uom_id': 1,
-                'default_code': 'Fusion - Do not use directly'
+                'default_code': 'I',
+                'invoice_policy': 'delivery'
             })
-            uom = self.validate_uom(product,uom)
+            category_type= 'liquids' if  commodity=="Refined Products" else 'solids'
+            uom = self.create_new_product_uom(product,uom,category_type)
             product.uom_id= uom.id
             product.uom_po_id = uom.id
         
         if product:
             product= self.env['product.product'].search([('product_tmpl_id', '=', product.id)], limit=1)
         return product
+    
+    def create_new_product_uom(self, product, uomname,category_type):
+        if uomname:
+            uom_type=''
+            base_unit = self.get_base_unit(product.name)
+            result = self.env['uom.uom']
+            if category_type=='solids':
+                category = self.env['uom.category'].search([('name', '=', 'solids')], limit=1)
+                if not category:
+                    category = self.env['uom.category'].create({
+                        'name': 'Solids'
+                    })
+            else:
+                category = self.env['uom.category'].search([('name', '=', product.name)], limit=1)
+                if not category:
+                    category = self.env['uom.category'].create({
+                        'name': product.name
+                    })
+                    reference_uom = self.env['uom.uom'].create({
+                        'name': base_unit,
+                        'category_id': category.id,
+                        'ratio': 1,
+                        'uom_type': 'reference'
+                    })
+            result = self.env['uom.uom'].search(
+                [('category_id', '=', category.id), ('name', '=', uomname)])
+            
+            if not result:
+                uom_category = category
+                conversionfactor = 1
+            # reference_uom = self.env['uom.uom'].search([('category_id', '=', category.id),('uom_type', '=', 'reference')], limit=1)
+                if base_unit==uomname:
+                    conversionfactor = 1
+                    uom_type = 'reference'
+                else:
+                    conversionfactor = self.get_uom_conversion_factor(product, base_unit, uomname)
+                    if float(conversionfactor) < 1:
+                        uom_type = 'bigger'
+                    else:
+                        uom_type = 'smaller'
+                result = self.env['uom.uom'].create({
+                    'name': uomname,
+                    'category_id': category.id,
+                    'ratio': conversionfactor,
+                    'uom_type': uom_type  if uom_type else 'bigger'
+                })
+            return result
+
+    
     def validate_uom(self,product,uomname):
         if uomname:
+            base_unit = self.get_base_unit(product.name)
+            # if base_unit==uomname:
+            #     return self.env['uom.uom'].search(
+            #     [('category_id', '=', product.uom_id.category_id.id), ('name', '=', uomname)])
+            # else:
             result = self.env['uom.uom'].search(
             [('category_id', '=', product.uom_id.category_id.id), ('name', '=', uomname)])
-        
             if not result:
-                conversionfactor=1
-                uom_type='reference'
-                if uomname=='MT':
-                    conversionfactor=1
-                    uom_type='reference'
+                uom_category = self.env['uom.category'].search(
+                    [('id', '=', product.uom_id.category_id.id)])
+                if uomname==base_unit:
+                    conversionfactor = 1
+                    uom_type = 'reference'
                 else:
-                    conversionfactor = self.get_uom_conversion_factor(product,'MT',uomname)
+                    conversionfactor = self.get_uom_conversion_factor(product,base_unit,uomname)
                     if conversionfactor:
-                        if conversionfactor<1:
-                            uom_type='smaller'
-                        else:
+                        if float(conversionfactor)<1:
                             uom_type='bigger'
+                        else:
+                            uom_type='smaller'
                     else:
                         conversionfactor =1
                 result = self.env['uom.uom'].create({
                     'name': uomname,
                     'category_id': product.uom_id.category_id.id,
                     'ratio': conversionfactor,
-                    'uom_type': uom_type
+                    'uom_type': uom_type,
+                    'rounding':0.001
                 })
             return result
         else:
@@ -188,7 +266,7 @@ class FusionSyncHistory(models.Model):
             'Content-Type': 'application/json',
         }
         params = {
-            'product': product,
+            'product': product.name,
             'fromuom': fromuom,
             'touom': touom
         }
@@ -198,14 +276,70 @@ class FusionSyncHistory(models.Model):
                 result = response.json()
             except Exception as e:
                 _logger.error('Error processing API data: %s', str(e))
+        else:
+            params = {
+                'product': product.name,
+                'fromuom': fromuom,
+                'touom': touom
+            }
+            response = requests.get(url, headers=headers, params=params)
+            if response.status_code == 200:
+                try:
+                    result = response.json()
+                except Exception as e:
+                    _logger.error('Error processing API data: %s', str(e))
+            else:
+                if fromuom=='MT' and touom=='MT (Vac)':
+                    conversionfactor = 0.998
+                elif fromuom=='MT (Vac)' and touom=='MT':
+                    conversionfactor = 1.002
+                else:
+                    conversionfactor = 1
+                result = conversionfactor
         return result
     
-    def validate_warehouse(self,warehouse,company):
-        result = self.env['stock.warehouse'].search([('name', '=', warehouse),('company_id', '=', company)], limit=1)
+    def get_base_unit(self,material):
+        result = ''
+        url = "https://fusionsqlmirrorapi.azure-api.net/api/ProductBaseUnit"
+        headers = {
+            'Ocp-Apim-Subscription-Key': '38cb5797102f4b1f852ae8ff6e8482e5',
+            'Content-Type': 'application/json',
+        }
+        params = {
+            'material': material,
+        }
+        response = requests.get(url, headers=headers, params=params)
+        if response.status_code == 200:
+            try:
+                result = response.text
+            except Exception as e:
+                _logger.error('Error processing API data: %s', str(e))
+        return result
+    
+    
+    def get_wh_code(self,warehouse,company,iteration):
+        code=''
+        warehouse=warehouse.replace(' ','')
+        if len(warehouse)<iteration+5:
+            code=warehouse
+        else:
+            code = warehouse[iteration:iteration+5]
+        existing_warehouse = self.env['stock.warehouse'].search([('code', '=', code), ('company_id', '=', company)])
+        if existing_warehouse:
+            iteration+=1
+            code = self.get_wh_code(warehouse,company,iteration)
+            return code
+        else:
+            return code
+            
+    def validate_warehouse(self,warehouse,company,nomkey):
+        result = self.env['stock.warehouse'].search([('name', '=', nomkey),('company_id', '=', company)], limit=1)
+        
         if not result:
+            code = self.get_wh_code(warehouse, company, 0)
             result = self.env['stock.warehouse'].create({
-                'name': warehouse,
-                'code':warehouse,
+                'name': nomkey,
+                'code':code,
                 'company_id': company,
                 'partner_id':company
             })
@@ -238,8 +372,45 @@ class FusionSyncHistory(models.Model):
             'company_id': company,
         })
         return lot
-        
-            
+    
+    def get_tax_record(self, code,purchasesale,company):
+        if code:
+            result = self.env['account.tax']
+            url = "https://fusionsqlmirrorapi.azure-api.net/api/TaxRate"
+            headers = {
+                'Ocp-Apim-Subscription-Key': '38cb5797102f4b1f852ae8ff6e8482e5',
+                'Content-Type': 'application/json',
+            }
+            params = {
+                'ratecode': code,
+            }
+            response = requests.get(url, headers=headers, params=params)
+            if response.status_code == 200:
+                try:
+                    result_json = response.json()
+                    result_pct = result_json['percentageRate']
+                    name = result_json['taxRateCode']
+                    currency = result_json['currencyCode']
+                    
+                    result =  self.env['account.tax'].search([('name','=',name),('type_tax_use', '=', purchasesale),('company_id', '=', company)], limit=1)
+                    if not result:
+                        new_tax = self.env['account.tax'].create({
+                            'name': name,
+                            'amount': result_pct,  # Tax percentage rate
+                            'amount_type': 'percent',  # 'percent' for percentage or 'fixed' for fixed amount
+                            'description': purchasesale.capitalize() +' ' + str(result_pct),
+                            'type_tax_use': purchasesale,  # 'sale' for sales, 'purchase' for purchases, or 'none' for none
+                            'price_include': False,  # True if the tax is included in the price
+                            'include_base_amount': False,  # True if tax affects the base amount for subsequent taxes
+                            'sequence': 10,  # Determines the order of the tax application
+                            'company_id': company,
+                        })
+                        
+                except Exception as e:
+                    _logger.error('Error processing API data: %s', str(e))
+            return result
+        else:
+            return
             
             
         

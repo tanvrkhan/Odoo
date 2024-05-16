@@ -437,3 +437,5 @@ class CashflowControllerBi(models.Model):
             else:
                 self.env['cashflow.controller.bi'].create(data)
                 self.env.cr.commit()
+        
+        
