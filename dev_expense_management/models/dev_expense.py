@@ -126,23 +126,6 @@ class dev_expense(models.Model):
         if move_id:
             self.move_id = move_id.id
 
-    # def create_expense_journal_entry(self):
-    #     move_vals = self._prepare_move_values()
-    #     move_id = self.env['account.move'].with_context(default_journal_id=self.journal_id.id).create(move_vals)
-    #     move_line_values = self._prepare_move_line_values()
-    #
-    #     # Update name field of move lines with the value from expense line
-    #     for line_vals, expense_line in zip(move_line_values, self.expense_lines):
-    #         line_vals['name'] = expense_line.name
-    #
-    #     # Create move lines
-    #     move_line_records = [(0, 0, line) for line in move_line_values]
-    #
-    #     move_id.write({'line_ids': move_line_records})
-    #
-    #     if move_id:
-    #         self.move_id = move_id.id
-
     @api.depends('expense_lines.amount_total')
     def _compute_amount(self):
         for expense in self:
