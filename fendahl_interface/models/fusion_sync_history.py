@@ -317,23 +317,25 @@ class FusionSyncHistory(models.Model):
         return result
     
     def get_wh_code(self, warehouse, company):
-        warehouse = warehouse.replace(' ', '')
+        warehouse = warehouse.replace(' ', '')  # Remove spaces from the warehouse name
         iteration = 0
         while True:
             if len(warehouse) < iteration + 5:
-                code = warehouse
+                code = warehouse  # Use the entire string if it's shorter than the desired segment
             else:
-                code = warehouse[iteration:iteration + 5]
+                code = warehouse[iteration:iteration + 5]  # Slice the string to get a code of length 5
+            
+            # Search for existing warehouse with the generated code
             existing_warehouse = self.env['stock.warehouse'].search([('code', '=', code), ('company_id', '=', company)])
             if not existing_warehouse:
-                return code
+                return code  # Return the code if it's unique
             iteration += 1
             
     def validate_warehouse(self,warehouse,company,nomkey):
         result = self.env['stock.warehouse'].search([('name', '=', nomkey),('company_id', '=', company)], limit=1)
         
         if not result:
-            code = self.get_wh_code(warehouse, company, 0)
+            code = self.get_wh_code(warehouse, company)
             result = self.env['stock.warehouse'].create({
                 'name': nomkey,
                 'code':code,
