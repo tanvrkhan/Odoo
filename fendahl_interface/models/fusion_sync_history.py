@@ -316,21 +316,18 @@ class FusionSyncHistory(models.Model):
                 _logger.error('Error processing API data: %s', str(e))
         return result
     
-    
-    def get_wh_code(self,warehouse,company,iteration):
-        code=''
-        warehouse=warehouse.replace(' ','')
-        if len(warehouse)<iteration+5:
-            code=warehouse
-        else:
-            code = warehouse[iteration:iteration+5]
-        existing_warehouse = self.env['stock.warehouse'].search([('code', '=', code), ('company_id', '=', company)])
-        if existing_warehouse:
-            iteration+=1
-            code = self.get_wh_code(warehouse,company,iteration)
-            return code
-        else:
-            return code
+    def get_wh_code(self, warehouse, company):
+        warehouse = warehouse.replace(' ', '')
+        iteration = 0
+        while True:
+            if len(warehouse) < iteration + 5:
+                code = warehouse
+            else:
+                code = warehouse[iteration:iteration + 5]
+            existing_warehouse = self.env['stock.warehouse'].search([('code', '=', code), ('company_id', '=', company)])
+            if not existing_warehouse:
+                return code
+            iteration += 1
             
     def validate_warehouse(self,warehouse,company,nomkey):
         result = self.env['stock.warehouse'].search([('name', '=', nomkey),('company_id', '=', company)], limit=1)
