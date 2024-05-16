@@ -19,8 +19,16 @@
             <field name="arch" type="xml">
                 <tree string="Estimate">
                     <field name="dealmasterid"/>
+                     <field name="tradedate"/>
                      <field name="segmentid"/>
-                     <field name="referencenumber"/>
+                     <field name="segmentsectioncode"/>
+                     <field name="internalcompany"/>
+                     <field name="counterpartcompany"/>
+                     <field name="material"/>
+                     <field name="qtyuom"/>
+                     <field name="tradeqty"/>
+                     <field name="tradeprice"/>
+                     <field name="pricingtype"/>
                 </tree>
             </field>
          </record>
@@ -38,13 +46,13 @@
             </field>
         </record>
         <record id="model_fusion_trade_controller_create_po" model="ir.actions.server">
-            <field name="name">Create PO</field>
+            <field name="name">Create Order</field>
             <field name="model_id" ref="model_trade_controller_bi"/>
             <field name="binding_model_id" ref="model_trade_controller_bi"/>
             <field name="binding_view_types">tree,form</field>
             <field name="state">code</field>
             <field name="code">
-                action = records.create_purchase_order()
+                action = records.create_order()
             </field>
         </record>
           <menuitem id="menu_fusion_Trades"

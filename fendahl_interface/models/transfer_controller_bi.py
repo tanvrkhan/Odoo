@@ -293,7 +293,7 @@ class TransferControllerBI(models.Model):
     
     def create_update_transfer(self, interface_type, data):
         if interface_type == 'transfer':
-            exists = self.env['transfer.controller.bi'].search([('transfercontrollerbiid', '=', data['transfercontrollerbiid'])])
+            exists = self.env['transfer.controller.bi'].search([('deliveryid', '=', data['deliveryid'])])
             if exists:
                 return
                 # if exists:
@@ -308,9 +308,9 @@ class TransferControllerBI(models.Model):
     
     def regular_update_transfer(self, interface_type, data):
         if interface_type == 'transfer':
-            exists = self.env['transfer.controller.bi'].search([('transfercontrollerbiid', '=', data['transfercontrollerbiid'])])
+            exists = self.env['transfer.controller.bi'].search([('deliveryid', '=', data['deliveryid'])])
             if exists:
-                self.env['transfer.controller.bi'].search([('transfercontrollerbiid', '=', data['transfercontrollerbiid'])]).unlink()
+                self.env['transfer.controller.bi'].search([('deliveryid', '=', data['deliveryid'])]).unlink()
                 self.env['transfer.controller.bi'].create(data)
             else:
                 self.env['transfer.controller.bi'].create(data)
@@ -319,75 +319,172 @@ class TransferControllerBI(models.Model):
     def create_receipt(self):
         for rec in self:
             try:
-                if rec.buyselldisplaytext=="Buy" and rec.deliveryactivestatusdisplayname=="Active":
-                    company = self.env['res.company'].search([('name', '=', rec.frominternalcompany)], limit=1)
-                    pol = self.env['purchase.order.line'].search([('fusion_segment_id', '=', rec.fromsegmentid)],limit=1)
-                    po = self.env['purchase.order'].search([('id', '=', pol.order_id.id)])
-                    
-                    if po:
+                if rec.deliveryactivestatusdisplayname=="Active":
+                    if rec.deliverystatusenum=='Actual':
+                        company = self.env['res.company'].search([('name', '=', rec.frominternalcompany)], limit=1)
+                        if not company:
+                            company = self.env['res.company'].search([('name', '=', rec.tointernalcompany)], limit=1)
+                            
+                        pol = self.env['purchase.order.line'].search([('fusion_segment_code', '=', rec.fromsegmentsectioncode if rec.fromsegmentsectioncode else '100')], limit=1)
+                        po = self.env['purchase.order'].search([('id', '=', pol.order_id.id)])
+                        sol = self.env['sale.order.line'].search(
+                            [('fusion_segment_code', '=', rec.tosegmentsectioncode  if rec.tosegmentsectioncode else '100')], limit=1)
+                        so = self.env['sale.order'].search([('id', '=', sol.order_id.id)])
+                        cf = self.env['cashflow.controller.bi'].search([('transfernumber', '=', rec.deliveryid),('costtype', '=', 'Primary Settlement')],limit=1)
+                        exists = self.env['stock.move'].search([('id', '=', '0')])
+                        stock_move = self.env['stock.move'].search([('id', '=', '0')])
+    
+                        product = self.env['product.product'].search([('id', '=', '0')], limit=1)
                         nomination_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Nomination',
                                                                                                  rec.itineraryid,
                                                                                                  company.id)
-                        storage_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Deal Reference',
-                                                                                                 rec.tomotcode,
-                                                                                                 company.id)
-                        # pol.analytic_distribution[nomination_link.id] = 100 #Not working
-                        existing_distribution = pol.analytic_distribution
-                        existing_distribution[str(nomination_link.id)] = 100
-                        existing_distribution[str(storage_link.id)] = 100
-                        
-                        pol['analytic_distribution']=existing_distribution
-                        self.env.cr.commit()
-                        if not po.state=='purchase':
+                        warehouse = self.env['stock.warehouse'].search([('id', '=', '0')], limit=1)
+                        existing_distribution=[]
+                        if rec.buyselldisplaytext=="Buy":
+                            if po:
+                                if pol:
+                                    if not po.state == 'purchase':
+                                        po.button_confirm()
+                                        self.env.cr.commit()
+                                    product = self.env['fusion.sync.history'].validate_product(rec.fromcommoditycode,
+                                                                                               rec.frommaterialcode,
+                                                                                               rec.fromactualqtyuomcode)
+                                    storage_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Deal Reference',
+                                                                                                          rec.tomotcode,
+                                                                                                          company.id)
+                                    warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.tomotcode,
+                                                                                                   company.id,rec.itineraryid)
+                                    existing_distribution = pol.analytic_distribution
+                                    existing_distribution[str(nomination_link.id)] = 100
+                                    existing_distribution[str(storage_link.id)] = 100
+                                    pol['analytic_distribution'] = existing_distribution
+                                    exists = self.env['stock.move'].search(
+                                        [('fusion_delivery_id', '=', rec.deliveryid), ('purchase_line_id', '=', pol.id)],
+                                        limit=1)
+                                    if exists:
+                                        stock_move = self.env['stock.move'].search([('id', '=', exists.id)])
+                                    else:
+                                        stock_move = self.env['stock.move'].search(
+                                            [('purchase_line_id', '=', pol.id), ('state', 'in', ('assigned','waiting','confirmed','draft'))], limit=1)
+                                        if not stock_move:
+                                            stock_move_posted = self.env['stock.move'].search(
+                                                [('purchase_line_id', '=', pol.id), ('state', '=', 'done')], limit=1)
+                                            if stock_move_posted:
+                                                stock_move = stock_move_posted.copy()
+                                
+                                    
+                        elif rec.tobuyselldisplaytext=="Sell":
+                            if so:
+                                if sol:
+                                    warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
+                                                                                                   company.id,
+                                                                                                   rec.itineraryid)
+                                    so.warehouse_id = warehouse
+                                    if not so.state == 'sale':
+                                        so.action_confirm()
+                                        self.env.cr.commit()
+                                    product = sol.product_id
+                                    storage_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Deal Reference',
+                                                                                                          rec.frommotcode,
+                                                                                                          company.id)
+                                    existing_distribution = sol.analytic_distribution
+                                    existing_distribution[str(nomination_link.id)] = 100
+                                    existing_distribution[str(storage_link.id)] = 100
+                                    sol['analytic_distribution'] = existing_distribution
+                                    warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
+                                                                                                   company.id,rec.itineraryid)
+                                    exists = self.env['stock.move'].search(
+                                        [('fusion_delivery_id', '=', rec.deliveryid), ('sale_line_id', '=', sol.id)],
+                                        limit=1)
+                                    if exists:
+                                        stock_move = self.env['stock.move'].search([('id', '=', exists.id)])
+                                    else:
+                                        stock_move = self.env['stock.move'].search(
+                                            [('sale_line_id', '=', sol.id), ('state', 'in', ('assigned','waiting','confirmed','draft'))], limit=1)
+                                        if not stock_move:
+                                            stock_move_posted = self.env['stock.move'].search(
+                                                [('sale_line_id', '=', sol.id), ('state', '=', 'done')], limit=1)
+                                            if stock_move_posted:
+                                                stock_move = stock_move_posted.copy()
+                                
                             
-                            po.button_confirm()
-                            self.env.cr.commit()
-                        stock_move= self.env['stock.move']
-                        exists = self.env['stock.move'].search(
-                            [('fusion_delivery_id', '=', rec.deliveryid),('purchase_line_id', '=', pol.id)],limit=1)
-                        if exists:
-                            stock_move=self.env['stock.move'].search([('id', '=', exists.id)])
+                        if po or so:
+                            if stock_move:
+                                product.uom_id.rounding=0.001
+                                stock_move.picking_id.fusion_delivery_id=rec.deliveryid
+                                stock_move.picking_id.fusion_segment_code=pol.fusion_segment_code
+                                stock_move.fusion_delivery_id = rec.deliveryid
+                                stock_move.fusion_segment_code = pol.fusion_segment_code
+                                stock_move.picking_id.set_stock_move_to_draft()
+                                stock_move.picking_id.deal_ref  = 'moved_to_Draft'
+                                self.env.cr.commit()
+                                stock_move.picking_id.custom_delivery_date = datetime.datetime.strptime(rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
+                                stock_move.picking_id.scheduled_date = datetime.datetime.strptime(rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
+                                stock_move.date = datetime.datetime.strptime(rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
+                                self.env.cr.commit()
+                                if rec.buyselldisplaytext=="Buy":
+                                    picking_type = self.env['stock.picking.type'].search(
+                                    [('code', '=', 'incoming'), ('warehouse_id', '=', warehouse.id)], limit=1)
+                                elif rec.buyselldisplaytext=="Sell":
+                                    picking_type = self.env['stock.picking.type'].search(
+                                        [('code', '=', 'outgoing'), ('warehouse_id', '=', warehouse.id)], limit=1)
+                                stock_move.picking_id.picking_type_id = picking_type
+                                stock_move.picking_id.action_confirm()
+                                
+                                lot=self.env['fusion.sync.history'].validate_lot(rec.itineraryid, product.id, company.id)
+                                self.env.cr.commit()
+                                
+                                quantity =0
+                                if rec.frombuyselldisplaytext=="Buy":
+                                    if rec.fromcontractqtyuomcode == product.uom_id.name:
+                                        quantity = rec.fromactualqty
+                                elif rec.tobuyselldisplaytext == "Sell":
+                                    if rec.toactualqtyuomcode == product.uom_id.name:
+                                        quantity = rec.toactualqty
+                                existing_line = stock_move.move_line_ids.filtered(lambda ml: ml.fusion_delivery_id == rec.deliveryid)
+                                if existing_line:
+                                    for line in existing_line:
+                                        if line.qty_done != float(quantity):
+                                            line.qty_done = quantity
+                                else:
+                                    line = stock_move.move_line_ids.filtered(lambda ml: ml.product_id == product)
+                                    if line:
+                                        line.lot_id = lot.id
+                                        i=0
+                                        for line2 in line:
+                                            if i==0:
+                                                if line2.qty_done!=float(quantity):
+                                                    line2.qty_done = quantity
+                                                    line2.fusion_delivery_id = rec.deliveryid
+                                                    i+=1
+                                    else:
+                                        self.env['stock.move.line'].create({
+                                            'product_id': product.id,
+                                            'lot_id': lot.id,
+                                            'qty_done': quantity,
+                                            'move_id': stock_move.id,
+                                            'picking_id': stock_move.picking_id.id,
+                                            'location_id': stock_move.picking_id.location_id.id,
+                                            'fusion_delivery_id': rec.deliveryid
+                                        })
+                                stock_move.picking_id._action_done()
+                                stock_move.stock_valuation_layer_ids.warehouse_id = warehouse.id
                         else:
-                            stock_move = self.env['stock.move'].search([('purchase_line_id', '=', pol.id),('state','=','assigned')],limit=1)
-                            if not stock_move:
-                                stock_move_posted = self.env['stock.move'].search([('purchase_line_id', '=', pol.id),('state','=','done')],limit=1)
-                                if stock_move_posted:
-                                    stock_move= stock_move_posted.copy()
-                        if stock_move:
-                            stock_move.picking_id.fusion_delivery_id=rec.deliveryid
-                            stock_move.fusion_delivery_id = rec.deliveryid
-                            stock_move.picking_id.set_stock_move_to_draft()
-                            stock_move.picking_id.deal_ref  = 'moved_to_Draft'
-                            self.env.cr.commit()
-                            stock_move.picking_id.custom_delivery_date = datetime.datetime.strptime(rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
-                            stock_move.picking_id.scheduled_date = datetime.datetime.strptime(rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
-                            stock_move.date = datetime.datetime.strptime(rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
-                            self.env.cr.commit()
-                            warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.tomotcode,
-                                                                                           pol.order_id.company_id.id)
-                            picking_type = self.env['stock.picking.type'].search(
-                                [('code', '=', 'incoming'), ('warehouse_id', '=', warehouse.id)], limit=1)
-                            stock_move.picking_id.picking_type_id = picking_type
-                            stock_move.picking_id.action_confirm()
-                            lot=self.env['fusion.sync.history'].validate_lot(rec.itineraryid, stock_move.picking_id.product_id.id, company.id)
-                            self.env.cr.commit()
-                            quantity    =0
-                            if rec.fromcontractqtyuomcode == pol.product_uom.name:
-                                quantity = rec.fromactualqty
-                            elif rec.toactualqtyuomcode == pol.product_uom.name:
-                                quantity = rec.toactualqty
-                            existing_line =  stock_move.move_line_ids.filtered(lambda ml: ml.lot_id.name == lot.name)
-                            if existing_line:
-                                existing_line.qty_done = quantity
+                            if rec.frombuyselldisplaytext == "Buy":
+                                log_error = self.env['fusion.sync.history.errors'].log_error('TransferController',
+                                                                                             rec.fromsegmentid,
+                                                                                             'PO Line not found',
+                                                                                             rec.frominternalcompany)
                             else:
-                                stock_move.move_line_ids.lot_id = lot.id
-                                stock_move.move_line_ids.qty_done=quantity
-                            stock_move.picking_id.button_validate()
-                    else:
-                        log_error = self.env['fusion.sync.history.errors'].log_error('TransferController',
-                                                                                     rec.fromsegmentid,
-                                                                                     'PO Line not found',
-                                                                                     rec.tointernalcompany)
+                                log_error = self.env['fusion.sync.history.errors'].log_error('TransferController',
+                                                                                         rec.tosegmentid,
+                                                                                         'SO Line not found',
+                                                                                         rec.tointernalcompany)
+                else:
+                    cancelled_entry = self.env['stock.move'].search(
+                        [('fusion_delivery_id', '=', rec.deliveryid)])
+                    if cancelled_entry:
+                        cancelled_entry.picking_id.set_stock_move_to_draft()
             except Exception as e:
                 log_error = self.env['fusion.sync.history.errors'].log_error('TransferController', rec.fromsegmentid,
                                                                              str(e),

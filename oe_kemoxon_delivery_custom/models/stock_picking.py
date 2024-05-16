@@ -299,58 +299,58 @@ class StockPicking(models.Model):
                         line.lot_id=new_lot
                         record.move_ids.move_line_ids.product_id = record.move_ids.product_id
             
-            for line in record.move_ids.move_line_ids:
-                if line.qty_done != 0 and existingstate == 'done':
-                    location_quant = record.env['stock.quant'].search(['&', ('product_id', '=', record.product_id.id)
-                                                                        , ('lot_id', '=', line.lot_id.id)
-                                                                        , ('location_id', '=', line.location_id.id)
-                                                                          
-                                                                          , ('company_id', '=', line.company_id.id)
-                                                                     ])
-                    location_dest_quant = record.env['stock.quant'].search(['&', ('product_id', '=', record.product_id.id)
-                                                                             , ('lot_id', '=', line.lot_id.id)
-                                                                             ,
-                                                                          ('location_id', '=', line.location_dest_id.id)
-                                                                          , ('company_id', '=', line.company_id.id)
-                                                                          ])
-
-                    if len(location_quant) == 1:
-                        if (location_quant.location_id.usage == 'internal'):
-                            if (existingstate == 'done'):
-                            # SALES REVERSAL
-                                record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
-                                                                                   package_id=None, owner_id=None,
-                                                                                   location_id=line.location_id,
-                                                                                   quantity=line.qty_done,
-                                                                                   lot_id=line.lot_id, in_date=None)
-                        # location_quant.quantity=location_quant.quantity-line.qty_done
-                        else:
-                            # PURCHASE REVERSAL
-                            if (existingstate == 'done'):
-                                record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
-                                                                               package_id=None, owner_id=None,
-                                                                               location_id=line.location_id,
-                                                                               quantity=line.qty_done,
-                                                                               lot_id=line.lot_id, in_date=None)
-
-                    if len(location_dest_quant) == 1:
-                        if (location_quant.location_id.usage == 'internal'):
-                            # PURCHASE REVERSAL
-                            if (existingstate == 'done'):
-                                record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
-                                                                               package_id=None, owner_id=None,
-                                                                               location_id=line.location_dest_id,
-                                                                               quantity=-1 * line.qty_done,
-                                                                               lot_id=line.lot_id, in_date=None)
-                        # location_dest_quant.quantity=location_dest_quant.quantity-line.qty_done
-                        else:
-                            # PURCHASE REVERSAL
-                            if (existingstate == 'done'):
-                                record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
-                                                                               package_id=None, owner_id=None,
-                                                                               location_id=line.location_dest_id,
-                                                                               quantity=-1 * line.qty_done,
-                                                                               lot_id=line.lot_id, in_date=None)
+            # for line in record.move_ids.move_line_ids:
+            #     if line.qty_done != 0 and existingstate == 'done':
+            #         location_quant = record.env['stock.quant'].search(['&', ('product_id', '=', record.product_id.id)
+            #                                                             , ('lot_id', '=', line.lot_id.id)
+            #                                                             , ('location_id', '=', line.location_id.id)
+            #
+            #                                                               , ('company_id', '=', line.company_id.id)
+            #                                                          ])
+            #         location_dest_quant = record.env['stock.quant'].search(['&', ('product_id', '=', record.product_id.id)
+            #                                                                  , ('lot_id', '=', line.lot_id.id)
+            #                                                                  ,
+            #                                                               ('location_id', '=', line.location_dest_id.id)
+            #                                                               , ('company_id', '=', line.company_id.id)
+            #                                                               ])
+            #
+            #         if len(location_quant) == 1:
+            #             if (location_quant.location_id.usage == 'internal'):
+            #                 if (existingstate == 'done'):
+            #                 # SALES REVERSAL
+            #                     record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+            #                                                                        package_id=None, owner_id=None,
+            #                                                                        location_id=line.location_id,
+            #                                                                        quantity=line.qty_done,
+            #                                                                        lot_id=line.lot_id, in_date=None)
+            #             # location_quant.quantity=location_quant.quantity-line.qty_done
+            #             else:
+            #                 # PURCHASE REVERSAL
+            #                 if (existingstate == 'done'):
+            #                     record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+            #                                                                    package_id=None, owner_id=None,
+            #                                                                    location_id=line.location_id,
+            #                                                                    quantity=line.qty_done,
+            #                                                                    lot_id=line.lot_id, in_date=None)
+            #
+            #         if len(location_dest_quant) == 1:
+            #             if (location_quant.location_id.usage == 'internal'):
+            #                 # PURCHASE REVERSAL
+            #                 if (existingstate == 'done'):
+            #                     record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+            #                                                                    package_id=None, owner_id=None,
+            #                                                                    location_id=line.location_dest_id,
+            #                                                                    quantity=-1 * line.qty_done,
+            #                                                                    lot_id=line.lot_id, in_date=None)
+            #             # location_dest_quant.quantity=location_dest_quant.quantity-line.qty_done
+            #             else:
+            #                 # PURCHASE REVERSAL
+            #                 if (existingstate == 'done'):
+            #                     record.env['stock.quant']._update_available_quantity(product_id=line.product_id,
+            #                                                                    package_id=None, owner_id=None,
+            #                                                                    location_id=line.location_dest_id,
+            #                                                                    quantity=-1 * line.qty_done,
+            #                                                                    lot_id=line.lot_id, in_date=None)
             record.updatestatus="waspostedbefore"
 
     def sync_stock_quant(self):

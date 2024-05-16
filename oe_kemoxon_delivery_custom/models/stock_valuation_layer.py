@@ -163,8 +163,12 @@ class StockValuationLayer(models.Model):
         return self
     def verify_picking_date(self, record,datetocheck):
         result=datetime.combine(datetocheck, datetime.min.time())
+        if record.quantity>0:
+            interval =-5
+        else:
+            interval = 5
         while record.check_if_exists(record,result):
-            result = result + timedelta(minutes=5)
+            result = result + timedelta(minutes=interval)
             # record.verify_picking_date( record, result)
         return result
     def check_if_exists(self,record,datetocheck):

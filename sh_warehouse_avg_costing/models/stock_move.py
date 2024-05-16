@@ -120,11 +120,11 @@ class WarehouseStockMove(models.Model):
                 if warehouse:
                     amount_unit = warehouse.cost
                     new_std_price = ((amount_unit * group_quantity) +
-                                     (move._get_price_unit() * qty)) / (group_quantity + qty)
+                                     (move._get_price_unit() * qty)) / ((group_quantity + qty) if group_quantity + qty!=0 else qty)
                     warehouse.write({'cost': new_std_price})
                 else:
                     new_std_price = ((amount_unit * group_quantity) +
-                                     (move._get_price_unit() * qty)) / (group_quantity + qty)
+                                     (move._get_price_unit() * qty)) / ((group_quantity + qty) if group_quantity + qty!=0 else qty)
                     self.env['sh.warehouse.cost'].create({
                         'product_id': move.product_id.id,
                         'warehouse_id': self.location_dest_id.warehouse_id.id,
