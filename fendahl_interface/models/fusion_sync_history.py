@@ -2,7 +2,8 @@ from odoo import models, fields, api
 import requests
 import logging
 import datetime
-
+import random
+import string
 _logger = logging.getLogger(__name__)
 
 
@@ -320,17 +321,27 @@ class FusionSyncHistory(models.Model):
         warehouse = warehouse.replace(' ', '')  # Remove spaces from the warehouse name
         iteration = 0
         while True:
-            if len(warehouse) < iteration + 5:
-                code = warehouse  # Use the entire string if it's shorter than the desired segment
+            if iteration<=5:
+                    if len(warehouse) < iteration + 5:
+                        code = warehouse  # Use the entire string if it's shorter than the desired segment
+                    else:
+                        code = warehouse[iteration:iteration + 5]  # Slice the string to get a code of length 5
             else:
-                code = warehouse[iteration:iteration + 5]  # Slice the string to get a code of length 5
-            
+                code = self.generate_random_string()
             # Search for existing warehouse with the generated code
             existing_warehouse = self.env['stock.warehouse'].search([('code', '=', code), ('company_id', '=', company)])
             if not existing_warehouse:
                 return code  # Return the code if it's unique
             iteration += 1
-            
+    
+
+    
+    def generate_random_string(self):
+        # Choose from letters and digits
+        characters = string.ascii_letters + string.digits
+        # Use random.choices to select `length` characters
+        random_string = ''.join(random.choices(characters, k=5))
+        return random_string
     def validate_warehouse(self,warehouse,company,nomkey):
         result = self.env['stock.warehouse'].search([('name', '=', nomkey),('company_id', '=', company)], limit=1)
         
