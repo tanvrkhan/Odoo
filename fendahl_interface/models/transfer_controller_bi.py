@@ -352,8 +352,14 @@ class TransferControllerBI(models.Model):
                                     storage_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Deal Reference',
                                                                                                           rec.tomotcode,
                                                                                                           company.id)
-                                    warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.tomotcode,
-                                                                                                   company.id,rec.itineraryid)
+                                    sp_warehouse_transfer = self.env['transfer.controller.bi'].search([('itineraryid', '=', rec.itineraryid),('fromtypeenum', '=', 'Trade'),
+                                                                                              ('deliveryactivestatusdisplayname', '=', 'Active')],limit=1)
+                                    sp_warehouse = sp_warehouse_transfer.tomotcode
+                                    
+                                    
+                                    warehouse = self.env['fusion.sync.history'].validate_warehouse(sp_warehouse,
+                                                                                                   company.id)
+                                    
                                     existing_distribution = pol.analytic_distribution
                                     existing_distribution[str(nomination_link.id)] = 100
                                     existing_distribution[str(storage_link.id)] = 100
@@ -376,9 +382,13 @@ class TransferControllerBI(models.Model):
                         elif rec.tobuyselldisplaytext=="Sell":
                             if so:
                                 if sol:
-                                    warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
-                                                                                                   company.id,
-                                                                                                   rec.itineraryid)
+                                    sp_warehouse_transfer = self.env['transfer.controller.bi'].search(
+                                        [('itineraryid', '=', rec.itineraryid), ('fromtypeenum', '=', 'Trade'),
+                                         ('deliveryactivestatusdisplayname', '=', 'Active')], limit=1)
+                                    sp_warehouse = sp_warehouse_transfer.tomotcode
+                                    
+                                    warehouse = self.env['fusion.sync.history'].validate_warehouse(sp_warehouse,
+                                                                                                   company.id)
                                     so.warehouse_id = warehouse
                                     if not so.state == 'sale':
                                         so.action_confirm()
@@ -391,8 +401,7 @@ class TransferControllerBI(models.Model):
                                     existing_distribution[str(nomination_link.id)] = 100
                                     existing_distribution[str(storage_link.id)] = 100
                                     sol['analytic_distribution'] = existing_distribution
-                                    warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
-                                                                                                   company.id,rec.itineraryid)
+                                    
                                     exists = self.env['stock.move'].search(
                                         [('fusion_delivery_id', '=', rec.deliveryid), ('sale_line_id', '=', sol.id)],
                                         limit=1)
