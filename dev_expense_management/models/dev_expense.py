@@ -122,6 +122,12 @@ class dev_expense(models.Model):
         move_vals = self._prepare_move_values()
         move_id = self.env['account.move'].with_context(default_journal_id=self.journal_id.id).create(move_vals)
         move_line_values = self._prepare_move_line_values()
+        for attachment in self.message_main_attachment_id:
+            attachment.copy({
+                'res_model': 'account.move',
+                'res_id': move_id.id,
+                'name': attachment.name,
+            })
         move_id.write({'line_ids': [(0, 0, line) for line in move_line_values]})
         if move_id:
             self.move_id = move_id.id
