@@ -35,6 +35,7 @@ class dev_expense(models.Model):
             'company_id': self.company_id.id,
             'date': account_date,
             'ref': self.name,
+            'message_main_attachment_id': self.message_main_attachment_id and self.message_main_attachment_id.id or False,
             'name': '/',
             'move_type': 'entry'
         }
