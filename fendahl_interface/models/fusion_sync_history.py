@@ -318,22 +318,24 @@ class FusionSyncHistory(models.Model):
         return result
     
     def get_wh_code(self, warehouse, company):
-        warehouse = warehouse.replace(' ', '')  # Remove spaces from the warehouse name
-        iteration = 0
-        while True:
-            if iteration<=5:
-                    if len(warehouse) < iteration + 5:
-                        code = warehouse  # Use the entire string if it's shorter than the desired segment
-                    else:
-                        code = warehouse[iteration:iteration + 5]  # Slice the string to get a code of length 5
-            else:
-                code = self.generate_random_string()
-            # Search for existing warehouse with the generated code
-            existing_warehouse = self.env['stock.warehouse'].search([('code', '=', code), ('company_id', '=', company)])
-            if not existing_warehouse:
-                return code  # Return the code if it's unique
-            iteration += 1
-    
+        if warehouse:
+            warehouse = warehouse.replace(' ', '')  # Remove spaces from the warehouse name
+            iteration = 0
+            while True:
+                if iteration<=5:
+                        if len(warehouse) < iteration + 5:
+                            code = warehouse  # Use the entire string if it's shorter than the desired segment
+                        else:
+                            code = warehouse[iteration:iteration + 5]  # Slice the string to get a code of length 5
+                else:
+                    code = self.generate_random_string()
+                # Search for existing warehouse with the generated code
+                existing_warehouse = self.env['stock.warehouse'].search([('code', '=', code), ('company_id', '=', company)])
+                if not existing_warehouse:
+                    return code  # Return the code if it's unique
+                iteration += 1
+        else:
+            return
 
     
     def generate_random_string(self):
