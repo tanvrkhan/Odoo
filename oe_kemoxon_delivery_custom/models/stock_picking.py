@@ -439,7 +439,12 @@ class StockPicking(models.Model):
             picking.move_ids.move_line_ids.unlink()
             picking.move_ids.unlink()
 
-
+    def fix_valuation_warehouse(self):
+        for rec in self:
+            if rec._is_in():
+                rec.move_ids.stock_valuation_layer_ids.warehouse_id = rec.move_ids.picking_id.location_dest_id.warehouse_id.id
+            else:
+                rec.move_ids.stock_valuation_layer_ids.warehouse_id = rec.move_ids.picking_id.location_id.warehouse_id.id
 # search where location id is 8 and add it to a collection
 # search where location id is not 8 and is internal location
 # updates the ones with 8
@@ -478,3 +483,4 @@ class StockMoveLine(models.Model):
             if related_truck_details and related_truck_details.delete_option:
                 related_truck_details.unlink()
         return super(StockMoveLine, self).unlink()
+    

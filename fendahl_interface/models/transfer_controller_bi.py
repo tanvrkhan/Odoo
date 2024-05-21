@@ -596,4 +596,6 @@ class TransferControllerBI(models.Model):
                 #             if len(picking_ids):
                 #                 a=True
                 #
-            
+ 
+             
+                
