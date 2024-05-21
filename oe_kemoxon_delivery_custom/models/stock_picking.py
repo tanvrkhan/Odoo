@@ -33,6 +33,7 @@ class StockPicking(models.Model):
     en_plus = fields.Boolean('EN Plus')
     custom_delivery_date=fields.Date(string="Delivery Date")
     updatestatus=fields.Char()
+    valuation_price = fields.Float(string="Valuation Price")
     def fix_unmatching_lots(self):
         for rec in self:
             for mv in rec.move_ids:
@@ -445,6 +446,11 @@ class StockPicking(models.Model):
                 rec.move_ids.stock_valuation_layer_ids.warehouse_id = rec.location_id.warehouse_id.id
             elif rec.location_dest_id.usage=='internal':
                 rec.move_ids.stock_valuation_layer_ids.warehouse_id = rec.location_dest_id.warehouse_id.id
+    def update_valuation(self):
+        self.move_ids.stock_valuation_layer_ids.unit_cost = self.valuation_price
+        self.move_ids.stock_valuation_layer_ids.value = self.valuation_price * self.move_ids.stock_valuation_layer_ids.quantity
+        
+    
 # search where location id is 8 and add it to a collection
 # search where location id is not 8 and is internal location
 # updates the ones with 8

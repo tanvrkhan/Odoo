@@ -283,36 +283,41 @@ class StockValuationLayer(models.Model):
                             rateusd = round(totalamount/totalquantity, 2)
                             applicablequantity = record.quantity
                             applicableamount = applicablequantity * rateusd
-                
+                if applicablequantity==record.quantity and applicableamount == 0 and record.stock_move_id.picking_id.valuation_price != 0:
+                    applicablequantity = record.quantity
+                    applicableamount = applicablequantity * record.stock_move_id.picking_id.valuation_price
+                    self._validate_accounting_entries()
+                    return
                 if applicablequantity!=0 and applicableamount!=0:
                     rateusd = round(applicableamount / applicablequantity, 2)
                     if round(record.unit_cost,2)!=round(rateusd,2):
                         wrong+= 1
                     record.unit_cost = rateusd
                     record.value = applicableamount
-                    record.account_move_id.state = 'draft'
-                    for ae in record.account_move_id.line_ids:
-                        ae.remove_move_reconcile()
-                        if ae.amount_currency != 0:
-                            if ae.amount_currency > 0:
-                                if record.quantity < 0:
-                                    newquantity = record.quantity * -1
-                                else:
-                                    newquantity = record.quantity
-                                ae.with_context(
-                                    check_move_validity=False).amount_currency = rate * newquantity
-                                ae.with_context(
-                                    check_move_validity=False).debit = rateusd * newquantity
-                            elif ae.amount_currency < 0:
-                                if record.quantity > 0:
-                                    newquantity = record.quantity * -1
-                                else:
-                                    newquantity = record.quantity
-                                ae.with_context(
-                                    check_move_validity=False).amount_currency = rate * newquantity
-                                ae.with_context(
-                                    check_move_validity=False).credit = rateusd* newquantity * -1
-                    record.account_move_id.state = 'posted'
+                    self._validate_accounting_entries()
+                    # record.account_move_id.state = 'draft'
+                    # for ae in record.account_move_id.line_ids:
+                    #     ae.remove_move_reconcile()
+                    #     if ae.amount_currency != 0:
+                    #         if ae.amount_currency > 0:
+                    #             if record.quantity < 0:
+                    #                 newquantity = record.quantity * -1
+                    #             else:
+                    #                 newquantity = record.quantity
+                    #             ae.with_context(
+                    #                 check_move_validity=False).amount_currency = rate * newquantity
+                    #             ae.with_context(
+                    #                 check_move_validity=False).debit = rateusd * newquantity
+                    #         elif ae.amount_currency < 0:
+                    #             if record.quantity > 0:
+                    #                 newquantity = record.quantity * -1
+                    #             else:
+                    #                 newquantity = record.quantity
+                    #             ae.with_context(
+                    #                 check_move_validity=False).amount_currency = rate * newquantity
+                    #             ae.with_context(
+                    #                 check_move_validity=False).credit = rateusd* newquantity * -1
+                    # record.account_move_id.state = 'posted'
         if wrong > 0:
             self.recalculate_stock_value()
     
