@@ -283,12 +283,12 @@ class StockValuationLayer(models.Model):
                             rateusd = round(totalamount/totalquantity, 2)
                             applicablequantity = record.quantity
                             applicableamount = applicablequantity * rateusd
-                if applicablequantity==record.quantity and applicableamount == 0 and record.stock_move_id.picking_id.valuation_price != 0:
-                    applicablequantity = record.quantity
-                    applicableamount = applicablequantity * record.stock_move_id.picking_id.valuation_price
+                if record.stock_move_id.picking_id.valuation_price != 0:
+                    record.unit_cost = record.stock_move_id.picking_id.valuation_price
+                    record.value = record.quantity * record.stock_move_id.picking_id.valuation_price
                     self._validate_accounting_entries()
                     return
-                if applicablequantity!=0 and applicableamount!=0:
+                elif applicablequantity!=0 and applicableamount!=0:
                     rateusd = round(applicableamount / applicablequantity, 2)
                     if round(record.unit_cost,2)!=round(rateusd,2):
                         wrong+= 1
