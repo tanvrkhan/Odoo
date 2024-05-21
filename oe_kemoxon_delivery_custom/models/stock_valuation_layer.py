@@ -98,37 +98,53 @@ class StockValuationLayer(models.Model):
     def remove_from_valuation(self):
         for record in self:
             if record.quantity == 0 or record.value == 0:
-                record.delete_valuation(record)
+                record.delete_valuation()
             elif record.stock_move_id.picking_id:
                 if record.stock_move_id.quantity_done == 0:
-                    record.delete_valuation(record)
+                    record.delete_valuation()
             else:
-                record.delete_valuation(record)
+                record.delete_valuation()
 
-    def delete_valuation(self,record):
-            record.unit_cost = 0
-            record.value = 0
-            record.quantity = 0
-            if record.account_move_id:
-                for ae in record.account_move_id:
+    def delete_valuation(self):
+        for rec in self:
+            rec.unit_cost = 0
+            rec.value = 0
+            rec.quantity = 0
+            if rec.account_move_id:
+                for ae in rec.account_move_id:
                     for ael in ae.line_ids:
                         ael.remove_move_reconcile()
                     ae.state = 'draft'
                     ae.line_ids.unlink()
                     self.env['account.move'].search([('id', '=', ae.id)]).unlink()
-            self.env['stock.valuation.layer'].search([('id', '=', record.id)]).unlink()
+            self.env['stock.valuation.layer'].search([('id', '=', rec.id)]).unlink()
     def delete_valuation_force(self):
-            self.unit_cost = 0
-            self.value = 0
-            self.quantity = 0
-            if self.account_move_id:
-                for ae in self.account_move_id:
+        for rec in self:
+            rec.unit_cost = 0
+            rec.value = 0
+            rec.quantity = 0
+            if rec.account_move_id:
+                for ae in rec.account_move_id:
                     for ael in ae.line_ids:
                         ael.remove_move_reconcile()
                     ae.state = 'draft'
                     ae.line_ids.unlink()
                     self.env['account.move'].search([('id', '=', ae.id)]).unlink()
-            self.env['stock.valuation.layer'].search([('id', '=', self.id)]).unlink()
+            if rec.stock_move_id:
+                if rec.stock_move_id.picking_id:
+                    self.env['stock.picking'].search([('stock_move_id', '=', rec.stock_move_id.picking_id.id)]).set_stock_move_to_draft()
+                else:
+                    self.env['stock.move.line'].search(
+                        [('move_id', '=', rec.stock_move_id.id)]).state='draft'
+                    self.env['stock.move.line'].search(
+                        [('move_id', '=', rec.stock_move_id.id)]).unlink()
+                    self.env['stock.move'].search(
+                        [('id', '=', rec.stock_move_id.id)]).state='draft'
+                    self.env['stock.move'].search(
+                        [('id', '=', rec.stock_move_id.id)]).unlink()
+            self.env['stock.valuation.layer'].search([('id', '=', rec.id)]).unlink()
+            #     self.env['stock.move'].search([('id', '=', rec.stock_move_id)]).unlink()
+            # self.env['stock.valuation.layer'].search([('id', '=', rec.id)]).unlink()
     def update_date_to_schedule_date(self):
         for record in self:
             next_number = self.env['ir.sequence'].next_by_code('stock.valuation')

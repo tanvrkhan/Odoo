@@ -95,6 +95,8 @@ class WarehouseStockMove(models.Model):
     def product_price_update_before_done(self, forced_qty=None):
         res = super(WarehouseStockMove,
                     self).product_price_update_before_done()
+        for rec in self:
+        
 
         # * Softhealer code Start *
 
@@ -102,35 +104,35 @@ class WarehouseStockMove(models.Model):
         #  on warehouse in the product
 
         # * Softhealer code end *
-        if self:
-            tmpl_dict = defaultdict(lambda: 0.0)
-            for move in self.filtered(lambda move: move._is_in() and move.with_company(move.company_id).product_id.cost_method == 'average'):
-                group_quantity = self.get_quantity_from_valuation(
-                    move.product_id.id, self.location_dest_id.warehouse_id.id) + tmpl_dict[move.product_id.id]
-                valued_move_lines = move._get_in_move_lines()
-                qty_done = 0
-                for valued_move_line in valued_move_lines:
-                    qty_done += valued_move_line.product_uom_id._compute_quantity(
-                        valued_move_line.qty_done, move.product_id.uom_id)
-                qty = forced_qty or qty_done
-                amount_unit = 0.0
-                warehouse = False
-                warehouse = move.product_id.with_company(move.company_id).warehouse_cost_lines.filtered(
-                    lambda x: x.warehouse_id.id == self.location_dest_id.warehouse_id.id)
-                if warehouse:
-                    amount_unit = warehouse.cost
-                    new_std_price = ((amount_unit * group_quantity) +
-                                     (move._get_price_unit() * qty)) / ((group_quantity + qty) if group_quantity + qty!=0 else qty)
-                    warehouse.write({'cost': new_std_price})
-                else:
-                    new_std_price = ((amount_unit * group_quantity) +
-                                     (move._get_price_unit() * qty)) / ((group_quantity + qty) if group_quantity + qty!=0 else qty)
-                    self.env['sh.warehouse.cost'].create({
-                        'product_id': move.product_id.id,
-                        'warehouse_id': self.location_dest_id.warehouse_id.id,
-                        'cost': new_std_price
-                    })
-                tmpl_dict[move.product_id.id] += qty_done
+            if rec:
+                tmpl_dict = defaultdict(lambda: 0.0)
+                for move in rec.filtered(lambda move: move._is_in() and move.with_company(move.company_id).product_id.cost_method == 'average'):
+                    group_quantity = rec.get_quantity_from_valuation(
+                        move.product_id.id, rec.location_dest_id.warehouse_id.id) + tmpl_dict[move.product_id.id]
+                    valued_move_lines = move._get_in_move_lines()
+                    qty_done = 0
+                    for valued_move_line in valued_move_lines:
+                        qty_done += valued_move_line.product_uom_id._compute_quantity(
+                            valued_move_line.qty_done, move.product_id.uom_id)
+                    qty = forced_qty or qty_done
+                    amount_unit = 0.0
+                    warehouse = False
+                    warehouse = move.product_id.with_company(move.company_id).warehouse_cost_lines.filtered(
+                        lambda x: x.warehouse_id.id == rec.location_dest_id.warehouse_id.id)
+                    if warehouse:
+                        amount_unit = warehouse.cost
+                        new_std_price = ((amount_unit * group_quantity) +
+                                         (move._get_price_unit() * qty)) / ((group_quantity + qty) if group_quantity + qty!=0 else qty)
+                        warehouse.write({'cost': new_std_price})
+                    else:
+                        new_std_price = ((amount_unit * group_quantity) +
+                                         (move._get_price_unit() * qty)) / ((group_quantity + qty) if group_quantity + qty!=0 else qty)
+                        rec.env['sh.warehouse.cost'].create({
+                            'product_id': move.product_id.id,
+                            'warehouse_id': rec.location_dest_id.warehouse_id.id,
+                            'cost': new_std_price
+                        })
+                    tmpl_dict[move.product_id.id] += qty_done
         return res
 
     def get_quantity_from_valuation(self, productid, warehouseid):

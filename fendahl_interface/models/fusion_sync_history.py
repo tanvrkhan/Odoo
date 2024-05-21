@@ -171,6 +171,7 @@ class FusionSyncHistory(models.Model):
             category_type= 'liquids' if  commodity=="Refined Products" else 'solids'
             uom = self.create_new_product_uom(product,uom,category_type)
             product.uom_id= uom.id
+            product.tracking = 'lot'
             product.uom_po_id = uom.id
         
         if product:
