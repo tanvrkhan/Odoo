@@ -35,6 +35,7 @@ class dev_expense(models.Model):
             'company_id': self.company_id.id,
             'date': account_date,
             'ref': self.name,
+            'message_main_attachment_id': self.message_main_attachment_id and self.message_main_attachment_id.id or False,
             'name': '/',
             'move_type': 'entry'
         }
@@ -74,7 +75,7 @@ class dev_expense(models.Model):
                                                                   self.company_id,
                                                                   self.date)
             move_line_src = {
-                'name': expense_line.product_id and expense_line.product_id.name or '/',
+                'name': str(expense_line.name),
                 'quantity': expense_line.quantity,
                 'debit': currency_converted_amount,
                 'credit': 0,
@@ -107,7 +108,7 @@ class dev_expense(models.Model):
                                                               self.date)
         account_id = self.get_account_id_from_journal()
         move_line_dst = {
-            'name': self.name,
+            'name': (self.name) + ' - ' + str(expense_line.name),
             'debit': 0,
             'credit': currency_converted_amount,
             'amount_currency': -currency_converted_amount,
@@ -122,6 +123,12 @@ class dev_expense(models.Model):
         move_vals = self._prepare_move_values()
         move_id = self.env['account.move'].with_context(default_journal_id=self.journal_id.id).create(move_vals)
         move_line_values = self._prepare_move_line_values()
+        for attachment in self.message_main_attachment_id:
+            attachment.copy({
+                'res_model': 'account.move',
+                'res_id': move_id.id,
+                'name': attachment.name,
+            })
         move_id.write({'line_ids': [(0, 0, line) for line in move_line_values]})
         if move_id:
             self.move_id = move_id.id
@@ -207,33 +214,37 @@ class dev_expense(models.Model):
     #                                            'email_from': self.company_id.email})
     #                         template_id.send_mail(self.id, True)
 
-    # def send_request(self):
-    #     self.state = 'approve'
-    #     if self.env.user.has_group('account.group_account_manager'):
-    #         self.done_expense()
-    #     else:
-    #         if self.company_id.exp_approval_amount <= self.amount_total:
-    #             self.send_approval_mail()
-    #             self.state = 'approve'
-    #         else:
-    #             self.done_expense()
+    def send_request(self):
+        self.state = 'approve'
+        if self.env.user.has_group('account.group_account_manager'):
+            self.done_expense()
+        else:
+            if self.company_id.exp_approval_amount <= self.amount_total:
+                # self.send_approval_mail()
+                self.state = 'approve'
+                self.done_expense()
+            else:
+                self.done_expense()
 
     def done_expense(self):
         self.create_expense_journal_entry()
         self.state = 'done'
 
-    def set_to_draft(self):
-        self.state = 'draft'
+    def reset_to_draft(self):
+        for expense in self:
+            if expense.move_id and expense.move_id.state == 'posted':
+                expense.move_id.button_draft()
+            expense.state = 'draft'
 
-    def reject_expense(self):
-        self.state = 'reject'
-        template_id = self.env.ref('dev_expense_management.dev_expense_reject_mail_template')
-        email_from = self.env.user and self.env.user.partner_id and self.env.user.partner_id.email or ''
-        email_to =  self.user_id and self.user_id.partner_id and self.user_id.partner_id.email or ''
-        if template_id and email_from and email_to:
-            template_id.write({'email_to': email_to,
-                               'email_from': email_from})
-            template_id.send_mail(self.id, True)
+    # def reject_expense(self):
+    #     self.state = 'reject'
+    #     template_id = self.env.ref('dev_expense_management.dev_expense_reject_mail_template')
+    #     email_from = self.env.user and self.env.user.partner_id and self.env.user.partner_id.email or ''
+    #     email_to =  self.user_id and self.user_id.partner_id and self.user_id.partner_id.email or ''
+    #     if template_id and email_from and email_to:
+    #         template_id.write({'email_to': email_to,
+    #                            'email_from': email_from})
+    #         template_id.send_mail(self.id, True)
 
     def cancel_expense(self):
         self.state = 'cancel'
@@ -270,5 +281,7 @@ class dev_expense(models.Model):
     amount_total = fields.Monetary(string='Total',
                                    store=True, readonly=True, compute='_compute_amount')
     submitted_by = fields.Many2one('hr.employee', string='Submitted By')
+    en_plus = fields.Boolean('EN Plus')
+    show_vat_ids = fields.Boolean(string="Show VAT Ids")
 
 # vim:expandtab:smartindent:tabstop=4:4softtabstop=4:shiftwidth=4:

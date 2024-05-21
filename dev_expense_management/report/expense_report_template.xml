@@ -48,6 +48,9 @@
                                 <td class="text-center">
                                     <b>Journal</b>
                                 </td>
+                                <td class="text-center">
+                                    <b>Payment Method</b>
+                                </td>
                             </tr>
                             <tr>
                                 <td class="text-center">
@@ -58,6 +61,9 @@
                                 </td>
                                 <td class="text-center">
                                     <span t-field="o.journal_id"/>
+                                </td>
+                                <td class="text-center">
+                                    <span t-field="o.payment_journal_id"/>
                                 </td>
                             </tr>
                         </table>

@@ -2,7 +2,7 @@
 <!--
 Copyright (C) 2015 DevIntelle Consulting Service Pvt.Ltd (<http://www.devintellecs.com>).
 
-For Module Support : devintelle@gmail.com  or Skype : devintelle 
+For Module Support : devintelle@gmail.com  or Skype : devintelle
  -->
 <odoo>
     <!-- Expense Form View -->
@@ -24,8 +24,7 @@ For Module Support : devintelle@gmail.com  or Skype : devintelle
                     <button name="cancel_expense" states="approve" string="Cancel"
                             type="object" groups="account.group_account_invoice"/>
 
-                    <button name="set_to_draft" states="reject" string="Set To Draft"
-                            type="object" groups="account.group_account_manager"/>
+                    <button name="reset_to_draft" string="Reset to Draft" type="object" states="done" />
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,request,confirm,done"/>
                 </header>
@@ -58,6 +57,7 @@ For Module Support : devintelle@gmail.com  or Skype : devintelle
                                     <field name="product_id" domain="[('misc_expense','=',True)]" context="{'default_misc_expense':True}"/>
                                     <field name="name"/>
                                     <field name="account_id"/>
+                                    <field name="analytic_account"/>
                                     <field name="attachment_id" widget="many2many_binary" />
                                     <field name="quantity"/>
                                     <field name="unit_price"/>
@@ -99,6 +99,7 @@ For Module Support : devintelle@gmail.com  or Skype : devintelle
                         </page>
                     </notebook>
                 </sheet>
+                <div class="o_attachment_preview"/>
                  <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers" groups="base.group_user" />
                     <field name="activity_ids" widget="mail_activity" />
