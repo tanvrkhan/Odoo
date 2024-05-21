@@ -482,7 +482,11 @@ class TransferControllerBI(models.Model):
                                                         'fusion_delivery_id': rec.deliveryid
                                                     })
                                             stock_move.picking_id._action_done()
-                                            stock_move.stock_valuation_layer_ids.warehouse_id = stock_move.picking_id.location_id.warehouse_id.id
+                                            if stock_move.picking_id.location_id:
+                                                stock_move.stock_valuation_layer_ids.warehouse_id = stock_move.picking_id.location_id.warehouse_id.id
+                                            else:
+                                                stock_move.stock_valuation_layer_ids.warehouse_id = stock_move.picking_id.location_dest_id.warehouse_id.id
+                                                
                                     else:
                                         if rec.frombuyselldisplaytext == "Buy":
                                             log_error = self.env['fusion.sync.history.errors'].log_error('TransferController',
