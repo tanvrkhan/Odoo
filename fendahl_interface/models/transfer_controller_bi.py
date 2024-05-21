@@ -482,9 +482,9 @@ class TransferControllerBI(models.Model):
                                                         'fusion_delivery_id': rec.deliveryid
                                                     })
                                             stock_move.picking_id._action_done()
-                                            if stock_move.picking_id.location_id:
+                                            if stock_move.picking_id.location_id.usage=='internal':
                                                 stock_move.stock_valuation_layer_ids.warehouse_id = stock_move.picking_id.location_id.warehouse_id.id
-                                            else:
+                                            elif stock_move.picking_id.location_dest_id.usage=='internal':
                                                 stock_move.stock_valuation_layer_ids.warehouse_id = stock_move.picking_id.location_dest_id.warehouse_id.id
                                                 
                                     else:
