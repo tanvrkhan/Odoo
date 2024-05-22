@@ -324,11 +324,11 @@ class TransferControllerBI(models.Model):
                 for rec in all_transfers:
                     if (rec.frominternalcompany if rec.frominternalcompany else rec.tointernalcompany) == self.env.company.name:
                         if rec.deliveryactivestatusdisplayname=="Active":
-                            if rec.deliverystatusenum=='Actual':
-                                company = self.env['res.company'].search([('name', '=', rec.frominternalcompany)], limit=1)
-                                if not company:
-                                    company = self.env['res.company'].search([('name', '=', rec.tointernalcompany)], limit=1)
-                                    
+                            company = self.env['res.company'].search([('name', '=', rec.frominternalcompany)], limit=1)
+                            if not company:
+                                company = self.env['res.company'].search([('name', '=', rec.tointernalcompany)],
+                                                                         limit=1)
+                            if rec.deliverystatusenum in ('Actual','Scheduled'):
                                 pol = self.env['purchase.order.line'].search([('fusion_segment_code', '=', rec.fromsegmentsectioncode if rec.fromsegmentsectioncode else '100')], limit=1)
                                 po = self.env['purchase.order'].search([('id', '=', pol.order_id.id)])
                                 sol = self.env['sale.order.line'].search(
@@ -450,10 +450,10 @@ class TransferControllerBI(models.Model):
                                             quantity = 0
                                             if rec.frombuyselldisplaytext == "Buy":
                                                 if rec.fromcontractqtyuomcode == product.uom_id.name:
-                                                    quantity = rec.fromactualqty
+                                                    quantity = rec.fromactualqty if rec.fromactualqty else rec.fromscheduledqty
                                             elif rec.tobuyselldisplaytext == "Sell":
                                                 if rec.toactualqtyuomcode == product.uom_id.name:
-                                                    quantity = rec.toactualqty
+                                                    quantity = rec.toactualqty if rec.toactualqty else rec.toscheduledqty
                                             existing_line = stock_move.move_line_ids.filtered(
                                                 lambda ml: ml.fusion_delivery_id == rec.deliveryid)
                                             if existing_line:
@@ -486,7 +486,10 @@ class TransferControllerBI(models.Model):
                                                 stock_move.stock_valuation_layer_ids.warehouse_id = stock_move.picking_id.location_id.warehouse_id.id
                                             elif stock_move.picking_id.location_dest_id.usage=='internal':
                                                 stock_move.stock_valuation_layer_ids.warehouse_id = stock_move.picking_id.location_dest_id.warehouse_id.id
-                                                
+                                            self.env.cr.commit()
+                                            stock_move.stock_valuation_layer_ids.update_date_to_schedule_date()
+                                            self.env.cr.commit()
+                                            stock_move.stock_valuation_layer_ids.recalculate_stock_value()
                                     else:
                                         if rec.frombuyselldisplaytext == "Buy":
                                             log_error = self.env['fusion.sync.history.errors'].log_error('TransferController',
@@ -573,7 +576,12 @@ class TransferControllerBI(models.Model):
                                         stock_move.move_line_ids.fusion_delivery_id = rec.deliveryid,  #
                                         picking.action_confirm()
                                         picking.action_assign()
-                                        picking.button_validate()
+                                        picking._action_done()
+                                        self.env.cr.commit()
+                                        picking.stock_move_id.stock_valuation_layer_ids.update_date_to_schedule_date()
+                                        self.env.cr.commit()
+                                        picking.stock_move_id.stock_valuation_layer_ids.recalculate_stock_value()
+                                        
                         else:
                             cancelled_entry = self.env['stock.move'].search(
                                 [('fusion_delivery_id', '=', rec.deliveryid)])
