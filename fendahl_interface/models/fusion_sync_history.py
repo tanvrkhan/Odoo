@@ -29,7 +29,7 @@ class FusionSyncHistory(models.Model):
     _name = 'fusion.sync.history'
     
     interface_type = fields.Char("Interface Type")
-    last_sync = fields.Char("Interface Type")
+    last_sync = fields.Datetime("Date")
     
     ##CASHFLOW
     
