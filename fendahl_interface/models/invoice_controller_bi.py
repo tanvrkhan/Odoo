@@ -581,10 +581,10 @@ class InvoiceControllerBI(models.Model):
                                              ('buysell', '=', 'Sell')], limit=1)
                                         for cfline in cashflow_lines:
                                             if cfline['payablereceivable' ] == 'Receivable':
-                                                if float(round(cfline['extendedamount'], 2)) == line.price_total:
+                                                if float(round(cfline['extendedamount'], 2)) == line.price_total or -5<= (float(round(cfline['extendedamount'], 2)) - line.price_total)<=5:
                                                     self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
                                             else:
-                                                if float(round(cfline['extendedamount'], 2))*-1 == line.price_total:
+                                                if float(round(cfline['extendedamount'], 2))*-1 == line.price_total  or -5<= (float(round(cfline['extendedamount'], 2)) - line.price_total)<=5:
                                                     self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
                                                 
                                 
