@@ -9,7 +9,10 @@ class UpdateInvoiceCosting(models.Model):
     
         
        
-
+    def reset_to_draft(self) :
+        for rec in self:
+            rec.move_id.button_draft()
+            rec.move_id.button_cancel()
 
 
         

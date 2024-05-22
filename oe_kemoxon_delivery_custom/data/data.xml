@@ -188,6 +188,14 @@
     <field name="state">code</field>
     <field name="code">records.reset_to_draft()</field>
 </record>
+         <record id="model_a_move_line_action_set_draft_tk" model="ir.actions.server">
+    <field name="name">Set to draft - kx</field>
+    <field name="model_id" ref="account.model_account_move_line"/>
+    <field name="binding_model_id" ref="account.model_account_move_line"/>
+    <field name="binding_view_types">list,form</field>
+    <field name="state">code</field>
+    <field name="code">records.reset_to_draft()</field>
+</record>
    <record id="model_a_move_action_update_costing" model="ir.actions.server">
     <field name="name">Update costing</field>
     <field name="model_id" ref="account.model_account_move"/>
