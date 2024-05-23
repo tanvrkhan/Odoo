@@ -487,9 +487,7 @@ class TransferControllerBI(models.Model):
                                             elif stock_move.picking_id.location_dest_id.usage=='internal':
                                                 stock_move.stock_valuation_layer_ids.warehouse_id = stock_move.picking_id.location_dest_id.warehouse_id.id
                                             self.env.cr.commit()
-                                            stock_move.stock_valuation_layer_ids.update_date_to_schedule_date()
-                                            self.env.cr.commit()
-                                            stock_move.stock_valuation_layer_ids.recalculate_stock_value()
+                                            # stock_move.stock_valuation_layer_ids.recalculate_stock_value()
                                     else:
                                         if rec.frombuyselldisplaytext == "Buy":
                                             log_error = self.env['fusion.sync.history.errors'].log_error('TransferController',
@@ -578,9 +576,7 @@ class TransferControllerBI(models.Model):
                                         picking.action_assign()
                                         picking._action_done()
                                         self.env.cr.commit()
-                                        picking.stock_move_id.stock_valuation_layer_ids.update_date_to_schedule_date()
-                                        self.env.cr.commit()
-                                        picking.stock_move_id.stock_valuation_layer_ids.recalculate_stock_value()
+                                        # picking.stock_move_id.stock_valuation_layer_ids.recalculate_stock_value()
                                         
                         else:
                             cancelled_entry = self.env['stock.move'].search(
