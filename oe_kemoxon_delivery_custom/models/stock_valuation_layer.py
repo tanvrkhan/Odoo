@@ -286,6 +286,10 @@ class StockValuationLayer(models.Model):
                 if record.stock_move_id.picking_id.valuation_price != 0:
                     record.unit_cost = record.stock_move_id.picking_id.valuation_price
                     record.value = record.quantity * record.stock_move_id.picking_id.valuation_price
+                    for ae in record.account_move_id.line_ids:
+                        ae.remove_move_reconcile()
+                        ae.move_id.button_draft()
+                        ae.move_id.button_cancel()
                     self._validate_accounting_entries()
                     return
                 elif applicablequantity!=0 and applicableamount!=0:
@@ -294,6 +298,10 @@ class StockValuationLayer(models.Model):
                         wrong+= 1
                     record.unit_cost = rateusd
                     record.value = applicableamount
+                    for ae in record.account_move_id.line_ids:
+                        ae.remove_move_reconcile()
+                        ae.move_id.button_draft()
+                        ae.move_id.button_cancel()
                     self._validate_accounting_entries()
                     # record.account_move_id.state = 'draft'
                     # for ae in record.account_move_id.line_ids:
