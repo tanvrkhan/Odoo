@@ -111,7 +111,7 @@ class dev_expense(models.Model):
             'name': (self.name) + ' - ' + str(expense_line.name),
             'debit': 0,
             'credit': currency_converted_amount,
-            'amount_currency': -currency_converted_amount,
+            'amount_currency': -expense_line.amount_total,
             'account_id': account_id and account_id.id or False,
             'date_maturity': self.date,
             'currency_id': self.currency_id and self.currency_id.id or False,
