@@ -389,18 +389,19 @@ class TransferControllerBI(models.Model):
                                     exists = sms.search(
                                         [('fusion_delivery_id', '=', rec.deliveryid)], limit=1)
                                     if exists:
-                                        stock_move = sms.search([('id', '=', exists.id)])
-                                        # sol = stock_move.sale_line_id
-                                        # so =sol.order_id
-                                        # pol = stock_move.purchase_line_id
-                                        # po = pol.order_id
-                                        picking = stock_move.picking_id
-                                        picking.set_stock_move_to_draft()
-                                        quantity = 0
-                                        picking.action_confirm()
-                                        self.update_existing_lines(stock_move, stock_move.product_id, rec, company)
-                                        picking._action_done()
-                                        continue
+                                        if stock_move.update_identity == random_string:
+                                            continue
+                                        else:
+                                            stock_move.update_identity = random_string
+                                            stock_move = sms.search([('id', '=', exists.id)])
+                                            picking = stock_move.picking_id
+                                            picking.set_stock_move_to_draft()
+                                            quantity = 0
+                                            picking.action_confirm()
+                                            self.update_existing_lines(stock_move, stock_move.product_id, rec, company)
+                                            # stock_move.quantity_done = quantity
+                                            picking._action_done()
+                                            continue
                                     else:
                                         if rec.buyselldisplaytext=="Buy":
                                             if po:
