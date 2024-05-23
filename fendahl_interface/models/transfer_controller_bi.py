@@ -351,7 +351,7 @@ class TransferControllerBI(models.Model):
                                             if pol:
                                                 if not po.state == 'purchase':
                                                     po.button_confirm()
-                                                    self.env.cr.commit()
+                                                    # self.env.cr.commit()
                                                 product = self.env['fusion.sync.history'].validate_product(rec.fromcommoditycode,
                                                                                                            rec.frommaterialcode,
                                                                                                            rec.fromactualqtyuomcode)
@@ -391,7 +391,7 @@ class TransferControllerBI(models.Model):
                                                 so.warehouse_id = warehouse
                                                 if not so.state == 'sale':
                                                     so.action_confirm()
-                                                    self.env.cr.commit()
+                                                    # self.env.cr.commit()
                                                 product = sol.product_id
                                                 storage_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Deal Reference',
                                                                                                                       rec.frommotcode,
@@ -425,15 +425,13 @@ class TransferControllerBI(models.Model):
                                             stock_move.fusion_delivery_id = rec.deliveryid
                                             stock_move.fusion_segment_code = pol.fusion_segment_code
                                             stock_move.picking_id.set_stock_move_to_draft()
-                                            stock_move.picking_id.deal_ref = 'moved_to_Draft'
-                                            self.env.cr.commit()
+                                            # stock_move.picking_id.deal_ref = 'moved_to_Draft'
                                             stock_move.picking_id.custom_delivery_date = datetime.datetime.strptime(
                                                 rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
                                             stock_move.picking_id.scheduled_date = datetime.datetime.strptime(
                                                 rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
                                             stock_move.date = datetime.datetime.strptime(rec.deliverycompletiondate,
                                                                                          '%Y-%m-%dT%H:%M:%S')
-                                            self.env.cr.commit()
                                             if rec.buyselldisplaytext == "Buy":
                                                 picking_type = self.env['stock.picking.type'].search(
                                                     [('code', '=', 'incoming'), ('warehouse_id', '=', warehouse.id)], limit=1)
@@ -445,7 +443,6 @@ class TransferControllerBI(models.Model):
                                             
                                             lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid, product.id,
                                                                                                company.id)
-                                            self.env.cr.commit()
                                             
                                             quantity = 0
                                             if rec.frombuyselldisplaytext == "Buy":
@@ -486,7 +483,7 @@ class TransferControllerBI(models.Model):
                                                 stock_move.stock_valuation_layer_ids.warehouse_id = stock_move.picking_id.location_id.warehouse_id.id
                                             elif stock_move.picking_id.location_dest_id.usage=='internal':
                                                 stock_move.stock_valuation_layer_ids.warehouse_id = stock_move.picking_id.location_dest_id.warehouse_id.id
-                                            self.env.cr.commit()
+                                            # self.env.cr.commit()
                                             # stock_move.stock_valuation_layer_ids.recalculate_stock_value()
                                     else:
                                         if rec.frombuyselldisplaytext == "Buy":
@@ -575,7 +572,7 @@ class TransferControllerBI(models.Model):
                                         picking.action_confirm()
                                         picking.action_assign()
                                         picking._action_done()
-                                        self.env.cr.commit()
+                                        # self.env.cr.commit()
                                         # picking.stock_move_id.stock_valuation_layer_ids.recalculate_stock_value()
                                         
                         else:
