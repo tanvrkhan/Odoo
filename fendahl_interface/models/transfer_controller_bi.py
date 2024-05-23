@@ -349,28 +349,14 @@ class TransferControllerBI(models.Model):
                                 if rec.totypeenum == 'Trade' or rec.fromtypeenum == 'Trade':
                                     exists = sms.search(
                                         [('fusion_delivery_id', '=', rec.deliveryid)], limit=1)
-                                    if exists :
-                                        if exists.state == 'cancel':
-                                            continue
-                                        else:
-                                            stock_move = sms.search([('id', '=', exists.id)])
-                                            sol = stock_move.sale_line_id
-                                            so =sol.order_id
-                                            pol = stock_move.purchase_line_id
-                                            po = pol.order_id
-                                            quantity = 0
-                                            if rec.frombuyselldisplaytext == "Buy":
-                                                if rec.fromcontractqtyuomcode == product.uom_id.name:
-                                                    quantity = rec.fromactualqty if rec.fromactualqty else rec.fromscheduledqty
-                                            elif rec.tobuyselldisplaytext == "Sell":
-                                                if rec.toactualqtyuomcode == product.uom_id.name:
-                                                    quantity = rec.toactualqty if rec.toactualqty else rec.toscheduledqty
-                                            if stock_move.quantity_done != quantity :
-                                                stock_move.quantity_done = quantity
-                                            continue
+                                    if exists:
+                                        stock_move = sms.search([('id', '=', exists.id)])
+                                        sol = stock_move.sale_line_id
+                                        so =sol.order_id
+                                        pol = stock_move.purchase_line_id
+                                        po = pol.order_id
                                     else:
                                         if rec.buyselldisplaytext=="Buy":
-                                            
                                             if po:
                                                 if pol:
                                                     if not po.state == 'purchase':
@@ -499,7 +485,8 @@ class TransferControllerBI(models.Model):
                                                         'move_id': stock_move.id,
                                                         'picking_id': stock_move.picking_id.id,
                                                         'location_id': stock_move.picking_id.location_id.id,
-                                                        'fusion_delivery_id': rec.deliveryid
+                                                        'fusion_delivery_id': rec.deliveryid,
+                                                        'company_id': company.id
                                                     })
                                             picking._action_done()
                                             if picking.location_id.usage=='internal':
@@ -570,8 +557,8 @@ class TransferControllerBI(models.Model):
                                             'location_id': in_location.id,
                                             'location_dest_id': out_location.id,
                                             'move_type': 'direct',
-                                            'fusion_delivery_id': rec.deliveryid,
-                                            'company_id': company.id,
+                                            'fusion_delivery_id': rec.deliveryid,  #
+                                            'company_id': company.id
                                         }
                                         picking = self.env['stock.picking'].create(picking_vals)
                                         quantity = 0.00
@@ -589,7 +576,7 @@ class TransferControllerBI(models.Model):
                                             'picking_id': picking.id,
                                             'location_id': in_location.id,
                                             'location_dest_id': out_location.id,
-                                            'company_id': company.id,
+                                            'company_id': company.id
                                         }
                                         stock_move = sms.create(move_vals)
                                         stock_move.move_line_ids.lot_id=lot
@@ -609,7 +596,7 @@ class TransferControllerBI(models.Model):
                 log_error = self.env['fusion.sync.history.errors'].log_error('TransferController', rec.fromsegmentid,
                                                                              str(e),
                                                                              rec.tointernalcompany)
-                raise UserError(str(e))
+                raise UserError('Error processing API data: %s', str(e))
                 # _logger.error('Error processing API data: %s', str(e))
                 # if pol:
                 #     pol = self.env['purchase.order.line'].search([('fusion_segment_id', '=', pol.termnumber)],limit=1)
