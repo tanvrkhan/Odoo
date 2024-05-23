@@ -315,7 +315,46 @@ class TransferControllerBI(models.Model):
             else:
                 self.env['transfer.controller.bi'].create(data)
                 self.env.cr.commit()
-                
+    
+    def update_existing_lines(self,stock_move,product,rec,company):
+        lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid, product.id,
+                                                           company.id)
+        
+        quantity = 0
+        if rec.frombuyselldisplaytext == "Buy":
+            if rec.fromcontractqtyuomcode == product.uom_id.name:
+                quantity = rec.fromactualqty if rec.fromactualqty else rec.fromscheduledqty
+        elif rec.tobuyselldisplaytext == "Sell":
+            if rec.toactualqtyuomcode == product.uom_id.name:
+                quantity = rec.toactualqty if rec.toactualqty else rec.toscheduledqty
+        existing_line = stock_move.move_line_ids.filtered(
+            lambda ml: ml.fusion_delivery_id == rec.deliveryid)
+        if existing_line:
+            for line in existing_line:
+                if line.qty_done != float(quantity):
+                    line.qty_done = quantity
+        else:
+            line = stock_move.move_line_ids.filtered(lambda ml: ml.product_id == product)
+            if line:
+                line.lot_id = lot.id
+                i = 0
+                for line2 in line:
+                    if i == 0:
+                        if line2.qty_done != float(quantity):
+                            line2.qty_done = quantity
+                            line2.fusion_delivery_id = rec.deliveryid
+                            i += 1
+            else:
+                self.env['stock.move.line'].create({
+                    'product_id': product.id,
+                    'lot_id': lot.id,
+                    'qty_done': quantity,
+                    'move_id': stock_move.id,
+                    'picking_id': stock_move.picking_id.id,
+                    'location_id': stock_move.picking_id.location_id.id,
+                    'fusion_delivery_id': rec.deliveryid,
+                    'company_id': company.id
+                })
     def create_receipt(self):
         for record in self:
             try:
@@ -351,10 +390,17 @@ class TransferControllerBI(models.Model):
                                         [('fusion_delivery_id', '=', rec.deliveryid)], limit=1)
                                     if exists:
                                         stock_move = sms.search([('id', '=', exists.id)])
-                                        sol = stock_move.sale_line_id
-                                        so =sol.order_id
-                                        pol = stock_move.purchase_line_id
-                                        po = pol.order_id
+                                        # sol = stock_move.sale_line_id
+                                        # so =sol.order_id
+                                        # pol = stock_move.purchase_line_id
+                                        # po = pol.order_id
+                                        picking = stock_move.picking_id
+                                        picking.set_stock_move_to_draft()
+                                        quantity = 0
+                                        picking.action_confirm()
+                                        self.update_existing_lines(stock_move, stock_move.product_id, rec, company)
+                                        picking._action_done()
+                                        continue
                                     else:
                                         if rec.buyselldisplaytext=="Buy":
                                             if po:
@@ -449,45 +495,11 @@ class TransferControllerBI(models.Model):
                                             elif rec.buyselldisplaytext == "Sell":
                                                 picking_type = self.env['stock.picking.type'].search(
                                                     [('code', '=', 'outgoing'), ('warehouse_id', '=', warehouse.id)], limit=1)
+                                            if not picking_type:
+                                                picking_type=picking.picking_type_id
                                             picking.picking_type_id = picking_type
                                             picking.action_confirm()
-                                            lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid, product.id,
-                                                                                               company.id)
-                                            quantity = 0
-                                            if rec.frombuyselldisplaytext == "Buy":
-                                                if rec.fromcontractqtyuomcode == product.uom_id.name:
-                                                    quantity = rec.fromactualqty if rec.fromactualqty else rec.fromscheduledqty
-                                            elif rec.tobuyselldisplaytext == "Sell":
-                                                if rec.toactualqtyuomcode == product.uom_id.name:
-                                                    quantity = rec.toactualqty if rec.toactualqty else rec.toscheduledqty
-                                            existing_line = stock_move.move_line_ids.filtered(
-                                                lambda ml: ml.fusion_delivery_id == rec.deliveryid)
-                                            if existing_line:
-                                                for line in existing_line:
-                                                    if line.qty_done != float(quantity):
-                                                        line.qty_done = quantity
-                                            else:
-                                                line = stock_move.move_line_ids.filtered(lambda ml: ml.product_id == product)
-                                                if line:
-                                                    line.lot_id = lot.id
-                                                    i = 0
-                                                    for line2 in line:
-                                                        if i == 0:
-                                                            if line2.qty_done != float(quantity):
-                                                                line2.qty_done = quantity
-                                                                line2.fusion_delivery_id = rec.deliveryid
-                                                                i += 1
-                                                else:
-                                                    self.env['stock.move.line'].create({
-                                                        'product_id': product.id,
-                                                        'lot_id': lot.id,
-                                                        'qty_done': quantity,
-                                                        'move_id': stock_move.id,
-                                                        'picking_id': stock_move.picking_id.id,
-                                                        'location_id': stock_move.picking_id.location_id.id,
-                                                        'fusion_delivery_id': rec.deliveryid,
-                                                        'company_id': company.id
-                                                    })
+                                            self.update_existing_lines(stock_move,product,rec,company)
                                             picking._action_done()
                                             if picking.location_id.usage=='internal':
                                                 stock_move.stock_valuation_layer_ids.warehouse_id = picking.location_id.warehouse_id.id
@@ -558,7 +570,6 @@ class TransferControllerBI(models.Model):
                                             'location_dest_id': out_location.id,
                                             'move_type': 'direct',
                                             'fusion_delivery_id': rec.deliveryid,  #
-                                            'company_id': company.id
                                         }
                                         picking = self.env['stock.picking'].create(picking_vals)
                                         quantity = 0.00
@@ -576,7 +587,6 @@ class TransferControllerBI(models.Model):
                                             'picking_id': picking.id,
                                             'location_id': in_location.id,
                                             'location_dest_id': out_location.id,
-                                            'company_id': company.id
                                         }
                                         stock_move = sms.create(move_vals)
                                         stock_move.move_line_ids.lot_id=lot
