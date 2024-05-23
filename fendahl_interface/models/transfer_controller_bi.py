@@ -402,6 +402,7 @@ class TransferControllerBI(models.Model):
                                             # stock_move.quantity_done = quantity
                                             picking._action_done()
                                             continue
+                                            self.env.cr.commit()
                                     else:
                                         if rec.buyselldisplaytext=="Buy":
                                             if po:
