@@ -241,7 +241,6 @@ class TransferControllerBI(models.Model):
     customerid = fields.Char(string="CustomerId")
     lockid = fields.Char(string="LockId")
     birecordcreationdate = fields.Char(string="BiRecordCreationDate")
-    
     def import_transfer(self):
         interface = self.env['fusion.sync.history']
         last_sync = '2023-01-01'
@@ -362,6 +361,8 @@ class TransferControllerBI(models.Model):
                 all_transfers = self.env['transfer.controller.bi'].search([('itineraryid', '=', record.itineraryid)])
                 sms  = self.env['stock.move'].search([])
                 for rec in all_transfers:
+                    
+                    
                     if (rec.frominternalcompany if rec.frominternalcompany else rec.tointernalcompany) == self.env.company.name:
                         if rec.deliveryactivestatusdisplayname=="Active":
                             company = self.env['res.company'].search([('name', '=', rec.frominternalcompany)], limit=1)
@@ -389,10 +390,10 @@ class TransferControllerBI(models.Model):
                                     exists = sms.search(
                                         [('fusion_delivery_id', '=', rec.deliveryid)], limit=1)
                                     if exists:
-                                        if stock_move.update_identity == random_string:
+                                        if stock_move.fusion_last_modify == rec.lastmodifydate:
                                             continue
                                         else:
-                                            stock_move.update_identity = random_string
+                                            stock_move.fusion_last_modify = rec.lastmodifydate
                                             stock_move = sms.search([('id', '=', exists.id)])
                                             picking = stock_move.picking_id
                                             picking.set_stock_move_to_draft()
@@ -474,9 +475,9 @@ class TransferControllerBI(models.Model):
                                                                 stock_move = stock_move_posted.copy()
                                     
                                     if po or so:
-                                        if stock_move and stock_move.update_identity!=random_string:
-                                            picking  = stock_move.picking_id
-                                            stock_move.update_identity = random_string
+                                        if stock_move and stock_move.fusion_last_modify == rec.lastmodifydate:
+                                            picking = stock_move.picking_id
+                                            stock_move.fusion_last_modify = rec.lastmodifydate
                                             if product.uom_id.rounding != 0.001:
                                                 product.uom_id.rounding = 0.001
                                             picking.fusion_delivery_id = rec.deliveryid

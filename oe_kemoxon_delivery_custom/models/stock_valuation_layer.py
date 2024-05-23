@@ -307,6 +307,7 @@ class StockValuationLayer(models.Model):
         record.account_move_id.line_ids.remove_move_reconcile()
         record.account_move_id.button_draft()
         record.account_move_id.button_cancel()
+        self.env.cr.commit()
         record._validate_accounting_entries()
                     # record.account_move_id.state = 'draft'
                     # for ae in record.account_move_id.line_ids:
