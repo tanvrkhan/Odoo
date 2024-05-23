@@ -273,16 +273,20 @@ class StockPicking(models.Model):
     def set_stock_move_to_draft(self):
         for record in self:
             existingstate= record.state
-            record.move_ids.stock_valuation_layer_ids.account_move_id.state = 'draft'
-            for ae in record.move_ids.stock_valuation_layer_ids.account_move_id.line_ids:
-                ae.remove_move_reconcile()
-            record.move_ids.stock_valuation_layer_ids.account_move_id.line_ids.unlink()
-            record.move_ids.stock_valuation_layer_ids.account_move_id.unlink()
-            record.move_ids.stock_valuation_layer_ids.unlink()
+            am = record.move_ids.stock_valuation_layer_ids.account_move_id
+            am.line_ids.remove_move_reconcile()
+            am.button_draft()
+            am.unlink()
+            moves = record.move_ids
+            # for ae in record.move_ids.stock_valuation_layer_ids.account_move_id.line_ids:
+            #     ae.remove_move_reconcile()
+            # record.move_ids.stock_valuation_layer_ids.account_move_id.line_ids.unlink()
+            # record.move_ids.stock_valuation_layer_ids.account_move_id.unlink()
+            moves.stock_valuation_layer_ids.unlink()
             record.state = 'draft'
-            record.move_ids.move_line_ids.state = 'draft'
-            record.move_ids.state = 'draft'
-            record.move_ids.state = 'draft'
+            moves.move_line_ids.state = 'draft'
+            moves.state = 'draft'
+            moves.state = 'draft'
 
             for line in record.move_ids.move_line_ids:
                 if line.lot_id:
