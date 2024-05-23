@@ -154,28 +154,22 @@ class StockValuationLayer(models.Model):
             else:
                 datetocheck=record.stock_move_id.picking_id.scheduled_date
             datetouse=datetocheck
-            datetouse=self.verify_picking_date(record,datetocheck)
-            
-            
-            # next_number = next_number[-5:]
-            year = datetouse.year
-            month = datetouse.month
-            sequence = 'STJU/' + str(year) + '/' + str(month) + '/' + next_number
-            
-            for line in record.stock_move_id.move_line_ids:
-                line.date = datetouse
-            record.create_date = datetouse
-            record.stock_move_id.picking_id.date_done = datetouse
-            record.stock_move_id.date = datetouse
-            
-            record.account_move_id.state = 'draft'
-            record.account_move_line_id.parent_state = 'draft'
-            record.account_move_id.name = 'draft'
-            record.account_move_id.date = datetouse
-            record.account_move_id.name = sequence
-            record.account_move_line_id.date = datetouse
-            record.account_move_id.state = 'posted'
-            record.account_move_line_id.parent_state = 'posted'
+            if datetouse:
+                datetouse=self.verify_picking_date(record,datetocheck)
+                
+                
+                # next_number = next_number[-5:]
+                year = datetouse.year
+                month = datetouse.month
+                sequence = 'STJU/' + str(year) + '/' + str(month) + '/' + next_number
+                
+                for line in record.stock_move_id.move_line_ids:
+                    line.date = datetouse
+                record.create_date = datetouse
+                record.stock_move_id.picking_id.date_done = datetouse
+                record.stock_move_id.date = datetouse
+                
+                self.reset_accounting(record)
         return self
     def verify_picking_date(self, record,datetocheck):
         result=datetime.combine(datetocheck, datetime.min.time())
@@ -198,111 +192,122 @@ class StockValuationLayer(models.Model):
             return True
         else:
             return False
-
+    
+    def update_date_without_accounting_date(self):
+        for record in self:
+            next_number = self.env['ir.sequence'].next_by_code('stock.valuation')
+            next_number = str(next_number)
+            if record.stock_move_id.picking_id.custom_delivery_date:
+                datetocheck = record.stock_move_id.picking_id.custom_delivery_date
+            else:
+                datetocheck = record.stock_move_id.picking_id.scheduled_date
+            datetouse = datetocheck
+            if datetouse:
+                datetouse = self.verify_picking_date(record, datetocheck)
+                
+                # next_number = next_number[-5:]
+                year = datetouse.year
+                month = datetouse.month
+                sequence = 'STJU/' + str(year) + '/' + str(month) + '/' + next_number
+                
+                for line in record.stock_move_id.move_line_ids:
+                    line.date = datetouse
+                record.create_date = datetouse
+                record.stock_move_id.picking_id.date_done = datetouse
+                record.stock_move_id.date = datetouse
+                
+                # self.reset_accounting(record)
+        return self
+    
     def recalculate_stock_value(self):
-        selfupdated = self.update_date_to_schedule_date()
+        self.update_date_without_accounting_date()
+        self.env.cr.commit()
         wrong = 0
-        # sorted = self.env['stock.valuation.layer'].search([('id', 'in', [self.id])],order="id desc")
-        # sorted = self.search([],order="id asc")
-        # sorted={}
-        # for rec in self
-        # orderingdate= date.min
-        # sortedself= sorted(self,key=lambda x:x["create_date"],reverse=True)
         sortedself = self.sorted(key=lambda r: r.create_date)
+        stock_valuations = self.env['stock.valuation.layer'].search([])
         
         for record in sortedself:
-            if record.stock_move_id.quantity_done == 0:
-                for acce in record.account_move_id.line_ids:
-                    acce.remove_move_reconcile()
+            sm = record.stock_move_id
+            picking = record.stock_move_id.picking_id
+            am = record.account_move_id
+            aml = record.account_move_id.line_ids
+            
+            applicablequantity = 0
+            applicableamount = 0
+            if sm.quantity_done == 0:
+                aml.remove_move_reconcile()
+                am.button_draft()
+                am.button_cancel()
                 record.remove_from_valuation()
-            else:
-                if record.company_id.id == 1:
-                    all_valuations = self.env['stock.valuation.layer'].search(
-                        ['&', '&', '&',
-                         ('product_id', '=', record.product_id.id),
-                         ('stock_move_id.date', '<', record.stock_move_id.date),
-                         ('id', '!=', record.id),
-                         ('company_id', '=', record.company_id.id)
-                         ])
-                else:
-                    all_valuations = self.env['stock.valuation.layer'].search(
-                        ['&', '&', '&',
-                         ('product_id', '=', record.product_id.id),
-                         ('stock_move_id.date', '<=', record.stock_move_id.date),
-                         ('id', '!=', record.id),
-                         ('warehouse_id', '=', record.warehouse_id.id),
-                         ('company_id', '=', record.company_id.id)
-                         ])
-                totalquantity = 0
-                totalamount = 0
-                
-                base_currency = record.company_id.currency_id
-                applicablequantity=0
-                applicableamount =0
-                rate=0
-                rateusd=0
-                
-                if record.stock_move_id.location_id.usage == 'internal' and record.stock_move_id.location_dest_id.usage == 'internal' and record.quantity > 0:
-                    all_valuations = self.env['stock.valuation.layer'].search(
+                continue
+            elif picking.valuation_price != 0:
+                record.unit_cost = picking.valuation_price
+                record.value = record.quantity * picking.valuation_price
+                self.reset_accounting(record)
+                return
+            #purchase transaction
+            elif record.quantity > 0:
+                #internal transfer
+                if sm.location_id.usage == 'internal' and sm.location_dest_id.usage == 'internal':
+                    all_valuations = stock_valuations.search(
                     [
-                        ('stock_move_id', '=', record.stock_move_id.id),
+                        ('stock_move_id', '=', sm.id),
                         ('quantity', '=', record.quantity * -1)
                     ])
-                    for valuation in all_valuations:
-                        totalquantity += valuation.quantity
-                        totalamount += valuation.value
+                    total_quantity = sum(v.quantity for v in all_valuations)
+                    total_value = sum(v.value for v in all_valuations)
                     applicablequantity = record.quantity
-                    temprate = totalamount / totalquantity
+                    temprate = total_value / total_quantity
                     applicableamount = applicablequantity * temprate
-                  
+                #external purchase
                 else:
-                    if record.quantity > 0:
-                     applicablequantity = record.quantity
-                     # porateusd2 = record.stock_move_id.purchase_line_id.order_id.currency_id.compute(
-                     #     record.stock_move_id.purchase_line_id.price_unit, record.stock_move_id.purchase_line_id.currency_id)
-                     rate=round(record.stock_move_id.purchase_line_id.price_unit,2)
-                     rateusd = round(record.stock_move_id.purchase_line_id.order_id.currency_id._convert(
-                         record.stock_move_id.purchase_line_id.price_unit,
-                         base_currency, record.company_id, record.stock_move_id.date, True),2)
-                     applicableamount += (rateusd * record.quantity)
-                
+                    pl= sm.purchase_line_id
+                    base_currency = record.company_id.currency_id
+                    applicablequantity = record.quantity
+                    rate=round(pl.price_unit,2)
+                    rateusd = round(pl.order_id.currency_id._convert(
+                        pl.price_unit,
+                        base_currency, record.company_id, sm.date, True),2)
+                    applicableamount += (rateusd * record.quantity)
+            #sales transaction
+            elif record.quantity < 0:
+                domain = [
+                    ('product_id', '=', record.product_id.id),
+                    ('stock_move_id.date', '<=', record.stock_move_id.date),
+                    ('id', '!=', record.id),
+                    ('company_id', '=', record.company_id.id)
+                ]
+                domain.append(('warehouse_id', '=', record.warehouse_id.id))
+                all_valuations = stock_valuations.search(domain)
+                if all_valuations:
+                    total_quantity = sum(v.quantity for v in all_valuations)
+                    total_value = sum(v.value for v in all_valuations)
+                    if total_quantity<0:
+                        raise ValidationError("Quantity in the warehouse is not enough for this transaction.")
                     
-                
                     else:
-                        if all_valuations:
-                            for valuation in all_valuations:
-                                totalquantity += valuation.quantity
-                                totalamount += valuation.value
-                                # rateusd=totalquantity
-                            # applicablequantity= totalquantity
-                            # applicableamount = totalamount
-                        if totalquantity<0:
-                            raise ValidationError("Quantity in the warehouse is not enough for this transaction.")
-                            
-                        else:
-                            rateusd = round(totalamount/totalquantity, 2)
-                            applicablequantity = record.quantity
-                            applicableamount = applicablequantity * rateusd
-                if record.stock_move_id.picking_id.valuation_price != 0:
-                    record.unit_cost = record.stock_move_id.picking_id.valuation_price
-                    record.value = record.quantity * record.stock_move_id.picking_id.valuation_price
-                    for ae in record.account_move_id.line_ids:
-                        ae.remove_move_reconcile()
-                        ae.move_id.button_draft()
-                        ae.move_id.button_cancel()
-                    self._validate_accounting_entries()
-                    return
-                elif applicablequantity!=0 and applicableamount!=0:
-                    rateusd = round(applicableamount / applicablequantity, 2)
-                    if round(record.unit_cost,2)!=round(rateusd,2):
-                        wrong+= 1
-                    record.unit_cost = rateusd
-                    record.value = applicableamount
-                    for ae in record.account_move_id.line_ids:
-                        ae.remove_move_reconcile()
-                        ae.move_id.button_draft()
-                        ae.move_id.button_cancel()
-                    self._validate_accounting_entries()
+                        rateusd = round(total_value/total_quantity, 2)
+                        applicablequantity = record.quantity
+                        applicableamount = applicablequantity * rateusd
+            #force feeding rate if valuation price is not 0
+            
+            if applicablequantity!=0 and applicableamount!=0:
+                rateusd = round(applicableamount / applicablequantity, 2)
+                if round(record.unit_cost,2)!=round(rateusd,2):
+                    wrong+= 1
+                record.unit_cost = rateusd
+                record.value = applicableamount
+                self.reset_accounting(record)
+    
+        if wrong > 0:
+            self.recalculate_stock_value()
+                
+                
+    def reset_accounting(self,record):
+        record.account_move_id.line_ids.remove_move_reconcile()
+        record.account_move_id.button_draft()
+        record.account_move_id.button_cancel()
+        record._validate_accounting_entries()
                     # record.account_move_id.state = 'draft'
                     # for ae in record.account_move_id.line_ids:
                     #     ae.remove_move_reconcile()
@@ -326,8 +331,7 @@ class StockValuationLayer(models.Model):
                     #             ae.with_context(
                     #                 check_move_validity=False).credit = rateusd* newquantity * -1
                     # record.account_move_id.state = 'posted'
-        if wrong > 0:
-            self.recalculate_stock_value()
+
     
     # def recalculate_stock_value(self):
     #     for record in self:
