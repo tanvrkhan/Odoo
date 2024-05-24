@@ -66,6 +66,14 @@
             <field name="state">code</field>
             <field name="code">records.repost()</field>
         </record>
+         <record id="model_stock_valuation_fix_valuation_warehouse" model="ir.actions.server">
+            <field name="name">Fix warehouse</field>
+            <field name="model_id" ref="stock_account.model_stock_valuation_layer"/>
+            <field name="binding_model_id" ref="stock_account.model_stock_valuation_layer"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.fix_valuation_warehouse()</field>
+        </record>
         <record id="model_stock_picking_action_set_draft" model="ir.actions.server">
             <field name="name">Set to draft</field>
             <field name="model_id" ref="stock.model_stock_picking"/>

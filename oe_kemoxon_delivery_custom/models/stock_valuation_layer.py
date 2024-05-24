@@ -322,7 +322,9 @@ class StockValuationLayer(models.Model):
                 picking._action_done()
             except Exception as e:
                 raise ValidationError(str(e))
-
+    def fix_valuation_warehouse(self):
+        for rec in self:
+            rec.stock_move_id.picking_id.fix_valuation_warehouse()
                     # record.account_move_id.state = 'draft'
                     # for ae in record.account_move_id.line_ids:
                     #     ae.remove_move_reconcile()
