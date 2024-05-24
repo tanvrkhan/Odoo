@@ -354,6 +354,13 @@ class TransferControllerBI(models.Model):
                     'fusion_delivery_id': rec.deliveryid,
                     'company_id': company.id
                 })
+                
+    def fix_valuation_warehouse(self,picking,stock_move):
+        for rec in self:
+            if picking.location_id.usage == 'internal':
+                stock_move.stock_valuation_layer_ids.warehouse_id = picking.location_id.warehouse_id.id
+            elif picking.location_dest_id.usage == 'internal':
+                stock_move.stock_valuation_layer_ids.warehouse_id = picking.location_dest_id.warehouse_id.id
     def create_receipt(self):
         for record in self:
             try:
@@ -402,6 +409,7 @@ class TransferControllerBI(models.Model):
                                             self.update_existing_lines(stock_move, stock_move.product_id, rec, company)
                                             # stock_move.quantity_done = quantity
                                             picking._action_done()
+                                            self.fix_valuation_warehouse(picking,stock_move)
                                             continue
                                             self.env.cr.commit()
                                     else:
@@ -504,10 +512,7 @@ class TransferControllerBI(models.Model):
                                             picking.action_confirm()
                                             self.update_existing_lines(stock_move,product,rec,company)
                                             picking._action_done()
-                                            if picking.location_id.usage=='internal':
-                                                stock_move.stock_valuation_layer_ids.warehouse_id = picking.location_id.warehouse_id.id
-                                            elif picking.location_dest_id.usage=='internal':
-                                                stock_move.stock_valuation_layer_ids.warehouse_id = picking.location_dest_id.warehouse_id.id
+                                            self.fix_valuation_warehouse(picking,stock_move)
                                             # self.env.cr.commit()
                                             # stock_move.stock_valuation_layer_ids.recalculate_stock_value()
                                     else:
