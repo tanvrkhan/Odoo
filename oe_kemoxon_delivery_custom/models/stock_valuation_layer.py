@@ -270,7 +270,7 @@ class StockValuationLayer(models.Model):
                         base_currency, record.company_id, sm.date, True),2)
                     applicableamount += (rateusd * record.quantity)
 
-                self.reset_accounting(record)
+                
             #sales transaction
             elif record.quantity < 0:
                 domain = [
