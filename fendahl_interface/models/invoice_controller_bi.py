@@ -531,12 +531,13 @@ class InvoiceControllerBI(models.Model):
                                         cashflow_id = self.env['cashflow.controller.bi'].search(
                                             [('invoicenumber', '=', rec.invoicenumber),('cashflowstatus', '!=', 'Defunct'),('quantitystatus', '=', 'Actual'),('buysell', '=', 'Buy')],limit=1)
                                         for cfline in cashflow_lines:
-                                            if cfline['payablereceivable' ] == 'Payable':
-                                                if float(round(cfline['extendedamount'],2))*-1 == line.price_total:
-                                                    self.update_existing_line(line,pol,company,cfline,cashflow_id)
-                                            else:
-                                                if float(round(cfline['extendedamount'],2)) == line.price_total:
-                                                    self.update_existing_line(line,pol,company,cfline,cashflow_id)
+                                            if cfline['material'] == line.product_id.name and (
+                                                    float(round(cfline['price'], 2)) == round(line.price_unit, 2)):
+                                                # if float(round(cfline['extendedamount'],2))*-1 == line.price_total:
+                                                self.update_existing_line(line,pol,company,cfline,cashflow_id)
+                                            # else:
+                                            #     if float(round(cfline['extendedamount'],2)) == line.price_total:
+                                            #         self.update_existing_line(line,pol,company,cfline,cashflow_id)
                                 
                                 existing_invoice.action_post()
                                 if invoice_reconciled_lines:
@@ -580,12 +581,16 @@ class InvoiceControllerBI(models.Model):
                                              ('cashflowstatus', '!=', 'Defunct'), ('quantitystatus', '=', 'Actual'),
                                              ('buysell', '=', 'Sell')], limit=1)
                                         for cfline in cashflow_lines:
-                                            if cfline['payablereceivable' ] == 'Receivable':
-                                                if float(round(cfline['extendedamount'], 2)) == line.price_total or -5<= (float(round(cfline['extendedamount'], 2)) - line.price_total)<=5:
-                                                    self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
-                                            else:
-                                                if float(round(cfline['extendedamount'], 2))*-1 == line.price_total  or -5<= (float(round(cfline['extendedamount'], 2)) - line.price_total)<=5:
-                                                    self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
+                                            if cfline['material'] == line.product_id.name and (
+                                                    float(round(cfline['price'], 2)) == round(line.price_unit,2)):
+                                                self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
+                                            # if cfline['payablereceivable' ] == 'Receivable':
+                                                # if float(round(cfline['extendedamount'], 2)) == line.price_total or -5<= (float(round(cfline['extendedamount'], 2)) - line.price_total)<=5:
+                                                #     self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
+                                               
+                                            # else:
+                                            #     if float(round(cfline['extendedamount'], 2))*-1 == line.price_total  or -5<= (float(round(cfline['extendedamount'], 2)) - line.price_total)<=5:
+                                            #         self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
                                                 
                                 
                                 existing_invoice.action_post()
