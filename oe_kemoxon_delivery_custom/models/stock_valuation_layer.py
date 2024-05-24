@@ -309,6 +309,20 @@ class StockValuationLayer(models.Model):
         record.account_move_id.button_cancel()
         self.env.cr.commit()
         record._validate_accounting_entries()
+        
+    def repost(self):
+        for rec in self:
+            try:
+                sm = rec.stock_move_id
+                quantity = sm.quantity_done
+                picking = rec.stock_move_id.picking_id
+                picking.set_stock_move_to_draft()
+                picking.action_confirm()
+                sm.quantity_done = quantity
+                picking._action_done()
+            except Exception as e:
+                raise ValidationError(str(e))
+
                     # record.account_move_id.state = 'draft'
                     # for ae in record.account_move_id.line_ids:
                     #     ae.remove_move_reconcile()
