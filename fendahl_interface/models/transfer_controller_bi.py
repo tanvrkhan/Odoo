@@ -314,18 +314,16 @@ class TransferControllerBI(models.Model):
             else:
                 self.env['transfer.controller.bi'].create(data)
                 self.env.cr.commit()
-    
+    def get_quantity_from_controller(self,rec,product):
+        if rec.fromcontractqtyuomcode == product.uom_id.name:
+            return rec.fromactualqty if rec.fromactualqty else rec.fromscheduledqty
+        elif rec.toactualqtyuomcode == product.uom_id.name:
+            return rec.toactualqty if rec.toactualqty else rec.toscheduledqty
     def update_existing_lines(self,stock_move,product,rec,company):
         lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid, product.id,
                                                            company.id)
         
-        quantity = 0
-        if rec.frombuyselldisplaytext == "Buy":
-            if rec.fromcontractqtyuomcode == product.uom_id.name:
-                quantity = rec.fromactualqty if rec.fromactualqty else rec.fromscheduledqty
-        elif rec.tobuyselldisplaytext == "Sell":
-            if rec.toactualqtyuomcode == product.uom_id.name:
-                quantity = rec.toactualqty if rec.toactualqty else rec.toscheduledqty
+        quantity = self.get_quantity_from_controller(rec,product)
         existing_line = stock_move.move_line_ids.filtered(
             lambda ml: ml.fusion_delivery_id == rec.deliveryid)
         if existing_line:
@@ -400,6 +398,7 @@ class TransferControllerBI(models.Model):
                                         if stock_move.fusion_last_modify == rec.lastmodifydate:
                                             continue
                                         else:
+                                            stock_move.fusion_delivery_id = rec.deliveryid
                                             stock_move.fusion_last_modify = rec.lastmodifydate
                                             stock_move = sms.search([('id', '=', exists.id)])
                                             picking = stock_move.picking_id
@@ -580,11 +579,8 @@ class TransferControllerBI(models.Model):
                                             'fusion_delivery_id': rec.deliveryid,  #
                                         }
                                         picking = self.env['stock.picking'].create(picking_vals)
-                                        quantity = 0.00
-                                        if rec.fromcontractqtyuomcode == product.uom_id.name:
-                                            quantity = rec.fromactualqty
-                                        if rec.toactualqtyuomcode == product.uom_id.name:
-                                            quantity = rec.toactualqty
+                                        quantity = get_quantity_from_controller(rec,product)
+                                        
                                         move_vals = {
                                             'name': 'Internal Transfer ' + str(rec.frommotcode) + ' - ' + str(
                                                 rec.tomotcode),

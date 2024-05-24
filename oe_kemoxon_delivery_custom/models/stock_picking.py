@@ -287,7 +287,7 @@ class StockPicking(models.Model):
             moves.move_line_ids.state = 'draft'
             moves.state = 'draft'
             moves.state = 'draft'
-
+            
             for line in record.move_ids.move_line_ids:
                 if line.lot_id:
                     previous_lot = line.lot_id
