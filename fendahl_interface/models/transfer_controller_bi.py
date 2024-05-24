@@ -405,8 +405,7 @@ class TransferControllerBI(models.Model):
                                             picking.set_stock_move_to_draft()
                                             quantity = 0
                                             picking.action_confirm()
-                                            self.update_existing_lines(stock_move, stock_move.product_id, rec, company)
-                                            # stock_move.quantity_done = quantity
+                                            self.update_existing_lines(stock_move, product, rec, company)
                                             picking._action_done()
                                             self.fix_valuation_warehouse(picking,stock_move)
                                             continue

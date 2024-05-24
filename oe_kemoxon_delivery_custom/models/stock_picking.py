@@ -274,12 +274,13 @@ class StockPicking(models.Model):
         for record in self:
             existingstate= record.state
             am = record.move_ids.stock_valuation_layer_ids.account_move_id
+            for ae in am.line_ids:
+                ae.remove_move_reconcile()
             am.line_ids.remove_move_reconcile()
             am.button_draft()
             am.unlink()
             moves = record.move_ids
-            # for ae in record.move_ids.stock_valuation_layer_ids.account_move_id.line_ids:
-            #     ae.remove_move_reconcile()
+            
             # record.move_ids.stock_valuation_layer_ids.account_move_id.line_ids.unlink()
             # record.move_ids.stock_valuation_layer_ids.account_move_id.unlink()
             moves.stock_valuation_layer_ids.unlink()
