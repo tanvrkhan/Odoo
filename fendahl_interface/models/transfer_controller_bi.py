@@ -611,7 +611,7 @@ class TransferControllerBI(models.Model):
                 log_error = self.env['fusion.sync.history.errors'].log_error('TransferController', rec.fromsegmentid,
                                                                              str(e),
                                                                              rec.tointernalcompany)
-                raise UserError('Error processing API data: %s', str(e))
+                raise UserError( str(e) + str(rec))
                 # _logger.error('Error processing API data: %s', str(e))
                 # if pol:
                 #     pol = self.env['purchase.order.line'].search([('fusion_segment_id', '=', pol.termnumber)],limit=1)

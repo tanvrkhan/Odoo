@@ -281,8 +281,6 @@ class StockPicking(models.Model):
             am.unlink()
             moves = record.move_ids
             
-            # record.move_ids.stock_valuation_layer_ids.account_move_id.line_ids.unlink()
-            # record.move_ids.stock_valuation_layer_ids.account_move_id.unlink()
             moves.stock_valuation_layer_ids.unlink()
             record.state = 'draft'
             moves.move_line_ids.state = 'draft'

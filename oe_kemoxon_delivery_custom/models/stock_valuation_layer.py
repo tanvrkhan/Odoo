@@ -269,6 +269,8 @@ class StockValuationLayer(models.Model):
                         pl.price_unit,
                         base_currency, record.company_id, sm.date, True),2)
                     applicableamount += (rateusd * record.quantity)
+
+                self.reset_accounting(record)
             #sales transaction
             elif record.quantity < 0:
                 domain = [
@@ -298,15 +300,21 @@ class StockValuationLayer(models.Model):
                 record.unit_cost = rateusd
                 record.value = applicableamount
                 self.reset_accounting(record)
-    
+                
+            
+            
+            
         if wrong > 0:
             self.recalculate_stock_value()
                 
                 
     def reset_accounting(self,record):
-        record.account_move_id.line_ids.remove_move_reconcile()
-        record.account_move_id.button_draft()
-        record.account_move_id.button_cancel()
+        am =record.account_move_id
+        am.line_ids.remove_move_reconcile()
+        for ae in am.line_ids:
+            ae.remove_move_reconcile()
+        am.button_draft()
+        am.button_cancel()
         self.env.cr.commit()
         record._validate_accounting_entries()
         
