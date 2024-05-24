@@ -293,13 +293,13 @@ class StockValuationLayer(models.Model):
                         applicableamount = applicablequantity * rateusd
             #force feeding rate if valuation price is not 0
             
-                if applicablequantity!=0 and applicableamount!=0:
-                    rateusd = round(applicableamount / applicablequantity, 2)
-                    if round(record.unit_cost,2)!=round(rateusd,2):
-                        wrong+= 1
-                    record.unit_cost = rateusd
-                    record.value = applicableamount
-                    self.reset_accounting(record)
+            if applicablequantity!=0 and applicableamount!=0:
+                rateusd = round(applicableamount / applicablequantity, 2)
+                if round(record.unit_cost,2)!=round(rateusd,2):
+                    wrong+= 1
+                record.unit_cost = rateusd
+                record.value = applicableamount
+                self.reset_accounting(record)
                 
             
             
