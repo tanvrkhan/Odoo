@@ -533,8 +533,11 @@ class InvoiceControllerBI(models.Model):
                                         for cfline in cashflow_lines:
                                             if cfline['material'] == line.product_id.name and (
                                                     float(round(cfline['price'], 2)) == round(line.price_unit, 2)):
-                                                # if float(round(cfline['extendedamount'],2))*-1 == line.price_total:
                                                 self.update_existing_line(line,pol,company,cfline,cashflow_id)
+                                            elif len(existing_invoice.line_ids.filtered(
+                                                    lambda r: r.display_type == 'product')) == 1:
+                                                self.update_existing_line(line,pol,company,cfline,cashflow_id)
+                                                
                                             # else:
                                             #     if float(round(cfline['extendedamount'],2)) == line.price_total:
                                             #         self.update_existing_line(line,pol,company,cfline,cashflow_id)
@@ -559,7 +562,7 @@ class InvoiceControllerBI(models.Model):
                             existing_invoice.write({'fusion_segment_code': sol.fusion_segment_code}) if so else None
                            
                             if existing_invoice.line_ids:
-                                for line in existing_invoice.line_ids:
+                                for line in existing_invoice.line_ids.filtered(lambda r: r.display_type=='product'):
                                     # cashflow_line = self.env['cashflow.controller.bi'].search(
                                     #     [('invoicenumber', '=', rec.invoicenumber)])
                                     cashflow_lines = self.env['cashflow.controller.bi'].read_group(
@@ -583,6 +586,8 @@ class InvoiceControllerBI(models.Model):
                                         for cfline in cashflow_lines:
                                             if cfline['material'] == line.product_id.name and (
                                                     float(round(cfline['price'], 2)) == round(line.price_unit,2)):
+                                                self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
+                                            elif len(existing_invoice.line_ids.filtered(lambda r: r.display_type=='product'))==1:
                                                 self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
                                             # if cfline['payablereceivable' ] == 'Receivable':
                                                 # if float(round(cfline['extendedamount'], 2)) == line.price_total or -5<= (float(round(cfline['extendedamount'], 2)) - line.price_total)<=5:
