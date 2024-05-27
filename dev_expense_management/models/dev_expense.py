@@ -66,57 +66,57 @@ class dev_expense(models.Model):
         tax_account_id = False
         if self.amount_tax:
             tax_account_id = self.get_tax_account()
+
         move_lines = []
-        # source line
         company_currency = self.company_id.currency_id
+
+        # Source lines
         for expense_line in self.expense_lines:
-            currency_converted_amount = self.currency_id._convert(expense_line.amount_total,
-                                                                  company_currency,
-                                                                  self.company_id,
-                                                                  self.date)
+            currency_converted_amount = self.currency_id._convert(expense_line.amount_total, company_currency,
+                                                                  self.company_id, self.date)
             move_line_src = {
                 'name': str(expense_line.name),
                 'quantity': expense_line.quantity,
                 'debit': currency_converted_amount,
                 'credit': 0,
                 'amount_currency': expense_line.amount_total,
-                'account_id': expense_line.account_id and expense_line.account_id.id or False,
-                'product_id': expense_line.product_id and expense_line.product_id.id or False,
-                'product_uom_id': expense_line.product_id and expense_line.product_id.uom_id and expense_line.product_id.uom_id.id or False,
-                'currency_id': expense_line.currency_id and expense_line.currency_id.id or False,
+                'account_id': expense_line.account_id.id or False,
+                'product_id': expense_line.product_id.id or False,
+                'product_uom_id': expense_line.product_id.uom_id.id or False,
+                'currency_id': expense_line.currency_id.id or False,
             }
             move_lines.append(move_line_src)
+
+        # Destination line
+        total_expense_amount = sum(expense_line.amount_total for expense_line in self.expense_lines)
+        currency_converted_amount = self.currency_id._convert(total_expense_amount, company_currency, self.company_id,
+                                                              self.date)
+        account_id = self.get_account_id_from_journal()
+        move_line_dst = {
+            'name': self.name,
+            'debit': 0,
+            'credit': currency_converted_amount,
+            'amount_currency': -total_expense_amount,
+            'account_id': account_id.id or False,
+            'date_maturity': self.date,
+            'currency_id': self.currency_id.id or False,
+        }
+        move_lines.append(move_line_dst)
+
+        # Tax line
         if self.amount_tax > 0:
-            currency_converted_amount = self.currency_id._convert(self.amount_tax,
-                                                                  company_currency,
-                                                                  self.company_id,
+            currency_converted_amount = self.currency_id._convert(self.amount_tax, company_currency, self.company_id,
                                                                   self.date)
-            move_line_src = {
+            move_line_tax = {
                 'name': 'Tax',
                 'debit': currency_converted_amount,
                 'credit': 0,
                 'amount_currency': self.amount_tax,
-                'account_id': tax_account_id and tax_account_id.id or False,
-                'currency_id': self.currency_id and self.currency_id.id or False,
+                'account_id': tax_account_id.id or False,
+                'currency_id': self.currency_id.id or False,
             }
-            move_lines.append(move_line_src)
+            move_lines.append(move_line_tax)
 
-        # destination line
-        currency_converted_amount = self.currency_id._convert(self.amount_total,
-                                                              company_currency,
-                                                              self.company_id,
-                                                              self.date)
-        account_id = self.get_account_id_from_journal()
-        move_line_dst = {
-            'name': (self.name) + ' - ' + str(expense_line.name),
-            'debit': 0,
-            'credit': currency_converted_amount,
-            'amount_currency': -expense_line.amount_total,
-            'account_id': account_id and account_id.id or False,
-            'date_maturity': self.date,
-            'currency_id': self.currency_id and self.currency_id.id or False,
-        }
-        move_lines.append(move_line_dst)
         return move_lines
 
     def create_expense_journal_entry(self):
