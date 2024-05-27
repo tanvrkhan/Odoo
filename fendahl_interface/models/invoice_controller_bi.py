@@ -683,8 +683,8 @@ class InvoiceControllerBI(models.Model):
             existing_line.name = pol.product_id.name
             existing_line.product_id = product.id
             existing_line.product_uom_id = uom.id
-            existing_line.quantity = float(cf['quantity'])
-            existing_line.price_unit = cf['price'] * multiplier
+            existing_line.quantity = float(cf['quantity']) * multiplier
+            existing_line.price_unit = cf['price']
             if pol:
                 existing_line.purchase_line_id = pol.id
                 existing_line.analytic_distribution = pol.analytic_distribution
@@ -783,8 +783,8 @@ class InvoiceControllerBI(models.Model):
             existing_line.name = sol.product_id.name
             existing_line.product_id = sol.product_id.id
             existing_line.product_uom_id = uom.id
-            existing_line.quantity = float(cf['quantity'])
-            existing_line.price_unit = cf['price'] * multiplier
+            existing_line.quantity = float(cf['quantity']) * multiplier
+            existing_line.price_unit = cf['price']
             if sol:
                 # existing_line.purchase_line_id = sol.id
                 existing_line.analytic_distribution = sol.analytic_distribution
