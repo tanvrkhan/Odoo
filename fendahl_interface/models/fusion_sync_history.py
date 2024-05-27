@@ -86,6 +86,15 @@ class FusionSyncHistory(models.Model):
         self.env['cashflow.controller.bi'].sync_cashflow()
         self.env['trade.controller.bi'].sync_trade()
         self.env['invoice.controller.bi'].sync_invoice()
+        
+    def sync_trades(self):
+        self.env['trade.controller.bi'].sync_trade()
+    def sync_transfers(self):
+        self.env['transfer.controller.bi'].sync_transfer()
+    def sync_cashflow(self):
+        self.env['cashflow.controller.bi'].sync_cashflow()
+    def sync_invoices(self):
+        self.env['invoice.controller.bi'].sync_invoice()
     def get_partner_info(self,info):
         result =''
         url = "https://fusionsqlmirrorapi.azure-api.net/api/partner"

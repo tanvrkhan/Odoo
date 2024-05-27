@@ -531,13 +531,14 @@ class InvoiceControllerBI(models.Model):
                                         cashflow_id = self.env['cashflow.controller.bi'].search(
                                             [('invoicenumber', '=', rec.invoicenumber),('cashflowstatus', '!=', 'Defunct'),('buysell', '=', 'Buy')],limit=1)
                                         for cfline in cashflow_lines:
-                                            if cfline['material'] == line.product_id.name and (
-                                                    float(round(cfline['price'], 2)) == round(line.price_unit, 2)) and ((line.balance<0 and cfline['extendedamount']<0) or (line.balance>0 and cfline['extendedamount']>0)):
+                                            if (cfline['material'] == line.product_id.name and (
+                                                    float(round(cfline['price'], 2)) == round(line.price_unit, 2))
+                                                    and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (line.balance>0 and (cfline['extendedamount']*-1)>0))):
                                                 self.update_existing_line(line,pol,company,cfline,cashflow_id)
-                                            elif float(round(cfline['price'], 2)) == round(line.price_unit, 2) and ((line.balance<0 and cfline['extendedamount']<0) or (line.balance>0 and cfline['extendedamount']>0)):
+                                            elif float(round(cfline['price'], 2)) == round(line.price_unit, 2) and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (line.balance>0 and (cfline['extendedamount']*-1)>0)):
                                                     self.update_existing_line(line,pol,company,cfline,cashflow_id)
                                             elif len(existing_invoice.line_ids.filtered(
-                                                    lambda r: r.display_type == 'product')) == 1 and ((line.balance<0 and cfline['extendedamount']<0) or (line.balance>0 and cfline['extendedamount']>0)):
+                                                    lambda r: r.display_type == 'product')) == 1 and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (line.balance>0 and (cfline['extendedamount']*-1)>0)):
                                                 self.update_existing_line(line,pol,company,cfline,cashflow_id)
                                                 
                                             # else:
