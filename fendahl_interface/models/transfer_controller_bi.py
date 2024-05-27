@@ -395,21 +395,21 @@ class TransferControllerBI(models.Model):
                                     exists = sms.search(
                                         [('fusion_delivery_id', '=', rec.deliveryid)], limit=1)
                                     if exists:
-                                        if stock_move.fusion_last_modify == rec.lastmodifydate:
+                                        if exists.fusion_last_modify == datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f'):
                                             continue
                                         else:
-                                            stock_move.fusion_delivery_id = rec.deliveryid
-                                            stock_move.fusion_last_modify = rec.lastmodifydate
-                                            stock_move = sms.search([('id', '=', exists.id)])
-                                            picking = stock_move.picking_id
+                                            exists.fusion_delivery_id = rec.deliveryid
+                                            exists.fusion_last_modify = datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f')
+                                            exists = sms.search([('id', '=', exists.id)])
+                                            picking = exists.picking_id
                                             picking.set_stock_move_to_draft()
                                             quantity = 0
                                             picking.action_confirm()
                                             # self.update_existing_lines(stock_move, product, rec, company)
-                                            self.update_existing_lines(stock_move, stock_move.product_id, rec, company)
+                                            self.update_existing_lines(exists, exists.product_id, rec, company)
                                             # stock_move.quantity_done = quantity
                                             picking._action_done()
-                                            self.fix_valuation_warehouse(picking,stock_move)
+                                            self.fix_valuation_warehouse(picking,exists)
                                             continue
                                             self.env.cr.commit()
                                     else:
@@ -483,9 +483,9 @@ class TransferControllerBI(models.Model):
                                                                 stock_move = stock_move_posted.copy()
                                     
                                     if po or so:
-                                        if stock_move and stock_move.fusion_last_modify == rec.lastmodifydate:
+                                        if stock_move and stock_move.fusion_last_modify == datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f'):
                                             picking = stock_move.picking_id
-                                            stock_move.fusion_last_modify = rec.lastmodifydate
+                                            stock_move.fusion_last_modify = datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f')
                                             if product.uom_id.rounding != 0.001:
                                                 product.uom_id.rounding = 0.001
                                             picking.fusion_delivery_id = rec.deliveryid
@@ -607,6 +607,7 @@ class TransferControllerBI(models.Model):
                                 [('fusion_delivery_id', '=', rec.deliveryid)])
                             if cancelled_entry:
                                 cancelled_entry.picking_id.set_stock_move_to_draft()
+                self.env.cr.commit()
             except Exception as e:
                 log_error = self.env['fusion.sync.history.errors'].log_error('TransferController', rec.fromsegmentid,
                                                                              str(e),
