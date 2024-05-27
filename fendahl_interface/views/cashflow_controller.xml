@@ -33,5 +33,18 @@
               parent="account.menu_finance_receivables"
               sequence="114"/>
     </data>
+    <data noupdate="1">  <!-- noupdate="1" means it won't be updated automatically at module updates -->
+        <record id="cron_sync_missing_cashflow" model="ir.cron">
+            <field name="name">Sync Missing cashflows</field>
+            <field name="active" eval="False"/>
+            <field name="user_id" ref="base.user_root"/>  <!-- Executes as Superuser -->
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>  <!-- -1 for indefinite repetitions -->
+            <field name="doall" eval="False"/>  <!-- False means do not run all missed if server stops -->
+            <field name="model_id" ref="model_cashflow_controller_bi"/>
+            <field name="code">model.sync_missing_cashflows()</field>
+        </record>
+    </data>
 
 </odoo>

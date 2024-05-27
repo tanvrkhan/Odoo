@@ -520,7 +520,7 @@ class InvoiceControllerBI(models.Model):
                                     # cashflow_line = self.env['cashflow.controller.bi'].search(
                                     #     [('invoicenumber', '=', rec.invoicenumber)])
                                     cashflow_lines = self.env['cashflow.controller.bi'].read_group(
-                                    domain=[('invoicenumber', '=', rec.invoicenumber),('cashflowstatus', '!=', 'Defunct'),('buysell', '=', 'Buy')],
+                                    domain=[('invoicenumber', '=', rec.invoicenumber),('cashflowstatus', '!=', 'Defunct')],
                                     fields=['payablereceivable', 'costtype', 'commodity', 'material', 'quantityuom', 'quantity', 'price', 'extendedamount'],             # Fields to load
                                     groupby=['erptaxcode', 'costtype','price','quantityuom','payablereceivable', 'commodity', 'material'],
                                     lazy=False                                  # Get results for each partner directly
@@ -540,7 +540,10 @@ class InvoiceControllerBI(models.Model):
                                             elif len(existing_invoice.line_ids.filtered(
                                                     lambda r: r.display_type == 'product')) == 1 and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (line.balance>0 and (cfline['extendedamount']*-1)>0)):
                                                 self.update_existing_line(line,pol,company,cfline,cashflow_id)
-                                                
+                                            else:
+                                                line_to_update = existing_invoice.line_ids.filtered(lambda r: r.product_id.name == (cfline['material'] if cfline['costtype'] == 'Primary Settlement' else cfline['costtype']) and r.display_type=='product')
+                                                if len(line_to_update) == 1:
+                                                    self.update_existing_line(line_to_update,pol,company,cfline,cashflow_id)
                                             # else:
                                             #     if float(round(cfline['extendedamount'],2)) == line.price_total:
                                             #         self.update_existing_line(line,pol,company,cfline,cashflow_id)
@@ -706,8 +709,8 @@ class InvoiceControllerBI(models.Model):
             existing_line.price_unit = float(cf['extendedamount'] * multiplier)
             existing_analytic = existing_line.analytic_distribution
             if pol:
-                if pol.product_id != existing_line.product_id:
-                    existing_line.purchase_line_id = [(6, 0, [])]
+                # if pol.product_id != existing_line.product_id:
+                #     # existing_line.purchase_line_id = [(6, 0, [])]
                 existing_line.analytic_distribution = pol.analytic_distribution
                 if existing_analytic:
                     for aa in existing_analytic:
@@ -723,8 +726,8 @@ class InvoiceControllerBI(models.Model):
             existing_line.price_unit = float(cf['extendedamount'])* multiplier
             existing_analytic = existing_line.analytic_distribution
             if pol:
-                if pol.product_id != existing_line.product_id:
-                    existing_line.purchase_line_id = [(6, 0, [])]
+                # if pol.product_id != existing_line.product_id:
+                #     existing_line.purchase_line_id = [(6, 0, [])]
                 existing_line.analytic_distribution = pol.analytic_distribution
                 if existing_analytic:
                     for aa in existing_analytic:
@@ -740,8 +743,8 @@ class InvoiceControllerBI(models.Model):
             existing_line.price_unit = float(cf['price']) * multiplier
             existing_analytic = existing_line.analytic_distribution
             if pol:
-                if pol.product_id != existing_line.product_id:
-                    existing_line.purchase_line_id = [(6, 0, [])]
+                # if pol.product_id != existing_line.product_id:
+                #     existing_line.purchase_line_id = [(6, 0, [])]
                 existing_line.analytic_distribution = pol.analytic_distribution
                 if existing_analytic:
                     for aa in existing_analytic:

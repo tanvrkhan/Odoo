@@ -398,7 +398,7 @@ class CashflowControllerBi(models.Model):
             'Content-Type': 'application/json',
         }
         params = {
-            'date': last_sync
+            'date': '2023-01-01'
         }
         response = requests.get(url, headers=headers, params=params)
         if response.status_code == 200:
@@ -407,6 +407,29 @@ class CashflowControllerBi(models.Model):
                 json_data = interface.lowercase_keys(json_data)
                 for data in json_data:
                     self.regular_update_cashflow('cashflow', data)
+                interface.update_sync_interface('cashflow')
+            except Exception as e:
+                _logger.error('Error processing API data: %s', str(e))
+        else:
+            _logger.error('Failed to fetch data from external API: %s', response.status_code)
+    def sync_missing_cashflows(self):
+        interface = self.env['fusion.sync.history']
+        last_sync = interface.get_last_sync('cashflow')
+        url = "https://fusionsqlmirrorapi.azure-api.net/api/Cashflow"
+        headers = {
+            'Ocp-Apim-Subscription-Key': '38cb5797102f4b1f852ae8ff6e8482e5',
+            'Content-Type': 'application/json',
+        }
+        params = {
+            'date': last_sync
+        }
+        response = requests.get(url, headers=headers, params=params)
+        if response.status_code == 200:
+            try:
+                json_data = response.json()
+                json_data = interface.lowercase_keys(json_data)
+                for data in json_data:
+                    self.sync_missing_cashflow('cashflow', data)
                 interface.update_sync_interface('cashflow')
             except Exception as e:
                 _logger.error('Error processing API data: %s', str(e))
@@ -437,5 +460,13 @@ class CashflowControllerBi(models.Model):
             else:
                 self.env['cashflow.controller.bi'].create(data)
                 self.env.cr.commit()
-        
+    
+    def sync_missing_cashflow(self, interface_type, data):
+        if interface_type == 'cashflow':
+            exists = self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])])
+            if exists:
+                return
+            else:
+                self.env['cashflow.controller.bi'].create(data)
+                self.env.cr.commit()
         
