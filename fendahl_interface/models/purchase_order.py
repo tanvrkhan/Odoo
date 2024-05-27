@@ -77,3 +77,12 @@ class AccountMoveLine(models.Model):
     custom_section_number = fields.Char('Fusion Custom Section Number')
     fusion_segment_code = fields.Char('Fusion Section Code')
     cashflow_id = fields.Integer('Cashflow Id')
+    
+    def fetch_invoice_from_controller(self):
+        for rec in self:
+            if rec.move_id.fusion_reference:
+                invoicenumber = rec.move_id.fusion_reference.split(',')[0]
+                if invoicenumber:
+                    controllerinvoice = (self.env['invoice.controller.bi'].search('invoicenumber','=',invoicenumber))
+                    if invoicenumber:
+                        invoicenumber.create_bill()

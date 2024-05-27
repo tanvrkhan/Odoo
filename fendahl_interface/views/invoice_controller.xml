@@ -44,6 +44,16 @@
                 action = records.create_bill()
             </field>
         </record>
+        <record id="model_account_move_line_create_invoice" model="ir.actions.server">
+            <field name="name">Fetch from controller</field>
+            <field name="model_id" ref="model_account_move_line"/>
+            <field name="binding_model_id" ref="model_account_move_line"/>
+            <field name="binding_view_types">tree,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                action = records.fetch_invoice_from_controller()
+            </field>
+        </record>
           <menuitem id="menu_fusion_Invoice"
               name="Fusion Invoice Controller"
               action="action_fusion_invoice_controller"
