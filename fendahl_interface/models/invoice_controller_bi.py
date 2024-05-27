@@ -592,6 +592,10 @@ class InvoiceControllerBI(models.Model):
                                             elif float(round(cfline['price'], 2)) == round(line.price_unit, 2) and ((line.balance<0 and cfline['extendedamount']<0) or (line.balance>0 and cfline['extendedamount']>0)):
                                                     self.update_existing_si_line(line, sol, company, cfline,
                                                                                  cashflow_id)
+                                                    
+                                            elif cfline['costtype']!='Primary Settlement' and float(round(cfline['extendedamount'], 2)) == round(line.price_unit, 2) and ((line.balance>0 and cfline['extendedamount']<0) or (line.balance<0 and cfline['extendedamount']>0)):
+                                                    self.update_existing_si_line(line, sol, company, cfline,
+                                                                                 cashflow_id)
                                             elif len(existing_invoice.line_ids.filtered(lambda r: r.display_type=='product'))==1 and ((line.balance<0 and cfline['extendedamount']<0) or (line.balance>0 and cfline['extendedamount']>0)):
                                                 self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
                                             # if cfline['payablereceivable' ] == 'Receivable':
@@ -683,8 +687,8 @@ class InvoiceControllerBI(models.Model):
             existing_line.name = pol.product_id.name
             existing_line.product_id = product.id
             existing_line.product_uom_id = uom.id
-            existing_line.quantity = float(cf['quantity'])
-            existing_line.price_unit = cf['price'] * multiplier
+            existing_line.quantity = float(cf['quantity']) * multiplier
+            existing_line.price_unit = cf['price']
             if pol:
                 existing_line.purchase_line_id = pol.id
                 existing_line.analytic_distribution = pol.analytic_distribution
@@ -698,7 +702,7 @@ class InvoiceControllerBI(models.Model):
             
             # existing_line.product_uom_id = 1,
             existing_line.quantity = float(1.00)
-            existing_line.price_unit = float(cf['extendedamount'] )
+            existing_line.price_unit = float(cf['extendedamount'] * multiplier)
             existing_analytic = existing_line.analytic_distribution
             if pol:
                 if pol.product_id != existing_line.product_id:
@@ -783,8 +787,8 @@ class InvoiceControllerBI(models.Model):
             existing_line.name = sol.product_id.name
             existing_line.product_id = sol.product_id.id
             existing_line.product_uom_id = uom.id
-            existing_line.quantity = float(cf['quantity'])
-            existing_line.price_unit = cf['price'] * multiplier
+            existing_line.quantity = float(cf['quantity']) * multiplier
+            existing_line.price_unit = cf['price']
             if sol:
                 # existing_line.purchase_line_id = sol.id
                 existing_line.analytic_distribution = sol.analytic_distribution
@@ -816,7 +820,7 @@ class InvoiceControllerBI(models.Model):
             existing_line.name = 'Down payment reversal',
             existing_line.product_uom_id = existing_line.product_id.uom_id,
             existing_line.quantity = float(1.00)
-            existing_line.price_unit = float(cf['extendedamount']*multiplier)
+            existing_line.price_unit = float(cf['extendedamount'])*multiplier
             existing_analytic = existing_line.analytic_distribution
             existing_line.tax_ids = [
                 (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
@@ -834,8 +838,8 @@ class InvoiceControllerBI(models.Model):
             cost = self.env['fusion.sync.history'].validate_cost(cf['costtype'])
             existing_line.name = sol.product_id.name if sol else cost.name
             existing_line.product_id = cost.id
-            existing_line.quantity = float(cf['quantity']) if cf['quantity'] else 1
-            existing_line.price_unit = float(cf['price']) * multiplier
+            existing_line.quantity = (float(cf['quantity']) if cf['quantity'] else 1) * multiplier
+            existing_line.price_unit = float(cf['price'])
             existing_analytic = existing_line.analytic_distribution
             existing_line.tax_ids = [
                 (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
