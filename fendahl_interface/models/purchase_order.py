@@ -83,6 +83,6 @@ class AccountMoveLine(models.Model):
             if rec.move_id.fusion_reference:
                 invoicenumber = rec.move_id.fusion_reference.split(',')[0]
                 if invoicenumber:
-                    controllerinvoice = (self.env['invoice.controller.bi'].search('invoicenumber','=',invoicenumber))
-                    if invoicenumber:
-                        invoicenumber.create_bill()
+                    controllerinvoice = self.env['invoice.controller.bi'].search([('invoicenumber','=',invoicenumber)],limit=1)
+                    if controllerinvoice:
+                        controllerinvoice.create_bill()
