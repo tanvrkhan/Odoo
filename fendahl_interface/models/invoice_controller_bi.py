@@ -534,6 +534,8 @@ class InvoiceControllerBI(models.Model):
                                             if cfline['material'] == line.product_id.name and (
                                                     float(round(cfline['price'], 2)) == round(line.price_unit, 2)):
                                                 self.update_existing_line(line,pol,company,cfline,cashflow_id)
+                                            elif float(round(cfline['price'], 2)) == round(line.price_unit, 2):
+                                                    self.update_existing_line(line,pol,company,cfline,cashflow_id)
                                             elif len(existing_invoice.line_ids.filtered(
                                                     lambda r: r.display_type == 'product')) == 1:
                                                 self.update_existing_line(line,pol,company,cfline,cashflow_id)
@@ -587,6 +589,9 @@ class InvoiceControllerBI(models.Model):
                                             if cfline['material'] == line.product_id.name and (
                                                     float(round(cfline['price'], 2)) == round(line.price_unit,2)):
                                                 self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
+                                            elif float(round(cfline['price'], 2)) == round(line.price_unit, 2):
+                                                    self.update_existing_si_line(line, sol, company, cfline,
+                                                                                 cashflow_id)
                                             elif len(existing_invoice.line_ids.filtered(lambda r: r.display_type=='product'))==1:
                                                 self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
                                             # if cfline['payablereceivable' ] == 'Receivable':
@@ -596,11 +601,15 @@ class InvoiceControllerBI(models.Model):
                                             # else:
                                             #     if float(round(cfline['extendedamount'], 2))*-1 == line.price_total  or -5<= (float(round(cfline['extendedamount'], 2)) - line.price_total)<=5:
                                             #         self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
-                                                
-                                
+                                    else:
+                                        raise UserError('Cashflow lines not found in Odoo')
                                 existing_invoice.action_post()
                                 if invoice_reconciled_lines:
                                     self.reconcile_entries(invoice_reconciled_lines, existing_invoice)
+                            else:
+                                raise UserError('Invoice has no lines in Odoo.')
+                        else:
+                            raise UserError('Invoice doesnt exist in Odoo.')
             else:
                 existing_invoice = self.check_existing_invoice(rec.invoicenumber)
                 if existing_invoice:
