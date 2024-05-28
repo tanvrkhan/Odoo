@@ -44,5 +44,5 @@ class WarehouseCosting(models.Model):
                 'sh_onhand_qty':round(quantity,3),
                 'cost':round(value,2)
             })
-            
+    
         
