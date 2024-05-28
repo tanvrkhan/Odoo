@@ -321,6 +321,28 @@ class TransferControllerBI(models.Model):
             return rec.toactualqty if rec.toactualqty else rec.toscheduledqty
         elif rec.fromscheduledqty == rec.fromactualqty and rec.fromscheduledqtyuomcode == product.uom_id.name:
             return rec.fromactualqty
+        # else:
+        #     uom =''
+        #     if rec.toactualqtyuomcode:
+        #         quantity=rec.toactualqty
+        #         uom = rec.toactualqtyuomcode
+        #
+        #     elif rec.fromactualqtyuomcode:
+        #         quantity = rec.fromactualqty
+        #         uom = rec.fromactualqtyuomcode
+        #
+        #     elif rec.fromscheduledqtyuomcode:
+        #         quantity = rec.fromscheduledqty
+        #         uom = rec.fromscheduledqtyuomcode
+        #
+        #     elif rec.toscheduledqtyuomcode:
+        #         quantity = rec.toscheduledqty
+        #         uom = rec.toscheduledqtyuomcode
+        #
+        #     conversion_rate = self.env['fusion.sync.history'].get_uom_conversion_factor(product, product.uom_id.name,uom)
+        #     if conversion_rate:
+        #         return quantity * conversion_rate
+            
     def update_existing_lines(self,stock_move,product,rec,company):
         lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid, product.id,
                                                            company.id)
@@ -402,16 +424,16 @@ class TransferControllerBI(models.Model):
                                     exists = sms.search(
                                         [('fusion_delivery_id', '=', rec.deliveryid)], limit=1)
                                     if exists:
-                                        if exists.fusion_last_modify == datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f'):
+                                        if exists.fusion_last_modify == datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f') and exists.state=='done':
                                             continue
                                         else:
                                             exists.fusion_delivery_id = rec.deliveryid
                                             exists.fusion_last_modify = datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f')
                                             exists = sms.search([('id', '=', exists.id)])
                                             picking = exists.picking_id
-                                            if picking.state  in ('done','waiting','confirmed','cancel'):
-                                                picking.set_stock_move_to_draft()
-                                                picking.action_confirm()
+                                            # if picking.state  in ('done','waiting','confirmed','cancel'):
+                                            #     picking.set_stock_move_to_draft()
+                                            #     picking.action_confirm()
                                             self.update_existing_lines(exists, exists.product_id, rec, company)
                                             # stock_move.quantity_done = quantity
                                             picking._action_done()
@@ -489,7 +511,7 @@ class TransferControllerBI(models.Model):
                                                                 stock_move = stock_move_posted.copy()
                                     
                                     if po or so:
-                                        if stock_move and stock_move.fusion_last_modify == datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f'):
+                                        if stock_move and (stock_move.fusion_last_modify != datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f') or stock_move.state!='done'):
                                             picking = stock_move.picking_id
                                             stock_move.fusion_last_modify = datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f')
                                             if product.uom_id.rounding != 0.001:
