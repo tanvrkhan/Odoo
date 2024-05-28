@@ -87,3 +87,22 @@ class ProductTemplate(models.Model):
     _inherit = "product.template"
 
     warehouse_cost_lines = fields.One2many('sh.warehouse.cost', 'product_id',related="product_variant_id.warehouse_cost_lines")
+    
+    def update_wh_costing(self):
+        for rec in self:
+            valuations = self.env['stock.valuation.layer'].read_group(
+                domain=[('product_id', '=', rec.product_variant_id.id),
+                        ('company_id', '=', self.env.company.id)
+                       ],
+                fields=['warehouse_id', 'quantity', 'value'],
+                # Fields to load
+                groupby=['warehouse_id'],
+                lazy=False  # Get results for each partner directly
+            )
+            for valuation in valuations:
+                if valuation['quantity']>0:
+                    cost = valuation['value']/valuation['quantity']
+                    if cost>0:
+                        rec.warehouse_cost_lines.create_update_costing(rec.product_variant_id,valuation['warehouse_id'],valuation['quantity'],cost)
+            # rec.warehouse_cost_lines._compute_cost_warehouse_wise()
+                

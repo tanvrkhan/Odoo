@@ -330,6 +330,8 @@ class TransferControllerBI(models.Model):
             for line in existing_line:
                 if line.qty_done != float(quantity):
                     line.qty_done = quantity
+                    line.location_id = stock_move.picking_id.location_id
+                    line.location_dest_id = stock_move.picking_id.location_dest_id
         else:
             line = stock_move.move_line_ids.filtered(lambda ml: ml.product_id == product)
             if line:
@@ -340,6 +342,8 @@ class TransferControllerBI(models.Model):
                         if line2.qty_done != float(quantity):
                             line2.qty_done = quantity
                             line2.fusion_delivery_id = rec.deliveryid
+                            line2.location_id = stock_move.picking_id.location_id
+                            line2.location_dest_id = stock_move.picking_id.location_dest_id
                             i += 1
             else:
                 self.env['stock.move.line'].create({
@@ -349,6 +353,7 @@ class TransferControllerBI(models.Model):
                     'move_id': stock_move.id,
                     'picking_id': stock_move.picking_id.id,
                     'location_id': stock_move.picking_id.location_id.id,
+                    'location_dest_id': stock_move.picking_id.location_dest_id.id,
                     'fusion_delivery_id': rec.deliveryid,
                     'company_id': company.id
                 })
@@ -500,6 +505,8 @@ class TransferControllerBI(models.Model):
                                                 rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
                                             stock_move.date = datetime.datetime.strptime(rec.deliverycompletiondate,
                                                                                          '%Y-%m-%dT%H:%M:%S')
+                                            stock_move.location_id = picking.location_id,
+                                            stock_move.location_dest_id = picking.location_dest_id,
                                             if rec.buyselldisplaytext == "Buy":
                                                 picking_type = self.env['stock.picking.type'].search(
                                                     [('code', '=', 'incoming'), ('warehouse_id', '=', warehouse.id)], limit=1)

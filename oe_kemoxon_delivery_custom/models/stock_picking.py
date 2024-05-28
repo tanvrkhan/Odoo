@@ -358,21 +358,29 @@ class StockPicking(models.Model):
             record.updatestatus="waspostedbefore"
 
     def sync_stock_quant(self):
+        self.ensure_one()
         company = self.env.company.id
-        quants=self.env['stock.quant'].search([('product_id','=',self.product_id.id)]).unlink()
+        quants=self.env['stock.quant'].search([('product_id','=',self.product_id.id),('company_id','=',self.company_id.id)])
+        if quants:
+            self.env.cr.execute('''
+                       delete from stock_quant where id in  %s
+                    ''', [tuple(quants.ids)])
         # if quants:
         #     for quant in quants:
         #         quant.unlink()
         
-        pickings = self.env['stock.picking'].search([('product_id','=',self.product_id.id)])
+        pickings = self.env['stock.picking'].search([('product_id','=',self.product_id.id),('state','=','done')])
+        pickings.fix_valuation_warehouse()
+        self.env.cr.commit()
+        quant = self.env['stock.quant'].search([])
         for record in pickings:
             for line in record.move_ids.move_line_ids:
                 # check if move is in state done and quantity is not 0.
                 if line.qty_done != 0 and line.state == 'done' and line.product_id.type=='product':
-                    location_quant = self.env['stock.quant'].search(['&', ('product_id', '=', line.product_id.id)
+                    location_quant = quant.search(['&', ('product_id', '=', line.product_id.id)
                                                                         , ('lot_id', '=', line.lot_id.id)
                                                                         , ('location_id', '=', line.location_id.id)
-                                                                     # ,('company_id','=',line.company_id.id)
+                                                                     ,('company_id','=',line.company_id.id)
                                                                      ])
                     # if entry already exists, update it.
                     if location_quant:
@@ -380,7 +388,7 @@ class StockPicking(models.Model):
                                                                            package_id=None, owner_id=None,
                                                                            location_id=line.location_id,
                                                                            quantity=-1 * line.qty_done,
-                                                                           lot_id=line.lot_id, in_date=None)
+                                                                           lot_id=line.lot_id, in_date=record.date_done)
                     # otherwise create it.
                     else:
                         self.env['stock.quant'].create({
@@ -388,11 +396,11 @@ class StockPicking(models.Model):
                             'location_id': line.location_id.id,
                             'lot_id': line.lot_id.id,
                             'quantity': -1 * line.qty_done,
-                            # 'company_id':line.company_id.id
+                            'company_id':line.company_id.id
                         })
-                    location_dest_quant = self.env['stock.quant'].search(['&','&', ('product_id', '=', line.product_id.id)
+                    location_dest_quant = quant.search(['&','&', ('product_id', '=', line.product_id.id)
                                                                              , ('lot_id', '=', line.lot_id.id)
-                                                                             # ,('company_id','=',line.company_id.id)
+                                                                             ,('company_id','=',line.company_id.id)
                                                                           ,('location_id', '=', line.location_dest_id.id)
                                                                           ])
                     if location_dest_quant:
@@ -400,7 +408,7 @@ class StockPicking(models.Model):
                                                                            package_id=None, owner_id=None,
                                                                            location_id=line.location_dest_id,
                                                                            quantity=1 * line.qty_done,
-                                                                           lot_id=line.lot_id, in_date=None)
+                                                                           lot_id=line.lot_id, in_date=record.date_done)
                     # otherwise create it.
                     else:
                         self.env['stock.quant'].create({
@@ -410,7 +418,8 @@ class StockPicking(models.Model):
                             'quantity': line.qty_done,
                             # 'company_id':line.company_id.id
                         })
-
+        self.env.cr.commit()
+        self.product_id.product_tmpl_id.update_wh_costing()
     def stock_quant_zero(self):
         all_quant = self.env['stock.quant'].search([])
         for quant in all_quant:
@@ -445,13 +454,17 @@ class StockPicking(models.Model):
 
     def fix_valuation_warehouse(self):
         for rec in self:
+            sm = rec.move_ids
+            sp = rec.move_ids.picking_id
             if rec.location_id.usage=='internal':
-                rec.move_ids.stock_valuation_layer_ids.warehouse_id = rec.location_id.warehouse_id.id
+                sm.stock_valuation_layer_ids.warehouse_id = rec.location_id.warehouse_id.id
+                sm.location_id = sp.location_id
+                sm.move_line_ids.location_id = sp.location_id
             elif rec.location_dest_id.usage=='internal':
-                rec.move_ids.stock_valuation_layer_ids.warehouse_id = rec.location_dest_id.warehouse_id.id
-    def update_valuation(self):
-        self.move_ids.stock_valuation_layer_ids.unit_cost = self.valuation_price
-        self.move_ids.stock_valuation_layer_ids.value = self.valuation_price * self.move_ids.stock_valuation_layer_ids.quantity
+                sm.stock_valuation_layer_ids.warehouse_id = rec.location_dest_id.warehouse_id.id
+                sm.location_dest_id = sp.location_dest_id
+                sm.move_line_ids.location_dest_id = sp.location_dest_id
+   
         
     
 # search where location id is 8 and add it to a collection

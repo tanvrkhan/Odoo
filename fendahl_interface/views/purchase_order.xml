@@ -9,6 +9,14 @@
     <field name="state">code</field>
     <field name="code">records.cancel()</field>
     </record>
+        <record id="model_force_delete_account_move" model="ir.actions.server">
+    <field name="name">Force Delete - KX</field>
+    <field name="model_id" ref="stock.model_stock_move_line"/>
+    <field name="binding_model_id" ref="stock.model_stock_move_line"/>
+    <field name="binding_view_types">list,form</field>
+    <field name="state">code</field>
+    <field name="code">records.force_delete()</field>
+    </record>
 <!--         <record id="model_fusion_sync_history_action_trigger_sync_nomination" model="ir.actions.server">-->
 <!--            <field name="name">ICancel PO</field>-->
 <!--            <field name="model_id" ref="model_purchase_order"/>-->

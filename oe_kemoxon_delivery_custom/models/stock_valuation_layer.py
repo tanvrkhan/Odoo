@@ -133,15 +133,14 @@ class StockValuationLayer(models.Model):
             if rec.stock_move_id:
                 if rec.stock_move_id.picking_id:
                     self.env['stock.picking'].search([('stock_move_id', '=', rec.stock_move_id.picking_id.id)]).set_stock_move_to_draft()
-                else:
-                    self.env['stock.move.line'].search(
-                        [('move_id', '=', rec.stock_move_id.id)]).state='draft'
-                    self.env['stock.move.line'].search(
-                        [('move_id', '=', rec.stock_move_id.id)]).unlink()
-                    self.env['stock.move'].search(
-                        [('id', '=', rec.stock_move_id.id)]).state='draft'
-                    self.env['stock.move'].search(
-                        [('id', '=', rec.stock_move_id.id)]).unlink()
+                self.env['stock.move.line'].search(
+                    [('move_id', '=', rec.stock_move_id.id)]).state='draft'
+                self.env['stock.move.line'].search(
+                    [('move_id', '=', rec.stock_move_id.id)]).unlink()
+                self.env['stock.move'].search(
+                    [('id', '=', rec.stock_move_id.id)]).state='draft'
+                self.env['stock.move'].search(
+                    [('id', '=', rec.stock_move_id.id)]).unlink()
             self.env['stock.valuation.layer'].search([('id', '=', rec.id)]).unlink()
             #     self.env['stock.move'].search([('id', '=', rec.stock_move_id)]).unlink()
             # self.env['stock.valuation.layer'].search([('id', '=', rec.id)]).unlink()
@@ -464,3 +463,4 @@ class StockValuationLayer(models.Model):
         if total_amount and total_quantity:
             avco = total_amount / total_quantity
             self.update_valuation(avco, record)
+    

@@ -60,6 +60,16 @@ class StockMove(models.Model):
 class StockMoveLine(models.Model):
     _inherit = 'stock.move.line'
     fusion_delivery_id = fields.Char('Fusion Delivery ID')
+    
+    def force_delete(self):
+        for rec in self:
+            if not rec.move_id.picking_id:
+                rec.state='draft'
+                rec.move_id.state='draft'
+                ml = rec.id
+                m = rec.move_id.id
+                self.env['stock.move.line'].search([('id','=',ml)]).unlink()
+                self.env['stock.move'].search([('id', '=', m)]).unlink()
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
