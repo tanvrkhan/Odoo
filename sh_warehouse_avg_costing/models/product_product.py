@@ -106,7 +106,7 @@ class ProductTemplate(models.Model):
                         rec.warehouse_cost_lines.create_update_costing(rec.product_variant_id,valuation['warehouse_id'],valuation['quantity'],cost)
                 elif valuation['quantity']<=0:
                     costing = self.env['sh.warehouse.cost'].search(
-                        [('product_id', '=', rec.product_variant_id), ('warehouse_id', '=', valuation['warehouse_id'][0])]).unlink()
+                        [('product_id', '=', rec.product_variant_id.id), ('warehouse_id', '=', valuation['warehouse_id'][0])]).unlink()
                 
             # rec.warehouse_cost_lines._compute_cost_warehouse_wise()
                 
