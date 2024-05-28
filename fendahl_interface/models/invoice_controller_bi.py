@@ -591,9 +591,9 @@ class InvoiceControllerBI(models.Model):
                                              ('buysell', '=', 'Sell')], limit=1)
                                         for cfline in cashflow_lines:
                                             if cfline['material'] == line.product_id.name and (
-                                                    float(round(cfline['price'], 2)) == round(line.price_unit,2)) and ((line.balance<0 and cfline['extendedamount']<0) or (line.balance>0 and cfline['extendedamount']>0)):
+                                                    float(round(cfline['price'], 2)) == round(line.price_unit,2)) and ((line.balance>0 and cfline['extendedamount']<0) or (line.balance<0 and cfline['extendedamount']>0)):
                                                 self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
-                                            elif float(round(cfline['price'], 2)) == round(line.price_unit, 2) and ((line.balance<0 and cfline['extendedamount']<0) or (line.balance>0 and cfline['extendedamount']>0)):
+                                            elif float(round(cfline['price'], 2)) == round(line.price_unit, 2) and ((line.balance>0 and cfline['extendedamount']<0) or (line.balance<0 and cfline['extendedamount']>0)):
                                                     self.update_existing_si_line(line, sol, company, cfline,
                                                                                  cashflow_id)
                                                     
