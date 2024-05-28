@@ -431,9 +431,9 @@ class TransferControllerBI(models.Model):
                                             exists.fusion_last_modify = datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f')
                                             exists = sms.search([('id', '=', exists.id)])
                                             picking = exists.picking_id
-                                            # if picking.state  in ('done','waiting','confirmed','cancel'):
-                                            #     picking.set_stock_move_to_draft()
-                                            #     picking.action_confirm()
+                                            if picking.state  in ('done','waiting','confirmed','cancel'):
+                                                picking.set_stock_move_to_draft()
+                                                picking.action_confirm()
                                             self.update_existing_lines(exists, exists.product_id, rec, company)
                                             # stock_move.quantity_done = quantity
                                             picking._action_done()
