@@ -5,7 +5,7 @@ from odoo import api, fields, models, _
 from dateutil import parser
 from datetime import date, datetime
 from odoo.exceptions import ValidationError
-
+from odoo.exceptions import UserError, Warning
 
 class PurchaseOrderSync(models.Model):
     _inherit = 'purchase.order'
@@ -96,3 +96,7 @@ class AccountMoveLine(models.Model):
                     controllerinvoice = self.env['invoice.controller.bi'].search([('invoicenumber','=',invoicenumber)],limit=1)
                     if controllerinvoice:
                         controllerinvoice.create_bill()
+                    else:
+                        raise UserError('The invoice doesnt exist in fusion controller')
+                else:
+                    raise UserError('The invoice is not from Fusion')

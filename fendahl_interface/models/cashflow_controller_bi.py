@@ -361,7 +361,7 @@ class CashflowControllerBi(models.Model):
     deliveryorigin = fields.Char(string='deliveryorigin')
     carriagename = fields.Char(string='carriagename')
     transportcarriagetype = fields.Char(string='transportcarriagetype')
-    lastmodifydate = fields.Date(string='lastmodifydate')
+    lastmodifydate = fields.Char(string='lastmodifydate')
     birecordcreationdate = fields.Date(string='birecordcreationdate')
     
     def import_cashflow(self):
@@ -381,8 +381,8 @@ class CashflowControllerBi(models.Model):
             try:
                 json_data = response.json()
                 json_data = interface.lowercase_keys(json_data)
-                for data in json_data:
-                    self.create_update_cashflow('cashflow', data)
+                # for data in json_data:
+                self.create_update_cashflow('cashflow', json_data)
                 interface.update_sync_interface('cashflow')
             except Exception as e:
                 _logger.error('Error processing API data: %s', str(e))
@@ -398,15 +398,15 @@ class CashflowControllerBi(models.Model):
             'Content-Type': 'application/json',
         }
         params = {
-            'date': '2023-01-01'
+            'date': last_sync
         }
         response = requests.get(url, headers=headers, params=params)
         if response.status_code == 200:
             try:
                 json_data = response.json()
                 json_data = interface.lowercase_keys(json_data)
-                for data in json_data:
-                    self.regular_update_cashflow('cashflow', data)
+                # for data in json_data:
+                self.regular_update_cashflow('cashflow', json_data)
                 interface.update_sync_interface('cashflow')
             except Exception as e:
                 _logger.error('Error processing API data: %s', str(e))
@@ -414,7 +414,7 @@ class CashflowControllerBi(models.Model):
             _logger.error('Failed to fetch data from external API: %s', response.status_code)
     def sync_missing_cashflows(self):
         interface = self.env['fusion.sync.history']
-        last_sync = interface.get_last_sync('cashflow')
+        last_sync = '2022-01-01'
         url = "https://fusionsqlmirrorapi.azure-api.net/api/Cashflow"
         headers = {
             'Ocp-Apim-Subscription-Key': '38cb5797102f4b1f852ae8ff6e8482e5',
@@ -428,45 +428,51 @@ class CashflowControllerBi(models.Model):
             try:
                 json_data = response.json()
                 json_data = interface.lowercase_keys(json_data)
-                for data in json_data:
-                    self.sync_missing_cashflow('cashflow', data)
+                # for data in json_data:
+                self.sync_missing_cashflow('cashflow', json_data)
                 interface.update_sync_interface('cashflow')
             except Exception as e:
                 _logger.error('Error processing API data: %s', str(e))
         else:
             _logger.error('Failed to fetch data from external API: %s', response.status_code)
     
-    def create_update_cashflow(self, interface_type, data):
-        if interface_type == 'cashflow':
-            exists = self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])])
+    def create_update_cashflow(self, interface_type, json_data):
+        all = self.env['cashflow.controller.bi'].search([])
+        for data in json_data:
+            exists = all.search([('cashflowid', '=', data['cashflowid'])])
             if exists:
-                return
-                # if exists:
-                #     return
-                # else:
-                #     self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
-                #     self.env['cashflow.controller.bi'].create(data)
-                #     self.env.cr.commit()
+                continue
             else:
                 self.env['cashflow.controller.bi'].create(data)
                 self.env.cr.commit()
     
-    def regular_update_cashflow(self, interface_type, data):
+    def regular_update_cashflow(self, interface_type, json_data):
         if interface_type == 'cashflow':
-            exists = self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])])
-            if exists:
-                self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
-                self.env['cashflow.controller.bi'].create(data)
-            else:
+            existing_ids = set(self.env['cashflow.controller.bi'].search([]).mapped('cashflowid'))
+            new_entries = [data for data in json_data if data['cashflowid'] not in existing_ids]
+            # Process each item in json_data
+            for data in new_entries:
                 self.env['cashflow.controller.bi'].create(data)
                 self.env.cr.commit()
+                
+            # all_cfs = self.env['cashflow.controller.bi'].search([])
+            # for data in json_data:
+            #     exists = all_cfs.search([('cashflowid', '=', data['cashflowid'])])
+            #     if exists:
+            #         self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
+            #         self.env['cashflow.controller.bi'].create(data)
+            #     else:
+            #         self.env['cashflow.controller.bi'].create(data)
+            #         # self.env.cr.commit()
     
-    def sync_missing_cashflow(self, interface_type, data):
+    def sync_missing_cashflow(self, interface_type, json_data):
         if interface_type == 'cashflow':
-            exists = self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])])
-            if exists:
-                return
-            else:
-                self.env['cashflow.controller.bi'].create(data)
-                self.env.cr.commit()
+            all_cfs = self.env['cashflow.controller.bi'].search([])
+            for data in json_data:
+                exists = all_cfs.search([('cashflowid', '=', data['cashflowid'])])
+                if exists:
+                    continue
+                else:
+                    self.env['cashflow.controller.bi'].create(data)
+                    # self.env.cr.commit()
         

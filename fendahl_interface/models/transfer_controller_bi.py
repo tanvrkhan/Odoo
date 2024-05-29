@@ -258,8 +258,8 @@ class TransferControllerBI(models.Model):
             try:
                 json_data = response.json()
                 json_data = interface.lowercase_keys(json_data)
-                for data in json_data:
-                    self.create_update_transfer('transfer', data)
+                # for data in json_data:
+                self.create_update_transfer('transfer', json_data)
                 interface.update_sync_interface('transfer')
             except Exception as e:
                 _logger.error('Error processing API data: %s', str(e))
@@ -282,38 +282,41 @@ class TransferControllerBI(models.Model):
             try:
                 json_data = response.json()
                 json_data = interface.lowercase_keys(json_data)
-                for data in json_data:
-                    self.regular_update_transfer('transfer', data)
+                self.create_update_transfer('transfer', json_data)
                 interface.update_sync_interface('transfer')
             except Exception as e:
                 _logger.error('Error processing API data: %s', str(e))
         else:
             _logger.error('Failed to fetch data from external API: %s', response.status_code)
     
-    def create_update_transfer(self, interface_type, data):
+    def create_update_transfer(self, interface_type, json_data):
         if interface_type == 'transfer':
-            exists = self.env['transfer.controller.bi'].search([('deliveryid', '=', data['deliveryid'])])
-            if exists:
-                return
-                # if exists:
-                #     return
-                # else:
-                #     self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
-                #     self.env['cashflow.controller.bi'].create(data)
-                #     self.env.cr.commit()
-            else:
-                self.env['transfer.controller.bi'].create(data)
-                self.env.cr.commit()
+            all = self.env['transfer.controller.bi'].search([])
+            for data in json_data:
+                exists = all.search([('deliveryid', '=', data['deliveryid'])])
+                if exists:
+                    return
+                    # if exists:
+                    #     return
+                    # else:
+                    #     self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
+                    #     self.env['cashflow.controller.bi'].create(data)
+                    #     self.env.cr.commit()
+                else:
+                    self.env['transfer.controller.bi'].create(data)
+                    self.env.cr.commit()
     
-    def regular_update_transfer(self, interface_type, data):
+    def regular_update_transfer(self, interface_type, json_data):
         if interface_type == 'transfer':
-            exists = self.env['transfer.controller.bi'].search([('deliveryid', '=', data['deliveryid'])])
-            if exists:
-                self.env['transfer.controller.bi'].search([('deliveryid', '=', data['deliveryid'])]).unlink()
-                self.env['transfer.controller.bi'].create(data)
-            else:
-                self.env['transfer.controller.bi'].create(data)
-                self.env.cr.commit()
+            all = self.env['transfer.controller.bi'].search([])
+            for data in json_data:
+                exists = all.search([('deliveryid', '=', data['deliveryid'])])
+                if exists:
+                    self.env['transfer.controller.bi'].search([('deliveryid', '=', data['deliveryid'])]).unlink()
+                    self.env['transfer.controller.bi'].create(data)
+                else:
+                    self.env['transfer.controller.bi'].create(data)
+                    self.env.cr.commit()
     def get_quantity_from_controller(self,rec,product):
         if rec.fromcontractqtyuomcode == product.uom_id.name:
             return rec.fromactualqty if rec.fromactualqty else rec.fromscheduledqty

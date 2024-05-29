@@ -279,8 +279,7 @@ class TradeControllerBI(models.Model):
             try:
                 json_data = response.json()
                 json_data = interface.lowercase_keys(json_data)
-                for data in json_data:
-                    self.create_update_trade('trade', data)
+                self.regular_update_trade('trade', json_data)
                 interface.update_sync_interface('trade')
             except Exception as e:
                 _logger.error('Error processing API data: %s', str(e))
@@ -303,38 +302,41 @@ class TradeControllerBI(models.Model):
             try:
                 json_data = response.json()
                 json_data = interface.lowercase_keys(json_data)
-                for data in json_data:
-                    self.regular_update_trade('trade', data)
+                self.regular_update_trade('trade', json_data)
                 interface.update_sync_interface('trade')
             except Exception as e:
                 _logger.error('Error processing API data: %s', str(e))
         else:
             _logger.error('Failed to fetch data from external API: %s', response.status_code)
     
-    def create_update_trade(self, interface_type, data):
+    def create_update_trade(self, interface_type, json_data):
         if interface_type == 'trade':
-            exists = self.env['trade.controller.bi'].search([('dealmasterid', '=', data['dealmasterid']),('segmentid', '=', data['segmentid'])])
-            if exists:
-                return
-                # if exists:
-                #     return
-                # else:
-                #     self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
-                #     self.env['cashflow.controller.bi'].create(data)
-                #     self.env.cr.commit()
-            else:
-                self.env['trade.controller.bi'].create(data)
-                self.env.cr.commit()
+            all = self.env['trade.controller.bi'].search([])
+            for data in json_data:
+                exists = all.search([('dealmasterid', '=', data['dealmasterid']),('segmentid', '=', data['segmentid'])])
+                if exists:
+                    return
+                    # if exists:
+                    #     return
+                    # else:
+                    #     self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
+                    #     self.env['cashflow.controller.bi'].create(data)
+                    #     self.env.cr.commit()
+                else:
+                    self.env['trade.controller.bi'].create(data)
+                    self.env.cr.commit()
     
-    def regular_update_trade(self, interface_type, data):
+    def regular_update_trade(self, interface_type, json_data):
         if interface_type == 'trade':
-            exists = self.env['trade.controller.bi'].search([('dealmasterid', '=', data['dealmasterid']),('segmentid', '=', data['segmentid'])])
-            if exists:
-                self.env['trade.controller.bi'].search([('dealmasterid', '=', data['dealmasterid']),('segmentid', '=', data['segmentid'])]).unlink()
-                self.env['trade.controller.bi'].create(data)
-            else:
-                self.env['trade.controller.bi'].create(data)
-                self.env.cr.commit()
+            all = self.env['trade.controller.bi'].search([])
+            for data in json_data:
+                exists = all.search([('dealmasterid', '=', data['dealmasterid']),('segmentid', '=', data['segmentid'])])
+                if exists:
+                    self.env['trade.controller.bi'].search([('dealmasterid', '=', data['dealmasterid']),('segmentid', '=', data['segmentid'])]).unlink()
+                    self.env['trade.controller.bi'].create(data)
+                else:
+                    self.env['trade.controller.bi'].create(data)
+                    self.env.cr.commit()
     
     
     def validate_payment_term(self,settlementpaymentterm):
