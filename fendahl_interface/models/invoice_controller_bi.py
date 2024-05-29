@@ -525,25 +525,55 @@ class InvoiceControllerBI(models.Model):
                                     groupby=['erptaxcode', 'costtype','price','quantityuom','payablereceivable', 'commodity', 'material'],
                                     lazy=False                                  # Get results for each partner directly
                                     )
-                                    
+                                    quantity_multiplier = 1
+                                    if existing_invoice.move_type == 'in_refund':
+                                        primary_lines = sum(r['extendedamount'] for r in cashflow_lines if
+                                                            r['costtype'] == 'Primary Settlement')
+                                        other_lines = sum(r['extendedamount'] for r in cashflow_lines if
+                                                          r['costtype'] != 'Primary Settlement')
+                                        
+                                        if (primary_lines - other_lines) < 0:
+                                            quantity_multiplier = -1
                                     if cashflow_lines:
                                         
                                         cashflow_id = self.env['cashflow.controller.bi'].search(
                                             [('invoicenumber', '=', rec.invoicenumber),('cashflowstatus', '!=', 'Defunct'),('buysell', '=', 'Buy')],limit=1)
                                         for cfline in cashflow_lines:
-                                            if (cfline['material'] == line.product_id.name and (
-                                                    float(round(cfline['price'], 2)) == round(line.price_unit, 2))
-                                                    and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (line.balance>0 and (cfline['extendedamount']*-1)>0))):
-                                                self.update_existing_line(line,pol,company,cfline,cashflow_id)
-                                            elif float(round(cfline['price'], 2)) == round(line.price_unit, 2) and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (line.balance>0 and (cfline['extendedamount']*-1)>0)):
-                                                    self.update_existing_line(line,pol,company,cfline,cashflow_id)
-                                            elif len(existing_invoice.line_ids.filtered(
-                                                    lambda r: r.display_type == 'product')) == 1 and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (line.balance>0 and (cfline['extendedamount']*-1)>0)):
-                                                self.update_existing_line(line,pol,company,cfline,cashflow_id)
+                                            same_product_lines = existing_invoice.line_ids.filtered(
+                                                lambda r: r.display_type == 'product')
+                                            if len(same_product_lines) == 1:
+                                                if (cfline['material'] == line.product_id.name and (
+                                                        float(round(cfline['price'], 2)) == round(line.price_unit, 2))
+                                                        and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (line.balance>0 and (cfline['extendedamount']*-1)>0))):
+                                                    self.update_existing_line(line,pol,company,cfline,cashflow_id,quantity_multiplier)
+                                                elif float(round(cfline['price'], 2)) == round(line.price_unit, 2) and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (line.balance>0 and (cfline['extendedamount']*-1)>0)):
+                                                        self.update_existing_line(line,pol,company,cfline,cashflow_id,quantity_multiplier)
+                                                elif len(existing_invoice.line_ids.filtered(
+                                                        lambda r: r.display_type == 'product')) == 1 and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (line.balance>0 and (cfline['extendedamount']*-1)>0)):
+                                                    self.update_existing_line(line,pol,company,cfline,cashflow_id,quantity_multiplier)
+                                                else:
+                                                    line_to_update = existing_invoice.line_ids.filtered(lambda r: r.product_id.name == (cfline['material'] if cfline['costtype'] == 'Primary Settlement' else cfline['costtype']) and r.display_type=='product')
+                                                    if len(line_to_update) == 1:
+                                                        self.update_existing_line(line_to_update,pol,company,cfline,cashflow_id,quantity_multiplier)
                                             else:
-                                                line_to_update = existing_invoice.line_ids.filtered(lambda r: r.product_id.name == (cfline['material'] if cfline['costtype'] == 'Primary Settlement' else cfline['costtype']) and r.display_type=='product')
-                                                if len(line_to_update) == 1:
-                                                    self.update_existing_line(line_to_update,pol,company,cfline,cashflow_id)
+                                                # same_product_lines = existing_invoice.line_ids.filtered(lambda r: r.display_type=='product')
+                                                if len(same_product_lines)==1 and ((line.balance>0 and cfline['extendedamount']<0) or (line.balance<0 and cfline['extendedamount']>0)):
+                                                    self.update_existing_line(line, pol, company, cfline, cashflow_id,quantity_multiplier)
+                                                elif len(same_product_lines)>1:
+                                                    with_same_quantity = same_product_lines.filtered(
+                                                        lambda r: round(r.quantity, 2) == round(cfline['quantity'],
+                                                                                                2))
+                                                    if len(with_same_quantity)==1:
+                                                        self.update_existing_line(with_same_quantity, pol, company,
+                                                                                     cfline,
+                                                                                     cashflow_id,quantity_multiplier)
+                                                    elif len(with_same_quantity)>1:
+                                                        with_same_price = same_product_lines.filtered(
+                                                            lambda r: round(r.price_unit, 2) == round(cfline['price'],
+                                                                                                      2))
+                                                        if len(with_same_price) == 1:
+                                                            self.update_existing_line(with_same_price, pol, company, cfline,
+                                                                                 cashflow_id,quantity_multiplier)
                                             # else:
                                             #     if float(round(cfline['extendedamount'],2)) == line.price_total:
                                             #         self.update_existing_line(line,pol,company,cfline,cashflow_id)
@@ -705,7 +735,7 @@ class InvoiceControllerBI(models.Model):
             [('parentcashflowid', '=', parent_cashflow.cashflowid), ('costtype', '=', 'VAT')], limit=1)
         tax_rate_record = self.env['fusion.sync.history'].get_tax_record(tax_cf.erptaxcode,
                                                                          'purchase', company.id)
-    def update_existing_line(self, existing_line,pol,company,cf,cashflow_id):
+    def update_existing_line(self, existing_line,pol,company,cf,cashflow_id,quantity_multiplier):
         tax_rate_record = self.get_tax_rate_record(cashflow_id, company)
         multiplier = 1
         if existing_line.move_id.move_type == 'in_refund':
@@ -723,7 +753,7 @@ class InvoiceControllerBI(models.Model):
             existing_line.name = pol.product_id.name
             existing_line.product_id = product.id
             existing_line.product_uom_id = uom.id
-            existing_line.quantity = float(cf['quantity']) * multiplier
+            existing_line.quantity = float(cf['quantity']) * quantity_multiplier
             existing_line.price_unit = cf['price']
             if pol:
                 existing_line.purchase_line_id = pol.id
