@@ -243,8 +243,11 @@ class StockPicking(models.Model):
     def set_reserved_zero(self):
         for record in self:
             for move in record.move_ids:
-                for line in move.move_line_ids:
-                    line.reserved_uom_qty=0
+                if move.move_line_ids:
+                    self.env.cr.execute('''update stock_move_line set reserved_uom_qty=0,reserved_qty=0 where id in  %s
+                                                            ''', [tuple(move.move_line_ids.ids)])
+                # for line in move.move_line_ids:
+                #     line.reserved_uom_qty=0
 
     def action_view_transporter_invoice(self):
         action = {
