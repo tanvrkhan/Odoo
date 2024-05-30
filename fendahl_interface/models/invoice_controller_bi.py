@@ -544,37 +544,30 @@ class InvoiceControllerBI(models.Model):
                                             lambda r: r.display_type == 'product')
                                         if len(same_product_lines) == 1:
                                             if (cfline['material'] == same_product_lines.product_id.name and (
-                                                    float(round(cfline['price'], 2)) == round(line.price_unit, 2))
-                                                    and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (line.balance>0 and (cfline['extendedamount']*-1)>0))):
-                                                self.update_existing_line(line,pol,company,cfline,cashflow_id,quantity_multiplier)
-                                            elif float(round(cfline['price'], 2)) == round(line.price_unit, 2) and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (line.balance>0 and (cfline['extendedamount']*-1)>0)):
-                                                    self.update_existing_line(line,pol,company,cfline,cashflow_id,quantity_multiplier)
-                                            elif len(existing_invoice.line_ids.filtered(
-                                                    lambda r: r.display_type == 'product')) == 1 and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (line.balance>0 and (cfline['extendedamount']*-1)>0)):
-                                                self.update_existing_line(line,pol,company,cfline,cashflow_id,quantity_multiplier)
+                                                    float(round(cfline['price'], 2)) == round(same_product_lines.price_unit, 2))
+                                                    and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (same_product_lines.balance>0 and (cfline['extendedamount']*-1)>0))):
+                                                self.update_existing_line(same_product_lines,pol,company,cfline,cashflow_id,quantity_multiplier)
+                                            elif float(round(cfline['price'], 2)) == round(line.price_unit, 2) and ((same_product_lines.balance<0 and (cfline['extendedamount']*-1)<0) or (same_product_lines.balance>0 and (cfline['extendedamount']*-1)>0)):
+                                                    self.update_existing_line(same_product_lines,pol,company,cfline,cashflow_id,quantity_multiplier)
                                             else:
                                                 line_to_update = existing_invoice.line_ids.filtered(lambda r: r.product_id.name == (cfline['material'] if cfline['costtype'] == 'Primary Settlement' else cfline['costtype']) and r.display_type=='product')
                                                 if len(line_to_update) == 1:
                                                     self.update_existing_line(line_to_update,pol,company,cfline,cashflow_id,quantity_multiplier)
                                         else:
-                                            # same_product_lines = existing_invoice.line_ids.filtered(lambda r: r.display_type=='product')
-                                            if len(same_product_lines)==1 and ((line.balance>0 and cfline['extendedamount']<0) or (line.balance<0 and cfline['extendedamount']>0)):
-                                                self.update_existing_line(line, pol, company, cfline, cashflow_id,quantity_multiplier)
-                                            elif len(same_product_lines)>1:
-                                                with_same_quantity = same_product_lines.filtered(
-                                                    lambda r: round(r.quantity, 2) == round(cfline['quantity'],
-                                                                                            2))
-                                                if len(with_same_quantity)==1:
-                                                    self.update_existing_line(with_same_quantity, pol, company,
-                                                                                 cfline,
-                                                                                 cashflow_id,quantity_multiplier)
-                                                else:
-                                                    with_same_price = same_product_lines.filtered(
-                                                        lambda r: round(r.price_unit, 2) == round(cfline['price'],
-                                                                                                  2))
-                                                    if len(with_same_price) == 1:
-                                                        self.update_existing_line(with_same_price, pol, company, cfline,
+                                            with_same_quantity = same_product_lines.filtered(
+                                                lambda r: round(r.quantity, 2) == round(cfline['quantity'],
+                                                                                        2))
+                                            if len(with_same_quantity)==1:
+                                                self.update_existing_line(with_same_quantity, pol, company,
+                                                                             cfline,
                                                                              cashflow_id,quantity_multiplier)
+                                            else:
+                                                with_same_price = same_product_lines.filtered(
+                                                    lambda r: round(r.price_unit, 2) == round(cfline['price'],
+                                                                                              2))
+                                                if len(with_same_price) == 1:
+                                                    self.update_existing_line(with_same_price, pol, company, cfline,
+                                                                         cashflow_id,quantity_multiplier)
                                         
                                     
                                 else:
