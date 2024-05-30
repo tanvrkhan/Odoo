@@ -597,82 +597,63 @@ class InvoiceControllerBI(models.Model):
                             # existing_invoice.write({'sale_line_id': so.id}) if so else None
                             existing_invoice.write({'invoice_origin': so.name}) if so else None
                             existing_invoice.write({'fusion_segment_code': sol.fusion_segment_code}) if so else None
-                           
                             if existing_invoice.line_ids:
-                                for line in existing_invoice.line_ids.filtered(lambda r: r.display_type=='product'):
-                                    # cashflow_line = self.env['cashflow.controller.bi'].search(
-                                    #     [('invoicenumber', '=', rec.invoicenumber)])
-                                    cashflow_lines = self.env['cashflow.controller.bi'].read_group(
-                                        domain=[('invoicenumber', '=', rec.invoicenumber),
-                                                ('cashflowstatus', '!=', 'Defunct'),
-                                                ('buysell', '=', 'Sell')],
-                                        fields=['payablereceivable', 'costtype', 'commodity',
-                                                'material', 'quantityuom', 'quantity', 'price', 'extendedamount'],
-                                        # Fields to load
-                                        groupby=['erptaxcode', 'costtype', 'price', 'quantityuom', 'payablereceivable',
-                                                 'commodity', 'material','location'],
-                                        lazy=False  # Get results for each partner directly
-                                    )
-                                    quantity_multiplier = 1
-                                    if existing_invoice.move_type=='out_refund':
-                                        primary_lines = sum(r['extendedamount'] for r in cashflow_lines if
-                                                            r['costtype'] == 'Primary Settlement') * -1
-                                        other_lines = sum(r['extendedamount'] for r in cashflow_lines if
-                                                          r['costtype'] != 'Primary Settlement') * -1
-                                        
-                                        if (primary_lines - other_lines)<0:
-                                            quantity_multiplier = -1
-                                    if cashflow_lines:
-                                        
-                                        cashflow_id = self.env['cashflow.controller.bi'].search(
-                                            [('invoicenumber', '=', rec.invoicenumber),
-                                             ('cashflowstatus', '!=', 'Defunct'),
-                                             ('buysell', '=', 'Sell')], limit=1)
-                                        for cfline in cashflow_lines:
-                                            same_product_lines = existing_invoice.line_ids.filtered(
-                                                lambda r: r.display_type == 'product')
-                                            if len(same_product_lines)==1:
-                                                if cfline['material'] == line.product_id.name and (
-                                                        float(round(cfline['price'], 2)) == round(line.price_unit,2)) and ((line.balance>0 and cfline['extendedamount']<0) or (line.balance<0 and cfline['extendedamount']>0)):
-                                                    self.update_existing_si_line(line, sol, company, cfline, cashflow_id,quantity_multiplier)
-                                                elif float(round(cfline['price'], 2)) == round(line.price_unit, 2) and ((line.balance>0 and cfline['extendedamount']<0) or (line.balance<0 and cfline['extendedamount']>0)):
-                                                        self.update_existing_si_line(line, sol, company, cfline,
-                                                                                     cashflow_id,quantity_multiplier)
-                                                        
-                                                elif cfline['costtype']!='Primary Settlement' and float(round(cfline['extendedamount'], 2)) == round(line.price_unit, 2) and ((line.balance>0 and cfline['extendedamount']<0) or (line.balance<0 and cfline['extendedamount']>0)):
-                                                        self.update_existing_si_line(line, sol, company, cfline,
-                                                                                     cashflow_id,quantity_multiplier)
-                                                elif cfline['costtype']!='Primary Settlement' and float(round(cfline['extendedamount'], 2)) == round(line.balance, 2)*-1 and ((line.balance>0 and cfline['extendedamount']<0) or (line.balance<0 and cfline['extendedamount']>0)):
-                                                        self.update_existing_si_line(line, sol, company, cfline,
-                                                                                     cashflow_id,quantity_multiplier)
-                                            else:
-                                                # same_product_lines = existing_invoice.line_ids.filtered(lambda r: r.display_type=='product')
-                                                if len(same_product_lines)==1 and ((line.balance<0 and cfline['extendedamount']>0) or (line.balance>0 and cfline['extendedamount']<0)):
-                                                    self.update_existing_si_line(line, sol, company, cfline, cashflow_id,quantity_multiplier)
-                                                elif len(same_product_lines)>1:
-                                                    with_same_quantity = same_product_lines.filtered(
-                                                        lambda r: round(r.quantity, 2) == round(cfline['quantity'],
-                                                                                                2))
-                                                    if len(with_same_quantity)==1:
-                                                        self.update_existing_si_line(with_same_quantity, sol, company,
-                                                                                     cfline,
-                                                                                     cashflow_id,quantity_multiplier)
-                                                    else:
-                                                        with_same_price = same_product_lines.filtered(
-                                                            lambda r: round(r.price_unit, 2) == round(cfline['price'],
-                                                                                                      2))
-                                                        if len(with_same_price) == 1:
-                                                            self.update_existing_si_line(with_same_price, sol, company, cfline,
+                                # cashflow_line = self.env['cashflow.controller.bi'].search(
+                                #     [('invoicenumber', '=', rec.invoicenumber)])
+                                cashflow_lines = self.env['cashflow.controller.bi'].read_group(
+                                    domain=[('invoicenumber', '=', rec.invoicenumber),
+                                            ('cashflowstatus', '!=', 'Defunct'),
+                                            ('buysell', '=', 'Sell')],
+                                    fields=['payablereceivable', 'costtype', 'commodity',
+                                            'material', 'quantityuom', 'quantity', 'price', 'extendedamount'],
+                                    # Fields to load
+                                    groupby=['erptaxcode', 'costtype', 'price', 'quantityuom', 'payablereceivable',
+                                             'commodity', 'material','location'],
+                                    lazy=False  # Get results for each partner directly
+                                )
+                                quantity_multiplier = 1
+                                if existing_invoice.move_type=='out_refund':
+                                    primary_lines = sum(r['extendedamount'] for r in cashflow_lines if
+                                                        r['costtype'] == 'Primary Settlement') * -1
+                                    other_lines = sum(r['extendedamount'] for r in cashflow_lines if
+                                                      r['costtype'] != 'Primary Settlement') * -1
+                                    
+                                    if (primary_lines - other_lines)<0:
+                                        quantity_multiplier = -1
+                                if cashflow_lines:
+                                    
+                                    cashflow_id = self.env['cashflow.controller.bi'].search(
+                                        [('invoicenumber', '=', rec.invoicenumber),
+                                         ('cashflowstatus', '!=', 'Defunct'),
+                                         ('buysell', '=', 'Sell')], limit=1)
+                                    for cfline in cashflow_lines:
+                                        same_product_lines = existing_invoice.line_ids.filtered(
+                                            lambda r: r.display_type == 'product')
+                                        if len(same_product_lines)==1:
+                                            if cfline['material'] == same_product_lines.product_id.name and (
+                                                    float(round(cfline['price'], 2)) == round(same_product_lines.price_unit,2)) and ((same_product_lines.balance>0 and cfline['extendedamount']<0) or (same_product_lines.balance<0 and cfline['extendedamount']>0)):
+                                                self.update_existing_si_line(same_product_lines, sol, company, cfline, cashflow_id,quantity_multiplier)
+                                            elif cfline['costtype']!='Primary Settlement' and float(round(cfline['extendedamount'], 2)) == round(same_product_lines.price_unit, 2) and ((same_product_lines.balance>0 and cfline['extendedamount']<0) or (same_product_lines.balance<0 and cfline['extendedamount']>0)):
+                                                    self.update_existing_si_line(same_product_lines, sol, company, cfline,
                                                                                  cashflow_id,quantity_multiplier)
-                                        
-                                            # if cfline['payablereceivable' ] == 'Receivable':
-                                                # if float(round(cfline['extendedamount'], 2)) == line.price_total or -5<= (float(round(cfline['extendedamount'], 2)) - line.price_total)<=5:
-                                                #     self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
-                                               
-                                            # else:
-                                            #     if float(round(cfline['extendedamount'], 2))*-1 == line.price_total  or -5<= (float(round(cfline['extendedamount'], 2)) - line.price_total)<=5:
-                                            #         self.update_existing_si_line(line, sol, company, cfline, cashflow_id)
-                                            
+                                            elif cfline['costtype']!='Primary Settlement' and float(round(cfline['extendedamount'], 2)) == round(same_product_lines.balance, 2)*-1 and ((same_product_lines.balance>0 and cfline['extendedamount']<0) or (same_product_lines.balance<0 and cfline['extendedamount']>0)):
+                                                    self.update_existing_si_line(same_product_lines, sol, company, cfline,
+                                                                                 cashflow_id,quantity_multiplier)
+                                        else:
+                                            with_same_quantity = same_product_lines.filtered(
+                                                lambda r: round(r.quantity, 2) == round(cfline['quantity'],
+                                                                                        2))
+                                            if len(with_same_quantity)==1:
+                                                self.update_existing_si_line(with_same_quantity, sol, company,
+                                                                             cfline,
+                                                                             cashflow_id,quantity_multiplier)
+                                            else:
+                                                with_same_price = same_product_lines.filtered(
+                                                    lambda r: round(r.price_unit, 2) == round(cfline['price'],
+                                                                                              2))
+                                                if len(with_same_price) == 1:
+                                                    self.update_existing_si_line(with_same_price, sol, company, cfline,
+                                                                         cashflow_id,quantity_multiplier)
                                     else:
                                         raise UserError('Cashflow lines not found in Odoo')
                                 existing_invoice.action_post()
