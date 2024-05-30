@@ -88,6 +88,7 @@ class FusionSyncHistory(models.Model):
         self.env['invoice.controller.bi'].sync_invoice()
         
     def sync_trades(self):
+
         self.env['trade.controller.bi'].sync_trade()
     def sync_transfers(self):
         self.env['transfer.controller.bi'].sync_transfer()
@@ -236,7 +237,7 @@ class FusionSyncHistory(models.Model):
 
     
     def validate_uom(self,product,uomname):
-        if uomname:
+        if product and uomname:
             base_unit = self.get_base_unit(product.name)
             # if base_unit==uomname:
             #     return self.env['uom.uom'].search(
