@@ -9,8 +9,14 @@
 
                 <tree string="Estimate">
                      <field name="cashflowid"/>
-
-
+                     <field name="internalcompany"/>
+                     <field name="cashflowid"/>
+                     <field name="invoicenumber"/>
+                     <field name="deliveryref"/>
+                     <field name="itineraryid"/>
+                     <field name="extendedamount"/>
+                     <field name="costtype"/>
+                     <field name="quantitystatus"/>
                 </tree>
             </field>
          </record>
