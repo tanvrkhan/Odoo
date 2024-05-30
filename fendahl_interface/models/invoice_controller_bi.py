@@ -545,9 +545,9 @@ class InvoiceControllerBI(models.Model):
                                         if len(same_product_lines) == 1:
                                             if (cfline['material'] == same_product_lines.product_id.name and (
                                                     float(round(cfline['price'], 2)) == round(same_product_lines.price_unit, 2))
-                                                    and ((line.balance<0 and (cfline['extendedamount']*-1)<0) or (same_product_lines.balance>0 and (cfline['extendedamount']*-1)>0))):
+                                                    and ((same_product_lines.balance<0 and (cfline['extendedamount']*-1)<0) or (same_product_lines.balance>0 and (cfline['extendedamount']*-1)>0))):
                                                 self.update_existing_line(same_product_lines,pol,company,cfline,cashflow_id,quantity_multiplier)
-                                            elif float(round(cfline['price'], 2)) == round(line.price_unit, 2) and ((same_product_lines.balance<0 and (cfline['extendedamount']*-1)<0) or (same_product_lines.balance>0 and (cfline['extendedamount']*-1)>0)):
+                                            elif float(round(cfline['price'], 2)) == round(same_product_lines.price_unit, 2) and ((same_product_lines.balance<0 and (cfline['extendedamount']*-1)<0) or (same_product_lines.balance>0 and (cfline['extendedamount']*-1)>0)):
                                                     self.update_existing_line(same_product_lines,pol,company,cfline,cashflow_id,quantity_multiplier)
                                             else:
                                                 line_to_update = existing_invoice.line_ids.filtered(lambda r: r.product_id.name == (cfline['material'] if cfline['costtype'] == 'Primary Settlement' else cfline['costtype']) and r.display_type=='product')
