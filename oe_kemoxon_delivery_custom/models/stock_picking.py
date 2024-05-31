@@ -34,6 +34,8 @@ class StockPicking(models.Model):
     custom_delivery_date=fields.Date(string="Delivery Date")
     updatestatus=fields.Char()
     valuation_price = fields.Float(string="Valuation Price")
+    
+    
     def fix_unmatching_lots(self):
         for rec in self:
             for mv in rec.move_ids:
@@ -97,7 +99,25 @@ class StockPicking(models.Model):
                 r = super(StockPicking, rec)._action_done()
     def button_confirm(self):
         for rec in self:
+            picking = rec
             return super().action_confirm()
+    
+    def button_validate(self):
+
+        # Call the super method
+        result = super(StockPicking, self).button_validate()
+        # Restore 'date_done' to its original values
+        for record in self:
+            record.date_done = record.custom_delivery_date
+
+        return result
+    # def _action_done(self):
+    #     result = super(StockPicking, self)._action_done()
+    #     for record in self:
+    #         record.date_done = record.custom_delivery_date
+    #         self.move_ids.stock_valuation_layer_ids.recalculate_stock_value()
+    #     return result
+        
         
     def button_cancel(self):
         for rec in self:

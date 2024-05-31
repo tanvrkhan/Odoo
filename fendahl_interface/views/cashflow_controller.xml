@@ -17,6 +17,7 @@
                      <field name="extendedamount"/>
                      <field name="costtype"/>
                      <field name="quantitystatus"/>
+                     <field name="cashflowstatus"/>
                 </tree>
             </field>
          </record>

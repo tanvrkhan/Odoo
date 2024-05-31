@@ -527,6 +527,8 @@ class TransferControllerBI(models.Model):
                                             # stock_move.picking_id.deal_ref = 'moved_to_Draft'
                                             picking.custom_delivery_date = datetime.datetime.strptime(
                                                 rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
+                                            picking.date_done = datetime.datetime.strptime(
+                                                rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
                                             picking.scheduled_date = datetime.datetime.strptime(
                                                 rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
                                             stock_move.date = datetime.datetime.strptime(rec.deliverycompletiondate,
@@ -544,7 +546,7 @@ class TransferControllerBI(models.Model):
                                             picking.picking_type_id = picking_type
                                             picking.action_confirm()
                                             self.update_existing_lines(stock_move,product,rec,company)
-                                            picking._action_done()
+                                            picking.button_validate()
                                             self.fix_valuation_warehouse(picking,stock_move)
                                             # self.env.cr.commit()
                                             # stock_move.stock_valuation_layer_ids.recalculate_stock_value()

@@ -8,6 +8,8 @@
             <field name="arch" type="xml">
                 <tree string="Estimate">
                     <field name="transfercontrollerbiid"/>
+                     <field name="itineraryid"/>
+                     <field name="materialcode"/>
                      <field name="deliveryid"/>
                      <field name="deliveryactivestatusdisplayname"/>
                      <field name="bldate"/>
