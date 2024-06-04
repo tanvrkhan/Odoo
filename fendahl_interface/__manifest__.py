@@ -6,7 +6,7 @@
     'author': "Kemexon",
     'website': "http://www.kemexon.com",
     'category': 'Uncategorized',
-    'version': '0.1',
+    'version': '0.2',
     'depends': ['base', 'account', 'sale', 'stock', 'purchase', 'oe_kemoxon_delivery_custom'],
     'data': [
         'data/data.xml',

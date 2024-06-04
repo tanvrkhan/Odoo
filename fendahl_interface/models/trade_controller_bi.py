@@ -363,11 +363,23 @@ class TradeControllerBI(models.Model):
         if rec.pricingtype == 'Fixed':
             return float(rec.price)
         else:
-            cf = self.env['cashflow.controller.bi'].search([('quantitystatus', '=', 'Contractual'),('sectionno', '=', rec.segmentsectioncode)], limit=1)
-            if cf:
-                return float(cf.price1)
+            cashflow_lines = self.env['cashflow.controller.bi'].read_group(
+                domain=[('quantitystatus', '=', 'Actual'),('sectionno', '=', rec.segmentsectioncode),('costtype', '=', "Primary Settlement"),('actualestimate', '=', "Actual"),('cashflowstatus', '=', "Active")],
+                fields=['price:avg'],
+                # Fields to load
+                groupby=['quantitystatus', 'sectionno', 'costtype', 'actualestimate'],
+                lazy=False  # Get results for each partner directly
+            )
+            if cashflow_lines:
+                return round(cashflow_lines[0]['price'],2)
     def update_order(self,type,existing_order,rec,currency,partner,incoterm,location,payment_term):
-        if type=='Purchase order':
+        company = self.env['res.company'].search([('name', '=', rec.internalcompany)],
+                                                 limit=1)
+
+        warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.location,company)
+        if type=='Purchase Order':
+            existing_order.write({'date_approve': datetime.datetime.strptime(
+                                                    rec.tradedate, '%Y-%m-%dT%H:%M:%S')})
             existing_order.write({'currency_id': currency.id})
             existing_order.write({'partner_id': partner.id})
             existing_order.write({'partner_ref': rec.description})
@@ -375,17 +387,19 @@ class TradeControllerBI(models.Model):
             existing_order.write({'incoterm_location_custom': location.id})
             existing_order.write({'fusion_deal_number': rec.dealmasterid})
             existing_order.write({'payment_term_id': payment_term.id})
-            self.update_po_lines(existing_order,rec,partner.company_id,existing_order.warehouse_id)
-        elif type=='Sale order':
+            self.update_po_lines(existing_order,rec,company,warehouse)
+        elif type=='Sale Order':
             pricelist = self.env['product.pricelist'].search([('currency_id', '=', currency.id)], limit=1)
             existing_order.write({'pricelist_id': pricelist.id})
             existing_order.write({'partner_id': partner.id})
             existing_order.write({'deal_ref': rec.description})
+            existing_order.write({'date_order': datetime.datetime.strptime(
+                                                    rec.tradedate, '%Y-%m-%dT%H:%M:%S')})
             existing_order.write({'incoterm': incoterm.id})
             existing_order.write({'incoterm_location_custom': location.id})
             existing_order.write({'fusion_deal_number': rec.dealmasterid})
             existing_order.write({'payment_term_id': payment_term.id})
-            self.update_so_lines(existing_order, rec, partner.company_id, existing_order.warehouse_id)
+            self.update_so_lines(existing_order, rec, company, warehouse)
     def update_po_lines(self,existing_order,rec,company,warehouse):
         all_segments = self.env['trade.controller.bi'].search(
             [('dealmasterid', '=', rec.dealmasterid)])
@@ -397,8 +411,10 @@ class TradeControllerBI(models.Model):
                 [('parentcashflowid', '=', main_cf.cashflowid), ('costtype', '=', 'VAT')], limit=1)
             tax_rate_record = self.env['fusion.sync.history'].get_tax_record(tax_cf.erptaxcode,
                                                                              'purchase', company.id)
-            if existing_order.order_line.filtered(
-                    lambda ol: ol.fusion_segment_code == segment.segmentsectioncode):
+            existing_line  = existing_order.order_line.filtered(
+                lambda ol: ol.fusion_segment_code == segment.segmentsectioncode)
+            if existing_line:
+                existing_line.price_unit = self.get_triggered_price(rec)
                 continue
             else:
                 self.create_new_po_line(existing_order,segment,warehouse,company,tax_rate_record)
@@ -438,6 +454,13 @@ class TradeControllerBI(models.Model):
                                                                                   company.id)
             
             price = self.get_triggered_price( segment)
+            analytic_distribution=[]
+            if commodity_ann:
+                analytic_distribution[commodity_ann.id] = 100
+            if trader_ann:
+                analytic_distribution[trader_ann.id] = 100
+            if strategy_ann:
+                analytic_distribution[strategy_ann.id] = 100
             line = {
                 'product_id': product.id,
                 'name': product.name + segment.shape if segment.shape else product.name,
@@ -446,12 +469,13 @@ class TradeControllerBI(models.Model):
                     segment.tradeqty) >= 0 else segment.tradeqty * -1,
                 'product_uom': uom.id,
                 'price_unit': float(segment.price) if self.is_convertible_to_float(price) else 0,
-                'analytic_distribution': {
-                    commodity_ann.id: 100,
-                    trader_ann.id: 100,
-                    strategy_ann.id: 100,
-                    # portfolio_ann.id: 100,
-                },
+                'analytic_distribution': analytic_distribution,
+                #     'analytic_distribution': {
+                #     commodity_ann.id: 100,
+                #     trader_ann.id: 100,
+                #     strategy_ann.id: 100,
+                #     # portfolio_ann.id: 100,
+                # },
                 'taxes_id': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])],
                 'fusion_segment_id': segment.segmentid,
                 'custom_section_number': segment.customsectionnumber,
@@ -485,6 +509,13 @@ class TradeControllerBI(models.Model):
                                                                                     company.id)
                 strategy_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Strategy', segment.strategy,
                                                                                       company.id)
+                analytic_distribution = {}
+                if commodity_ann:
+                    analytic_distribution[commodity_ann.id] = 100
+                if trader_ann:
+                    analytic_distribution[trader_ann.id] = 100
+                if strategy_ann:
+                    analytic_distribution[strategy_ann.id] = 100
                 # portfolio_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Portfolio', segment.portfoliosegment, company.id)
                 
                 lines.append((0, 0, {
@@ -494,12 +525,7 @@ class TradeControllerBI(models.Model):
                     'product_uom_qty': segment.tradeqty if float(segment.tradeqty) >= 0 else float(segment.tradeqty) * -1,
                     'product_uom': uom.id,
                     'price_unit': self.get_triggered_price(segment),
-                    'analytic_distribution': {
-                        commodity_ann.id: 100,
-                        trader_ann.id: 100,
-                        strategy_ann.id: 100,
-                        # portfolio_ann.id: 100,
-                    },
+                    'analytic_distribution': analytic_distribution,
                     'tax_id': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])],
                     'fusion_segment_id': segment.segmentid,
                     'custom_section_number': segment.customsectionnumber,
@@ -543,6 +569,13 @@ class TradeControllerBI(models.Model):
             strategy_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Strategy',
                                                                                   segment.strategy,
                                                                                   company.id)
+            analytic_distribution = {}
+            if commodity_ann:
+                analytic_distribution[commodity_ann.id] = 100
+            if trader_ann:
+                analytic_distribution[trader_ann.id] = 100
+            if strategy_ann:
+                analytic_distribution[strategy_ann.id] = 100
             price = self.get_triggered_price(segment)
             line = {
                 'product_id': product.id,
@@ -552,12 +585,7 @@ class TradeControllerBI(models.Model):
                     segment.tradeqty) >= 0 else segment.tradeqty * -1,
                 'product_uom': uom.id,
                 'price_unit': float(price) if self.is_convertible_to_float(price) else 0,
-                'analytic_distribution': {
-                    commodity_ann.id: 100,
-                    trader_ann.id: 100,
-                    strategy_ann.id: 100,
-                    # portfolio_ann.id: 100,
-                },
+                'analytic_distribution': analytic_distribution,
                 'tax_id': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])],
                 'fusion_segment_id': segment.segmentid,
                 'custom_section_number': segment.customsectionnumber,
@@ -573,8 +601,8 @@ class TradeControllerBI(models.Model):
             [('dealmasterid', '=', rec.dealmasterid)])
         lines = []
         for segment in all_segments:
-            main_cf = cf = self.env['cashflow.controller.bi'].search(
-                [('sectionno', '=', segment.segmentsectioncode)], limit=1)
+            main_cf = self.env['cashflow.controller.bi'].search(
+                [('sectionno', '=', segment.segmentsectioncode),('costtype', '=', "Primary Settlement")], limit=1)
             tax_cf = self.env['cashflow.controller.bi'].search(
                 [('parentcashflowid', '=', main_cf.cashflowid), ('costtype', '=', 'VAT')], limit=1)
             tax_rate_record = self.env['fusion.sync.history'].get_tax_record(tax_cf.erptaxcode,
@@ -590,6 +618,13 @@ class TradeControllerBI(models.Model):
                                                                                     company.id)
                 strategy_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Strategy', segment.strategy,
                                                                                       company.id)
+                analytic_distribution = {}
+                if commodity_ann:
+                    analytic_distribution[commodity_ann.id] = 100
+                if trader_ann:
+                    analytic_distribution[trader_ann.id] = 100
+                if strategy_ann:
+                    analytic_distribution[strategy_ann.id] = 100
                 # portfolio_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Portfolio', segment.portfoliosegment, company.id)
                 
                 lines.append((0, 0, {
@@ -599,12 +634,7 @@ class TradeControllerBI(models.Model):
                     'product_qty': segment.tradeqty if Decimal(segment.tradeqty) >= 0 else segment.tradeqty * -1,
                     'product_uom': uom.id,
                     'price_unit': self.get_triggered_price(segment),
-                    'analytic_distribution': {
-                        commodity_ann.id: 100,
-                        trader_ann.id: 100,
-                        strategy_ann.id: 100,
-                        # portfolio_ann.id: 100,
-                    },
+                    'analytic_distribution': analytic_distribution,
                     'taxes_id': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])],
                     'fusion_segment_id': segment.segmentid,
                     'custom_section_number': segment.customsectionnumber,

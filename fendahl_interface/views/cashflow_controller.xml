@@ -18,6 +18,8 @@
                      <field name="costtype"/>
                      <field name="quantitystatus"/>
                      <field name="cashflowstatus"/>
+                     <field name="material"/>
+                     <field name="commodity"/>
                 </tree>
             </field>
          </record>
