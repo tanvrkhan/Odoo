@@ -21,12 +21,41 @@ class ProductTmpl(models.Model):
         if warehouse:
             price = self.warehouse_cost_lines.filtered(
                 lambda x: x.warehouse_id.id == warehouse).cost
+            if not price:
+                price = self.get_price_from_valuations(warehouse)
         else:
-            price = self.standard_price
+            price = self.get_price_from_valuations(warehouse)
+            # price = self.standard_price
         if not self or not uom or self.uom_id.id == uom.id:
             return price or 0.0
         return self.uom_id._compute_price(price, uom)
-
+    def get_price_from_valuations(self,warehouse):
+        if warehouse:
+            valuations = self.env['stock.valuation.layer'].read_group(
+            domain=[('product_id', '=', self.product_variant_id.id),
+                    ('company_id', '=', self.env.company.id),
+                    ('warehouse_id', '=', warehouse.id)
+                    ],
+            fields=['warehouse_id', 'quantity', 'value'],
+            # Fields to load
+            groupby=['warehouse_id'],
+            lazy=False  # Get results for each partner directly
+        )
+        else:
+            valuations = self.env['stock.valuation.layer'].read_group(
+                domain=[('product_id', '=', self.product_variant_id.id),
+                        ('company_id', '=', self.env.company.id)
+                        ],
+                fields=['warehouse_id', 'quantity', 'value'],
+                # Fields to load
+                groupby=['warehouse_id'],
+                lazy=False  # Get results for each partner directly
+            )
+        if valuations:
+            for valuation in valuations:
+                if valuation['quantity'] > 0:
+                    return valuation['value'] / valuation['quantity']
+        
     def _prepare_out_svl_vals(self, quantity, company, warehouse=False):
         """Prepare the values for a stock valuation layer created by a delivery.
 
@@ -67,7 +96,15 @@ class ProductTmpl(models.Model):
                     vals.update({
                         'value': quantity * price,
                         'unit_cost': price
-                    })               
+                    })
+                else:
+                    price = self.get_price_from_valuations(warehouse)
+                    if price:
+                        vals.update({
+                            'value': quantity * price,
+                            'unit_cost': price
+                        })
+                    
             rounding_error = currency.round(self.standard_price * self.quantity_svl - self.value_svl)
             if rounding_error:
                 # If it is bigger than the (smallest number of the currency * quantity) / 2,

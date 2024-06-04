@@ -105,5 +105,5 @@ class AccountMoveLine(models.Model):
                         controllerinvoice.create_bill(True)
                     else:
                         raise UserError('The invoice doesnt exist in fusion controller')
-                else:
-                    raise UserError('The invoice is not from Fusion')
+            else:
+                raise UserError('The invoice is not from Fusion')
