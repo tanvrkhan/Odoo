@@ -21,6 +21,7 @@
                      <field name="material"/>
                      <field name="commodity"/>
                      <field name="buysell"/>
+                     <field name="sectionno"/>
                 </tree>
             </field>
         </record>
@@ -69,6 +70,7 @@
                     <field name="cashflowstatus"/>
                     <field name="material"/>
                     <field name="commodity"/>
+                    <field name="sectionno"/>
                     <separator/>
                 </search>
             </field>

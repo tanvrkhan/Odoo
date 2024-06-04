@@ -186,7 +186,33 @@ class WarehouseStockMove(models.Model):
             svl_vals['description'] += svl_vals.pop('rounding_adjustment', '')
             svl_vals_list.append(svl_vals)       
         return self.env['stock.valuation.layer'].sudo().create(svl_vals_list)
-    
+    def get_price_from_valuations(self,warehouse):
+        if warehouse:
+            valuations = self.env['stock.valuation.layer'].read_group(
+            domain=[('product_id', '=', self.product_variant_id.id),
+                    ('company_id', '=', self.env.company.id),
+                    ('warehouse_id', '=', warehouse.id)
+                    ],
+            fields=['warehouse_id', 'quantity', 'value'],
+            # Fields to load
+            groupby=['warehouse_id'],
+            lazy=False  # Get results for each partner directly
+        )
+        else:
+            valuations = self.env['stock.valuation.layer'].read_group(
+                domain=[('product_id', '=', self.product_variant_id.id),
+                        ('company_id', '=', self.env.company.id)
+                        ],
+                fields=['warehouse_id', 'quantity', 'value'],
+                # Fields to load
+                groupby=['warehouse_id'],
+                lazy=False  # Get results for each partner directly
+            )
+        if valuations:
+            for valuation in valuations:
+                if valuation['quantity'] > 0:
+                    return valuation['value'] / valuation['quantity']
+                
     def _get_in_svl_vals(self, forced_quantity):
         svl_vals_list = []
         for move in self:
@@ -195,7 +221,7 @@ class WarehouseStockMove(models.Model):
             valued_quantity = 0
             for valued_move_line in valued_move_lines:
                 valued_quantity += valued_move_line.product_uom_id._compute_quantity(valued_move_line.qty_done, move.product_id.uom_id)
-            unit_cost = move.product_id.standard_price
+            unit_cost = self.get_price_from_valuations('')
             if move.product_id.cost_method != 'standard':
                 unit_cost = abs(move._get_price_unit())  # May be negative (i.e. decrease an out move).
 

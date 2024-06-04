@@ -445,6 +445,33 @@ class StockPicking(models.Model):
                         })
         self.env.cr.commit()
         self.product_id.product_tmpl_id.update_wh_costing()
+        self.update_standard_price()
+    def update_standard_price(self,warehouse=None):
+        if warehouse:
+            valuations = self.env['stock.valuation.layer'].read_group(
+            domain=[('product_id', '=', self.product_id.id),
+                    ('company_id', '=', self.env.company.id),
+                    ('warehouse_id', '=', warehouse.id)
+                    ],
+            fields=['warehouse_id', 'quantity', 'value'],
+            # Fields to load
+            groupby=['warehouse_id'],
+            lazy=False  # Get results for each partner directly
+        )
+        else:
+            valuations = self.env['stock.valuation.layer'].read_group(
+                domain=[('product_id', '=', self.product_id.id),
+                        ('company_id', '=', self.env.company.id)
+                        ],
+                fields=['warehouse_id', 'quantity', 'value'],
+                # Fields to load
+                groupby=['warehouse_id'],
+                lazy=False  # Get results for each partner directly
+            )
+        if valuations:
+            for valuation in valuations:
+                if valuation['quantity'] > 0:
+                    self.product_id.product_tmpl_id.standard_price = valuation['value'] / valuation['quantity']
     def stock_quant_zero(self):
         all_quant = self.env['stock.quant'].search([])
         for quant in all_quant:
