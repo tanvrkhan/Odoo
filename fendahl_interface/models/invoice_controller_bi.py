@@ -699,15 +699,15 @@ class InvoiceControllerBI(models.Model):
                                                 if len(with_same_price) == 1:
                                                     self.update_existing_si_line(with_same_price, company, cfline,
                                                                          quantity_multiplier)
-                                    else:
-                                        if uierrors:
-                                            raise UserError(
-                                                'Cashflow Lines not found in Odoo')
-                                        log_error = self.env['fusion.sync.history.errors'].log_error(
-                                            'InvoiceControllerBI',
-                                            rec.invoicenumber,
-                                            'Cashflow Lines not found in Odoo',
-                                            rec.internalcompany)
+                                else:
+                                    if uierrors:
+                                        raise UserError(
+                                            'Cashflow Lines not found in Odoo')
+                                    log_error = self.env['fusion.sync.history.errors'].log_error(
+                                        'InvoiceControllerBI',
+                                        rec.invoicenumber,
+                                        'Cashflow Lines not found in Odoo',
+                                        rec.internalcompany)
                                 existing_invoice.action_post()
                                 if invoice_reconciled_lines:
                                     self.reconcile_entries(invoice_reconciled_lines, existing_invoice)
@@ -833,6 +833,8 @@ class InvoiceControllerBI(models.Model):
                                                                          cashflow_id.invoicenumber,
                                                                          'Purchase order line not found for Primary settlement line',
                                                                          cashflow_id.internalcompany)
+                raise UserError('Purchase order line not found for Primary settlement line')
+
         elif cf['costtype'] in ('Pre-payment',  'Provisional Payment',):
             existing_line.product_id = 312,
             existing_line.name = 'Downpayment',
@@ -951,8 +953,9 @@ class InvoiceControllerBI(models.Model):
             else:
                 log_error = self.env['fusion.sync.history.errors'].log_error('InvoiceControllerBI',
                                                                              cashflow_id.invoicenumber,
-                                                                             'Purchase order line not found for Primary settlement line',
+                                                                             'Sale order line not found for Primary settlement line',
                                                                              cashflow_id.internalcompany)
+                raise UserError('Related Sale order line not found')
             
             
         elif cf['costtype'] in ('Pre-payment', 'Provisional Payment'):

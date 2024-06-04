@@ -81,10 +81,9 @@ class FusionSyncHistory(models.Model):
     #         _logger.error('Failed to fetch data from external API: %s', response.status_code)
     
     def sync_all(self):
-        self.env['nomination.controller.bi'].sync_nomination()
-        self.env['transfer.controller.bi'].sync_transfer()
-        self.env['cashflow.controller.bi'].sync_cashflow()
         self.env['trade.controller.bi'].sync_trade()
+        self.env['cashflow.controller.bi'].sync_cashflow()
+        self.env['transfer.controller.bi'].sync_transfer()
         self.env['invoice.controller.bi'].sync_invoice()
         
     def sync_trades(self):
