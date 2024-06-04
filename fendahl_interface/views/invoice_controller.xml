@@ -54,7 +54,45 @@
                 action = records.fetch_invoice_from_controller()
             </field>
         </record>
-          <menuitem id="menu_fusion_Invoice"
+        <record id="view_invoice_controller_bi_search" model="ir.ui.view">
+            <field name="name">invoice.controller.bi.filter.search</field>
+            <field name="model">invoice.controller.bi</field>
+            <field name="arch" type="xml">
+                <search>
+                    <filter string="KEMEXON LTD" name="filter_internalcompany_1"
+                            domain="[('internalcompany', 'in', ['KEMEXON LTD'])]"/>
+                    <filter string="KEMEXON BELGIUM SRL" name="filter_internalcompany_2"
+                            domain="[('internalcompany', 'in', ['KEMEXON BELGIUM SRL'])]"/>
+                    <filter string="KEMEXON SA" name="filter_internalcompany_3"
+                            domain="[('internalcompany', 'in', ['KEMEXON SA'])]"/>
+                    <filter string="Payable" name="filter_payablereceivable_1"
+                            domain="[('payablereceivable', 'in', ['Payable'])]"/>
+                    <filter string="Receivable" name="filter_payablereceivable_2"
+                            domain="[('payablereceivable', 'in', ['Receivable'])]"/>
+                    <filter string="Refined Products" name="filter_commodity_1"
+                            domain="[('commodity', 'in', ['Refined Products'])]"/>
+                    <filter string="Coal" name="filter_commodity_2"
+                            domain="[('commodity', 'in', ['Coal'])]"/>
+                    <filter string="Pellets" name="filter_commodity_3"
+                            domain="[('commodity', 'in', ['Pellets'])]"/>
+                    <filter string="Pellets Industrial" name="filter_commodity_4"
+                            domain="[('commodity', 'in', ['Pellets Industrial'])]"/>
+                    <field name="invoicenumber"/>
+                    <field name="invoicestatus"/>
+                    <field name="internalcompany"/>
+                    <field name="counterparty"/>
+                    <field name="payablereceivable"/>
+                    <field name="material"/>
+                    <field name="commodity"/>
+                    <field name="amtcurrency"/>
+                    <field name="invoiceamt"/>
+                    <field name="invoicedate"/>
+                    <field name="customsectionnumber"/>
+                    <separator/>
+                </search>
+            </field>
+        </record>
+        <menuitem id="menu_fusion_Invoice"
               name="Fusion Invoice Controller"
               action="action_fusion_invoice_controller"
               parent="account.menu_finance_receivables"

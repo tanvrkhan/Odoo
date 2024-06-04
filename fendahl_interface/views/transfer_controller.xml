@@ -8,35 +8,35 @@
             <field name="arch" type="xml">
                 <tree string="Estimate">
                     <field name="transfercontrollerbiid"/>
-                     <field name="itineraryid"/>
-                     <field name="materialcode"/>
-                     <field name="deliveryid"/>
-                     <field name="deliveryactivestatusdisplayname"/>
-                     <field name="bldate"/>
-                     <field name="fromsegmentsectioncode"/>
-                     <field name="fromcounterpartcode"/>
-                     <field name="tocounterpartcode"/>
-                     <field name="frominternalcompany"/>
-                     <field name="tointernalcompany"/>
-                     <field name="frommotcode"/>
-                     <field name="tomotcode"/>
-                     <field name="tosegmentsectioncode"/>
-                     <field name="segmentid"/>
+                    <field name="itineraryid"/>
+                    <field name="materialcode"/>
+                    <field name="deliveryid"/>
+                    <field name="deliveryactivestatusdisplayname"/>
+                    <field name="bldate"/>
+                    <field name="fromsegmentsectioncode"/>
+                    <field name="fromcounterpartcode"/>
+                    <field name="tocounterpartcode"/>
+                    <field name="frominternalcompany"/>
+                    <field name="tointernalcompany"/>
+                    <field name="frommotcode"/>
+                    <field name="tomotcode"/>
+                    <field name="tosegmentsectioncode"/>
+                    <field name="segmentid"/>
 
                 </tree>
             </field>
-         </record>
+        </record>
 
-            <record id="action_fusion_transfer_controller" model="ir.actions.act_window">
+        <record id="action_fusion_transfer_controller" model="ir.actions.act_window">
             <field name="name">Fusion Transfer Controller</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">transfer.controller.bi</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_fusion_transfers"/>
             <field name="help" type="html">
-              <p class="o_view_nocontent_smiling_face">
-                Fusion Transfers Controller
-              </p>
+                <p class="o_view_nocontent_smiling_face">
+                    Fusion Transfers Controller
+                </p>
             </field>
         </record>
         <record id="model_fusion_trade_controller_create_receipt" model="ir.actions.server">
@@ -49,11 +49,47 @@
                 action = records.create_receipt()
             </field>
         </record>
-          <menuitem id="menu_fusion_Transfer"
-              name="Fusion Transfer Controller"
-              action="action_fusion_transfer_controller"
-              parent="account.menu_finance_receivables"
-              sequence="111"/>
+        <record id="view_transfer_controller_bi_search" model="ir.ui.view">
+            <field name="name">transfer.controller.bi.filter.search</field>
+            <field name="model">transfer.controller.bi</field>
+            <field name="arch" type="xml">
+                <search>
+                    <filter string="From Internal KEMEXON LTD" name="filter_frominternalcompany_1"
+                            domain="[('frominternalcompany', 'in', ['KEMEXON LTD'])]"/>
+                    <filter string="From Internal KEMEXON BELGIUM SRL" name="filter_frominternalcompany_2"
+                            domain="[('frominternalcompany', 'in', ['KEMEXON BELGIUM SRL'])]"/>
+                    <filter string="From internal KEMEXON SA" name="filter_frominternalcompany_3"
+                            domain="[('frominternalcompany', 'in', ['KEMEXON SA'])]"/>
+                    <filter string="To Internal KEMEXON LTD" name="filter_tointernalcompany_1"
+                            domain="[('tointernalcompany', 'in', ['KEMEXON LTD'])]"/>
+                    <filter string="To Internal KEMEXON BELGIUM SRL" name="filter_tointernalcompany_2"
+                            domain="[('tointernalcompany', 'in', ['KEMEXON BELGIUM SRL'])]"/>
+                    <filter string="To internal KEMEXON SA" name="filter_tointernalcompany_3"
+                            domain="[('tointernalcompany', 'in', ['KEMEXON SA'])]"/>
+                    <field name="transfercontrollerbiid"/>
+                    <field name="itineraryid"/>
+                    <field name="materialcode"/>
+                    <field name="deliveryid"/>
+                    <field name="deliveryactivestatusdisplayname"/>
+                    <field name="bldate"/>
+                    <field name="fromsegmentsectioncode"/>
+                    <field name="fromcounterpartcode"/>
+                    <field name="tocounterpartcode"/>
+                    <field name="frominternalcompany"/>
+                    <field name="tointernalcompany"/>
+                    <field name="frommotcode"/>
+                    <field name="tomotcode"/>
+                    <field name="tosegmentsectioncode"/>
+                    <field name="segmentid"/>
+                    <separator/>
+                </search>
+            </field>
+        </record>
+        <menuitem id="menu_fusion_Transfer"
+                  name="Fusion Transfer Controller"
+                  action="action_fusion_transfer_controller"
+                  parent="account.menu_finance_receivables"
+                  sequence="111"/>
     </data>
 
 </odoo>

@@ -1,7 +1,7 @@
 <odoo>
     <data>
         <!-- Inherit Form View to Modify it -->
-          <record id="picking_form_inherit" model="ir.ui.view">
+        <record id="picking_form_inherit" model="ir.ui.view">
             <field name="name">picking_form_inherit</field>
             <field name="model">stock.picking</field>
             <field name="inherit_id" ref="stock.view_picking_form"/>
@@ -19,30 +19,30 @@
             <field name="arch" type="xml">
                 <tree string="Estimate">
                     <field name="dealmasterid"/>
-                     <field name="tradedate"/>
-                     <field name="segmentid"/>
-                     <field name="segmentsectioncode"/>
-                     <field name="internalcompany"/>
-                     <field name="counterpartcompany"/>
-                     <field name="material"/>
-                     <field name="qtyuom"/>
-                     <field name="tradeqty"/>
-                     <field name="tradeprice"/>
-                     <field name="pricingtype"/>
+                    <field name="tradedate"/>
+                    <field name="segmentid"/>
+                    <field name="segmentsectioncode"/>
+                    <field name="internalcompany"/>
+                    <field name="counterpartcompany"/>
+                    <field name="material"/>
+                    <field name="qtyuom"/>
+                    <field name="tradeqty"/>
+                    <field name="tradeprice"/>
+                    <field name="pricingtype"/>
                 </tree>
             </field>
-         </record>
+        </record>
 
-            <record id="action_fusion_trade_controller" model="ir.actions.act_window">
+        <record id="action_fusion_trade_controller" model="ir.actions.act_window">
             <field name="name">Fusion Trade Controller</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">trade.controller.bi</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_fusion_trades"/>
             <field name="help" type="html">
-              <p class="o_view_nocontent_smiling_face">
-                Fusion Trade Controller
-              </p>
+                <p class="o_view_nocontent_smiling_face">
+                    Fusion Trade Controller
+                </p>
             </field>
         </record>
         <record id="model_fusion_trade_controller_create_po" model="ir.actions.server">
@@ -55,11 +55,45 @@
                 action = records.create_order()
             </field>
         </record>
-          <menuitem id="menu_fusion_Trades"
-              name="Fusion Trade Controller"
-              action="action_fusion_trade_controller"
-              parent="account.menu_finance_receivables"
-              sequence="110"/>
+        <record id="view_trade_controller_bi_search" model="ir.ui.view">
+            <field name="name">trade.controller.bi.filter.search</field>
+            <field name="model">trade.controller.bi</field>
+            <field name="arch" type="xml">
+                <search>
+                    <filter string="KEMEXON LTD" name="filter_internalcompany_1"
+                            domain="[('internalcompany', 'in', ['KEMEXON LTD'])]"/>
+                    <filter string="KEMEXON BELGIUM SRL" name="filter_internalcompany_2"
+                            domain="[('internalcompany', 'in', ['KEMEXON BELGIUM SRL'])]"/>
+                    <filter string="KEMEXON SA" name="filter_internalcompany_3"
+                            domain="[('internalcompany', 'in', ['KEMEXON SA'])]"/>
+                    <filter string="Fixed" name="filter_pricingtype_1"
+                            domain="[('pricingtype', 'in', ['Fixed'])]"/>
+                    <filter string="Index" name="filter_pricingtype_2"
+                            domain="[('pricingtype', 'in', ['Index'])]"/>
+                    <filter string="Standard Formula" name="filter_pricingtype_3"
+                            domain="[('pricingtype', 'in', ['Standard Formula'])]"/>
+                    <filter string="Trigger" name="filter_pricingtype_4"
+                            domain="[('pricingtype', 'in', ['Trigger'])]"/>
+                    <field name="dealmasterid"/>
+                    <field name="tradedate"/>
+                    <field name="segmentid"/>
+                    <field name="segmentsectioncode"/>
+                    <field name="internalcompany"/>
+                    <field name="counterpartcompany"/>
+                    <field name="material"/>
+                    <field name="qtyuom"/>
+                    <field name="tradeqty"/>
+                    <field name="tradeprice"/>
+                    <field name="pricingtype"/>
+                    <separator/>
+                </search>
+            </field>
+        </record>
+        <menuitem id="menu_fusion_Trades"
+                  name="Fusion Trade Controller"
+                  action="action_fusion_trade_controller"
+                  parent="account.menu_finance_receivables"
+                  sequence="110"/>
     </data>
 
 </odoo>

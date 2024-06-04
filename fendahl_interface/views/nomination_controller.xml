@@ -8,28 +8,39 @@
             <field name="arch" type="xml">
                 <tree string="Estimate">
                     <field name="itineraryid"/>
-                     <field name="itineraryname"/>
+                    <field name="itineraryname"/>
                 </tree>
             </field>
-         </record>
+        </record>
 
-            <record id="action_fusion_nomination_controller" model="ir.actions.act_window">
+        <record id="action_fusion_nomination_controller" model="ir.actions.act_window">
             <field name="name">Fusion nomination Controller</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">nomination.controller.bi</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_fusion_nomination"/>
             <field name="help" type="html">
-              <p class="o_view_nocontent_smiling_face">
-                Fusion nomination Controller
-              </p>
+                <p class="o_view_nocontent_smiling_face">
+                    Fusion nomination Controller
+                </p>
             </field>
         </record>
-          <menuitem id="menu_fusion_nomination"
-              name="Fusion nomination Controller"
-              action="action_fusion_nomination_controller"
-              parent="account.menu_finance_receivables"
-              sequence="113"/>
+        <record id="view_nomination_controller_bi_search" model="ir.ui.view">
+            <field name="name">nomination.controller.bi.filter.search</field>
+            <field name="model">nomination.controller.bi</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="itineraryid"/>
+                    <field name="itineraryname"/>
+                    <separator/>
+                </search>
+            </field>
+        </record>
+        <menuitem id="menu_fusion_nomination"
+                  name="Fusion nomination Controller"
+                  action="action_fusion_nomination_controller"
+                  parent="account.menu_finance_receivables"
+                  sequence="113"/>
     </data>
 
 </odoo>

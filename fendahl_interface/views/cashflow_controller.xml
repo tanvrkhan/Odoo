@@ -23,25 +23,61 @@
                      <field name="buysell"/>
                 </tree>
             </field>
-         </record>
+        </record>
 
-            <record id="action_fusion_cashflow_controller" model="ir.actions.act_window">
+        <record id="action_fusion_cashflow_controller" model="ir.actions.act_window">
             <field name="name">Fusion cashflow Controller</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">cashflow.controller.bi</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_fusion_cashflow"/>
             <field name="help" type="html">
-              <p class="o_view_nocontent_smiling_face">
-                Fusion cashflow Controller
-              </p>
+                <p class="o_view_nocontent_smiling_face">
+                    Fusion cashflow Controller
+                </p>
             </field>
         </record>
-          <menuitem id="menu_fusion_cashflow"
-              name="Fusion cashflow Controller"
-              action="action_fusion_cashflow_controller"
-              parent="account.menu_finance_receivables"
-              sequence="114"/>
+        <record id="view_cashflow_controller_bi_search" model="ir.ui.view">
+            <field name="name">cashflow.controller.bi.filter.search</field>
+            <field name="model">cashflow.controller.bi</field>
+            <field name="arch" type="xml">
+                <search>
+                    <filter string="KEMEXON LTD" name="filter_internalcompany_1"
+                            domain="[('internalcompany', 'in', ['KEMEXON LTD'])]"/>
+                    <filter string="KEMEXON BELGIUM SRL" name="filter_internalcompany_2"
+                            domain="[('internalcompany', 'in', ['KEMEXON BELGIUM SRL'])]"/>
+                    <filter string="KEMEXON SA" name="filter_internalcompany_3"
+                            domain="[('internalcompany', 'in', ['KEMEXON SA'])]"/>
+                    <filter string="Refined Products" name="filter_commodity_1"
+                            domain="[('commodity', 'in', ['Refined Products'])]"/>
+                    <filter string="Coal" name="filter_commodity_2"
+                            domain="[('commodity', 'in', ['Coal'])]"/>
+                    <filter string="Pellets" name="filter_commodity_3"
+                            domain="[('commodity', 'in', ['Pellets'])]"/>
+                    <filter string="Pellets Industrial" name="filter_commodity_4"
+                            domain="[('commodity', 'in', ['Pellets Industrial'])]"/>
+                    <filter string="Refined Product Derivatives" name="filter_commodity_5"
+                            domain="[('commodity', 'in', ['Refined Product Derivatives'])]"/>
+                    <field name="cashflowid"/>
+                    <field name="internalcompany"/>
+                    <field name="invoicenumber"/>
+                    <field name="deliveryref"/>
+                    <field name="itineraryid"/>
+                    <field name="extendedamount"/>
+                    <field name="costtype"/>
+                    <field name="quantitystatus"/>
+                    <field name="cashflowstatus"/>
+                    <field name="material"/>
+                    <field name="commodity"/>
+                    <separator/>
+                </search>
+            </field>
+        </record>
+        <menuitem id="menu_fusion_cashflow"
+                  name="Fusion cashflow Controller"
+                  action="action_fusion_cashflow_controller"
+                  parent="account.menu_finance_receivables"
+                  sequence="114"/>
     </data>
     <data noupdate="1">  <!-- noupdate="1" means it won't be updated automatically at module updates -->
         <record id="cron_sync_missing_cashflow" model="ir.cron">
