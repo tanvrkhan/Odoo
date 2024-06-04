@@ -392,6 +392,10 @@ class CashflowControllerBi(models.Model):
     def sync_cashflow(self):
         interface = self.env['fusion.sync.history']
         last_sync = interface.get_last_sync('cashflow')
+        max_synced_date = self.env['cashflow.controller.bi'].search_read([], fields=['lastmodifydate'], limit=1,
+                                                                         order='lastmodifydate desc')
+        if max_synced_date:
+            last_sync = max_synced_date[0]['lastmodifydate']
         url = "https://fusionsqlmirrorapi.azure-api.net/api/Cashflow"
         headers = {
             'Ocp-Apim-Subscription-Key': '38cb5797102f4b1f852ae8ff6e8482e5',
@@ -415,6 +419,10 @@ class CashflowControllerBi(models.Model):
     def sync_missing_cashflows(self):
         interface = self.env['fusion.sync.history']
         last_sync = '2022-01-01'
+        max_synced_date = self.env['cashflow.controller.bi'].search_read([], fields=['lastmodifydate'], limit=1,
+                                                                        order='lastmodifydate desc')
+        if max_synced_date:
+            last_sync = max_synced_date[0]['lastmodifydate']
         url = "https://fusionsqlmirrorapi.azure-api.net/api/Cashflow"
         headers = {
             'Ocp-Apim-Subscription-Key': '38cb5797102f4b1f852ae8ff6e8482e5',
@@ -471,7 +479,8 @@ class CashflowControllerBi(models.Model):
             for data in json_data:
                 exists = all_cfs.search([('cashflowid', '=', data['cashflowid'])])
                 if exists:
-                    continue
+                    all_cfs.search([('cashflowid', '=', data['cashflowid'])]).unlink()
+                    self.env['cashflow.controller.bi'].create(data)
                 else:
                     self.env['cashflow.controller.bi'].create(data)
                     # self.env.cr.commit()

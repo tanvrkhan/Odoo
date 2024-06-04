@@ -289,6 +289,10 @@ class TradeControllerBI(models.Model):
     def sync_trade(self):
         interface = self.env['fusion.sync.history']
         last_sync = interface.get_last_sync('trade')
+        max_synced_date = self.env['trade.controller.bi'].search_read([], fields=['lastmodifydate'], limit=1,
+                                                                        order='lastmodifydate desc')
+        if max_synced_date:
+            last_sync = max_synced_date[0]['lastmodifydate']
         url = "https://fusionsqlmirrorapi.azure-api.net/api/trade"
         headers = {
             'Ocp-Apim-Subscription-Key': '38cb5797102f4b1f852ae8ff6e8482e5',
