@@ -455,23 +455,22 @@ class CashflowControllerBi(models.Model):
                 self.env.cr.commit()
     
     def regular_update_cashflow(self, interface_type, json_data):
-        if interface_type == 'cashflow':
-            existing_ids = set(self.env['cashflow.controller.bi'].search([]).mapped('cashflowid'))
-            new_entries = [data for data in json_data if data['cashflowid'] not in existing_ids]
-            # Process each item in json_data
-            for data in new_entries:
+        # if interface_type == 'cashflow':
+        #     existing_ids = set(self.env['cashflow.controller.bi'].search([]).mapped('cashflowid'))
+        #     new_entries = [data for data in json_data if data['cashflowid'] not in existing_ids]
+        #     # Process each item in json_data
+        #     for data in new_entries:
+        #         self.env['cashflow.controller.bi'].create(data)
+        #         self.env.cr.commit()
+        all_cfs = self.env['cashflow.controller.bi'].search([])
+        for data in json_data:
+            exists = all_cfs.search([('cashflowid', '=', data['cashflowid'])])
+            if exists:
+                all_cfs.search([('cashflowid', '=', data['cashflowid'])]).unlink()
                 self.env['cashflow.controller.bi'].create(data)
-                self.env.cr.commit()
-                
-            # all_cfs = self.env['cashflow.controller.bi'].search([])
-            # for data in json_data:
-            #     exists = all_cfs.search([('cashflowid', '=', data['cashflowid'])])
-            #     if exists:
-            #         self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
-            #         self.env['cashflow.controller.bi'].create(data)
-            #     else:
-            #         self.env['cashflow.controller.bi'].create(data)
-            #         # self.env.cr.commit()
+            else:
+                self.env['cashflow.controller.bi'].create(data)
+                # self.env.cr.commit()
     
     def sync_missing_cashflow(self, interface_type, json_data):
         if interface_type == 'cashflow':
