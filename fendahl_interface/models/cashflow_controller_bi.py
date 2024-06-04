@@ -416,6 +416,34 @@ class CashflowControllerBi(models.Model):
                 _logger.error('Error processing API data: %s', str(e))
         else:
             _logger.error('Failed to fetch data from external API: %s', response.status_code)
+            
+    def force_sync_cashflow(self,date):
+        interface = self.env['fusion.sync.history']
+        last_sync = date
+        # max_synced_date = self.env['cashflow.controller.bi'].search_read([], fields=['lastmodifydate'], limit=1,
+        #                                                                  order='lastmodifydate desc')
+        # if max_synced_date:
+        #     last_sync = max_synced_date[0]['lastmodifydate']
+        url = "https://fusionsqlmirrorapi.azure-api.net/api/Cashflow"
+        headers = {
+            'Ocp-Apim-Subscription-Key': '38cb5797102f4b1f852ae8ff6e8482e5',
+            'Content-Type': 'application/json',
+        }
+        params = {
+            'date': last_sync
+        }
+        response = requests.get(url, headers=headers, params=params)
+        if response.status_code == 200:
+            try:
+                json_data = response.json()
+                json_data = interface.lowercase_keys(json_data)
+                # for data in json_data:
+                self.regular_update_cashflow('cashflow', json_data)
+                interface.update_sync_interface('cashflow')
+            except Exception as e:
+                _logger.error('Error processing API data: %s', str(e))
+        else:
+            _logger.error('Failed to fetch data from external API: %s', response.status_code)
     def sync_missing_cashflows(self):
         interface = self.env['fusion.sync.history']
         last_sync = '2022-01-01'
@@ -478,9 +506,23 @@ class CashflowControllerBi(models.Model):
             for data in json_data:
                 exists = all_cfs.search([('cashflowid', '=', data['cashflowid'])])
                 if exists:
-                    all_cfs.search([('cashflowid', '=', data['cashflowid'])]).unlink()
+                    self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
                     self.env['cashflow.controller.bi'].create(data)
                 else:
                     self.env['cashflow.controller.bi'].create(data)
+                    
+    # def re_fetch(self):
+    #     all_cfs = self.env['cashflow.controller.bi'].search([])
+    #     for rec in self:
+    #         exists = all_cfs.search([('cashflowid', '=', rec.cashflowid)])
+    #         if exists:
+    #             self.env['cashflow.controller.bi'].search(
+    #                 [('cashflowid', '=', rec.cashflowid)]).unlink()
+    #             self.env['cashflow.controller.bi'].create(data)
+    #         else:
+    #             self.env['cashflow.controller.bi'].create(data)
+    #
+            
+               
                     # self.env.cr.commit()
         
