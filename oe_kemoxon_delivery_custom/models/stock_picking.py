@@ -97,6 +97,7 @@ class StockPicking(models.Model):
                         })
                     rec.move_ids.move_line_ids.lot_id = new_lot
                 r = super(StockPicking, rec)._action_done()
+            
     def button_confirm(self):
         for rec in self:
             picking = rec
@@ -309,11 +310,12 @@ class StockPicking(models.Model):
             moves.move_line_ids.state = 'draft'
             moves.state = 'draft'
             moves.state = 'draft'
-            
-            for line in record.move_ids.move_line_ids:
+            lotNumbers = self.env['stock.lot'].search([])
+            sml =  record.move_ids.move_line_ids
+            for line in sml:
                 if line.lot_id:
                     previous_lot = line.lot_id
-                    lotNumbers = self.env['stock.lot'].search(
+                    lotNumbers = lotNumbers.search(
                         [('product_id', '=', line.product_id.id), ('name', '=', line.lot_id.name)])
                     if lotNumbers:
                         line.lot_id = lotNumbers[0]
@@ -325,16 +327,16 @@ class StockPicking(models.Model):
                         })
                         line.lot_id=new_lot
                         record.move_ids.move_line_ids.product_id = record.move_ids.product_id
-            
-            for line in record.move_ids.move_line_ids:
+            quants = record.env['stock.quant'].search([])
+            for line in sml:
                 if line.qty_done != 0 and existingstate == 'done':
-                    location_quant = record.env['stock.quant'].search(['&', ('product_id', '=', record.product_id.id)
+                    location_quant = quants.search(['&', ('product_id', '=', record.product_id.id)
                                                                         , ('lot_id', '=', line.lot_id.id)
                                                                         , ('location_id', '=', line.location_id.id)
 
                                                                           # , ('company_id', '=', line.company_id.id)
                                                                      ])
-                    location_dest_quant = record.env['stock.quant'].search(['&', ('product_id', '=', record.product_id.id)
+                    location_dest_quant = quants.search(['&', ('product_id', '=', record.product_id.id)
                                                                              , ('lot_id', '=', line.lot_id.id)
                                                                              ,
                                                                           ('location_id', '=', line.location_dest_id.id)

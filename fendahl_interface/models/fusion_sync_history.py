@@ -330,7 +330,7 @@ class FusionSyncHistory(models.Model):
     
     def get_wh_code(self, warehouse, company):
         if warehouse:
-            warehouse = warehouse.replace(' ', '')  # Remove spaces from the warehouse name
+            warehouse = str(company)+ warehouse.replace(' ', '')  # Remove spaces from the warehouse name
             iteration = 0
             while True:
                 if iteration<=5:
@@ -356,36 +356,39 @@ class FusionSyncHistory(models.Model):
         random_string = ''.join(random.choices(characters, k=5))
         return random_string
     def validate_warehouse(self,warehouse,company):
-        result = self.env['stock.warehouse'].search([('name', '=', warehouse),('company_id', '=', company)], limit=1)
+        result = self.env['stock.warehouse'].search([('name', '=', str(company.name) + '-' + warehouse),('company_id', '=', company.id)], limit=1)
         
         if not result:
-            code = self.get_wh_code(warehouse, company)
+            code = self.get_wh_code(warehouse, company.id)
             result = self.env['stock.warehouse'].create({
-                'name': warehouse,
+                'name': str(company.name) + '-' + warehouse,
                 'code':code,
-                'company_id': company,
-                'partner_id':company
+                'company_id': company.id,
+                # 'partner_id':company.id
             })
         return result
             
     def checkAndDefineAnalytic(self, planName, account,company):
-        analytic_plan = self.env['account.analytic.plan'].search([('name', '=', planName),
-                                                                  ('company_id', '=', company)])
-        if not (analytic_plan):
-            analytic_plan = self.env['account.analytic.plan'].create({
-                'name': planName,
-                'company_id': company
-            })
-        analytic_account = self.env['account.analytic.account'].search([('name', '=', account),
-                                                                       ('plan_id', '=', analytic_plan.id),
-                                                                        ('company_id', '=', company)])
-        if not analytic_account:
-            analytic_account = self.env['account.analytic.account'].create(
-                {'name': account,
-                 'plan_id': analytic_plan.id,
-                 'company_id': company
-                 })
-        return analytic_account
+        if account and planName:
+            analytic_plan = self.env['account.analytic.plan'].search([('name', '=', planName),
+                                                                      ('company_id', '=', company)])
+            if not (analytic_plan):
+                analytic_plan = self.env['account.analytic.plan'].create({
+                    'name': planName,
+                    'company_id': company
+                })
+            analytic_account = self.env['account.analytic.account'].search([('name', '=', account),
+                                                                           ('plan_id', '=', analytic_plan.id),
+                                                                            ('company_id', '=', company)])
+            if not analytic_account:
+                analytic_account = self.env['account.analytic.account'].create(
+                    {'name': account,
+                     'plan_id': analytic_plan.id,
+                     'company_id': company
+                     })
+            return analytic_account
+        else:
+            a=1
     def validate_lot(self,name,product,company):
         lot = self.env['stock.lot'].search([('name', '=', name),('product_id', '=', product),('company_id', '=', company)], limit=1)
         if not lot:

@@ -346,7 +346,7 @@ class TransferControllerBI(models.Model):
         #     if conversion_rate:
         #         return quantity * conversion_rate
             
-    def update_existing_lines(self,stock_move,product,rec,company):
+    def update_existing_lines(self,stock_move,product,rec,company,fromlocation,destlocation):
         lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid, product.id,
                                                            company.id)
         
@@ -357,8 +357,8 @@ class TransferControllerBI(models.Model):
             for line in existing_line:
                 if line.qty_done != float(quantity):
                     line.qty_done = quantity
-                    line.location_id = stock_move.picking_id.location_id
-                    line.location_dest_id = stock_move.picking_id.location_dest_id
+                    line.location_id = fromlocation.id
+                    line.location_dest_id = destlocation.id
         else:
             line = stock_move.move_line_ids.filtered(lambda ml: ml.product_id == product)
             if line:
@@ -369,8 +369,8 @@ class TransferControllerBI(models.Model):
                         if line2.qty_done != float(quantity):
                             line2.qty_done = quantity
                             line2.fusion_delivery_id = rec.deliveryid
-                            line2.location_id = stock_move.picking_id.location_id
-                            line2.location_dest_id = stock_move.picking_id.location_dest_id
+                            line2.location_id = fromlocation.id
+                            line2.location_dest_id = destlocation.id
                             i += 1
             else:
                 self.env['stock.move.line'].create({
@@ -379,8 +379,8 @@ class TransferControllerBI(models.Model):
                     'qty_done': quantity,
                     'move_id': stock_move.id,
                     'picking_id': stock_move.picking_id.id,
-                    'location_id': stock_move.picking_id.location_id.id,
-                    'location_dest_id': stock_move.picking_id.location_dest_id.id,
+                    'location_id': fromlocation.id,
+                    'location_dest_id': destlocation.id,
                     'fusion_delivery_id': rec.deliveryid,
                     'company_id': company.id
                 })
@@ -437,7 +437,7 @@ class TransferControllerBI(models.Model):
                                             if picking.state  in ('done','waiting','confirmed','cancel'):
                                                 picking.set_stock_move_to_draft()
                                                 picking.action_confirm()
-                                            self.update_existing_lines(exists, exists.product_id, rec, company)
+                                            self.update_existing_lines(exists, exists.product_id, rec, company,picking.location_id,picking.location_dest_id)
                                             # stock_move.quantity_done = quantity
                                             picking._action_done()
                                             self.fix_valuation_warehouse(picking,exists)
@@ -460,7 +460,7 @@ class TransferControllerBI(models.Model):
                                                     
                                                     
                                                     warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.tomotcode,
-                                                                                                                   company.id)
+                                                                                                                   company)
                                                     
                                                     existing_distribution = pol.analytic_distribution
                                                     existing_distribution[str(nomination_link.id)] = 100
@@ -485,7 +485,7 @@ class TransferControllerBI(models.Model):
                                             if so:
                                                 if sol:
                                                     warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
-                                                                                                                   company.id)
+                                                                                                                   company)
                                                     so.warehouse_id = warehouse
                                                     if not so.state == 'sale':
                                                         so.action_confirm()
@@ -523,31 +523,35 @@ class TransferControllerBI(models.Model):
                                             picking.fusion_segment_code = pol.fusion_segment_code
                                             stock_move.fusion_delivery_id = rec.deliveryid
                                             stock_move.fusion_segment_code = pol.fusion_segment_code
-                                            stock_move.picking_id.set_stock_move_to_draft()
-                                            # stock_move.picking_id.deal_ref = 'moved_to_Draft'
-                                            picking.custom_delivery_date = datetime.datetime.strptime(
-                                                rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
-                                            picking.date_done = datetime.datetime.strptime(
-                                                rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
-                                            picking.scheduled_date = datetime.datetime.strptime(
-                                                rec.deliverycompletiondate, '%Y-%m-%dT%H:%M:%S')
-                                            stock_move.date = datetime.datetime.strptime(rec.deliverycompletiondate,
-                                                                                         '%Y-%m-%dT%H:%M:%S')
-                                            stock_move.location_id = picking.location_id,
-                                            stock_move.location_dest_id = picking.location_dest_id,
-                                            if rec.buyselldisplaytext == "Buy":
-                                                picking_type = self.env['stock.picking.type'].search(
-                                                    [('code', '=', 'incoming'), ('warehouse_id', '=', warehouse.id)], limit=1)
-                                            elif rec.buyselldisplaytext == "Sell":
-                                                picking_type = self.env['stock.picking.type'].search(
-                                                    [('code', '=', 'outgoing'), ('warehouse_id', '=', warehouse.id)], limit=1)
-                                            if not picking_type:
-                                                picking_type=picking.picking_type_id
-                                            picking.picking_type_id = picking_type
-                                            picking.action_confirm()
-                                            self.update_existing_lines(stock_move,product,rec,company)
-                                            picking.button_validate()
-                                            self.fix_valuation_warehouse(picking,stock_move)
+                                            if rec.deliverycompletiondate or rec.bldate:
+                                                if stock_move.state in('done','waiting','confirmed','assigned'):
+                                                    stock_move.picking_id.set_stock_move_to_draft()
+                                                # stock_move.picking_id.deal_ref = 'moved_to_Draft'
+                                                picking.custom_delivery_date = datetime.datetime.strptime(
+                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate, '%Y-%m-%dT%H:%M:%S')
+                                                picking.date_done = datetime.datetime.strptime(
+                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate, '%Y-%m-%dT%H:%M:%S')
+                                                picking.scheduled_date = datetime.datetime.strptime(
+                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate, '%Y-%m-%dT%H:%M:%S')
+                                                stock_move.date = datetime.datetime.strptime(rec.deliverycompletiondate  if rec.deliverycompletiondate else rec.bldate,
+                                                                                             '%Y-%m-%dT%H:%M:%S')
+                                                
+                                                if rec.buyselldisplaytext == "Buy":
+                                                    picking_type = self.env['stock.picking.type'].search(
+                                                        [('code', '=', 'incoming'), ('warehouse_id', '=', warehouse.id)], limit=1)
+                                                elif rec.buyselldisplaytext == "Sell":
+                                                    picking_type = self.env['stock.picking.type'].search(
+                                                        [('code', '=', 'outgoing'), ('warehouse_id', '=', warehouse.id)], limit=1)
+                                                if not picking_type:
+                                                    picking_type=picking.picking_type_id
+                                                picking.picking_type_id = picking_type
+                                                stock_move.location_id = picking.location_id,
+                                                stock_move.location_dest_id = picking.location_dest_id,
+                                                picking.action_confirm()
+                                                self.update_existing_lines(stock_move,product,rec,company,picking.location_id,picking.location_dest_id)
+                                                self.env.cr.commit()
+                                                picking.button_validate()
+                                            # self.fix_valuation_warehouse(picking,stock_move)
                                             # self.env.cr.commit()
                                             # stock_move.stock_valuation_layer_ids.recalculate_stock_value()
                                     else:
@@ -588,13 +592,13 @@ class TransferControllerBI(models.Model):
                                                                                        company.id)
                                     
                                     in_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
-                                                                                                   company.id)
+                                                                                                   company)
                                     picking_type = self.env['stock.picking.type'].search(
                                         [('code', '=', 'internal'), ('warehouse_id', '=', in_warehouse.id)], limit=1)
                                     in_location = self.env['stock.location'].search([('warehouse_id', '=', in_warehouse.id)], limit=1)
                                     
                                     out_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.tomotcode,
-                                                                                                      company.id)
+                                                                                                      company)
                                     out_location = self.env['stock.location'].search(
                                         [('warehouse_id', '=', out_warehouse.id)], limit=1)
                                     

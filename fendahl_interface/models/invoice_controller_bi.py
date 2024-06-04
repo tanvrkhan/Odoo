@@ -500,7 +500,7 @@ class InvoiceControllerBI(models.Model):
                                                                  , ('costtype', 'not in', ('Primary Settlement','VAT','Tax'))
                                                               ])
     
-    def create_bill(self):
+    def create_bill(self,uierrors):
         for rec in self:
             if rec.invoicestatus == 'Active':
                 if rec.invoiceopenstatus == 'Send To Accounting':
@@ -516,19 +516,18 @@ class InvoiceControllerBI(models.Model):
                                 domain=[('invoicenumber', '=', rec.invoicenumber), ('cashflowstatus', '!=', 'Defunct')],
                                 fields=['sectionno'],  # Fields to load
                                 groupby=['sectionno'],
-                                lazy=False  # Get results for each partner directly
-                            )
+                                lazy=False)
                             invoice_origins=''
                             for clp in cashflow_lines_po:
-                                pol  =  self.env['purchase.order.line'].search([('fusion_segment_code','=',clp['sectionno'])])
-                                if pol:
-                                    if pol.order_id:
-                                        if invoice_origins =='':
-                                            invoice_origins=pol.order_id.name
-                                        else:
-                                            invoice_origins = invoice_origins + ', ' + pol.order_id.name
+                                if clp['sectionno']:
+                                    pol  =  self.env['purchase.order.line'].search([('fusion_segment_code','=',clp['sectionno'])])
+                                    if pol:
+                                        if pol.order_id:
+                                            if invoice_origins =='':
+                                                invoice_origins=pol.order_id.name
+                                            else:
+                                                invoice_origins = invoice_origins + ', ' + pol.order_id.name
                             existing_invoice.write({'invoice_origin': invoice_origins}) if invoice_origins else None
-                            
                             if existing_invoice.line_ids:
                                 cashflow_lines = cashflow_lines_all.read_group(
                                 domain=[('invoicenumber', '=', rec.invoicenumber),('cashflowstatus', '!=', 'Defunct')],
@@ -549,7 +548,6 @@ class InvoiceControllerBI(models.Model):
                                     existing_invoice.move_type = 'in_refund'
                                 else:
                                     existing_invoice.move_type = 'in_invoice'
-                                    
                                     
                                 if cashflow_lines:
                                     for cfline in cashflow_lines:
@@ -584,6 +582,8 @@ class InvoiceControllerBI(models.Model):
                                         
                                     
                                 else:
+                                    if uierrors:
+                                        raise UserError('Cashflow lines not found in Odoo')
                                     log_error = self.env['fusion.sync.history.errors'].log_error(
                                         'InvoiceControllerBI',
                                         rec.invoicenumber,
@@ -591,6 +591,8 @@ class InvoiceControllerBI(models.Model):
                                         rec.internalcompany)
                                         
                             else:
+                                if uierrors:
+                                    raise UserError('Invoice has no lines in Odoo')
                                 log_error = self.env['fusion.sync.history.errors'].log_error(
                                     'InvoiceControllerBI',
                                     rec.invoicenumber,
@@ -600,6 +602,8 @@ class InvoiceControllerBI(models.Model):
                             if invoice_reconciled_lines:
                                 self.reconcile_entries(invoice_reconciled_lines, existing_invoice)
                         else:
+                            if uierrors:
+                                raise UserError('Invoice not yet sent to Odoo. Please update the status of invoice to be SEND TO ACCOUNTING',)
                             log_error = self.env['fusion.sync.history.errors'].log_error(
                                     'InvoiceControllerBI',
                                     rec.invoicenumber,
@@ -611,11 +615,7 @@ class InvoiceControllerBI(models.Model):
                     if (rec.payablereceivable == 'Receivable' and '-DN-' not in rec.theirinvoiceref) or (rec.payablereceivable=='Payable' and '-CN-' in rec.theirinvoiceref):
                         sol = self.env['sale.order.line'].search([('id','=',0)])
                         so = self.env['sale.order'].search([('id','=',0)])
-                        if rec.customsectionnumber:
-                            sol = self.env['sale.order.line'].search(
-                                [('custom_section_number', '=', rec.customsectionnumber)])
-                            so = self.env['sale.order'].search(
-                                [('id', '=', sol.order_id.id)])
+                       
                         existing_invoice = self.check_existing_invoice(rec.invoicenumber)
                         if existing_invoice:
                             invoice_reconciled_lines = self.get_reconciled_lines(existing_invoice)
@@ -628,12 +628,13 @@ class InvoiceControllerBI(models.Model):
                             )
                             invoice_origins = ''
                             for clp in cashflow_lines_so:
-                                sol = self.env['sale.order.line'].search(
-                                    [('fusion_segment_code', '=', clp['sectionno'])])
-                                if invoice_origins == '':
-                                    invoice_origins = sol.order_id.name
-                                else:
-                                    invoice_origins = invoice_origins + ', ' + sol.order_id.name
+                                if clp['sectionno']:
+                                    sol = self.env['sale.order.line'].search(
+                                        [('fusion_segment_code', '=', clp['sectionno'])])
+                                    if invoice_origins == '':
+                                        invoice_origins = sol.order_id.name
+                                    else:
+                                        invoice_origins = invoice_origins + ', ' + sol.order_id.name
                                     
                             existing_invoice.write({'invoice_origin': invoice_origins}) if invoice_origins else None
                             # existing_invoice.write({'sale_line_id': so.id}) if so else None
@@ -695,6 +696,9 @@ class InvoiceControllerBI(models.Model):
                                                     self.update_existing_si_line(with_same_price, company, cfline,
                                                                          quantity_multiplier)
                                     else:
+                                        if uierrors:
+                                            raise UserError(
+                                                'Cashflow Lines not found in Odoo')
                                         log_error = self.env['fusion.sync.history.errors'].log_error(
                                             'InvoiceControllerBI',
                                             rec.invoicenumber,
@@ -704,12 +708,16 @@ class InvoiceControllerBI(models.Model):
                                 if invoice_reconciled_lines:
                                     self.reconcile_entries(invoice_reconciled_lines, existing_invoice)
                             else:
+                                if uierrors:
+                                    raise UserError('Invoice Lines not found in Odoo')
                                 log_error = self.env['fusion.sync.history.errors'].log_error(
                                     'InvoiceControllerBI',
                                     rec.invoicenumber,
                                     'Invoice Lines not found in Odoo',
                                     rec.internalcompany)
                         else:
+                            if uierrors:
+                                raise UserError('Invoice is not yet synced to Odoo')
                             log_error = self.env['fusion.sync.history.errors'].log_error(
                                 'InvoiceControllerBI',
                                 rec.invoicenumber,
@@ -782,7 +790,10 @@ class InvoiceControllerBI(models.Model):
             ('price', '=', cf['price']),
             ('quantityuom', '=', cf['quantityuom'])
         ],limit=1)
-        pol = self.env['purchase.order.line'].search([('fusion_segment_code','=', cashflow_id['sectionno'])])
+        pol = self.env['purchase.order.line']
+        if cashflow_id['sectionno']:
+            existing_line.fusion_segment_code = cashflow_id['sectionno']
+            pol = self.env['purchase.order.line'].search([('fusion_segment_code','=', cashflow_id['sectionno'])],limit=1)
         
         tax_rate_record = self.get_tax_rate_record(cashflow_id, company)
         multiplier = 1

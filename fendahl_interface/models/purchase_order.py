@@ -29,6 +29,13 @@ class PurchaseOrderLineSync(models.Model):
     fusion_segment_id = fields.Integer('Fusion Section Id')
     fusion_segment_code = fields.Char('Fusion Section Code')
     custom_section_number = fields.Char('Fusion Custom Section Number')
+    
+    def fetch_from_controller(self):
+        for rec in self:
+            if rec.fusion_segment_code:
+                self.env['trade.controller.bi'].search([('segmentsectioncode', '=', rec.fusion_segment_code)]).create_order()
+            else:
+                raise UserError("Order isn't from Fusion.")
 
 
 class SaleOrderSync(models.Model):
@@ -95,7 +102,7 @@ class AccountMoveLine(models.Model):
                 if invoicenumber:
                     controllerinvoice = self.env['invoice.controller.bi'].search([('invoicenumber','=',invoicenumber)],limit=1)
                     if controllerinvoice:
-                        controllerinvoice.create_bill()
+                        controllerinvoice.create_bill(True)
                     else:
                         raise UserError('The invoice doesnt exist in fusion controller')
                 else:
