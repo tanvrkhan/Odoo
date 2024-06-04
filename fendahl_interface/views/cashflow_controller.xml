@@ -20,6 +20,7 @@
                      <field name="cashflowstatus"/>
                      <field name="material"/>
                      <field name="commodity"/>
+                     <field name="buysell"/>
                 </tree>
             </field>
          </record>
