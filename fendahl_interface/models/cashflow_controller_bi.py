@@ -511,6 +511,22 @@ class CashflowControllerBi(models.Model):
                 else:
                     self.env['cashflow.controller.bi'].create(data)
                     
+                    
+    def update_trade_pricing(self):
+        for rec in self:
+            if rec.quantitystatus == "Actual" and rec.costtype == "Primary Settlement" and rec.cashflowstatus == "Active" and rec.pricingtype != "Fixed":
+                if rec.buysell == "Buy":
+                    pol = self.env['purchase.order.line'].search([('fusion_segment_code', '=', rec.sectionno)])
+                    if pol:
+                        if pol.price_unit != rec.price:
+                            pol.price_unit = round(rec.price,2)
+                if rec.buysell == "Sell":
+                    sol = self.env['sale.order.line'].search([('fusion_segment_code', '=', rec.sectionno)])
+                    if sol:
+                        if sol.price_unit != rec.price:
+                            sol.price_unit = round(rec.price,2)
+            
+                    
     # def re_fetch(self):
     #     all_cfs = self.env['cashflow.controller.bi'].search([])
     #     for rec in self:

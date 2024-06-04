@@ -49,6 +49,13 @@ class SaleOrderLineSync(models.Model):
     fusion_segment_id = fields.Integer('Fusion Section Id')
     fusion_segment_code = fields.Char('Fusion Section Code')
     custom_section_number = fields.Char('Fusion Custom Section Number')
+    
+    def fetch_from_controller(self):
+        for rec in self:
+            if rec.fusion_segment_code:
+                self.env['trade.controller.bi'].search([('segmentsectioncode', '=', rec.fusion_segment_code)]).create_order()
+            else:
+                raise UserError("Order isn't from Fusion.")
 
 
 class StockPicking(models.Model):

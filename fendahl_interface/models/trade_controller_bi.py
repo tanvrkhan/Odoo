@@ -374,6 +374,15 @@ class TradeControllerBI(models.Model):
                 groupby=['quantitystatus', 'sectionno', 'costtype', 'actualestimate'],
                 lazy=False  # Get results for each partner directly
             )
+            cashflow_lines = self.env['cashflow.controller.bi'].read_group(
+                domain=[('quantitystatus', '=', 'Actual'), ('sectionno', '=', rec.segmentsectioncode),
+                        ('costtype', '=', "Primary Settlement"),
+                        ('cashflowstatus', '=', "Active")],
+                fields=['price:avg'],
+                # Fields to load
+                groupby=['quantitystatus', 'sectionno', 'costtype', 'actualestimate'],
+                lazy=False  # Get results for each partner directly
+            )
             if cashflow_lines:
                 return round(cashflow_lines[0]['price'],2)
     def update_order(self,type,existing_order,rec,currency,partner,incoterm,location,payment_term):
