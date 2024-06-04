@@ -561,13 +561,13 @@ class InvoiceControllerBI(models.Model):
                                             if (cfline['material'] == same_product_lines.product_id.name and (
                                                     float(round(cfline['price'], 2)) == round(same_product_lines.price_unit, 2))
                                                     and ((same_product_lines.balance<0 and (cfline['extendedamount']*-1)<0) or (same_product_lines.balance>0 and (cfline['extendedamount']*-1)>0))):
-                                                self.update_existing_line(same_product_lines,company,cfline,quantity_multiplier,cashflow_lines_all)
+                                                self.update_existing_line(same_product_lines,company,cfline,quantity_multiplier,cashflow_lines_all,rec.invoicenumber)
                                             elif float(round(cfline['price'], 2)) == round(same_product_lines.price_unit, 2) and ((same_product_lines.balance<0 and (cfline['extendedamount']*-1)<0) or (same_product_lines.balance>0 and (cfline['extendedamount']*-1)>0)):
-                                                    self.update_existing_line(same_product_lines,company,cfline,quantity_multiplier,cashflow_lines_all)
+                                                    self.update_existing_line(same_product_lines,company,cfline,quantity_multiplier,cashflow_lines_all,rec.invoicenumber)
                                             else:
                                                 line_to_update = existing_invoice.line_ids.filtered(lambda r: r.product_id.name == (cfline['material'] if cfline['costtype'] == 'Primary Settlement' else cfline['costtype']) and r.display_type=='product')
                                                 if len(line_to_update) == 1:
-                                                    self.update_existing_line(line_to_update,company,cfline,quantity_multiplier,cashflow_lines_all)
+                                                    self.update_existing_line(line_to_update,company,cfline,quantity_multiplier,cashflow_lines_all,rec.invoicenumber)
                                         else:
                                             with_same_quantity = same_product_lines.filtered(
                                                 lambda r: round(r.quantity, 2) == round(cfline['quantity'],
@@ -575,14 +575,14 @@ class InvoiceControllerBI(models.Model):
                                             if len(with_same_quantity)==1:
                                                 self.update_existing_line(with_same_quantity,  company,
                                                                              cfline,
-                                                                             quantity_multiplier,cashflow_lines_all)
+                                                                             quantity_multiplier,cashflow_lines_all,rec.invoicenumber)
                                             else:
                                                 with_same_price = same_product_lines.filtered(
                                                     lambda r: round(r.price_unit, 2) == round(cfline['price'],
                                                                                               2))
                                                 if len(with_same_price) == 1:
                                                     self.update_existing_line(with_same_price, company, cfline,
-                                                                         quantity_multiplier,cashflow_lines_all)
+                                                                         quantity_multiplier,cashflow_lines_all,rec.invoicenumber)
                                         
                                     
                                 else:
@@ -679,11 +679,11 @@ class InvoiceControllerBI(models.Model):
                                         if len(same_product_lines)==1:
                                             if cfline['material'] == same_product_lines.product_id.name and (
                                                     float(round(cfline['price'], 2)) == round(same_product_lines.price_unit,2)) and ((same_product_lines.balance>0 and cfline['extendedamount']<0) or (same_product_lines.balance<0 and cfline['extendedamount']>0)):
-                                                self.update_existing_si_line(same_product_lines, company, cfline,quantity_multiplier)
+                                                self.update_existing_si_line(same_product_lines, company, cfline,quantity_multiplier,rec.invoicenumber)
                                             elif cfline['costtype']!='Primary Settlement' and float(round(cfline['extendedamount'], 2)) == round(same_product_lines.price_unit, 2) and ((same_product_lines.balance>0 and cfline['extendedamount']<0) or (same_product_lines.balance<0 and cfline['extendedamount']>0)):
-                                                self.update_existing_si_line(same_product_lines, company, cfline,quantity_multiplier)
+                                                self.update_existing_si_line(same_product_lines, company, cfline,quantity_multiplier,rec.invoicenumber)
                                             elif cfline['costtype']!='Primary Settlement' and float(round(cfline['extendedamount'], 2)) == round(same_product_lines.balance, 2)*-1 and ((same_product_lines.balance>0 and cfline['extendedamount']<0) or (same_product_lines.balance<0 and cfline['extendedamount']>0)):
-                                                self.update_existing_si_line(same_product_lines, company, cfline,quantity_multiplier)
+                                                self.update_existing_si_line(same_product_lines, company, cfline,quantity_multiplier,rec.invoicenumber)
                                         else:
                                             with_same_quantity = same_product_lines.filtered(
                                                 lambda r: round(r.quantity, 2) == round(cfline['quantity'],
@@ -691,14 +691,14 @@ class InvoiceControllerBI(models.Model):
                                             if len(with_same_quantity)==1:
                                                 self.update_existing_si_line(with_same_quantity, company,
                                                                              cfline
-                                                                             ,quantity_multiplier)
+                                                                             ,quantity_multiplier,rec.invoicenumber)
                                             else:
                                                 with_same_price = same_product_lines.filtered(
                                                     lambda r: round(r.price_unit, 2) == round(cfline['price'],
                                                                                               2))
                                                 if len(with_same_price) == 1:
                                                     self.update_existing_si_line(with_same_price, company, cfline,
-                                                                         quantity_multiplier)
+                                                                         quantity_multiplier,rec.invoicenumber)
                                 else:
                                     if uierrors:
                                         raise UserError(
@@ -783,9 +783,10 @@ class InvoiceControllerBI(models.Model):
                                                                          'purchase', company.id)
         if tax_rate_record:
             return tax_rate_record
-    def update_existing_line(self, existing_line,company,cf,quantity_multiplier,cashflow_lines_all):
+    def update_existing_line(self, existing_line,company,cf,quantity_multiplier,cashflow_lines_all,invoicenumber):
 
         cashflow_id = cashflow_lines_all.search([
+            ('invoicenumber', '=', invoicenumber),
             ('payablereceivable','=',cf['payablereceivable']),
             ('costtype', '=', cf['costtype']),
             ('commodity', '=', cf['commodity']),
@@ -908,8 +909,9 @@ class InvoiceControllerBI(models.Model):
                         #     new_product_invoice = self.env['account.move'].create(header)
                         #     new_product_invoice.action_post()
     
-    def update_existing_si_line(self, existing_line, company, cf,quantity_multiplier):
+    def update_existing_si_line(self, existing_line, company, cf,quantity_multiplier,invoicenumber):
         cashflow_id = self.env['cashflow.controller.bi'].search([
+            ('invoicenumber', '=', invoicenumber),
             ('payablereceivable', '=', cf['payablereceivable']),
             ('costtype', '=', cf['costtype']),
             ('commodity', '=', cf['commodity']),
