@@ -385,6 +385,8 @@ class TradeControllerBI(models.Model):
             )
             if cashflow_lines:
                 return round(cashflow_lines[0]['price'],2)
+            else:
+                return 0
     def update_order(self,type,existing_order,rec,currency,partner,incoterm,location,payment_term):
         company = self.env['res.company'].search([('name', '=', rec.internalcompany)],
                                                  limit=1)
@@ -468,7 +470,7 @@ class TradeControllerBI(models.Model):
                                                                                   segment.strategy,
                                                                                   company.id)
             
-            price = self.get_triggered_price( segment)
+            price = self.get_triggered_price(segment)
             analytic_distribution={}
             if commodity_ann:
                 analytic_distribution[commodity_ann.id] = 100
@@ -483,7 +485,7 @@ class TradeControllerBI(models.Model):
                 'product_qty': segment.tradeqty if Decimal(
                     segment.tradeqty) >= 0 else segment.tradeqty * -1,
                 'product_uom': uom.id,
-                'price_unit': float(segment.price) if self.is_convertible_to_float(price) else 0,
+                'price_unit': float(price) if self.is_convertible_to_float(price) else segment.price,
                 'analytic_distribution': analytic_distribution,
                 #     'analytic_distribution': {
                 #     commodity_ann.id: 100,
@@ -532,14 +534,14 @@ class TradeControllerBI(models.Model):
                 if strategy_ann:
                     analytic_distribution[strategy_ann.id] = 100
                 # portfolio_ann = self.env['fusion.sync.history'].checkAndDefineAnalytic('Portfolio', segment.portfoliosegment, company.id)
-                
+                price = self.get_triggered_price(segment)
                 lines.append((0, 0, {
                     'product_id': product.id,
                     'name': product.name + segment.shape if segment.shape else product.name,
                     # 'sh_warehouse_id': warehouse.id,
                     'product_uom_qty': segment.tradeqty if float(segment.tradeqty) >= 0 else float(segment.tradeqty) * -1,
                     'product_uom': uom.id,
-                    'price_unit': self.get_triggered_price(segment),
+                    'price_unit': float(price) if self.is_convertible_to_float(price) else segment.price,
                     'analytic_distribution': analytic_distribution,
                     'tax_id': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])],
                     'fusion_segment_id': segment.segmentid,
