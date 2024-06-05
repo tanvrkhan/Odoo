@@ -374,15 +374,28 @@ class TradeControllerBI(models.Model):
                 groupby=['quantitystatus', 'sectionno', 'costtype', 'actualestimate'],
                 lazy=False  # Get results for each partner directly
             )
-            cashflow_lines = self.env['cashflow.controller.bi'].read_group(
-                domain=[('quantitystatus', '=', 'Actual'), ('sectionno', '=', rec.segmentsectioncode),
-                        ('costtype', '=', "Primary Settlement"),
-                        ('cashflowstatus', '=', "Active")],
-                fields=['price:avg'],
-                # Fields to load
-                groupby=['quantitystatus', 'sectionno', 'costtype', 'actualestimate'],
-                lazy=False  # Get results for each partner directly
-            )
+            if not cashflow_lines:
+                cashflow_lines = self.env['cashflow.controller.bi'].read_group(
+                    domain=[('quantitystatus', '=', 'Actual'), ('sectionno', '=', rec.segmentsectioncode),
+                            ('costtype', '=', "Primary Settlement"),
+                            ('cashflowstatus', '=', "Active")],
+                    fields=['price:avg'],
+                    # Fields to load
+                    groupby=['quantitystatus', 'sectionno', 'costtype', 'actualestimate'],
+                    lazy=False  # Get results for each partner directly
+                )
+                if not cashflow_lines:
+                    cashflow_lines = self.env['cashflow.controller.bi'].read_group(
+                        domain=[('quantitystatus', '=', 'Contractual'), ('sectionno', '=', rec.segmentsectioncode),
+                                ('costtype', '=', "Primary Settlement"),
+                                ('cashflowstatus', '=', "Active")],
+                        fields=['price:avg'],
+                        # Fields to load
+                        groupby=['quantitystatus', 'sectionno', 'costtype', 'actualestimate'],
+                        lazy=False  # Get results for each partner directly
+                    )
+               
+                    
             if cashflow_lines:
                 return round(cashflow_lines[0]['price'],2)
             else:
@@ -429,7 +442,7 @@ class TradeControllerBI(models.Model):
             existing_line  = existing_order.order_line.filtered(
                 lambda ol: ol.fusion_segment_code == segment.segmentsectioncode)
             if existing_line:
-                existing_line.price_unit = self.get_triggered_price(rec)
+                existing_line.price_unit = self.get_triggered_price(segment)
                 continue
             else:
                 self.create_new_po_line(existing_order,segment,warehouse,company,tax_rate_record)
@@ -449,7 +462,7 @@ class TradeControllerBI(models.Model):
             existing_line = existing_order.order_line.filtered(
                     lambda ol: ol.fusion_segment_code == segment.segmentsectioncode)
             if existing_line:
-                existing_line.price_unit = self.get_triggered_price(rec)
+                existing_line.price_unit = self.get_triggered_price(segment)
                 continue
             else:
                 self.create_new_so_line(existing_order, segment, warehouse, company, tax_rate_record)
