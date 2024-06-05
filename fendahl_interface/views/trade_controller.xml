@@ -18,6 +18,7 @@
             <field name="model">trade.controller.bi</field>
             <field name="arch" type="xml">
                 <tree string="Estimate">
+                    <field name="buysell"/>
                     <field name="dealmasterid"/>
                     <field name="tradestatus"/>
                     <field name="tradedate"/>

@@ -397,7 +397,7 @@ class TransferControllerBI(models.Model):
                 stock_move.stock_valuation_layer_ids.warehouse_id = picking.location_dest_id.warehouse_id.id
     def create_receipt(self):
         for record in self:
-            try:
+            # try:
                 random_string = self.env['fusion.sync.history'].generate_random_string()
                 all_transfers = self.env['transfer.controller.bi'].search([('itineraryid', '=', record.itineraryid)])
                 sms  = self.env['stock.move'].search([])
@@ -444,6 +444,8 @@ class TransferControllerBI(models.Model):
                                             self.update_existing_lines(exists, exists.product_id, rec, company,picking.location_id,picking.location_dest_id)
                                             # stock_move.quantity_done = quantity
                                             picking.button_validate()
+                                            if picking.state != 'done':
+                                                picking._action_done()
                                             self.fix_valuation_warehouse(picking,exists)
                                             continue
                                             self.env.cr.commit()
@@ -552,6 +554,9 @@ class TransferControllerBI(models.Model):
                                                 self.update_existing_lines(stock_move,product,rec,company,picking.location_id,picking.location_dest_id)
                                                 picking.button_validate()
                                                 self.env.cr.commit()
+                                                if picking.state!='done':
+                                                    picking._action_done()
+                                                    
                                             # self.fix_valuation_warehouse(picking,stock_move)
                                             # self.env.cr.commit()
                                             # stock_move.stock_valuation_layer_ids.recalculate_stock_value()
@@ -566,6 +571,7 @@ class TransferControllerBI(models.Model):
                                                                                                      rec.tosegmentid,
                                                                                                      'SO Line not found',
                                                                                                      rec.tointernalcompany)
+                                        raise UserError("Order not found." + rec.tosegmentsectioncode if rec.tosegmentsectioncode else rec.fromsegmentsectioncode + rec.buysell)
                                 elif rec.fromcommoditycode!='Coal' and rec.tocommoditycode!='Coal' and (rec.fromtypeenum!='Trade' and rec.totypeenum!='Trade'):
                                     companies = []
                                     all_companies = self.env['res.company'].search([])
@@ -638,7 +644,10 @@ class TransferControllerBI(models.Model):
                                         stock_move.move_line_ids.fusion_delivery_id = rec.deliveryid,  #
                                         picking.action_confirm()
                                         picking.action_assign()
-                                        picking._action_done()
+                                        picking.button_validate()
+                                        # picking._action_done()
+                                        if picking.state != 'done':
+                                            picking._action_done()
                                         # self.env.cr.commit()
                                         # picking.stock_move_id.stock_valuation_layer_ids.recalculate_stock_value()
                                         
@@ -648,11 +657,11 @@ class TransferControllerBI(models.Model):
                             if cancelled_entry:
                                 cancelled_entry.picking_id.set_stock_move_to_draft()
                 self.env.cr.commit()
-            except Exception as e:
-                log_error = self.env['fusion.sync.history.errors'].log_error('TransferController', rec.fromsegmentid,
-                                                                             str(e),
-                                                                             rec.tointernalcompany)
-                raise UserError( str(e) + str(rec))
+            # except Exception as e:
+            #     log_error = self.env['fusion.sync.history.errors'].log_error('TransferController', rec.fromsegmentid,
+            #                                                                  str(e),
+            #                                                                  rec.tointernalcompany)
+            #     raise UserError( str(e) + str(rec))
                 
         
                 # _logger.error('Error processing API data: %s', str(e))

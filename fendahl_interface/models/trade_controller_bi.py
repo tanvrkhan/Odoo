@@ -711,6 +711,9 @@ class TradeControllerBI(models.Model):
                     if partner_info:
                         partner = self.env['res.partner'].search([('short_name', '=', partner_info['configCode'])],
                                               limit=1)
+                if not partner:
+                    raise UserError("Couldn't find partner in Odoo.")
+                    
                 #validation if partner still doesn't exist.
                 currency = self.env['res.currency'].search([('name', '=', rec.settlementcurrency)], limit=1)
                 company = self.env['res.company'].search([('name', '=', rec.internalcompany)], limit=1)
