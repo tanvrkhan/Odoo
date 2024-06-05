@@ -469,7 +469,7 @@ class TradeControllerBI(models.Model):
                                                                                   company.id)
             
             price = self.get_triggered_price( segment)
-            analytic_distribution=[]
+            analytic_distribution={}
             if commodity_ann:
                 analytic_distribution[commodity_ann.id] = 100
             if trader_ann:
