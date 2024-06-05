@@ -711,11 +711,9 @@ class TradeControllerBI(models.Model):
                         
                     else:
                         if partner and company:
+                            self.create_new_po(rec,warehouse,company,partner,incoterm,location,payment_term,currency)
                             if status == 'cancel':
-                                existing_po.action_cancel()
-                            else:
-                                self.create_new_po(rec,warehouse,company,partner,incoterm,location,payment_term,currency)
-                            
+                                existing_po.button_cancel()
                         else:
                             log_error = self.env['fusion.sync.history.errors'].log_error('TradeControllerBI', rec.segmentid, 'Partner or Company not found',rec.internalcompany)
                 if rec.buysell == 'Sell':
@@ -723,12 +721,12 @@ class TradeControllerBI(models.Model):
                     if existing_so:
                         self.update_order('Sale Order',existing_so,rec,currency,partner,incoterm,location,payment_term)
                         if status == 'cancel':
-                            existing_so.button_cancel()
+                            existing_so.action_cancel()
                     else:
                         if partner and company:
                             self.create_new_so(rec,warehouse,company,partner,incoterm,location,payment_term,currency)
                             if status == 'cancel':
-                                existing_so.button_cancel()
+                                existing_so.action_cancel()
                         else:
                             log_error = self.env['fusion.sync.history.errors'].log_error('TradeControllerBI', rec.segmentid, 'Partner or Company not found',rec.internalcompany)
             except Exception as e:
