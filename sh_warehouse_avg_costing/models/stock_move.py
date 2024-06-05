@@ -189,7 +189,7 @@ class WarehouseStockMove(models.Model):
     def get_price_from_valuations(self,warehouse):
         if warehouse:
             valuations = self.env['stock.valuation.layer'].read_group(
-            domain=[('product_id', '=', self.product_variant_id.id),
+            domain=[('product_id', '=', self.product_id.id),
                     ('company_id', '=', self.env.company.id),
                     ('warehouse_id', '=', warehouse.id)
                     ],
@@ -200,7 +200,7 @@ class WarehouseStockMove(models.Model):
         )
         else:
             valuations = self.env['stock.valuation.layer'].read_group(
-                domain=[('product_id', '=', self.product_variant_id.id),
+                domain=[('product_id', '=', self.product_id.id),
                         ('company_id', '=', self.env.company.id)
                         ],
                 fields=['warehouse_id', 'quantity', 'value'],
