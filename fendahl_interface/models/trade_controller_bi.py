@@ -683,6 +683,7 @@ class TradeControllerBI(models.Model):
             status = 'draft'
         elif rec.tradestatus == 'Rejected' or rec.tradestatus == 'Void':
             status = 'cancel'
+        return status
     def create_order(self):
         for rec in self:
             try:
@@ -703,14 +704,18 @@ class TradeControllerBI(models.Model):
                 if rec.buysell == 'Buy':
                     existing_po = self.env['purchase.order'].search([('fusion_deal_number', '=', rec.dealmasterid)])
                     if existing_po:
-                        self.update_order('Purchase Order',existing_po,rec,currency,partner,incoterm,location,payment_term)
                         if status == 'cancel':
                             existing_po.button_cancel()
+                        else:
+                            self.update_order('Purchase Order',existing_po,rec,currency,partner,incoterm,location,payment_term)
+                        
                     else:
                         if partner and company:
-                            self.create_new_po(rec,warehouse,company,partner,incoterm,location,payment_term,currency)
                             if status == 'cancel':
                                 existing_po.button_cancel()
+                            else:
+                                self.create_new_po(rec,warehouse,company,partner,incoterm,location,payment_term,currency)
+                            
                         else:
                             log_error = self.env['fusion.sync.history.errors'].log_error('TradeControllerBI', rec.segmentid, 'Partner or Company not found',rec.internalcompany)
                 if rec.buysell == 'Sell':
