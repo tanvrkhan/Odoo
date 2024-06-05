@@ -444,8 +444,10 @@ class TradeControllerBI(models.Model):
                 [('parentcashflowid', '=', main_cf.cashflowid), ('costtype', '=', 'VAT')], limit=1)
             tax_rate_record = self.env['fusion.sync.history'].get_tax_record(tax_cf.erptaxcode,
                                                                              'sale', company.id)
-            if existing_order.order_line.filtered(
-                    lambda ol: ol.fusion_segment_code == segment.segmentsectioncode):
+            existing_line = existing_order.order_line.filtered(
+                    lambda ol: ol.fusion_segment_code == segment.segmentsectioncode)
+            if existing_line:
+                existing_line.price_unit = self.get_triggered_price(rec)
                 continue
             else:
                 self.create_new_so_line(existing_order, segment, warehouse, company, tax_rate_record)
