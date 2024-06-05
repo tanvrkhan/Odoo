@@ -712,7 +712,7 @@ class TradeControllerBI(models.Model):
                     else:
                         if partner and company:
                             if status == 'cancel':
-                                existing_po.button_cancel()
+                                existing_po.action_cancel()
                             else:
                                 self.create_new_po(rec,warehouse,company,partner,incoterm,location,payment_term,currency)
                             
