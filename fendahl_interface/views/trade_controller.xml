@@ -19,6 +19,7 @@
             <field name="arch" type="xml">
                 <tree string="Estimate">
                     <field name="dealmasterid"/>
+                    <field name="tradestatus"/>
                     <field name="tradedate"/>
                     <field name="segmentid"/>
                     <field name="segmentsectioncode"/>
@@ -74,6 +75,18 @@
                             domain="[('pricingtype', 'in', ['Standard Formula'])]"/>
                     <filter string="Trigger" name="filter_pricingtype_4"
                             domain="[('pricingtype', 'in', ['Trigger'])]"/>
+                    <filter string="TS Accepted" name="filter_tradestatus_1"
+                            domain="[('tradestatus', 'in', ['Accepted'])]"/>
+                    <filter string="TS Closed" name="filter_tradestatus_2"
+                            domain="[('tradestatus', 'in', ['Closed'])]"/>
+                    <filter string="TS Confirmed" name="filter_tradestatus_3"
+                            domain="[('tradestatus', 'in', ['Confirmed'])]"/>
+                    <filter string="TS Void" name="filter_tradestatus_4"
+                            domain="[('tradestatus', 'in', ['Void'])]"/>
+                    <filter string="TS Pending" name="filter_tradestatus_5"
+                            domain="[('tradestatus', 'in', ['Pending'])]"/>
+                    <filter string="TS Rejected" name="filter_tradestatus_6"
+                            domain="[('tradestatus', 'in', ['Rejected'])]"/>
                     <field name="dealmasterid"/>
                     <field name="tradedate"/>
                     <field name="segmentid"/>
@@ -85,6 +98,7 @@
                     <field name="tradeqty"/>
                     <field name="tradeprice"/>
                     <field name="pricingtype"/>
+                    <field name="tradestatus"/>
                     <separator/>
                 </search>
             </field>
