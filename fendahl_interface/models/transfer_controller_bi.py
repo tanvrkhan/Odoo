@@ -431,11 +431,11 @@ class TransferControllerBI(models.Model):
                                     exists = sms.search(
                                         [('fusion_delivery_id', '=', rec.deliveryid)], limit=1)
                                     if exists:
-                                        if exists.fusion_last_modify == datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f') and exists.state=='done':
+                                        if exists.fusion_last_modify == self.parse_datetime(rec.lastmodifydate) and exists.state=='done':
                                             continue
                                         else:
                                             exists.fusion_delivery_id = rec.deliveryid
-                                            exists.fusion_last_modify = datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f')
+                                            exists.fusion_last_modify = self.parse_datetime(rec.lastmodifydate)
                                             exists = sms.search([('id', '=', exists.id)])
                                             picking = exists.picking_id
                                             if picking.state  in ('done','waiting','confirmed','cancel'):
@@ -518,9 +518,9 @@ class TransferControllerBI(models.Model):
                                                                 stock_move = stock_move_posted.copy()
                                     
                                     if po or so:
-                                        if stock_move and (stock_move.fusion_last_modify != datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f') or stock_move.state!='done'):
+                                        if stock_move and (stock_move.fusion_last_modify != self.parse_datetime(rec.lastmodifydate) or stock_move.state!='done'):
                                             picking = stock_move.picking_id
-                                            stock_move.fusion_last_modify = datetime.datetime.strptime(rec.lastmodifydate, '%Y-%m-%dT%H:%M:%S.%f')
+                                            stock_move.fusion_last_modify = self.parse_datetime(rec.lastmodifydate)
                                             if product.uom_id.rounding != 0.001:
                                                 product.uom_id.rounding = 0.001
                                             picking.fusion_delivery_id = rec.deliveryid
@@ -531,14 +531,13 @@ class TransferControllerBI(models.Model):
                                                 if stock_move.state in('done','waiting','confirmed','assigned'):
                                                     stock_move.picking_id.set_stock_move_to_draft()
                                                 # stock_move.picking_id.deal_ref = 'moved_to_Draft'
-                                                picking.custom_delivery_date = datetime.datetime.strptime(
-                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate, '%Y-%m-%dT%H:%M:%S')
-                                                picking.date_done = datetime.datetime.strptime(
-                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate, '%Y-%m-%dT%H:%M:%S')
-                                                picking.scheduled_date = datetime.datetime.strptime(
-                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate, '%Y-%m-%dT%H:%M:%S')
-                                                stock_move.date = datetime.datetime.strptime(rec.deliverycompletiondate  if rec.deliverycompletiondate else rec.bldate,
-                                                                                             '%Y-%m-%dT%H:%M:%S')
+                                                picking.custom_delivery_date = self.parse_datetime(
+                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate)
+                                                picking.date_done = self.parse_datetime(
+                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate)
+                                                picking.scheduled_date = self.parse_datetime(
+                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate)
+                                                stock_move.date = self.parse_datetime(rec.deliverycompletiondate  if rec.deliverycompletiondate else rec.bldate)
                                                 
                                                 if rec.buyselldisplaytext == "Buy":
                                                     picking_type = self.env['stock.picking.type'].search(
@@ -656,6 +655,8 @@ class TransferControllerBI(models.Model):
                                                                              str(e),
                                                                              rec.tointernalcompany)
                 raise UserError( str(e) + str(rec))
+                
+        
                 # _logger.error('Error processing API data: %s', str(e))
                 # if pol:
                 #     pol = self.env['purchase.order.line'].search([('fusion_segment_id', '=', pol.termnumber)],limit=1)
@@ -668,6 +669,12 @@ class TransferControllerBI(models.Model):
                 #             if len(picking_ids):
                 #                 a=True
                 #
- 
-             
+    
+    def parse_datetime(self,time_str):
+        try:
+            # First try parsing with fractional seconds
+            return datetime.datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S.%f')
+        except ValueError:
+            # If it fails, try parsing without fractional seconds
+            return datetime.datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')
                 
