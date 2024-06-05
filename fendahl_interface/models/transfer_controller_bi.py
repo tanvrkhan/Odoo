@@ -443,7 +443,7 @@ class TransferControllerBI(models.Model):
                                                 picking.action_confirm()
                                             self.update_existing_lines(exists, exists.product_id, rec, company,picking.location_id,picking.location_dest_id)
                                             # stock_move.quantity_done = quantity
-                                            picking._action_done()
+                                            picking.button_validate()
                                             self.fix_valuation_warehouse(picking,exists)
                                             continue
                                             self.env.cr.commit()
@@ -454,9 +454,7 @@ class TransferControllerBI(models.Model):
                                                     if not po.state == 'purchase':
                                                         po.button_confirm()
                                                         # self.env.cr.commit()
-                                                    product = self.env['fusion.sync.history'].validate_product(rec.fromcommoditycode,
-                                                                                                               rec.frommaterialcode,
-                                                                                                               rec.fromactualqtyuomcode)
+                                                    product = pol.product_id
                                                     storage_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Deal Reference',
                                                                                                                           rec.tomotcode,
                                                                                                                           company.id)
@@ -550,10 +548,10 @@ class TransferControllerBI(models.Model):
                                                 picking.picking_type_id = picking_type
                                                 stock_move.location_id = picking.location_id,
                                                 stock_move.location_dest_id = picking.location_dest_id,
-                                                picking.action_confirm()
+                                                # picking.action_confirm()
                                                 self.update_existing_lines(stock_move,product,rec,company,picking.location_id,picking.location_dest_id)
-                                                self.env.cr.commit()
                                                 picking.button_validate()
+                                                self.env.cr.commit()
                                             # self.fix_valuation_warehouse(picking,stock_move)
                                             # self.env.cr.commit()
                                             # stock_move.stock_valuation_layer_ids.recalculate_stock_value()

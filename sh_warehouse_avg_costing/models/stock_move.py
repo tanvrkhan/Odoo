@@ -221,7 +221,7 @@ class WarehouseStockMove(models.Model):
             valued_quantity = 0
             for valued_move_line in valued_move_lines:
                 valued_quantity += valued_move_line.product_uom_id._compute_quantity(valued_move_line.qty_done, move.product_id.uom_id)
-            unit_cost = self.get_price_from_valuations('')
+            unit_cost = move.get_price_from_valuations('')
             if move.product_id.cost_method != 'standard':
                 unit_cost = abs(move._get_price_unit())  # May be negative (i.e. decrease an out move).
 
@@ -245,7 +245,7 @@ class WarehouseStockMove(models.Model):
         # Called Super used to create svl when internal transfer is done
 
         # * Softhealer code end *
-        res = super(WarehouseStockMove, self)._action_done(cancel_backorder)
+        res = super(WarehouseStockMove, self)._action_done()
         if self.picking_type_id.code == 'internal':
             if self.location_id.warehouse_id.id != self.location_dest_id.warehouse_id.id:
                 self.create_manually_svl_in_out_vals()
