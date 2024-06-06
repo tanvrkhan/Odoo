@@ -329,7 +329,7 @@ class FusionSyncHistory(models.Model):
     
     def get_wh_code(self, warehouse, company):
         if warehouse:
-            warehouse = str(company)+ warehouse.replace(' ', '')  # Remove spaces from the warehouse name
+            warehouse = warehouse.replace(' ', '')  # Remove spaces from the warehouse name
             iteration = 0
             while True:
                 if iteration<=5:
@@ -356,15 +356,16 @@ class FusionSyncHistory(models.Model):
         return random_string
     def validate_warehouse(self,warehouse,company):
         if company.name=='KEMEXON LTD':
-            result = self.env['stock.warehouse'].search(
-                [('name', '=',  warehouse), ('company_id', '=', company.id)], limit=1)
+            name = warehouse
         else:
-            result = self.env['stock.warehouse'].search([('name', '=', str(company.name) + '-' + warehouse),('company_id', '=', company.id)], limit=1)
-        
+            name = str(company.name) + '-' + warehouse
+            
+        result = self.env['stock.warehouse'].search(
+            [('name', '=', name), ('company_id', '=', company.id)], limit=1)
         if not result:
-            code = self.get_wh_code(warehouse, company.id)
+            code = self.get_wh_code(name, company.id)
             result = self.env['stock.warehouse'].create({
-                'name': str(company.name) + '-' + warehouse,
+                'name': name,
                 'code':code,
                 'company_id': company.id,
                 # 'partner_id':company.id
