@@ -355,7 +355,11 @@ class FusionSyncHistory(models.Model):
         random_string = ''.join(random.choices(characters, k=5))
         return random_string
     def validate_warehouse(self,warehouse,company):
-        result = self.env['stock.warehouse'].search([('name', '=', str(company.name) + '-' + warehouse),('company_id', '=', company.id)], limit=1)
+        if company.name=='KEMEXON LTD':
+            result = self.env['stock.warehouse'].search(
+                [('name', '=',  warehouse), ('company_id', '=', company.id)], limit=1)
+        else:
+            result = self.env['stock.warehouse'].search([('name', '=', str(company.name) + '-' + warehouse),('company_id', '=', company.id)], limit=1)
         
         if not result:
             code = self.get_wh_code(warehouse, company.id)

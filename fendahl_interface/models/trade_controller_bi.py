@@ -691,7 +691,182 @@ class TradeControllerBI(models.Model):
         }
         deal['order_line'] = lines
         po = purchase_order = self.env['purchase.order'].create(deal)
+        
+            
         self.env.cr.commit()
+    
+    def do_interco_transfers(self):
+        for rec in self:
+            all_segments = self.env['trade.controller.bi'].search(
+                [('dealmasterid', '=', rec.dealmasterid)])
+            for interco_trade in all_segments.filtered(
+                    lambda ml: ml.tradeprice == "Intercompany Trade"):
+                rec.check_confirm_transfer(interco_trade)
+                
+                
+    def create_move_for_picking(self,picking, product, quantity,sol):
+      stock_move = self.env['stock.move'].create({
+          'name': product.display_name,
+          'product_id': product.id,
+          'product_uom_qty': quantity,
+          'product_uom': product.uom_id.id,
+          'location_id': picking.location_id.id,
+          'location_dest_id': picking.location_dest_id.id,
+          'picking_id': picking.id,
+          'sale_line_id': sol.id,
+      })
+      return stock_move
+    def check_confirm_transfer(self,segment):
+        if segment.tradeprice == "Intercompany Trade":
+            company = self.env['res.company'].search([('name', '=', segment.internalcompany)],
+                                                     limit=1)
+            warehouse = self.env['fusion.sync.history'].validate_warehouse(segment.location,
+                                                                           company)
+            sol =  self.env['sale.order.line']
+            pol =  self.env['purchase.order.line']
+            picking = self.env['stock.picking']
+            picking_type = self.env['stock.picking.type']
+            stock_move =  self.env['stock.move']
+            
+            existing_move = self.env['stock.move'].search([('fusion_segment_code', '=', segment.segmentsectioncode)])
+            if existing_move:
+                if existing_move.fusion_last_modify == self.parse_datetime(segment.lastmodifydate) and existing_move.state == 'done':
+                    return
+                else:
+                    existing_move.fusion_segment_code = segment.segmentsectioncode
+                    existing_move.fusion_last_modify = self.parse_datetime(segment.lastmodifydate)
+                    picking = existing_move.picking_id
+                    if picking.state in ('done', 'waiting', 'confirmed', 'cancel'):
+                        picking.set_stock_move_to_draft()
+                        picking.action_confirm()
+                    self.update_existing_lines(existing_move, existing_move.product_id, segment, company, picking.location_id,
+                                               picking.location_dest_id)
+                    self.confirm_picking(picking)
+                    pol = self.env['purchase.order.line'].search(
+                        [('fusion_segment_code', '=', segment.segmentsectioncode)], limit=1)
+                    sol = self.env['sale.order.line'].search([('fusion_segment_code', '=', segment.segmentsectioncode)],
+                                                             limit=1)
+                    if sol:
+                        sol.order_id.picking_ids = [(4, picking.id,0)]
+                    if pol:
+                        pol.order_id.picking_ids = [(4, picking.id,0)]
+            else:
+                if segment.buysell == 'Buy':
+                    pol = self.env['purchase.order.line'].search([('fusion_segment_code', '=', segment.segmentsectioncode)],limit=1)
+                    if pol:
+                        if not pol.order_id.state == 'purchase':
+                            pol.order_id.button_confirm()
+                        res = pol.order_id._prepare_picking()
+                        picking = self.env['stock.picking'].create(res)
+                        stock_move = pol._create_stock_moves(picking[0])
+                        picking_type = self.env['stock.picking.type'].search(
+                            [('code', '=', 'incoming'), ('warehouse_id', '=', warehouse.id)], limit=1)
+                        picking.custom_delivery_date = pol.date_approve
+                        picking.scheduled_date = picking.custom_delivery_date
+                        picking.date_done = picking.custom_delivery_date
+                  
+                elif segment.buysell == 'Sell':
+                    sol = self.env['sale.order.line'].search([('fusion_segment_code', '=', segment.segmentsectioncode)],
+                                                                 limit=1)
+                    if sol:
+                        picking_type = self.env['stock.picking.type'].search(
+                            [('code', '=', 'outgoing'), ('warehouse_id', '=', warehouse.id)], limit=1)
+                        if not sol.order_id.state == 'sale':
+                            sol.order_id.action_confirm()
+                        res = {
+                            'partner_id': sol.order_id.partner_id.id,
+                            'date': sol.order_id.date_order,
+                            'origin': sol.order_id.name,
+                            'picking_type_id': picking_type.id,
+                            'sale_id': sol.order_id.id,
+                        }
+                        picking = self.env['stock.picking'].create(res)
+                        picking.custom_delivery_date = pol.date_order
+                        picking.scheduled_date = picking.custom_delivery_date
+                        picking.date_done = picking.custom_delivery_date
+                        stock_move = self.create_move_for_picking(picking, sol.product_id, 0,sol)
+                        # stock_move = sol._create_stock_moves(picking[0])
+
+                 
+                if stock_move and (pol or sol):
+                    stock_move.fusion_last_modify = self.parse_datetime(segment.lastmodifydate)
+                    picking.fusion_segment_code = segment.segmentsectioncode
+                    stock_move.fusion_segment_code = segment.segmentsectioncode
+
+                    
+                    product =  sol.product_id if sol else pol.product_id
+                    # if stock_move and (stock_move.fusion_last_modify != self.parse_datetime(
+                    #         segment.lastmodifydate) or stock_move.state != 'done'):
+                    picking = stock_move.picking_id
+                    stock_move.fusion_last_modify = self.parse_datetime(segment.lastmodifydate)
+                    if product.uom_id.rounding != 0.001:
+                        product.uom_id.rounding = 0.001
+                    
+                    picking.fusion_itinerary_id = segment.segmentsectioncode + 'Interco'
+                    
+                    if stock_move.state in ('done', 'waiting', 'confirmed', 'assigned'):
+                        stock_move.picking_id.set_stock_move_to_draft()
+                    # stock_move.picking_id.deal_ref = 'moved_to_Draft'
+                    
+                    picking.picking_type_id = picking_type
+                    
+                    self.update_existing_lines(stock_move, sol.product_id, segment, company, picking.location_id, picking.location_dest_id)
+                    self.confirm_picking(picking)
+                    if sol:
+                        sol.order_id.picking_ids = [(4, picking,0)]
+                    if pol:
+                        pol.order_id.picking_ids = [(4, picking,0)]
+    
+    def update_existing_lines(self, stock_move, product, segment, company, fromlocation, destlocation):
+        lot = self.env['fusion.sync.history'].validate_lot(segment.segmentsectioncode, product.id,
+                                                           company.id)
+        quantity = float(segment.tradeqty) if float(segment.tradeqty)>=0 else float(segment.tradeqty)*-1
+        existing_line = stock_move.move_line_ids
+        if existing_line:
+            for line in existing_line:
+                if line.qty_done != float(quantity):
+                    line.qty_done = quantity
+                    line.location_id = fromlocation.id
+                    line.location_dest_id = destlocation.id
+        else:
+            line = stock_move.move_line_ids.filtered(lambda ml: ml.product_id == product)
+            if line:
+                line.lot_id = lot.id
+                i = 0
+                for line2 in line:
+                    if i == 0:
+                        if line2.qty_done != float(quantity):
+                            line2.qty_done = quantity
+                            line2.fusion_delivery_id = segment.segmentsectioncode
+                            line2.location_id = fromlocation.id
+                            line2.location_dest_id = destlocation.id
+                            i += 1
+            else:
+                self.env['stock.move.line'].create({
+                    'product_id': product.id,
+                    'lot_id': lot.id,
+                    'qty_done': quantity,
+                    'move_id': stock_move.id,
+                    'picking_id': stock_move.picking_id.id,
+                    'location_id': fromlocation.id,
+                    'location_dest_id': destlocation.id,
+                    'fusion_delivery_id': segment.segmentsectioncode,
+                    'company_id': company.id
+                })
+    def confirm_picking(self, picking):
+        a = 1
+        picking.button_validate()
+        if picking.state != 'done':
+            picking._action_done()
+        self.env.cr.commit()
+    
+    def parse_datetime(self, time_str):
+        try:
+            # First try parsing with fractional seconds
+            return datetime.datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S.%f')
+        except ValueError:
+            # If it fails, try parsing without fractional seconds
+            return datetime.datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')
     def get_status(self,rec):
         status = ''
         if rec.tradestatus == 'Confirmed':
@@ -728,10 +903,11 @@ class TradeControllerBI(models.Model):
                             existing_po.button_cancel()
                         else:
                             self.update_order('Purchase Order',existing_po,rec,currency,partner,incoterm,location,payment_term)
-                        
+                            self.do_interco_transfers()
                     else:
                         if partner and company:
                             self.create_new_po(rec,warehouse,company,partner,incoterm,location,payment_term,currency)
+                            self.do_interco_transfers()
                             if status == 'cancel':
                                 existing_po.button_cancel()
                         else:
@@ -740,11 +916,13 @@ class TradeControllerBI(models.Model):
                     existing_so = self.env['sale.order'].search([('fusion_deal_number', '=', rec.dealmasterid)])
                     if existing_so:
                         self.update_order('Sale Order',existing_so,rec,currency,partner,incoterm,location,payment_term)
+                        self.do_interco_transfers()
                         if status == 'cancel':
                             existing_so.action_cancel()
                     else:
                         if partner and company:
                             self.create_new_so(rec,warehouse,company,partner,incoterm,location,payment_term,currency)
+                            self.do_interco_transfers()
                             if status == 'cancel':
                                 existing_so.action_cancel()
                         else:

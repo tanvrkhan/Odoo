@@ -41,7 +41,6 @@ class PurchaseOrderLineSync(models.Model):
 class SaleOrderSync(models.Model):
     _inherit = 'sale.order'
     fusion_deal_number = fields.Char('Deal')
-    
 
 class SaleOrderLineSync(models.Model):
     _inherit = 'sale.order.line'
