@@ -400,7 +400,8 @@ class TransferControllerBI(models.Model):
             # try:
                 random_string = self.env['fusion.sync.history'].generate_random_string()
                 all_transfers = self.env['transfer.controller.bi'].search([('itineraryid', '=', record.itineraryid)])
-                sms  = self.env['stock.move'].search([])
+                sms = self.env['stock.move'].search([])
+                pickings = self.env['stock.picking'].search([])
                 for rec in all_transfers:
                     
                     
@@ -442,12 +443,9 @@ class TransferControllerBI(models.Model):
                                                 picking.set_stock_move_to_draft()
                                                 picking.action_confirm()
                                             self.update_existing_lines(exists, exists.product_id, rec, company,picking.location_id,picking.location_dest_id)
-                                            picking.button_validate()
-                                            if picking.state != 'done':
-                                                picking._action_done()
-                                            self.fix_valuation_warehouse(picking,exists)
+                                            self.confirm_picking(picking)
                                             continue
-                                            self.env.cr.commit()
+                                            
                                     else:
                                         if rec.buyselldisplaytext=="Buy":
                                             if po:
@@ -482,6 +480,11 @@ class TransferControllerBI(models.Model):
                                                                 [('purchase_line_id', '=', pol.id), ('state', '=', 'done')], limit=1)
                                                             if stock_move_posted:
                                                                 stock_move = stock_move_posted.copy()
+                                                        if not stock_move:
+                                                            res = pol.order_id._prepare_picking()
+                                                            picking = self.env['stock.picking'].create(res)
+                                                            stock_move = pol._create_stock_moves(picking[0])
+                                                            
                                                 
                                                     
                                         elif rec.tobuyselldisplaytext=="Sell":
@@ -509,12 +512,16 @@ class TransferControllerBI(models.Model):
                                                         stock_move = sms.search([('id', '=', exists.id)])
                                                     else:
                                                         stock_move = sms.search(
-                                                            [('sale_line_id', '=', sol.id), ('state', 'in', ('assigned','waiting','confirmed','draft'))], limit=1)
+                                                            [('sale_line_id', '=', sol.id), ('state', 'in', ('assigned', 'waiting', 'confirmed', 'draft'))], limit=1)
                                                         if not stock_move:
                                                             stock_move_posted = sms.search(
                                                                 [('sale_line_id', '=', sol.id), ('state', '=', 'done')], limit=1)
                                                             if stock_move_posted:
                                                                 stock_move = stock_move_posted.copy()
+                                                        if not stock_move:
+                                                            res = pol.order_id._prepare_picking()
+                                                            picking = self.env['stock.picking'].create(res)
+                                                            stock_move = pol._create_stock_moves(picking[0])
                                     
                                     if po or so:
                                         if stock_move and (stock_move.fusion_last_modify != self.parse_datetime(rec.lastmodifydate) or stock_move.state!='done'):
@@ -522,21 +529,21 @@ class TransferControllerBI(models.Model):
                                             stock_move.fusion_last_modify = self.parse_datetime(rec.lastmodifydate)
                                             if product.uom_id.rounding != 0.001:
                                                 product.uom_id.rounding = 0.001
-                                            picking.fusion_delivery_id = rec.deliveryid
                                             picking.fusion_segment_code = pol.fusion_segment_code
+                                            picking.fusion_itinerary_id = rec.itineraryid
                                             stock_move.fusion_delivery_id = rec.deliveryid
                                             stock_move.fusion_segment_code = pol.fusion_segment_code
-                                            if rec.deliverycompletiondate or rec.bldate:
+                                            if rec.deliverycompletiondate or rec.bldate or rec.titledeliverydate:
                                                 if stock_move.state in('done','waiting','confirmed','assigned'):
                                                     stock_move.picking_id.set_stock_move_to_draft()
                                                 # stock_move.picking_id.deal_ref = 'moved_to_Draft'
                                                 picking.custom_delivery_date = self.parse_datetime(
-                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate)
+                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate if rec.bldate else rec.titledeliverydate)
                                                 picking.date_done = self.parse_datetime(
-                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate)
+                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate if rec.bldate else rec.titledeliverydate)
                                                 picking.scheduled_date = self.parse_datetime(
-                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate)
-                                                stock_move.date = self.parse_datetime(rec.deliverycompletiondate  if rec.deliverycompletiondate else rec.bldate)
+                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate if rec.bldate else rec.titledeliverydate)
+                                                stock_move.date = self.parse_datetime(rec.deliverycompletiondate  if rec.deliverycompletiondate else rec.bldate if rec.bldate else rec.titledeliverydate)
                                                 
                                                 if rec.buyselldisplaytext == "Buy":
                                                     picking_type = self.env['stock.picking.type'].search(
@@ -549,12 +556,9 @@ class TransferControllerBI(models.Model):
                                                 picking.picking_type_id = picking_type
                                                 stock_move.location_id = picking.location_id,
                                                 stock_move.location_dest_id = picking.location_dest_id,
-                                                # picking.action_confirm()
                                                 self.update_existing_lines(stock_move,product,rec,company,picking.location_id,picking.location_dest_id)
-                                                picking.button_validate()
-                                                self.env.cr.commit()
-                                                if picking.state!='done':
-                                                    picking._action_done()
+                                                self.confirm_picking(picking)
+                                            
                                                     
                                             # self.fix_valuation_warehouse(picking,stock_move)
                                             # self.env.cr.commit()
@@ -625,7 +629,7 @@ class TransferControllerBI(models.Model):
                                             'fusion_delivery_id': rec.deliveryid,  #
                                         }
                                         picking = self.env['stock.picking'].create(picking_vals)
-                                        quantity = get_quantity_from_controller(rec,product)
+                                        quantity = self.get_quantity_from_controller(rec,product)
                                         
                                         move_vals = {
                                             'name': 'Internal Transfer ' + str(rec.frommotcode) + ' - ' + str(
@@ -643,11 +647,8 @@ class TransferControllerBI(models.Model):
                                         stock_move.move_line_ids.fusion_delivery_id = rec.deliveryid,  #
                                         picking.action_confirm()
                                         picking.action_assign()
-                                        picking.button_validate()
-                                        if picking.state != 'done':
-                                            picking._action_done()
-                                        self.env.cr.commit()
-                                        # picking.stock_move_id.stock_valuation_layer_ids.recalculate_stock_value()
+                                        self.confirm_picking(picking)
+
                                         
                         else:
                             cancelled_entry = self.env['stock.move'].search(
@@ -674,6 +675,13 @@ class TransferControllerBI(models.Model):
                 #             if len(picking_ids):
                 #                 a=True
                 #
+        
+    def confirm_picking(self,picking):
+        a=1
+        picking.button_validate()
+        if picking.state!='done':
+            picking._action_done()
+        self.env.cr.commit()
     
     def parse_datetime(self,time_str):
         try:
