@@ -813,9 +813,9 @@ class TradeControllerBI(models.Model):
                     self.update_existing_lines(stock_move, sol.product_id, segment, company, picking.location_id, picking.location_dest_id)
                     self.confirm_picking(picking)
                     if sol:
-                        sol.order_id.picking_ids = [(4, picking,0)]
+                        sol.order_id.picking_ids = [(4, picking.id,0)]
                     if pol:
-                        pol.order_id.picking_ids = [(4, picking,0)]
+                        pol.order_id.picking_ids = [(4, picking.id,0)]
     
     def update_existing_lines(self, stock_move, product, segment, company, fromlocation, destlocation):
         lot = self.env['fusion.sync.history'].validate_lot(segment.segmentsectioncode, product.id,
