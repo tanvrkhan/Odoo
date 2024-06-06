@@ -442,7 +442,6 @@ class TransferControllerBI(models.Model):
                                                 picking.set_stock_move_to_draft()
                                                 picking.action_confirm()
                                             self.update_existing_lines(exists, exists.product_id, rec, company,picking.location_id,picking.location_dest_id)
-                                            stock_move.quantity_done = quantity
                                             picking.button_validate()
                                             if picking.state != 'done':
                                                 picking._action_done()
