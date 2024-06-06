@@ -443,9 +443,9 @@ class TransferControllerBI(models.Model):
                                                 picking.action_confirm()
                                             self.update_existing_lines(exists, exists.product_id, rec, company,picking.location_id,picking.location_dest_id)
                                             # stock_move.quantity_done = quantity
-                                            picking.button_validate()
-                                            if picking.state != 'done':
-                                                picking._action_done()
+                                            # picking.button_validate()
+                                            # if picking.state != 'done':
+                                            #     picking._action_done()
                                             self.fix_valuation_warehouse(picking,exists)
                                             continue
                                             self.env.cr.commit()
@@ -552,10 +552,10 @@ class TransferControllerBI(models.Model):
                                                 stock_move.location_dest_id = picking.location_dest_id,
                                                 # picking.action_confirm()
                                                 self.update_existing_lines(stock_move,product,rec,company,picking.location_id,picking.location_dest_id)
-                                                picking.button_validate()
-                                                self.env.cr.commit()
-                                                if picking.state!='done':
-                                                    picking._action_done()
+                                                # picking.button_validate()
+                                                # self.env.cr.commit()
+                                                # if picking.state!='done':
+                                                #     picking._action_done()
                                                     
                                             # self.fix_valuation_warehouse(picking,stock_move)
                                             # self.env.cr.commit()
@@ -571,7 +571,7 @@ class TransferControllerBI(models.Model):
                                                                                                      rec.tosegmentid,
                                                                                                      'SO Line not found',
                                                                                                      rec.tointernalcompany)
-                                        raise UserError("Order not found." + rec.tosegmentsectioncode if rec.tosegmentsectioncode else rec.fromsegmentsectioncode + rec.buysell)
+                                        raise UserError("Order not found." + rec.tosegmentsectioncode if rec.tosegmentsectioncode else rec.fromsegmentsectioncode + rec.buyselldisplaytext)
                                 elif rec.fromcommoditycode!='Coal' and rec.tocommoditycode!='Coal' and (rec.fromtypeenum!='Trade' and rec.totypeenum!='Trade'):
                                     companies = []
                                     all_companies = self.env['res.company'].search([])
@@ -644,10 +644,10 @@ class TransferControllerBI(models.Model):
                                         stock_move.move_line_ids.fusion_delivery_id = rec.deliveryid,  #
                                         picking.action_confirm()
                                         picking.action_assign()
-                                        picking.button_validate()
-                                        # picking._action_done()
-                                        if picking.state != 'done':
-                                            picking._action_done()
+                                        # picking.button_validate()
+                                        # # picking._action_done()
+                                        # if picking.state != 'done':
+                                        #     picking._action_done()
                                         # self.env.cr.commit()
                                         # picking.stock_move_id.stock_valuation_layer_ids.recalculate_stock_value()
                                         
