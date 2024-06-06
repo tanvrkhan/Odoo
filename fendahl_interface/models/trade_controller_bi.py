@@ -717,6 +717,7 @@ class TradeControllerBI(models.Model):
       })
       return stock_move
     def check_confirm_transfer(self,segment):
+        transfers = self.evnv['stock.picking'].search([('fusion_segment_code', '=', segment.segmentsectioncode)])
         if segment.tradeprice == "Intercompany Trade":
             company = self.env['res.company'].search([('name', '=', segment.internalcompany)],
                                                      limit=1)
@@ -730,6 +731,10 @@ class TradeControllerBI(models.Model):
             
             existing_move = self.env['stock.move'].search([('fusion_segment_code', '=', segment.segmentsectioncode)])
             if existing_move:
+                pol = self.env['purchase.order.line'].search(
+                    [('fusion_segment_code', '=', segment.segmentsectioncode)], limit=1)
+                sol = self.env['sale.order.line'].search([('fusion_segment_code', '=', segment.segmentsectioncode)],
+                                                         limit=1)
                 if existing_move.fusion_last_modify == self.parse_datetime(segment.lastmodifydate) and existing_move.state == 'done':
                     return
                 else:
@@ -739,13 +744,10 @@ class TradeControllerBI(models.Model):
                     if picking.state in ('done', 'waiting', 'confirmed', 'cancel'):
                         picking.set_stock_move_to_draft()
                         picking.action_confirm()
-                    self.update_existing_lines(existing_move, existing_move.product_id, segment, company, picking.location_id,
+                    self.update_existing_lines(existing_move, pol.product_id if pol else sol.product_id, segment, company, picking.location_id,
                                                picking.location_dest_id)
                     self.confirm_picking(picking)
-                    pol = self.env['purchase.order.line'].search(
-                        [('fusion_segment_code', '=', segment.segmentsectioncode)], limit=1)
-                    sol = self.env['sale.order.line'].search([('fusion_segment_code', '=', segment.segmentsectioncode)],
-                                                             limit=1)
+                  
                     if sol:
                         sol.order_id.picking_ids = [(4, picking.id,0)]
                     if pol:
@@ -855,10 +857,10 @@ class TradeControllerBI(models.Model):
                 })
     def confirm_picking(self, picking):
         a = 1
-        picking.button_validate()
-        if picking.state != 'done':
-            picking._action_done()
-        self.env.cr.commit()
+        # picking.button_validate()
+        # if picking.state != 'done':
+        #     picking._action_done()
+        # self.env.cr.commit()
     
     def parse_datetime(self, time_str):
         try:
@@ -903,11 +905,11 @@ class TradeControllerBI(models.Model):
                             existing_po.button_cancel()
                         else:
                             self.update_order('Purchase Order',existing_po,rec,currency,partner,incoterm,location,payment_term)
-                            self.do_interco_transfers()
+                            # self.do_interco_transfers()
                     else:
                         if partner and company:
                             self.create_new_po(rec,warehouse,company,partner,incoterm,location,payment_term,currency)
-                            self.do_interco_transfers()
+                            # self.do_interco_transfers()
                             if status == 'cancel':
                                 existing_po.button_cancel()
                         else:
@@ -916,13 +918,13 @@ class TradeControllerBI(models.Model):
                     existing_so = self.env['sale.order'].search([('fusion_deal_number', '=', rec.dealmasterid)])
                     if existing_so:
                         self.update_order('Sale Order',existing_so,rec,currency,partner,incoterm,location,payment_term)
-                        self.do_interco_transfers()
+                        # self.do_interco_transfers()
                         if status == 'cancel':
                             existing_so.action_cancel()
                     else:
                         if partner and company:
                             self.create_new_so(rec,warehouse,company,partner,incoterm,location,payment_term,currency)
-                            self.do_interco_transfers()
+                            # self.do_interco_transfers()
                             if status == 'cancel':
                                 existing_so.action_cancel()
                         else:
