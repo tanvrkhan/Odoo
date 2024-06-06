@@ -810,7 +810,7 @@ class TradeControllerBI(models.Model):
                     
                     picking.picking_type_id = picking_type
                     
-                    self.update_existing_lines(stock_move, sol.product_id, segment, company, picking.location_id, picking.location_dest_id)
+                    self.update_existing_lines(stock_move, sol.product_id if sol else pol.product_id, segment, company, picking.location_id, picking.location_dest_id)
                     self.confirm_picking(picking)
                     if sol:
                         sol.order_id.picking_ids = [(4, picking.id,0)]
