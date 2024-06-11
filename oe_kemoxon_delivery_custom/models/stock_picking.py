@@ -508,14 +508,25 @@ class StockPicking(models.Model):
         for rec in self:
             sm = rec.move_ids
             sp = rec.move_ids.picking_id
-            if rec.location_id.usage=='internal':
-                sm.stock_valuation_layer_ids.warehouse_id = rec.location_id.warehouse_id.id
-                sm.location_id = sp.location_id
-                sm.move_line_ids.location_id = sp.location_id
-            elif rec.location_dest_id.usage=='internal':
-                sm.stock_valuation_layer_ids.warehouse_id = rec.location_dest_id.warehouse_id.id
-                sm.location_dest_id = sp.location_dest_id
-                sm.move_line_ids.location_dest_id = sp.location_dest_id
+            if rec.picking_type_id.sequence_code!='INT':
+                if rec.location_id.usage=='internal':
+                    sm.stock_valuation_layer_ids.warehouse_id = rec.location_id.warehouse_id.id
+                    
+                elif rec.location_dest_id.usage=='internal':
+                    sm.stock_valuation_layer_ids.warehouse_id = rec.location_dest_id.warehouse_id.id
+                    
+            elif rec.picking_type_id.sequence_code=='INT':
+                for valuation in sm.stock_valuation_layer_ids:
+                    sm.location_id = sp.location_id
+                    sm.move_line_ids.location_id = sp.location_id
+                    sm.location_dest_id = sp.location_dest_id
+                    sm.move_line_ids.location_dest_id = sp.location_dest_id
+                    if valuation.quantity>0:
+                        valuation.warehouse_id = rec.location_dest_id.warehouse_id.id
+                    elif valuation.quantity<0:
+                        valuation.warehouse_id = rec.location_id.warehouse_id.id
+                
+                
    
         
     
