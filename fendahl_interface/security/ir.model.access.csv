@@ -7,4 +7,5 @@ access_trade_controller_bi,Access Trade Controller,model_trade_controller_bi,bas
 access_invoice_controller_bi,Access Invoice Controller,model_invoice_controller_bi,base.group_user,1,1,1,1
 access_fusion_sync_history,fusion.sync.history model access,model_fusion_sync_history,base.group_user,1,1,1,1
 access_fusion_sync_history_errors,fusion.sync.history.errors model access,model_fusion_sync_history_errors,base.group_user,1,1,1,1
+access_stockadjustments_controller_bi,stockadjustments.controller.bi model access,model_stockadjustments_controller_bi,base.group_user,1,1,1,1
 

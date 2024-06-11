@@ -19,7 +19,8 @@
         'views/fusion_sync_history.xml',
         'security/ir.model.access.csv',
         'views/sync_history_errors.xml',
-        'views/purchase_order.xml'
+        'views/purchase_order.xml',
+        'views/stockadjustments_controller.xml',
     ],
 
 }

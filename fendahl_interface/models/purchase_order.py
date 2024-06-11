@@ -63,7 +63,7 @@ class StockPicking(models.Model):
     fusion_delivery_id = fields.Integer('Fusion Delivery Id')
     fusion_segment_code = fields.Char('Fusion Section Code')
     fusion_itinerary_id = fields.Char('Nomination No.')
-
+    fusion_build_draw = fields.Integer("Build Draw No.")
 class StockMove(models.Model):
     _inherit = 'stock.move'
     

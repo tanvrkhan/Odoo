@@ -75,7 +75,16 @@
                 action = env['invoice.controller.bi'].import_invoice()
             </field>
         </record>
-
+   <record id="model_fusion_sync_history_action_trigger_sync_stockadjustments" model="ir.actions.server">
+            <field name="name">Initial Update Stock Adj. </field>
+            <field name="model_id" ref="model_fusion_sync_history"/>
+            <field name="binding_model_id" ref="model_fusion_sync_history"/>
+            <field name="binding_view_types">tree,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                action = env['stockadjustments.controller.bi'].import_stock_adjustments()
+            </field>
+        </record>
 
           <menuitem id="menu_fusion_sync_history"
               name="Fusion Sync History Controller"
@@ -146,6 +155,19 @@
             <field name="doall" eval="False"/>  <!-- False means do not run all missed if server stops -->
             <field name="model_id" ref="model_fusion_sync_history"/>
             <field name="code">model.sync_cashflow()</field>
+        </record>
+    </data>
+    <data noupdate="1">  <!-- noupdate="1" means it won't be updated automatically at module updates -->
+        <record id="cron_import_stockadjustments" model="ir.cron">
+            <field name="name">Import StockAdjustments</field>
+            <field name="active" eval="False"/>
+            <field name="user_id" ref="base.user_root"/>  <!-- Executes as Superuser -->
+            <field name="interval_number">2</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>  <!-- -1 for indefinite repetitions -->
+            <field name="doall" eval="False"/>  <!-- False means do not run all missed if server stops -->
+            <field name="model_id" ref="model_stockadjustments_controller_bi"/>
+            <field name="code">model.sync_stock_adjustments()</field>
         </record>
     </data>
 
