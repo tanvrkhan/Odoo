@@ -70,22 +70,41 @@ class InheritAccountPayment(models.Model):
             
             # paired_amount = move_obj.browse(paired_payment.line_ids.ids[0]).balance * paired_currency.rate
             # paired_amount_2 = move_obj.browse(paired_payment.line_ids.ids[1]).balance * paired_currency.rate
-            paired_payment.move_id.line_ids = [
-                (1, paired_payment.line_ids.ids[0], {'amount_currency': payment.contraBankAmount*-1,
+            if paired_payment.payment_type=='inbound':
+                paired_payment.move_id.line_ids = [
+                (1, paired_payment.line_ids.ids[0], {'amount_currency': payment.contraBankAmount,
                                                      'currency_id': paired_currency,
-                                                     'balance':convertedamount*-1}),
-                (1, paired_payment.line_ids.ids[1], {'amount_currency': payment.contraBankAmount,
+                                                     'balance':convertedamount}),
+                (1, paired_payment.line_ids.ids[1], {'amount_currency': payment.contraBankAmount*-1,
                                                      'currency_id': paired_currency,
-                                                     'balance':convertedamount})
+                                                     'balance':convertedamount*-1})
             ]
-            payment.move_id.line_ids = [
-                (1, payment.line_ids.ids[0], {'amount_currency': payment.amount,
-                                              'currency_id': payment_currency,
-                                              'balance':convertedamount}),
-                (1, payment.line_ids.ids[1], {'amount_currency': payment.amount*-1,
-                                              'currency_id': payment_currency,
-                                               'balance':convertedamount*-1})
-            ]
+            elif paired_payment.payment_type=='outbound':
+                paired_payment.move_id.line_ids = [
+                    (1, paired_payment.line_ids.ids[0], {'amount_currency': payment.contraBankAmount* -1 ,
+                                                         'currency_id': paired_currency,
+                                                         'balance': convertedamount * -1}),
+                    (1, paired_payment.line_ids.ids[1], {'amount_currency': payment.contraBankAmount,
+                                                         'currency_id': paired_currency,
+                                                         'balance': convertedamount})]
+            if payment.payment_type=='inbound':
+                payment.move_id.line_ids = [
+                    (1, payment.line_ids.ids[0], {'amount_currency': payment.amount,
+                                                  'currency_id': payment_currency,
+                                                  'balance':convertedamount}),
+                    (1, payment.line_ids.ids[1], {'amount_currency': payment.amount*-1,
+                                                  'currency_id': payment_currency,
+                                                   'balance':convertedamount*-1})
+                ]
+            else:
+                payment.move_id.line_ids = [
+                    (1, payment.line_ids.ids[0], {'amount_currency': payment.amount* -1,
+                                                  'currency_id': payment_currency,
+                                                  'balance': convertedamount*-1}),
+                    (1, payment.line_ids.ids[1], {'amount_currency': payment.amount ,
+                                                  'currency_id': payment_currency,
+                                                  'balance': convertedamount})
+                ]
             
             
 
