@@ -140,7 +140,7 @@ class StorageInspectorBuildDrawDataBI(models.Model):
                 if exists.lastmodifydate == data['lastmodifydate']:
                     continue
                 else:
-                    all.search([('editedon', '=', data['editedon'])]).unlink()
+                    all.search([('builddrawnum', '=', data['builddrawnum'])]).unlink()
                     self.env['stockadjustments.controller.bi'].create(data)
                     self.env.cr.commit()
             else:
@@ -155,7 +155,7 @@ class StorageInspectorBuildDrawDataBI(models.Model):
                 if exists.lastmodifydate == data['lastmodifydate']:
                     continue
                 else:
-                    all.search([('editedon', '=', data['editedon'])]).unlink()
+                    all.search([('builddrawnum', '=', data['builddrawnum'])]).unlink()
                     self.env['stockadjustments.controller.bi'].create(data)
                     self.env.cr.commit()
             else:
