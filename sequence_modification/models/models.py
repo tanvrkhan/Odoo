@@ -11,35 +11,35 @@ class AccountMoveInheritModel(models.Model):
 
     def action_post(self):
         for rec in self:
-            if self.company_id.id!=4:
-                if not rec.move_sequence_done and rec.name == '/':
-                    if rec.move_type == 'out_invoice' and ((rec.journal_id.id == 2  and rec.company_id.id==1) or(rec.journal_id.id == 36  and rec.company_id.id==2)):
+            if not rec.move_sequence_done and rec.name == '/':
+                if rec.company_id.id in (1,2):
+                    if rec.move_type == 'out_invoice' and rec.journal_id.name == "Sales":
                         rec.generate_sequence('invoice.sequence', 'invoice')
-    
-                    elif rec.move_type == 'out_invoice' and ((rec.journal_id.id != 2  and rec.company_id.id==1) or(rec.journal_id.id != 36  and rec.company_id.id==2)):
+                    elif rec.move_type == 'out_invoice' and rec.journal_id.name != "Sales":
                         rec.generate_sequence('invoice.provisional.sequence', 'invoice')
-    
-                    elif rec.move_type == 'in_invoice' and ((rec.journal_id.id == 3  and rec.company_id.id==1) or(rec.journal_id.id == 37  and rec.company_id.id==2)):
+                    elif rec.move_type == 'in_invoice' and (rec.journal_id.name=="Purchases"):
                         rec.generate_sequence('bill.sequence', 'bill')
-    
-                    elif rec.move_type == 'in_invoice' and ((rec.journal_id.id != 3  and rec.company_id.id==1) or(rec.journal_id.id != 37  and rec.company_id.id==2)):
+                    elif rec.move_type == 'in_invoice' and (rec.journal_id.name!="Purchases"):
                         rec.generate_sequence('bill.provisional.sequence', 'bill')
-                    
-                    elif rec.move_type == 'out_invoice' and rec.company_id!=1 and rec.company_id!=2:
+                    elif rec.move_type == 'entry':
+                        if not rec.move_sequence_done and rec.name == '/':
+                            rec.set_entry_seq()
+                elif rec.company_id.id==4:
+                    if rec.move_type == 'out_invoice':
+                        rec.generate_sequence_continous('invoice.sequence', 'invoice')
+                    elif rec.move_type == 'in_invoice':
+                        rec.generate_sequence_continous('bill.sequence', 'bill')
+                   
+                else:
+                    if rec.move_type == 'out_invoice':
                         rec.generate_sequence('invoice.sequence', 'invoice')
-                        
-                    elif rec.move_type == 'in_invoice' and rec.company_id!=1 and rec.company_id!=2:
+                    elif rec.move_type == 'in_invoice':
                         rec.generate_sequence('bill.sequence', 'invoice')
-    
-                    elif rec.move_type == 'in_refund':
-                        rec.generate_sequence('debit.sequence', 'refund')
-    
-                    elif rec.move_type == 'out_refund':
-                        rec.generate_sequence('credit.sequence', 'credit')
-    
-                    # elif rec.move_type == 'entry':
-                    #     if not rec.move_sequence_done and rec.name == '/':
-                    #         rec.set_entry_seq()
+                        
+                if rec.move_type == 'in_refund':
+                    rec.generate_sequence('debit.sequence', 'refund')
+                elif rec.move_type == 'out_refund':
+                    rec.generate_sequence('credit.sequence', 'credit')
         return super().action_post()
     
     @api.returns('self', lambda value: value.id)
@@ -67,15 +67,35 @@ class AccountMoveInheritModel(models.Model):
         else:
             return False
 
-    # def set_entry_seq(self):
-    #     seq = self.env['ir.sequence'].next_by_code('journal.entry.sequence')
-    #     is_exists = self.is_entry_sequence_exits(seq)
-    #     if is_exists:
-    #         self.set_entry_seq()
-    #     else:
-    #         self.name = seq
-    #         self.move_sequence_done = True
-
+    def set_entry_seq(self):
+        seq = self.env['ir.sequence'].next_by_code('journal.entry.sequence')
+        is_exists = self.is_entry_sequence_exits(seq)
+        if is_exists:
+            self.set_entry_seq()
+        else:
+            self.name = seq
+            self.move_sequence_done = True
+    def generate_sequence_continous(self, code=None, move_type=None):
+        seq = self.env['ir.sequence'].next_by_code(code).split("-")
+        next_num = 0
+        if seq:
+            if move_type == "invoice" and code == 'invoice.sequence':
+                next_num = self.env['ir.sequence'].next_by_code(code)
+                name = self.get_new_name_continous(seq, next_num.split("-")[2])
+                is_exists = self.env['account.move'].search([('name', '=', name)])
+                if is_exists:
+                    self.generate_sequence_continous(code, move_type)
+                else:
+                    self.name = name
+            elif move_type == "bill" and code == 'bill.sequence':
+                next_num = self.env['ir.sequence'].next_by_code(code)
+                name = self.get_new_name_continous(seq, next_num)
+                is_exists = self.env['account.move'].search([('name', '=', name)])
+                if is_exists:
+                    self.generate_sequence_continous(code, move_type)
+                else:
+                    self.name = name
+        self.move_sequence_done = True
     def generate_sequence(self, code=None, move_type=None):
         seq = self.env['ir.sequence'].next_by_code(code).split("-")
         next_num = 0
@@ -158,6 +178,12 @@ class AccountMoveInheritModel(models.Model):
         name = short_name + "-" + seq[1] + "-" + str(year) + "" + str(month)
         get_name = self.check_in_partner_seq(name)
         return get_name
+    def get_new_name_continous(self, seq=None, next_num=None):
+        month = self.get_month()
+        year = self.get_year()
+        short_name = str(self.partner_id.short_name) if self.partner_id.short_name else ''
+        name = short_name + "-" + seq[1] + "-" + str(year) + "" + str(month) + str(next_num)
+        return name
 
     def get_year(self):
         year = str(datetime.datetime.now().year)[2:4]
