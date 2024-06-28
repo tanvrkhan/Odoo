@@ -57,23 +57,23 @@
                     <br/>
                     <span t-field="doc.partner_id.street"/>
                 </t>
-                <t t-if="o.partner_id.zip or o.partner_id.city or o.partner_id.state_id">
+                <t t-if="doc.partner_id.zip or doc.partner_id.city or doc.partner_id.state_id">
                     <br/>
-                    <t t-if="o.partner_id.zip">
-                        <span t-field="o.partner_id.zip"/>
+                    <t t-if="doc.partner_id.zip">
+                        <span t-field="doc.partner_id.zip"/>
                     </t>
-                    <t t-if="o.partner_id.city">
+                    <t t-if="doc.partner_id.city">
                         <span>,</span>
-                        <span t-field="o.partner_id.city"/>
+                        <span t-field="doc.partner_id.city"/>
                     </t>
-                    <t t-if="o.partner_id.state_id">
+                    <t t-if="doc.partner_id.state_id">
                         <span>,</span>
-                        <span t-field="o.partner_id.state_id.name"/>
+                        <span t-field="doc.partner_id.state_id.name"/>
                     </t>
                 </t>
-                <t t-if="o.partner_id.country_id">
+                <t t-if="doc.partner_id.country_id">
                     <br/>
-                    <span t-field="o.partner_id.country_id.name"/>
+                    <span t-field="doc.partner_id.country_id.name"/>
                 </t>
                 <t t-if="doc.show_vat_ids">
                     <br/>
@@ -485,6 +485,11 @@
                         <li>Fiscal representation of KEMEXON SA in France: RM BOULANGER SA (17A rue du
                             Vertuquet, 59960 Neuville-en-Ferrain, no SIREN: 321252827)
                         </li>
+                        <t t-if="doc.payment_term_id.name == 'Pre' or doc.payment_term_id.name == 'Prepayment'">
+                            <li>If payment is not received within 48 hours from the PFI date, the seller reserves the
+                                right to adjust the prices according to market conditions.
+                            </li>
+                        </t>
                         <li>Kemexon terms and conditions apply.</li>
                     </t>
                     <t t-else="">
@@ -495,6 +500,11 @@
                             informing the change of bank account etc. If you do so, the same shall be at your risk and
                             consequences.
                         </li>
+                        <t t-if="doc.payment_term_id.name == 'Pre' or doc.payment_term_id.name == 'Prepayment'">
+                            <li>If payment is not received within 48 hours from the PFI date, the seller reserves the
+                                right to adjust the prices according to market conditions.
+                            </li>
+                        </t>
                         <li>Kemexon terms and conditions apply.</li>
                     </t>
                 </ul>
