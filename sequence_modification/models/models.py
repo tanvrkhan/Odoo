@@ -4,6 +4,8 @@ from dateutil import parser
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 
+from odoo.exceptions import UserError
+
 class AccountMoveInheritModel(models.Model):
     _inherit = 'account.move'
 
@@ -75,12 +77,39 @@ class AccountMoveInheritModel(models.Model):
         else:
             self.name = seq
             self.move_sequence_done = True
+    # def generate_sequence_continous(self, code=None, move_type=None):
+    #     seq = self.env['ir.sequence'].next_by_code(code).split("-")
+    #     next_num = 0
+    #     if seq:
+    #         if move_type == "invoice" and code == 'invoice.sequence':
+    #             next_num = self.env['ir.sequence'].next_by_code(code)
+    #             name = self.get_new_name_continous(seq, next_num.split("-")[2])
+    #             is_exists = self.env['account.move'].search([('name', '=', name)])
+    #             if is_exists:
+    #                 self.generate_sequence_continous(code, move_type)
+    #             else:
+    #                 self.name = name
+    #         elif move_type == "bill" and code == 'bill.sequence':
+    #             next_num = self.env['ir.sequence'].next_by_code(code)
+    #             name = self.get_new_name_continous(seq, next_num)
+    #             is_exists = self.env['account.move'].search([('name', '=', name)])
+    #             if is_exists:
+    #                 self.generate_sequence_continous(code, move_type)
+    #             else:
+    #                 self.name = name
+    #     self.move_sequence_done = True
+
     def generate_sequence_continous(self, code=None, move_type=None):
-        seq = self.env['ir.sequence'].next_by_code(code).split("-")
+        # for checking invoice_date in bill case only before generating sequence
+        for rec in self:
+            if move_type == "bill" and not rec.invoice_date:
+                raise UserError("The Bill/Refund date is required to validate this document.")
+        initial_seq = self.env['ir.sequence'].next_by_code(code)
+        seq = initial_seq.split("-")
         next_num = 0
         if seq:
             if move_type == "invoice" and code == 'invoice.sequence':
-                next_num = self.env['ir.sequence'].next_by_code(code)
+                next_num = initial_seq
                 name = self.get_new_name_continous(seq, next_num.split("-")[2])
                 is_exists = self.env['account.move'].search([('name', '=', name)])
                 if is_exists:
@@ -88,14 +117,16 @@ class AccountMoveInheritModel(models.Model):
                 else:
                     self.name = name
             elif move_type == "bill" and code == 'bill.sequence':
-                next_num = self.env['ir.sequence'].next_by_code(code)
-                name = self.get_new_name_continous(seq, next_num)
+                next_num = initial_seq
+                name = self.get_new_name_continous(seq, next_num.split("-")[2])
                 is_exists = self.env['account.move'].search([('name', '=', name)])
                 if is_exists:
                     self.generate_sequence_continous(code, move_type)
                 else:
                     self.name = name
+
         self.move_sequence_done = True
+
     def generate_sequence(self, code=None, move_type=None):
         seq = self.env['ir.sequence'].next_by_code(code).split("-")
         next_num = 0
@@ -235,7 +266,7 @@ class AccountMoveInheritModel(models.Model):
                 num = 1
                 # new_name = name + str(num).zfill(3)
                 new_name = name + str(num).zfill(3)
-                num += 1
+                # num += 1 # This was incrementing the num after assigning value for 1st time
                 partner_seq_obj.create({
                     'name': name,
                     'next_number': num,
