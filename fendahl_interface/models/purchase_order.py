@@ -109,7 +109,7 @@ class AccountMoveLine(models.Model):
                 if invoicenumber:
                     controllerinvoice = self.env['invoice.controller.bi'].search([('invoicenumber','=',invoicenumber)],limit=1)
                     if controllerinvoice:
-                        controllerinvoice.create_bill(True)
+                        controllerinvoice.create_bill()
                     else:
                         raise UserError('The invoice doesnt exist in fusion controller')
             else:

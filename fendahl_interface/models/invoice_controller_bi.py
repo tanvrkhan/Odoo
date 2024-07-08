@@ -233,12 +233,6 @@ class InvoiceControllerBI(models.Model):
                 exists = all.search([('invoicenumber', '=', data['invoicenumber'])])
                 if exists:
                     return
-                    # if exists:
-                    #     return
-                    # else:
-                    #     self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
-                    #     self.env['cashflow.controller.bi'].create(data)
-                    #     self.env.cr.commit()
                 else:
                     self.env['invoice.controller.bi'].create(data)
                     self.env.cr.commit()
@@ -504,7 +498,7 @@ class InvoiceControllerBI(models.Model):
                                                                  , ('costtype', 'not in', ('Primary Settlement','VAT','Tax'))
                                                               ])
     
-    def create_bill(self,uierrors):
+    def create_bill(self):
         for rec in self:
             if rec.invoicestatus == 'Active':
                 if rec.invoiceopenstatus == 'Send To Accounting':
@@ -586,33 +580,32 @@ class InvoiceControllerBI(models.Model):
                                         
                                     
                                 else:
-                                    if uierrors:
-                                        raise UserError('Cashflow lines not found in Odoo')
                                     log_error = self.env['fusion.sync.history.errors'].log_error(
                                         'InvoiceControllerBI',
                                         rec.invoicenumber,
                                         'Cashflow lines not found in Odoo',
                                         rec.internalcompany)
+                                    raise UserError('Cashflow lines not found in Odoo')
+                                    
                                         
                             else:
-                                if uierrors:
-                                    raise UserError('Invoice has no lines in Odoo')
                                 log_error = self.env['fusion.sync.history.errors'].log_error(
                                     'InvoiceControllerBI',
                                     rec.invoicenumber,
                                     'Invoice has no lines in Odoo.',
                                     rec.internalcompany)
+                                raise UserError('Invoice has no lines in Odoo')
                             existing_invoice.action_post()
                             if invoice_reconciled_lines:
                                 self.reconcile_entries(invoice_reconciled_lines, existing_invoice)
                         else:
-                            if uierrors:
-                                raise UserError('Invoice not yet sent to Odoo. Please update the status of invoice to be SEND TO ACCOUNTING',)
                             log_error = self.env['fusion.sync.history.errors'].log_error(
-                                    'InvoiceControllerBI',
-                                    rec.invoicenumber,
-                                    'Invoice not yet sent to Odoo. Please update the status of invoice to be SEND TO ACCOUNTING',
-                                    rec.internalcompany)
+                                'InvoiceControllerBI',
+                                rec.invoicenumber,
+                                'Invoice not yet sent to Odoo. Please update the status of invoice to be SEND TO ACCOUNTING',
+                                rec.internalcompany)
+                            raise UserError('Invoice not yet sent to Odoo. Please update the status of invoice to be SEND TO ACCOUNTING',)
+                            
                             # raise UserError('Invoice doesnt exist in Odoo.')
                     
                     
@@ -700,33 +693,32 @@ class InvoiceControllerBI(models.Model):
                                                     self.update_existing_si_line(with_same_price, company, cfline,
                                                                          quantity_multiplier,rec.invoicenumber)
                                 else:
-                                    if uierrors:
-                                        raise UserError(
-                                            'Cashflow Lines not found in Odoo')
                                     log_error = self.env['fusion.sync.history.errors'].log_error(
                                         'InvoiceControllerBI',
                                         rec.invoicenumber,
                                         'Cashflow Lines not found in Odoo',
                                         rec.internalcompany)
+                                    raise UserError(
+                                            'Cashflow Lines not found in Odoo')
+                                    
                                 existing_invoice.action_post()
                                 if invoice_reconciled_lines:
                                     self.reconcile_entries(invoice_reconciled_lines, existing_invoice)
                             else:
-                                if uierrors:
-                                    raise UserError('Invoice Lines not found in Odoo')
                                 log_error = self.env['fusion.sync.history.errors'].log_error(
                                     'InvoiceControllerBI',
                                     rec.invoicenumber,
                                     'Invoice Lines not found in Odoo',
                                     rec.internalcompany)
+                                raise UserError('Invoice Lines not found in Odoo')
                         else:
-                            if uierrors:
-                                raise UserError('Invoice is not yet synced to Odoo')
                             log_error = self.env['fusion.sync.history.errors'].log_error(
                                 'InvoiceControllerBI',
                                 rec.invoicenumber,
                                 'Invoice is not yet synced to Odoo',
                                 rec.internalcompany)
+                            raise UserError('Invoice is not yet synced to Odoo')
+                            
             else:
                 existing_invoice = self.check_existing_invoice(rec.invoicenumber)
                 if existing_invoice:
@@ -1058,494 +1050,3 @@ class InvoiceControllerBI(models.Model):
                                                       multiplier, company)
         existing_invoice.action_post()
     
-        
-    # def update_existing_product_invoice(self,existing_invoice, cf, po, pol, company):
-    #     existing_invoice.button_draft()
-    #     # link existing invoice
-    #     self.update_existing_invoice_header(existing_invoice, po, pol)
-    #     existing_line = self.env['account.move.line'].search([('cashflow_id', '=', cf.cashflowid)])
-    #     product = self.env['fusion.sync.history'].validate_product(cf.commodity,
-    #                                                                cf.material,
-    #                                                                cf.quantityuom)
-    #     uom = self.env['fusion.sync.history'].validate_uom(product,
-    #                                                        cf.quantityuom)
-    #     tax_rate_record = self.get_tax_rate_record(cf, company)
-    #     multiplier = 1
-    #     if not cf.payablereceivable == 'Payable':
-    #         multiplier = -1
-    #     if existing_line:
-    #         self.update_existing_product_line(existing_line, cf, pol, tax_rate_record, multiplier)
-    #     else:
-    #         self.create_product_line_existing_invoice(existing_invoice, cf, product, uom, pol, tax_rate_record, multiplier, company)
-    #     existing_invoice.action_post()
-    # def create_bill(self):
-    #     for rec in self:
-    #         try:
-    #             if rec.payablereceivable == 'Payable':
-    #                 pol = self.env['purchase.order.line'].search([('custom_section_number', '=', rec.customsectionnumber)])
-    #                 po = pol.order_id
-    #                 cashflow = self.env['cashflow.controller.bi'].search([('sectionno', '=', pol.fusion_segment_code),('cashflowstatus', '!=', 'Defunct'),('quantitystatus', '=', 'Actual')])
-    #                 company = self.env['res.company'].search([('name', '=', rec.internalcompany)], limit=1)
-    #                 if rec.invoicestatus == 'Active':
-    #                     for cf in cashflow:
-    #                         if cf.costtype == 'Primary Settlement':
-    #                             existing_invoice = self.check_existing_invoice(pol)
-    #                             if existing_invoice:
-    #                                 self.update_existing_invoice(existing_invoice, cf, po, pol, company)
-    #                                 self.env.cr.commit()
-    #                             else:
-    #                                 if po:
-    #
-    #                                     tax_cf = self.env['cashflow.controller.bi'].search(
-    #                                         [('parentcashflowid', '=', cf.cashflowid), ('costtype', '=', 'VAT')], limit=1)
-    #                                     tax_rate_record = self.env['fusion.sync.history'].get_tax_record(tax_cf.erptaxcode,
-    #                                                                                                      'purchase',
-    #                                                                                                      company.id)
-    #
-    #                                     if cf.quantitystatus == 'Actual':
-    #                                         product = self.env['fusion.sync.history'].validate_product(cf.commodity,
-    #                                                                                                    cf.material,
-    #                                                                                                    cf.quantityuom)
-    #                                         uom = self.env['fusion.sync.history'].validate_uom(product,
-    #                                                                                            cf.quantityuom)
-    #                                         invoice_line_vals = {
-    #                                             'name': pol.product_id.name,
-    #                                             'product_id': product.id,
-    #                                             'product_uom_id': uom.id,
-    #                                             'quantity': float(cf.quantity),
-    #                                             'price_unit': cf.price*multiplier,
-    #                                             'purchase_line_id': pol.id if cf.invoicenumber == rec.invoicenumber else None,
-    #                                             'analytic_distribution': pol.analytic_distribution,
-    #                                             'cashflow_id': cf.cashflowid,
-    #                                             'tax_ids': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [
-    #                                                 (6, 0, [])]
-    #                                         }
-    #                                         invoice_vals['invoice_line_ids'].append((0, 0, invoice_line_vals))
-    #                                     vendor_bill = self.env['account.move'].create(invoice_vals)
-    #                                     vendor_bill.action_post()
-    #
-    #                     partners=[]
-    #                     unique_partners = set()
-    #                     for scf in cashflow:
-    #                         partners.append(scf.counterpart)
-    #                         unique_partners = set(partners)
-    #
-    #                     for partner in unique_partners:
-    #                         partner_grouped =
-    #                         for cf in partner_grouped:
-    #                             if cf.costtype in ('VAT','Tax'):
-    #                                 pass
-    #                             elif cf.costtype not in ('Primary Settlement','VAT','Tax'):
-    #
-    #                                 existing_invoice = self.env['account.move'].search(
-    #                                     [('fusion_segment_code', '=', pol.fusion_segment_code)
-    #                                         ,('partner_id','=',partner.id)])
-    #                                 if existing_invoice:
-    #                                     existing_invoice.button_draft()
-    #                                     self.env.cr.commit()
-    #                                     # link existing invoice
-    #                                     existing_invoice.write({'purchase_id': po.id})
-    #                                     existing_invoice.write({'invoice_origin': po.name})
-    #                                     existing_invoice.write({'fusion_segment_code': pol.segment_section_code})
-    #                                     existing_invoice.write({'fusion_segment_id': pol.fusion_segment_id})
-    #                                     tax_cf = self.env['cashflow.controller.bi'].search(
-    #                                         [('parentcashflowid', '=', cf.cashflowid), ('costtype', '=', 'VAT')], limit=1)
-    #                                     tax_rate_record = self.env['fusion.sync.history'].get_tax_record(tax_cf.erptaxcode,
-    #                                                                                                      'purchase',
-    #                                                                                                      company.id)
-    #                                     existing_line = self.env['account.move.line'].search(
-    #                                         [('cashflow_id', '=', cf.cashflowid)])
-    #                                     product = self.env['fusion.sync.history'].validate_product(cf.commodity,
-    #                                                                                                cf.material,
-    #                                                                                                cf.quantityuom)
-    #                                     uom = self.env['fusion.sync.history'].validate_uom(product,
-    #                                                                                        cf.quantityuom)
-    #                                     multiplier = 1
-    #                                     if not cf.payablereceivable == 'Payable':
-    #                                         multiplier = -1
-    #                                     if existing_line:
-    #                                         if cf.costtype in ('Pre-payment', 'Pre-payment_Rev', 'Provisional Payment','Provisional Payment_Rev'):
-    #                                             existing_line.product_id = 312,
-    #                                             existing_line.product_uom_id = 1,
-    #                                             existing_line.quantity = 1,
-    #                                             existing_line.price_unit = float(cf.extendedamount) * -1
-    #                                             existing_line.purchase_line_id = pol.id
-    #                                             existing_line.analytic_distribution = pol.analytic_distribution
-    #                                             existing_line.taxes_id = [
-    #                                                 (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
-    #                                         else:
-    #                                             cost = self.env['fusion.sync.history'].validate_cost(cf.costtype)
-    #                                             existing_line.name = pol.product_id.name
-    #                                             existing_line.product_id = cost.id
-    #                                             existing_line.quantity = float(cf.quantity)
-    #                                             existing_line.price_unit = float(cf.price) * -1
-    #                                             existing_line.purchase_line_id = pol.id
-    #                                             existing_line.analytic_distribution = pol.analytic_distribution
-    #                                             existing_line.taxes_id = [
-    #                                                 (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
-    #                                     else:
-    #
-    #                                     existing_invoice.action_post()
-    #                                     self.env.cr.commit()
-    #                                 else:
-    #
-    #                                     move_type = ''
-    #                                     if rec.invoicetype == "Final":
-    #                                         movetype = 'in_invoice'
-    #                                     elif rec.invoicetype == "Debit Note":
-    #                                         movetype = 'in_refund'
-    #                                     elif rec.invoicetype == 'Service Cost Invoice' and float(rec.invoiceamt) < 0:
-    #                                         movetype = 'in_invoice'
-    #                                     elif rec.invoicetype == 'Service Cost Invoice' and float(rec.invoiceamt) > 0:
-    #                                         movetype = 'in_refund'
-    #                                     else:
-    #                                         movetype = 'in_invoice'
-    #                                     # create new invoice
-    #
-    #                                     partner_grouped_lines = self.env['cashflow.controller.bi'].search(
-    #                                         [('sectionno', '=', pol.fusion_segment_code),
-    #                                          ('cashflowstatus', '!=', 'Defunct'), ('quantitystatus', '=', 'Actual'),
-    #                                          ('counterpart', '=', cf.counterpart)])
-    #                                     for cfl in partner_grouped_lines:
-    #                                         tax_cf = self.env['cashflow.controller.bi'].search(
-    #                                             [('parentcashflowid', '=', cfl.cashflowid), ('costtype', '=', 'VAT')],
-    #                                             limit=1)
-    #                                         tax_rate_record = self.env['fusion.sync.history'].get_tax_record(
-    #                                             tax_cf.erptaxcode,
-    #                                             'purchase',
-    #                                             company.id)
-    #                                         multiplier = 1
-    #                                         if not cfl.payablereceivable == 'Payable':
-    #                                             multiplier = -1
-    #                                         if cfl.quantitystatus == 'Actual':
-    #                                             product = self.env['fusion.sync.history'].validate_product(cfl.commodity,
-    #                                                                                                        cfl.material,
-    #                                                                                                        cfl.quantityuom)
-    #                                             uom = self.env['fusion.sync.history'].validate_uom(product,
-    #                                                                                                cfl.quantityuom)
-    #                                             invoice_line_vals=[]
-    #
-    #                                     vendor_bill = self.env['account.move'].create(invoice_vals)
-    #                                     vendor_bill.action_post()
-    #
-    #                 else:
-    #                     cancelled_invoice = self.env['account.move'].search([('custom_section_number', '=', rec.customsectionnumber)])
-    #                     if cancelled_invoice:
-    #                         cancelled_invoice.action_cancel()
-    #
-    #         except Exception as e:
-    #             log_error = self.env['fusion.sync.history.errors'].log_error('TransferController',
-    #                                                                          rec.invoicenumber,
-    #                                                                          str(e),
-    #                                                                          rec.internalcompany)
-    #             raise UserError('Error processing API data: %s', str(e))
-    #                 # secondary_cashflow = self.env['cashflow.controller.bi'].search(
-    #                 #     [('sectionno', '=', pol.fusion_segment_code), ('cashflowstatus', '!=', 'Defunct'),
-    #                 #      ('quantitystatus', '=', 'Actual'), ('costtype', 'not in', ('Primary Settlement', 'VAT', 'Tax'))])
-    #                 # company = self.env['res.company'].search([('name', '=', rec.internalcompany)], limit=1)
-    #                 # if rec.invoicestatus == 'Active':
-    #                 #     if rec.invoicetype in (
-    #                 #     'Proforma', 'Prepayment', 'Provisional', 'Final', 'Debit Note', 'Service Cost Invoice'):
-    #                 #
-    #                 #         # search_pattern = rec.custominvoicenumber[:3] + '%'
-    #                 #         existing_invoice = self.env['account.move'].search(
-    #                 #             [('fusion_invoice_ref', '=', rec.custominvoicenumber)])
-    #                 #         # product=self.env['fusion.sync.history'].validate_product(rec.commodity, rec.material,
-    #                 #         #                                                                                rec.invoiceqtyuom)
-    #                 #         # uom = self.env['fusion.sync.history'].validate_uom(product,
-    #                 #         #                                              rec.invoiceqtyuom)
-    #                 #         if existing_invoice:
-    #                 #             existing_invoice.button_draft()
-    #                 #             self.env.cr.commit()
-    #                 #             # link existing invoice
-    #                 #             existing_invoice.write({'purchase_id': po.id})
-    #                 #             existing_invoice.write({'invoice_origin': po.name})
-    #                 #             existing_invoice.write({'fusion_segment_code': pol.segment_section_code})
-    #                 #             existing_invoice.write({'fusion_segment_id': pol.fusion_segment_id})
-    #                 #             # existing_invoice.write({'custom_section_number': rec.customsectionnumber})
-    #                 #             existing_invoice.line_ids.custom_section_number = rec.customsectionnumber
-    #                 #
-    #                 #             for cf in primary_cashflow:
-    #                 #                 tax_cf = self.env['cashflow.controller.bi'].search(
-    #                 #                     [('parentcashflowid', '=', cf.cashflowid), ('costtype', '=', 'VAT')], limit=1)
-    #                 #                 tax_rate_record = self.env['fusion.sync.history'].get_tax_record(tax_cf.erptaxcode,
-    #                 #                                                                                  'purchase',
-    #                 #                                                                                  company.id)
-    #                 #                 existing_line = self.env['account.move.line'].search(
-    #                 #                     [('cashflow_id', '=', cf.cashflowid)])
-    #                 #                 no_cashflow_lines = self.env['account.move.line'].search_count(
-    #                 #                     [('cashflow_id', '=', ''), ('move_id', '=', existing_invoice.id)])
-    #                 #                 if no_cashflow_lines:
-    #                 #                     no_cashflow_lines.unlink()
-    #                 #                 multiplier = 1
-    #                 #                 if existing_line:
-    #                 #                     if not cf.payablereceivable == 'Payable':
-    #                 #                         multiplier = -1
-    #                 #                         # existing_line.unlink()
-    #                 #                     if cf.costtype == 'Primary Settlement':
-    #                 #                         if cf.quantitystatus == 'Actual':
-    #                 #                             product = self.env['fusion.sync.history'].validate_product(cf.commodity,
-    #                 #                                                                                        cf.material,
-    #                 #                                                                                        cf.quantityuom)
-    #                 #                             uom = self.env['fusion.sync.history'].validate_uom(cf.material,
-    #                 #                                                                                cf.quantityuom)
-    #                 #                             existing_line.name = pol.product_id.name
-    #                 #                             existing_line.product_id = product.id
-    #                 #                             existing_line.product_uom_id = uom.id
-    #                 #                             existing_line.quantity = float(cf.quantity)
-    #                 #                             existing_line.price_unit = cf.price * multiplier
-    #                 #                             existing_line.purchase_line_id = pol.id
-    #                 #                             existing_line.analytic_distribution = pol.analytic_distribution
-    #                 #                             existing_line.taxes_id = [
-    #                 #                                 (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
-    #                 #                         elif cf.costtype in (
-    #                 #                         'Pre-payment', 'Pre-payment_Rev', 'Provisional Payment',
-    #                 #                         'Provisional Payment_Rev'):
-    #                 #                             existing_line.product_id = 312,
-    #                 #                             existing_line.product_uom_id = 1,
-    #                 #                             existing_line.quantity = 1,
-    #                 #                             existing_line.price_unit = float(cf.extendedamount) * -1
-    #                 #                             existing_line.purchase_line_id = pol.id
-    #                 #                             existing_line.analytic_distribution = pol.analytic_distribution
-    #                 #                             existing_line.taxes_id = [
-    #                 #                                 (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
-    #                 #                         else:
-    #                 #                             cost = self.env['fusion.sync.history'].validate_cost(cf.costtype,
-    #                 #                                                                                  cf.quantityuom)
-    #                 #                             existing_line.name = pol.product_id.name
-    #                 #                             existing_line.product_id = cost.id
-    #                 #                             existing_line.quantity = float(cf.quantity)
-    #                 #                             existing_line.price_unit = float(cf.price) * -1
-    #                 #                             existing_line.purchase_line_id = pol.id
-    #                 #                             existing_line.analytic_distribution = pol.analytic_distribution
-    #                 #                             existing_line.taxes_id = [
-    #                 #                                 (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
-    #                 #                 else:
-    #                 #                     if cf.quantitystatus == 'Actual':
-    #                 #                         if cf.costtype == 'Primary Settlement':
-    #                 #
-    #                 #                             product = self.env['fusion.sync.history'].validate_product(cf.commodity,
-    #                 #                                                                                        cf.material,
-    #                 #                                                                                        cf.quantityuom)
-    #                 #                             uom = self.env['fusion.sync.history'].validate_uom(product,
-    #                 #                                                                                cf.quantityuom)
-    #                 #                             self.env['account.move.line'].create({
-    #                 #                                 'move_id': existing_invoice.id,
-    #                 #                                 'name': pol.product_id.name,
-    #                 #                                 'product_id': product.id,
-    #                 #                                 'product_uom_id': uom.id,
-    #                 #                                 'quantity': float(cf.quantity),
-    #                 #                                 'price_unit': float(cf.price) * multiplier,
-    #                 #                                 'purchase_line_id': pol.id if cf.invoicenumber == rec.invoicenumber else None,
-    #                 #                                 'analytic_distribution': pol.analytic_distribution,
-    #                 #                                 'cashflow_id': cf.cashflowid,
-    #                 #                                 'tax_ids': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [
-    #                 #                                     (6, 0, [])]
-    #                 #                             })
-    #                 #                         elif cf.costtype in (
-    #                 #                                 'Pre-payment', 'Pre-payment_Rev', 'Provisional Payment',
-    #                 #                                 'Provisional Payment_Rev'):
-    #                 #                             cost = self.env['fusion.sync.history'].validate_cost(cf.costtype)
-    #                 #                             self.env['account.move.line'].create({
-    #                 #                                 'move_id': existing_invoice.id,
-    #                 #                                 'name': pol.product_id.name,
-    #                 #                                 'product_id': 312,
-    #                 #                                 'quantity': 1,
-    #                 #                                 'price_unit': float(cf.price) * -1,
-    #                 #                                 'purchase_line_id': pol.id if cf.invoicenumber == rec.invoicenumber else None,
-    #                 #                                 'analytic_distribution': pol.analytic_distribution,
-    #                 #                                 'cashflow_id': cf.cashflowid,
-    #                 #                                 'tax_ids': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [
-    #                 #                                     (6, 0, [])]
-    #                 #                             })
-    #                 #                         else:
-    #                 #                             cost = self.env['fusion.sync.history'].validate_cost(cf.costtype,
-    #                 #                                                                                  cf.quantityuom)
-    #                 #                             self.env['account.move.line'].create({
-    #                 #                                 'move_id': existing_invoice.id,
-    #                 #                                 'name': pol.product_id.name,
-    #                 #                                 'product_id': cost.id,
-    #                 #                                 'quantity': float(cf.quantity),
-    #                 #                                 'price_unit': float(cf.price) * -1,
-    #                 #                                 'purchase_line_id': pol.id if cf.invoicenumber == rec.invoicenumber else None,
-    #                 #                                 'analytic_distribution': pol.analytic_distribution,
-    #                 #                                 'cashflow_id': cf.cashflowid,
-    #                 #                                 'tax_ids': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [
-    #                 #                                     (6, 0, [])]
-    #                 #                             })
-    #                 #             existing_invoice.action_post()
-    #                 #             self.env.cr.commit()
-    #                 #         else:
-    #                 #             if po:
-    #                 #                 move_type = ''
-    #                 #                 if rec.invoicetype == "Final":
-    #                 #                     movetype = 'in_invoice'
-    #                 #                 elif rec.invoicetype == "Debit Note":
-    #                 #                     movetype = 'in_refund'
-    #                 #                 elif rec.invoicetype == 'Service Cost Invoice' and float(rec.invoiceamt) < 0:
-    #                 #                     movetype = 'in_invoice'
-    #                 #                 elif rec.invoicetype == 'Service Cost Invoice' and float(rec.invoiceamt) > 0:
-    #                 #                     movetype = 'in_refund'
-    #                 #                 else:
-    #                 #                     movetype = 'in_invoice'
-    #                 #                 # create new invoice
-    #                 #                 invoice_vals = {
-    #                 #                     'company_id': self.env['res.company'].search(
-    #                 #                         [('name', '=', rec.internalcompany)], limit=1).id,
-    #                 #                     # 'fusion_invoice_ref': rec.invoicenumber, # Vendor bill
-    #                 #                     'invoice_origin': po.name,
-    #                 #                     'partner_id': po.partner_id.id,
-    #                 #                     'invoice_line_ids': [],
-    #                 #                     'currency_id': self.env['res.currency'].search([('name', '=', rec.amtcurrency)],
-    #                 #                                                                    limit=1).id,
-    #                 #                     # po.currency_id.id, # self.env['res.currency'].search([(rec.material)rec.amtcurrency,
-    #                 #                     'purchase_id': po.id,
-    #                 #                     'custom_section_number': rec.customsectionnumber,
-    #                 #                     # Link back to the purchase order
-    #                 #                     'invoice_date': rec.invoicedate,
-    #                 #                     'date': rec.invoicedate,
-    #                 #                     'ref': rec.theirinvoiceref,
-    #                 #                     'invoice_date_due': rec.paymentduedate,
-    #                 #                     'fusion_reference': rec.invoicenumber,
-    #                 #                     'fusion_invoice_ref': rec.custominvoicenumber,
-    #                 #                     'move_type': movetype
-    #                 #                 }
-    #                 #                 for cf in primary_cashflow:
-    #                 #                     tax_cf = self.env['cashflow.controller.bi'].search(
-    #                 #                         [('parentcashflowid', '=', cf.cashflowid), ('costtype', '=', 'VAT')],
-    #                 #                         limit=1)
-    #                 #                     tax_rate_record = self.env['fusion.sync.history'].get_tax_record(
-    #                 #                         tax_cf.erptaxcode,
-    #                 #                         'purchase',
-    #                 #                         company.id)
-    #                 #                     multiplier = 1
-    #                 #                     if not cf.payablereceivable == 'Payable':
-    #                 #                         multiplier = -1
-    #                 #                         # existing_line.unlink()
-    #                 #
-    #                 #                     if cf.quantitystatus == 'Actual':
-    #                 #                         if cf.costtype == 'Primary Settlement':
-    #                 #                             product = self.env['fusion.sync.history'].validate_product(cf.commodity,
-    #                 #                                                                                        cf.material,
-    #                 #                                                                                        cf.quantityuom)
-    #                 #                             uom = self.env['fusion.sync.history'].validate_uom(product,
-    #                 #                                                                                cf.quantityuom)
-    #                 #                             invoice_line_vals = {
-    #                 #                                 'name': pol.product_id.name,
-    #                 #                                 'product_id': product.id,
-    #                 #                                 'product_uom_id': uom.id,
-    #                 #                                 'quantity': float(cf.quantity),
-    #                 #                                 'price_unit': cf.price * multiplier,
-    #                 #                                 'purchase_line_id': pol.id if cf.invoicenumber == rec.invoicenumber else None,
-    #                 #                                 'analytic_distribution': pol.analytic_distribution,
-    #                 #                                 'cashflow_id': cf.cashflowid,
-    #                 #                                 'tax_ids': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [
-    #                 #                                     (6, 0, [])]
-    #                 #                             }
-    #                 #                             invoice_vals['invoice_line_ids'].append((0, 0, invoice_line_vals))
-    #                 #                         elif cf.costtype in (
-    #                 #                                 'Pre-payment', 'Pre-payment_Rev', 'Provisional Payment',
-    #                 #                                 'Provisional Payment_Rev'):
-    #                 #                             cost = self.env['fusion.sync.history'].validate_cost(cf.costtype)
-    #                 #                             invoice_line_vals = {
-    #                 #                                 'name': pol.product_id.name,
-    #                 #                                 'product_id': 312,
-    #                 #                                 'quantity': 1,
-    #                 #                                 'price_unit': float(cf.price) * multiplier,
-    #                 #                                 'purchase_line_id': pol.id if cf.invoicenumber == rec.invoicenumber else None,
-    #                 #                                 'analytic_distribution': pol.analytic_distribution,
-    #                 #                                 'cashflow_id': cf.cashflowid,
-    #                 #                                 'tax_ids': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [
-    #                 #                                     (6, 0, [])]
-    #                 #                             }
-    #                 #                         else:
-    #                 #                             cost = self.env['fusion.sync.history'].validate_cost(cf.costtype)
-    #                 #                             invoice_line_vals = {
-    #                 #                                 'name': pol.product_id.name,
-    #                 #                                 'product_id': cost.id,
-    #                 #                                 'quantity': float(cf.quantity),
-    #                 #                                 'price_unit': float(cf.price) * multiplier,
-    #                 #                                 'purchase_line_id': pol.id if cf.invoicenumber == rec.invoicenumber else None,
-    #                 #                                 'analytic_distribution': pol.analytic_distribution,
-    #                 #                                 'cashflow_id': cf.cashflowid,
-    #                 #                                 'tax_ids': [(6, 0, [tax_rate_record.id])] if tax_rate_record else [
-    #                 #                                     (6, 0, [])]
-    #                 #                             }
-    #                 #                             invoice_vals['invoice_line_ids'].append((0, 0, invoice_line_vals))
-    #                 #                 vendor_bill = self.env['account.move'].create(invoice_vals)
-    #                 #                 vendor_bill.action_post()
-    #                 # else:
-    #                 #     cancelled_invoice = self.env['account.move'].search(
-    #                 #         [('custom_section_number', '=', rec.customsectionnumber)])
-    #                 #     if cancelled_invoice:
-    #                 #         cancelled_invoice.action_cancel()
-    #
-    #             #
-    #             #                 # product = self.env['fusion.sync.history'].validate_product(rec.material)
-    #             #                 if rec.invoicetype=='Proforma' or rec.invoicetype=='Prepayment':
-    #             #                     invoice_line_vals = {
-    #             #                         'name': pol.product_id.name,
-    #             #                         'product_id': 312,
-    #             #                         'product_uom_id': 1,
-    #             #                         'quantity': 1,
-    #             #                         'price_unit': rec.invoiceamt if float(rec.invoiceamt)  > 0 else float(rec.invoiceamt) *-1,
-    #             #                         'purchase_line_id': pol.id,
-    #             #                         'analytic_distribution':pol.analytic_distribution
-    #             #                         # 'tax_ids': [(6, 0, [tax.id for tax in line.taxes_id])],
-    #             #                     }
-    #             #                     invoice_vals['invoice_line_ids'].append((0, 0, invoice_line_vals))
-    #             #                 elif rec.invoicetype=='Final' or rec.invoicetype=='Debit Note':
-    #             #                     invoice_line_vals = {
-    #             #                         'name': pol.product_id.name,
-    #             #                         'product_id': pol.product_id.id,
-    #             #                         'product_uom_id': pol.product_uom.id,
-    #             #                         'quantity': float(rec.invoiceamt if float(rec.invoiceamt) > 0 else float(rec.invoiceamt) * -1)/pol.price_unit,
-    #             #                         'price_unit': pol.price_unit,
-    #             #                         'purchase_line_id': pol.id,
-    #             #                         'analytic_distribution':pol.analytic_distribution
-    #             #                         # 'tax_ids': [(6, 0, [tax.id for tax in line.taxes_id])],
-    #             #                     }
-    #             #                     invoice_vals['invoice_line_ids'].append((0, 0, invoice_line_vals))
-    #             #                 vendor_bill =   self.env['account.move'].create(invoice_vals)
-    #             #                 vendor_bill.action_post()
-    #             #
-    #             #     else:
-    #             #
-    #             #         if rec.invoicestatus == 'Active' and rec.invoicetype== 'Service Cost Invoice':
-    #             #             movetype = 'in_invoice' if float(rec.invoiceamt) < 0 else 'in_refund'
-    #             #             invoice_vals = {
-    #             #             'company_id': self.env['res.company'].search([('name', '=', rec.internalcompany)], limit=1).id,
-    #             #             'move_type': movetype,
-    #             #             # 'fusion_invoice_ref': rec.invoicenumber, # Vendor bill
-    #             #             'invoice_origin': po.name,
-    #             #             'partner_id': po.partner_id.id,
-    #             #             'invoice_line_ids': [],
-    #             #             'currency_id': self.env['res.currency'].search([('name', '=', rec.amtcurrency)], limit=1).id,
-    #             #             # po.currency_id.id, # self.env['res.currency'].search([(rec.material)rec.amtcurrency,
-    #             #             'purchase_id': po.id,
-    #             #             'custom_section_number': rec.customsectionnumber,  # Link back to the purchase order
-    #             #             'invoice_date': rec.invoicedate,
-    #             #             'date': rec.invoicedate,
-    #             #             'ref': rec.theirinvoiceref,
-    #             #             'invoice_date_due': rec.paymentduedate,
-    #             #             'fusion_reference': rec.invoicenumber,
-    #             #             'fusion_invoice_ref': rec.custominvoicenumber
-    #             #         }
-    #             #         invoice_line_vals = {
-    #             #             'name': pol.product_id.name,
-    #             #             'product_id': 312,
-    #             #             'product_uom_id': 1,
-    #             #             'quantity': 1,
-    #             #             'price_unit': rec.invoiceamt if float(rec.invoiceamt) > 0 else float(rec.invoiceamt) * -1,
-    #             #             'purchase_line_id': pol.id,
-    #             #             'analytic_distribution': pol.analytic_distribution
-    #             #             # 'tax_ids': [(6, 0, [tax.id for tax in line.taxes_id])],
-    #             #         }
-    #             #         invoice_vals['invoice_line_ids'].append((0, 0, invoice_line_vals))
-    #             #         vendor_bill = self.env['account.move'].create(invoice_vals)
-    #             #         vendor_bill.action_post()
-    #             # else:
-    #             #     existing_invoice = self.env['account.move'].search(
-    #             #         [('fusion_invoice_ref', '=', rec.custominvoicenumber)])
-    #             #     existing_invoice.action_cancel()
-    #             #
