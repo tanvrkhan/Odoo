@@ -85,7 +85,12 @@ class AccountMove(models.Model):
         readonly=False,
         stored=True
     )
-    
+    def fix_decimal_accuracy(self):
+        for rec in self:
+            for line in rec.line_ids:
+                line.debit=round(line.debit,2)
+                line.credit=round(line.credit,2)
+                line.balance=round(line.balance,2)
     @api.onchange('picking_id')
     def on_change_picking_id(self):
         for record in self:
