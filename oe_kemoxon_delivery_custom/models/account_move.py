@@ -544,6 +544,34 @@ class AccountMove(models.Model):
                                 check_move_validity=False).amount_currency = avg_price * cline.quantity * -1
                             cline.with_context(
                                 check_move_validity=False).price_unit = avg_price * -1
+    
+    def fix_decimal_accuracy(self):
+        for rec in self:
+            rec.amount_residual = self.custom_round(rec.amount_residual, 2)
+            for line in rec.line_ids:
+                if line.display_type != 'line_note':
+                    
+                    debit = rec.custom_round(line.debit, 2)
+                    credit = rec.custom_round(line.credit, 2)
+                    balance = debit - credit
+                    if balance > 0:
+                        line.with_context(check_move_validity=False).debit = debit
+                    else:
+                        line.with_context(check_move_validity=False).credit = credit
+                    line.price_subtotal = self.custom_round(line.price_subtotal, 2)
+                    
+                    # line.with_context(check_move_validity=False).balance = rec.custom_round(line.balance, 2)
+                    # line.debit
+                    # line.credit=rec.custom_round(line.credit,2)
+                    # line.balance=rec.custom_round(line.balance,2)
+    
+    def custom_round(self, number, decimals=0):
+        import re
+        import math
+        if str(number).split('.')[-1][-1] == '5':
+            return math.floor(number * 100) / 100.0
+        else:
+            return round(number, decimals)
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
@@ -578,3 +606,4 @@ class DeliveryLocation(models.Model):
     _name = "delivery.location"
 
     name = fields.Char("Name")
+    
