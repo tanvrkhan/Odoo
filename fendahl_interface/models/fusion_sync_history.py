@@ -85,6 +85,7 @@ class FusionSyncHistory(models.Model):
         self.env['cashflow.controller.bi'].sync_cashflow()
         self.env['transfer.controller.bi'].sync_transfer()
         self.env['invoice.controller.bi'].sync_invoice()
+        self.env['stockadjustments.controller.bi'].sync_stock_adjustments()
         
     def sync_trades(self):
 
