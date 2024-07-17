@@ -627,13 +627,13 @@ class TransferControllerBI(models.Model):
                                                                                                rec.fromactualqtyuomcode)
                                     lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid, product.id,
                                                                                        company.id)
-                                    picking_type = self.env['stock.picking.type'].search(
-                                        [('code', '=', 'internal'), ('warehouse_id', '=', in_warehouse.id)], limit=1)
+                                    
                                     in_location = self.env['stock.location'].search(
                                         [('warehouse_id', '=', in_warehouse.id)], limit=1)
                                     in_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
                                                                                                    company)
-                                    
+                                    picking_type = self.env['stock.picking.type'].search(
+                                        [('code', '=', 'internal'), ('warehouse_id', '=', in_warehouse.id)], limit=1)
                                     
                                     out_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.tomotcode,
                                                                                                       company)
