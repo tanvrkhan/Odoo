@@ -186,6 +186,7 @@ class FusionSyncHistory(models.Model):
         
         if product:
             product= self.env['product.product'].search([('product_tmpl_id', '=', product.id)], limit=1)
+            product.allow_negative_stock = True
         return product
     
     def create_new_product_uom(self, product, uomname,category_type):
