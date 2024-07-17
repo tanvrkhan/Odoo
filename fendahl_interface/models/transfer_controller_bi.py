@@ -509,7 +509,11 @@ class TransferControllerBI(models.Model):
                                                     existing_distribution[str(nomination_link.id)] = 100
                                                     existing_distribution[str(storage_link.id)] = 100
                                                     sol['analytic_distribution'] = existing_distribution
-                                                    
+                                                    picking_type = self.env['stock.picking.type'].search(
+                                                        [('code', '=', 'outgoing'),
+                                                         ('warehouse_id', '=', warehouse.id)], limit=1)
+                                                    out_location = self.env['stock.location'].search(
+                                                        [('warehouse_id', '=', warehouse.id)], limit=1)
                                                     exists = sms.search(
                                                         [('fusion_delivery_id', '=', rec.deliveryid), ('sale_line_id', '=', sol.id)],
                                                         limit=1)
@@ -524,10 +528,29 @@ class TransferControllerBI(models.Model):
                                                             if stock_move_posted:
                                                                 stock_move = stock_move_posted.copy()
                                                         if not stock_move:
-                                                            res = pol.order_id._prepare_picking()
-                                                            picking = self.env['stock.picking'].create(res)
-                                                            stock_move = pol._create_stock_moves(picking[0])
-                                    
+                                                            picking = {
+                                                                'partner_id': so.partner_id.id,
+                                                                'picking_type_id': picking_type.id,
+                                                                'location_id': out_location.id,
+                                                                'move_type': 'direct',
+                                                                'company_id': company.id,
+                                                                'sale_id': so.id,
+                                                                'origin': so.name
+                                                            }
+                                                            
+                                                            picking = self.env['stock.picking'].create(picking)
+                                                            move_vals = {
+                                                                'name': product.name,
+                                                                'product_id': product.id,
+                                                                'fusion_delivery_id': rec.deliveryid,
+                                                                'product_uom': product.uom_id.id,
+                                                                'picking_id': picking.id,
+                                                                'location_id': out_location.id,
+                                                                'location_dest_id': picking.location_dest_id.id,
+                                                                'sale_line_id': sol.id
+                                                            }
+                                                            stock_move = sms.create(move_vals)
+                                                            picking.sale_id=so.id
                                     if po or so:
                                         if stock_move and (stock_move.fusion_last_modify != self.parse_datetime(rec.lastmodifydate) or stock_move.state!='done'):
                                             picking = stock_move.picking_id
@@ -553,9 +576,6 @@ class TransferControllerBI(models.Model):
                                                 if rec.buyselldisplaytext == "Buy":
                                                     picking_type = self.env['stock.picking.type'].search(
                                                         [('code', '=', 'incoming'), ('warehouse_id', '=', warehouse.id)], limit=1)
-                                                elif rec.buyselldisplaytext == "Sell":
-                                                    picking_type = self.env['stock.picking.type'].search(
-                                                        [('code', '=', 'outgoing'), ('warehouse_id', '=', warehouse.id)], limit=1)
                                                 if not picking_type:
                                                     picking_type=picking.picking_type_id
                                                 picking.picking_type_id = picking_type
@@ -563,6 +583,8 @@ class TransferControllerBI(models.Model):
                                                 stock_move.location_dest_id = picking.location_dest_id,
                                                 self.update_existing_lines(stock_move,product,rec,company,picking.location_id,picking.location_dest_id)
                                                 self.confirm_picking(picking)
+                                                if rec.buyselldisplaytext == "Sell":
+                                                    picking.sale_id=so.id
                                             
                                                     
                                             # self.fix_valuation_warehouse(picking,stock_move)
@@ -605,12 +627,13 @@ class TransferControllerBI(models.Model):
                                                                                                rec.fromactualqtyuomcode)
                                     lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid, product.id,
                                                                                        company.id)
-                                    
-                                    in_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
-                                                                                                   company)
                                     picking_type = self.env['stock.picking.type'].search(
                                         [('code', '=', 'internal'), ('warehouse_id', '=', in_warehouse.id)], limit=1)
-                                    in_location = self.env['stock.location'].search([('warehouse_id', '=', in_warehouse.id)], limit=1)
+                                    in_location = self.env['stock.location'].search(
+                                        [('warehouse_id', '=', in_warehouse.id)], limit=1)
+                                    in_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
+                                                                                                   company)
+                                    
                                     
                                     out_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.tomotcode,
                                                                                                       company)
@@ -631,7 +654,7 @@ class TransferControllerBI(models.Model):
                                             'location_id': in_location.id,
                                             'location_dest_id': out_location.id,
                                             'move_type': 'direct',
-                                            'fusion_delivery_id': rec.deliveryid,  #
+                                            'fusion_delivery_id': rec.deliveryid,
                                         }
                                         picking = self.env['stock.picking'].create(picking_vals)
                                         quantity = self.get_quantity_from_controller(rec,product)
