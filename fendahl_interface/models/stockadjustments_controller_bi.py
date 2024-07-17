@@ -124,7 +124,7 @@ class StorageInspectorBuildDrawDataBI(models.Model):
                 json_data = response.json()
                 json_data = interface.lowercase_keys(json_data)
                 # for data in json_data:
-                self.regular_update_stock_adjustments('stockadjustments', json_data)
+                self.create_update_stock_adjustments('stockadjustments', json_data)
                 interface.update_sync_interface('stockadjustments')
             except Exception as e:
                 _logger.error('Error processing API data: %s', str(e))
@@ -134,30 +134,30 @@ class StorageInspectorBuildDrawDataBI(models.Model):
    
     def create_update_stock_adjustments(self, interface_type, json_data):
         all = self.env['stockadjustments.controller.bi'].search([])
-        for data in json_data:
-            exists = all.search([('editedon', '=', data['editedon'])])
-            if exists:
-                if exists.lastmodifydate == data['lastmodifydate']:
-                    continue
+        if all:
+            for data in json_data:
+                exists = all.search([('builddrawnum', '=', data['builddrawnum'])])
+                if exists:
+                    if exists.lastmodifydate == data['lastmodifydate']:
+                        continue
+                    else:
+                        all.search([('builddrawnum', '=', data['builddrawnum'])]).unlink()
+                        self.env['stockadjustments.controller.bi'].create(data)
+                        self.env.cr.commit()
                 else:
-                    all.search([('builddrawnum', '=', data['builddrawnum'])]).unlink()
                     self.env['stockadjustments.controller.bi'].create(data)
                     self.env.cr.commit()
-            else:
-                self.env['stockadjustments.controller.bi'].create(data)
-                self.env.cr.commit()
+        else:
+             for data in json_data:
+                 self.env['stockadjustments.controller.bi'].create(data)
+                 self.env.cr.commit()
     
     def regular_update_stock_adjustments(self, interface_type, json_data):
-        all_cfs = self.env['stockadjustments.controller.bi'].search([])
+        all = self.env['stockadjustments.controller.bi'].search([])
         for data in json_data:
             exists = all.search([('editedon', '=', data['editedon'])])
             if exists:
-                if exists.lastmodifydate == data['lastmodifydate']:
-                    continue
-                else:
-                    all.search([('builddrawnum', '=', data['builddrawnum'])]).unlink()
-                    self.env['stockadjustments.controller.bi'].create(data)
-                    self.env.cr.commit()
+                continue
             else:
                 self.env['stockadjustments.controller.bi'].create(data)
     def create_transfer(self):
