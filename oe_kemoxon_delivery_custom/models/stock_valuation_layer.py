@@ -243,7 +243,7 @@ class StockValuationLayer(models.Model):
                 record.unit_cost = picking.valuation_price
                 record.value = record.quantity * picking.valuation_price
                 self.reset_accounting(record)
-                return
+                continue
             #purchase transaction
             elif record.quantity > 0:
                 #internal transfer
