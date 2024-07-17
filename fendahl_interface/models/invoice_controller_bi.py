@@ -229,11 +229,16 @@ class InvoiceControllerBI(models.Model):
     def create_update_invoice(self, interface_type, json_data):
         if interface_type == 'invoice':
             all = self.env['invoice.controller.bi'].search([])
-            for data in json_data:
-                exists = all.search([('invoicenumber', '=', data['invoicenumber'])])
-                if exists:
-                    return
-                else:
+            if all:
+                for data in json_data:
+                    exists = all.search([('invoicenumber', '=', data['invoicenumber'])])
+                    if exists:
+                        return
+                    else:
+                        self.env['invoice.controller.bi'].create(data)
+                        self.env.cr.commit()
+            else:
+                for data in json_data:
                     self.env['invoice.controller.bi'].create(data)
                     self.env.cr.commit()
     

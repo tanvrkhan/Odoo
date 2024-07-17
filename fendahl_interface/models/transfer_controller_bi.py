@@ -296,17 +296,22 @@ class TransferControllerBI(models.Model):
     def create_update_transfer(self, interface_type, json_data):
         if interface_type == 'transfer':
             all = self.env['transfer.controller.bi'].search([])
-            for data in json_data:
-                exists = all.search([('deliveryid', '=', data['deliveryid'])])
-                if exists:
-                    return
-                    # if exists:
-                    #     return
-                    # else:
-                    #     self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
-                    #     self.env['cashflow.controller.bi'].create(data)
-                    #     self.env.cr.commit()
-                else:
+            if all:
+                for data in json_data:
+                    exists = all.search([('deliveryid', '=', data['deliveryid'])])
+                    if exists:
+                        return
+                        # if exists:
+                        #     return
+                        # else:
+                        #     self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
+                        #     self.env['cashflow.controller.bi'].create(data)
+                        #     self.env.cr.commit()
+                    else:
+                        self.env['transfer.controller.bi'].create(data)
+                        self.env.cr.commit()
+            else:
+                for data in json_data:
                     self.env['transfer.controller.bi'].create(data)
                     self.env.cr.commit()
     

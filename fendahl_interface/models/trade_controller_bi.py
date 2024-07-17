@@ -316,19 +316,25 @@ class TradeControllerBI(models.Model):
     def create_update_trade(self, interface_type, json_data):
         if interface_type == 'trade':
             all = self.env['trade.controller.bi'].search([])
-            for data in json_data:
-                exists = all.search([('dealmasterid', '=', data['dealmasterid']),('segmentid', '=', data['segmentid'])])
-                if exists:
-                    return
-                    # if exists:
-                    #     return
-                    # else:
-                    #     self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
-                    #     self.env['cashflow.controller.bi'].create(data)
-                    #     self.env.cr.commit()
-                else:
+            if all:
+                for data in json_data:
+                    exists = all.search([('dealmasterid', '=', data['dealmasterid']),('segmentid', '=', data['segmentid'])])
+                    if exists:
+                        return
+                        # if exists:
+                        #     return
+                        # else:
+                        #     self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
+                        #     self.env['cashflow.controller.bi'].create(data)
+                        #     self.env.cr.commit()
+                    else:
+                        self.env['trade.controller.bi'].create(data)
+                        self.env.cr.commit()
+            else:
+                for data in json_data:
                     self.env['trade.controller.bi'].create(data)
                     self.env.cr.commit()
+                
     
     def regular_update_trade(self, interface_type, json_data):
         if interface_type == 'trade':
