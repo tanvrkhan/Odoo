@@ -196,8 +196,15 @@ class StorageInspectorBuildDrawDataBI(models.Model):
                 [('sequence_code', '=', 'INT'), ('warehouse_id', '=', warehouse.id)], limit=1)
             warehouse_location = self.env['stock.location'].search([('warehouse_id', '=', warehouse.id),('name','=','Stock')], limit=1)
             balancing_warehouse_location = self.env['stock.location'].search([('warehouse_id', '=', balancing_warehouse.id),('name','=','Stock')], limit=1)
-            product_templ = self.env['product.template'].search([('name', '=', rec.material),('default_code', '=', 'I')],
-                                                              limit=1)
+            if 'Coal' in rec.material or 'Wood' in rec.material:
+                product_templ = self.env['product.template'].search(
+                    [('name', '=', rec.material)],
+                    limit=1)
+            else:
+                product_templ = self.env['product.template'].search(
+                    [('name', '=', rec.material), ('default_code', '=', 'I')],
+                    limit=1)
+            
             product= self.env['product.product'].search([('product_tmpl_id', '=', product_templ.id)], limit=1)
             
             uom = self.env['fusion.sync.history'].validate_uom(product,
@@ -225,7 +232,9 @@ class StorageInspectorBuildDrawDataBI(models.Model):
                 'move_type': 'direct',
                 'valuation_price': rec.transferprice,
                 'company_id': company.id,
-                'fusion_build_draw': rec.builddrawnum
+                'fusion_build_draw': rec.builddrawnum,
+                'custom_delivery_date': rec.effectivedate,
+                'date_done': rec.effectivedate
             }
             picking = self.env['stock.picking'].create(picking_vals)
             quantity = rec.builddrawqty if rec.builddrawqty > 0 else rec.builddrawqty *-1
