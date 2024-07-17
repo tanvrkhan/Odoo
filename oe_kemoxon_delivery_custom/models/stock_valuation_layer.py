@@ -274,7 +274,7 @@ class StockValuationLayer(models.Model):
             elif record.quantity < 0:
                 domain = [
                     ('product_id', '=', record.product_id.id),
-                    ('stock_move_id.date', '<=', record.stock_move_id.date),
+                    ('stock_move_id.date', '<', record.stock_move_id.date),
                     ('id', '!=', record.id),
                     ('company_id', '=', record.company_id.id)
                 ]
