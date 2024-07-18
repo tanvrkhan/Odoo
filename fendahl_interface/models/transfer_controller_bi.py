@@ -270,7 +270,8 @@ class TransferControllerBI(models.Model):
         last_processing_date = interface.get_last_processing('transfer')
         trades_to_process = self.env['transfer.controller.bi'].search([('lastmodifydate', '>=', last_processing_date)])
         for rec in trades_to_process:
-            rec.create_receipt()
+            if (rec.buyselldisplaytext=='Buy' and (rec.frominternalcompany == 'KEMEXON SA' or rec.frominternalcompany == 'KEMEXON LTD')) or (rec.buyselldisplaytext=='Sell' and (rec.tointernalcompany == 'KEMEXON SA' or rec.tointernalcompany == 'KEMEXON LTD')):
+                rec.create_receipt()
         interface.update_processing_date('transfer')
     def sync_transfer(self):
         interface = self.env['fusion.sync.history']

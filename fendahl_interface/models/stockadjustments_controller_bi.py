@@ -136,7 +136,8 @@ class StorageInspectorBuildDrawDataBI(models.Model):
         last_processing_date = interface.get_last_processing('stockadjustments')
         trades_to_process = self.env['stockadjustments.controller.bi'].search([('lastmodifydate', '>=', last_processing_date)])
         for rec in trades_to_process:
-            rec.create_transfer()
+            if rec.internalcompany == 'KEMEXON LTD' or rec.internalcompany == 'KEMEXON SA':
+                rec.create_transfer()
         interface.update_processing_date('stockadjustments')
     
     def create_update_stock_adjustments(self, interface_type, json_data):

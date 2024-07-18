@@ -291,7 +291,8 @@ class TradeControllerBI(models.Model):
         last_processing_date = interface.get_last_processing('trade')
         trades_to_process =  self.env['trade.controller.bi'].search([('lastmodifydate','>=',last_processing_date)])
         for rec in trades_to_process:
-            rec.create_order()
+            if rec.internalcompany == 'KEMEXON LTD' or  rec.internalcompany == 'KEMEXON SA':
+                rec.create_order()
         interface.update_processing_date('trade')
     
     def sync_trade(self):
