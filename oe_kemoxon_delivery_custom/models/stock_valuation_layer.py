@@ -329,6 +329,12 @@ class StockValuationLayer(models.Model):
                 picking._action_done()
             except Exception as e:
                 raise ValidationError(str(e))
+    
+    def set_custom_valuation_price_empty(self):
+        for rec in self:
+            rec.stock_move_id.picking_id.valuation_price = 0
+            self.env.cr.commit()
+            rec.recalculate_stock_value()
     def fix_valuation_warehouse(self):
         for rec in self:
             rec.stock_move_id.picking_id.fix_valuation_warehouse()
