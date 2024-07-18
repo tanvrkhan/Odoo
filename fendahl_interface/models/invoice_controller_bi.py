@@ -197,7 +197,14 @@ class InvoiceControllerBI(models.Model):
                 _logger.error('Error processing API data: %s', str(e))
         else:
             _logger.error('Failed to fetch data from external API: %s', response.status_code)
-    
+    def process_odoo_transaction_action(self):
+        interface = self.env['fusion.sync.history']
+        last_processing_date = interface.get_last_processing('invoice')
+        trades_to_process = self.env['invoice.controller.bi'].search([('lastmodifydate', '>=', last_processing_date)])
+        for rec in trades_to_process:
+            rec.create_bill(False)
+        interface.update_processing_date('invoice')
+        
     def sync_invoice(self):
         interface = self.env['fusion.sync.history']
         last_sync = interface.get_last_sync('invoice')
@@ -256,7 +263,7 @@ class InvoiceControllerBI(models.Model):
     
     
     
-        
+
     def update_existing_invoice_header(self,existing_invoice, po, pol):
         existing_invoice.write({'purchase_id': po.id})
         existing_invoice.write({'invoice_origin': po.name})

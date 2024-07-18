@@ -265,7 +265,13 @@ class TransferControllerBI(models.Model):
                 _logger.error('Error processing API data: %s', str(e))
         else:
             _logger.error('Failed to fetch data from external API: %s', response.status_code)
-    
+    def process_odoo_transaction_action(self):
+        interface = self.env['fusion.sync.history']
+        last_processing_date = interface.get_last_processing('transfer')
+        trades_to_process = self.env['transfer.controller.bi'].search([('lastmodifydate', '>=', last_processing_date)])
+        for rec in trades_to_process:
+            rec.create_receipt()
+        interface.update_processing_date('transfer')
     def sync_transfer(self):
         interface = self.env['fusion.sync.history']
         last_sync = interface.get_last_sync('transfer')

@@ -30,7 +30,27 @@ class FusionSyncHistory(models.Model):
     
     interface_type = fields.Char("Interface Type")
     last_sync = fields.Datetime("Date")
+    last_processing_date = fields.Datetime("Processing Date")
     
+    def update_processing_date(self, interface_type):
+        interface_record = self.env['fusion.sync.history'].search([('interface_type', '=', interface_type)])
+        if interface_record:
+            interface_record.last_processing_date = datetime.datetime.now()
+        else:
+            self.env['fusion.sync.history'].create(
+                {
+                    'interface_type': interface_type,
+                    'last_processing_date': datetime.datetime.now()
+                })
+    def get_last_processing(self, interface_type):
+        interface_record = self.env['fusion.sync.history'].search([('interface_type', '=', interface_type)])
+        if interface_record:
+            if interface_record.last_processing_date:
+                return interface_record.last_processing_date.strftime('%Y-%m-%dT%H:%M:%S')
+            else:
+                return datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+        else:
+            return '2023-01-01'
     ##CASHFLOW
     
     ##NOMINATION
@@ -86,6 +106,12 @@ class FusionSyncHistory(models.Model):
         self.env['transfer.controller.bi'].sync_transfer()
         self.env['invoice.controller.bi'].sync_invoice()
         self.env['stockadjustments.controller.bi'].sync_stock_adjustments()
+        
+    def process_odoo_transactions(self):
+        self.env['trade.controller.bi'].process_odoo_transaction_action()
+        self.env['transfer.controller.bi'].process_odoo_transaction_action()
+        self.env['invoice.controller.bi'].process_odoo_transaction_action()
+        self.env['stockadjustments.controller.bi'].process_odoo_transaction_action()
         
     def sync_trades(self):
 

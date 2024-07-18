@@ -286,6 +286,14 @@ class TradeControllerBI(models.Model):
         else:
             _logger.error('Failed to fetch data from external API: %s', response.status_code)
     
+    def process_odoo_transaction_action(self):
+        interface = self.env['fusion.sync.history']
+        last_processing_date = interface.get_last_processing('trade')
+        trades_to_process =  self.env['trade.controller.bi'].search([('lastmodifydate','>=',last_processing_date)])
+        for rec in trades_to_process:
+            rec.create_order()
+        interface.update_processing_date('trade')
+    
     def sync_trade(self):
         interface = self.env['fusion.sync.history']
         last_sync = interface.get_last_sync('trade')
@@ -885,6 +893,8 @@ class TradeControllerBI(models.Model):
         elif rec.tradestatus == 'Rejected' or rec.tradestatus == 'Void':
             status = 'cancel'
         return status
+
+        
     def create_order(self):
         for rec in self:
             try:

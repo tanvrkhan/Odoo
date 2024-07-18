@@ -94,17 +94,70 @@
     </data>
     <data noupdate="1">  <!-- noupdate="1" means it won't be updated automatically at module updates -->
         <record id="cron_import_invoices" model="ir.cron">
-            <field name="name">Import Transactions</field>
+            <field name="name">Import Fusion Transactions</field>
             <field name="active" eval="True"/>
             <field name="user_id" ref="base.user_root"/>  <!-- Executes as Superuser -->
-            <field name="interval_number">1</field>
-            <field name="interval_type">hours</field>
+            <field name="interval_number">15</field>
+            <field name="interval_type">minutes</field>
             <field name="numbercall">-1</field>  <!-- -1 for indefinite repetitions -->
             <field name="doall" eval="False"/>  <!-- False means do not run all missed if server stops -->
             <field name="model_id" ref="model_fusion_sync_history"/>
             <field name="code">model.sync_all()</field>
         </record>
     </data>
+    <data noupdate="1">  <!-- noupdate="1" means it won't be updated automatically at module updates -->
+        <record id="cron_process_fusion_trades" model="ir.cron">
+            <field name="name">Process Fusion Trades</field>
+            <field name="active" eval="True"/>
+            <field name="user_id" ref="base.user_root"/>  <!-- Executes as Superuser -->
+            <field name="interval_number">16</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>  <!-- -1 for indefinite repetitions -->
+            <field name="doall" eval="False"/>  <!-- False means do not run all missed if server stops -->
+            <field name="model_id" ref="model_transfer_controller_bi"/>
+            <field name="code">model.process_odoo_transaction_action()</field>
+        </record>
+    </data>
+    <data noupdate="1">  <!-- noupdate="1" means it won't be updated automatically at module updates -->
+        <record id="cron_process_fusion_transfers" model="ir.cron">
+            <field name="name">Process Fusion Transfers</field>
+            <field name="active" eval="True"/>
+            <field name="user_id" ref="base.user_root"/>  <!-- Executes as Superuser -->
+            <field name="interval_number">16</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>  <!-- -1 for indefinite repetitions -->
+            <field name="doall" eval="False"/>  <!-- False means do not run all missed if server stops -->
+            <field name="model_id" ref="model_transfer_controller_bi"/>
+            <field name="code">model.process_odoo_transaction_action()</field>
+        </record>
+    </data>
+    <data noupdate="1">  <!-- noupdate="1" means it won't be updated automatically at module updates -->
+        <record id="cron_process_fusion_invoices" model="ir.cron">
+            <field name="name">Process Fusion Invoices</field>
+            <field name="active" eval="True"/>
+            <field name="user_id" ref="base.user_root"/>  <!-- Executes as Superuser -->
+            <field name="interval_number">16</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>  <!-- -1 for indefinite repetitions -->
+            <field name="doall" eval="False"/>  <!-- False means do not run all missed if server stops -->
+            <field name="model_id" ref="model_invoice_controller_bi"/>
+            <field name="code">model.process_odoo_transaction_action()</field>
+        </record>
+    </data>
+    <data noupdate="1">  <!-- noupdate="1" means it won't be updated automatically at module updates -->
+        <record id="cron_process_fusion_stockadjustments" model="ir.cron">
+            <field name="name">Process Fusion Stock Adjustments</field>
+            <field name="active" eval="True"/>
+            <field name="user_id" ref="base.user_root"/>  <!-- Executes as Superuser -->
+            <field name="interval_number">16</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>  <!-- -1 for indefinite repetitions -->
+            <field name="doall" eval="False"/>  <!-- False means do not run all missed if server stops -->
+            <field name="model_id" ref="model_stockadjustments_controller_bi"/>
+            <field name="code">model.process_odoo_transaction_action()</field>
+        </record>
+    </data>
+
     <data noupdate="1">  <!-- noupdate="1" means it won't be updated automatically at module updates -->
         <record id="cron_import_invoice" model="ir.cron">
             <field name="name">Import Invoices</field>
