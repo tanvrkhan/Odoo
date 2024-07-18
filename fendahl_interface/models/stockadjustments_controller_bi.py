@@ -188,7 +188,6 @@ class StorageInspectorBuildDrawDataBI(models.Model):
             else:
                 existing_picking.set_stock_move_to_draft()
                 existing_picking.action_confirm()
-                existing_picking.valuation_price= rec.transferprice
                 existing_picking.move_ids.line_ids.qty_done = rec.quantity
                 existing_picking.button_validate()
         else:
@@ -230,7 +229,6 @@ class StorageInspectorBuildDrawDataBI(models.Model):
                 'location_id': out_location.id,
                 'location_dest_id': in_location.id,
                 'move_type': 'direct',
-                'valuation_price': rec.transferprice,
                 'company_id': company.id,
                 'fusion_build_draw': rec.builddrawnum,
                 'custom_delivery_date': rec.effectivedate,

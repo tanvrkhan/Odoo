@@ -526,7 +526,9 @@ class StockPicking(models.Model):
                     elif valuation.quantity<0:
                         valuation.warehouse_id = rec.location_id.warehouse_id.id
                 
-                
+    def set_custom_valuation_price_empty(self):
+        for rec in self:
+            rec.valuation_price = 0
    
         
     
@@ -568,4 +570,6 @@ class StockMoveLine(models.Model):
             if related_truck_details and related_truck_details.delete_option:
                 related_truck_details.unlink()
         return super(StockMoveLine, self).unlink()
+    
+
     

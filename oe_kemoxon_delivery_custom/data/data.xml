@@ -42,6 +42,14 @@
             <field name="state">code</field>
             <field name="code">records.recalculate_stock_value()</field>
         </record>
+          <record id="model_stock_picking_action_set_picking_valuation_empty" model="ir.actions.server">
+            <field name="name">Set Custom valuation price 0</field>
+            <field name="model_id" ref="stock_account.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock_account.model_stock_picking"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">records.set_custom_valuation_price_empty()</field>
+        </record>
 <!--          <record id="model_stock_valuation_set_quantity" model="ir.actions.server">-->
 <!--            <field name="name">Update Valuation Quantity</field>-->
 <!--            <field name="model_id" ref="stock_account.model_stock_valuation_layer"/>-->
