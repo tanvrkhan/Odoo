@@ -100,6 +100,11 @@
                     <!-- In case we want to repeat the header, remove "display: table-row-group" -->
                     <tr style="border-bottom:2px solid #d4d6d9;border-top:2px solid #d4d6d9; border-top:2px solid #d4d6d9">
                         <th name="th_description" class="text-start">Description</th>
+                        <t t-if="doc.show_product_origin">
+                            <th name="th_product_origin" class="text-start">
+                                <span>Product Origin</span>
+                            </th>
+                        </t>
                         <t t-if="doc.show_hs_code">
                             <th name="th_hs_code" class="text-start">
                                 <span>HS Code</span>
@@ -141,6 +146,11 @@
                                 <td name="td_name">
                                     <span t-field="line.name"/>
                                 </td>
+                                <t t-if="doc.show_product_origin">
+                                    <td class="text-start">
+                                        <span t-field="line.product_origin"/>
+                                    </td>
+                                </t>
                                 <t t-if="doc.show_hs_code">
                                     <td class="text-start">
                                         <span t-field="line.product_id.hs_code_custom"/>

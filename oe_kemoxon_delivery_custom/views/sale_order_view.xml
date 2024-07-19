@@ -29,6 +29,7 @@
 
                 <xpath expr="//tree//field[@name='product_uom_qty']"
                        position="after">
+                    <field name="product_origin"/>
                     <field name="tolerance_type"/>
                     <field name="tolerance_percentage"/>
                 </xpath>
@@ -39,6 +40,7 @@
                     <field name="show_vat_ids"/>
                     <field name="en_plus"/>
                     <field name="show_hs_code"/>
+                    <field name="show_product_origin"/>
                 </xpath>
                 <xpath expr="//form//field[@name='team_id']"
                        position="before">
