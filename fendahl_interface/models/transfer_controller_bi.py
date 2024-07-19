@@ -412,8 +412,8 @@ class TransferControllerBI(models.Model):
         for record in self:
             # try:
                 random_string = self.env['fusion.sync.history'].generate_random_string()
-                all_transfers = self.env['transfer.controller.bi'].search([('itineraryid', '=', record.itineraryid)]) if record.itineraryid else record
-                # all_transfers =  record
+                # all_transfers = self.env['transfer.controller.bi'].search([('itineraryid', '=', record.itineraryid)]) if record.itineraryid else record
+                all_transfers =  record
                 sms = self.env['stock.move'].search([])
                 pickings = self.env['stock.picking'].search([])
                 for rec in all_transfers:
@@ -443,7 +443,7 @@ class TransferControllerBI(models.Model):
                                 warehouse = self.env['stock.warehouse'].search([('id', '=', '0')], limit=1)
                                 existing_distribution=[]
                                 
-                                if (rec.totypeenum == 'Trade' or rec.fromtypeenum == 'Trade') and rec.frominternalcompany in companies and rec.tointernalcompany in companies:
+                                if (rec.totypeenum == 'Trade' or rec.fromtypeenum == 'Trade') and (rec.frominternalcompany in companies or rec.frominternalcompany == False) and (rec.tointernalcompany in companies or rec.tointernalcompany == False):
                                     exists = sms.search(
                                         [('fusion_delivery_id', '=', rec.deliveryid)], limit=1)
                                     if exists:
