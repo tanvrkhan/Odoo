@@ -363,7 +363,8 @@ class TransferControllerBI(models.Model):
         #         return quantity * conversion_rate
             
     def update_existing_lines(self,stock_move,product,rec,company,fromlocation,destlocation):
-        lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid, product.id,
+
+        lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid if rec.itineraryid else rec.deliveryid, product.id,
                                                            company.id)
         
         quantity = self.get_quantity_from_controller(rec,product)
@@ -431,7 +432,8 @@ class TransferControllerBI(models.Model):
                                 stock_move = self.env['stock.move'].search([('id', '=', '0')])
             
                                 product = self.env['product.product'].search([('id', '=', '0')], limit=1)
-                                nomination_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Nomination',
+                                if rec.itineraryid:
+                                    nomination_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Nomination',
                                                                                                          rec.itineraryid,
                                                                                                          company.id)
                                 warehouse = self.env['stock.warehouse'].search([('id', '=', '0')], limit=1)
@@ -473,7 +475,8 @@ class TransferControllerBI(models.Model):
                                                                                                                    company)
                                                     
                                                     existing_distribution = pol.analytic_distribution
-                                                    existing_distribution[str(nomination_link.id)] = 100
+                                                    if rec.itineraryid:
+                                                        existing_distribution[str(nomination_link.id)] = 100
                                                     existing_distribution[str(storage_link.id)] = 100
                                                     pol['analytic_distribution'] = existing_distribution
                                                     exists = sms.search(
@@ -510,7 +513,8 @@ class TransferControllerBI(models.Model):
                                                                                                                           rec.frommotcode,
                                                                                                                           company.id)
                                                     existing_distribution = sol.analytic_distribution
-                                                    existing_distribution[str(nomination_link.id)] = 100
+                                                    if rec.itineraryid:
+                                                        existing_distribution[str(nomination_link.id)] = 100
                                                     existing_distribution[str(storage_link.id)] = 100
                                                     sol['analytic_distribution'] = existing_distribution
                                                     picking_type = self.env['stock.picking.type'].search(
@@ -630,7 +634,7 @@ class TransferControllerBI(models.Model):
                                     product = self.env['fusion.sync.history'].validate_product(rec.fromcommoditycode,
                                                                                                rec.frommaterialcode,
                                                                                                rec.fromactualqtyuomcode)
-                                    lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid, product.id,
+                                    lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid if rec.itineraryid else rec.deliveryid, product.id,
                                                                                        company.id)
                                   
                                     in_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
@@ -688,7 +692,7 @@ class TransferControllerBI(models.Model):
                                             'location_dest_id': out_location.id,
                                         }
                                         stock_move = sms.create(move_vals)
-                                        stock_move.move_line_ids.lot_id=lot
+                                        stock_move.move_line_ids.lot_id=lot.id
                                         stock_move.move_line_ids.fusion_delivery_id = rec.deliveryid,  #
                                         self.update_existing_lines(stock_move, product, rec, company,
                                                                    in_location,out_location)
