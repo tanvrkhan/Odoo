@@ -432,7 +432,7 @@ class TradeControllerBI(models.Model):
             existing_order.write({'payment_term_id': payment_term.id})
             self.update_po_lines(existing_order,rec,company,warehouse)
         elif type=='Sale Order':
-            pricelist = self.env['product.pricelist'].search([('currency_id', '=', currency.id),('company_id', '=', company)], limit=1)
+            pricelist = self.env['product.pricelist'].search([('currency_id', '=', currency.id),('company_id', '=', company.id)], limit=1)
             existing_order.write({'pricelist_id': pricelist.id})
             existing_order.write({'partner_id': partner.id})
             existing_order.write({'deal_ref': rec.description})
@@ -536,7 +536,7 @@ class TradeControllerBI(models.Model):
             [('dealmasterid', '=', rec.dealmasterid)])
         lines = []
         pricelist = self.env['product.pricelist'].search(
-            [('currency_id', '=', currency.id), ('company_id', '=', company)], limit=1)
+            [('currency_id', '=', currency.id), ('company_id', '=', company.id)], limit=1)
         for segment in all_segments:
             main_cf = cf = self.env['cashflow.controller.bi'].search(
                 [('sectionno', '=', segment.segmentsectioncode)], limit=1)
