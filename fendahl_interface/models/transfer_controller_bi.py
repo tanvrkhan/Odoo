@@ -413,32 +413,36 @@ class TransferControllerBI(models.Model):
             # try:
                 random_string = self.env['fusion.sync.history'].generate_random_string()
                 all_transfers = self.env['transfer.controller.bi'].search([('itineraryid', '=', record.itineraryid)]) if record.itineraryid else record
+                # all_transfers =  record
                 sms = self.env['stock.move'].search([])
                 pickings = self.env['stock.picking'].search([])
                 for rec in all_transfers:
                     
-                    
-                    if (rec.buyselldisplaytext=='Buy' and rec.frominternalcompany == self.env.company.name) or (rec.buyselldisplaytext=='Sell' and rec.tointernalcompany == self.env.company.name):
-                        if rec.deliveryactivestatusdisplayname=="Active":
+                    if rec.deliveryactivestatusdisplayname == "Active":
+                        companies = self.env['res.company'].search([]).mapped('name')
+                        stock_move = self.env['stock.move'].search([('id', '=', '0')])
+                        product = self.env['product.product'].search([('id', '=', '0')], limit=1)
+                        
+                        pol = self.env['purchase.order.line'].search([('fusion_segment_code', '=',
+                                                                       rec.fromsegmentsectioncode if rec.fromsegmentsectioncode else '100')],
+                                                                     limit=1)
+                        po = self.env['purchase.order'].search([('id', '=', pol.order_id.id)])
+                        sol = self.env['sale.order.line'].search(
+                            [('fusion_segment_code', '=',
+                              rec.tosegmentsectioncode if rec.tosegmentsectioncode else '100')], limit=1)
+                        so = self.env['sale.order'].search([('id', '=', sol.order_id.id)])
+                        if (rec.buyselldisplaytext=='Buy' and rec.frominternalcompany == self.env.company.name) or (rec.buyselldisplaytext=='Sell' and rec.tointernalcompany == self.env.company.name):
                             company = self.env['res.company'].search([('name', '=', rec.frominternalcompany if rec.buyselldisplaytext=='Buy' else rec.tointernalcompany)], limit=1)
                             if rec.deliverystatusenum in ('Actual','Scheduled'):
-                                pol = self.env['purchase.order.line'].search([('fusion_segment_code', '=', rec.fromsegmentsectioncode if rec.fromsegmentsectioncode else '100')], limit=1)
-                                po = self.env['purchase.order'].search([('id', '=', pol.order_id.id)])
-                                sol = self.env['sale.order.line'].search(
-                                    [('fusion_segment_code', '=', rec.tosegmentsectioncode  if rec.tosegmentsectioncode else '100')], limit=1)
-                                so = self.env['sale.order'].search([('id', '=', sol.order_id.id)])
                                 cf = self.env['cashflow.controller.bi'].search([('transfernumber', '=', rec.deliveryid),('costtype', '=', 'Primary Settlement')],limit=1)
                                 exists = self.env['stock.move'].search([('id', '=', '0')])
-                                stock_move = self.env['stock.move'].search([('id', '=', '0')])
-            
-                                product = self.env['product.product'].search([('id', '=', '0')], limit=1)
-                                if rec.itineraryid:
-                                    nomination_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Nomination',
-                                                                                                         rec.itineraryid,
+
+                                nomination_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Nomination',
+                                                                                                         rec.itineraryid if rec.itineraryid else rec.deliveryid,
                                                                                                          company.id)
                                 warehouse = self.env['stock.warehouse'].search([('id', '=', '0')], limit=1)
                                 existing_distribution=[]
-                                companies = self.env['res.company'].search([]).mapped('name')
+                                
                                 if (rec.totypeenum == 'Trade' or rec.fromtypeenum == 'Trade') and rec.frominternalcompany in companies and rec.tointernalcompany in companies:
                                     exists = sms.search(
                                         [('fusion_delivery_id', '=', rec.deliveryid)], limit=1)
@@ -475,8 +479,7 @@ class TransferControllerBI(models.Model):
                                                                                                                    company)
                                                     
                                                     existing_distribution = pol.analytic_distribution
-                                                    if rec.itineraryid:
-                                                        existing_distribution[str(nomination_link.id)] = 100
+                                                    existing_distribution[str(nomination_link.id)] = 100
                                                     existing_distribution[str(storage_link.id)] = 100
                                                     pol['analytic_distribution'] = existing_distribution
                                                     exists = sms.search(
@@ -513,8 +516,7 @@ class TransferControllerBI(models.Model):
                                                                                                                           rec.frommotcode,
                                                                                                                           company.id)
                                                     existing_distribution = sol.analytic_distribution
-                                                    if rec.itineraryid:
-                                                        existing_distribution[str(nomination_link.id)] = 100
+                                                    existing_distribution[str(nomination_link.id)] = 100
                                                     existing_distribution[str(storage_link.id)] = 100
                                                     sol['analytic_distribution'] = existing_distribution
                                                     picking_type = self.env['stock.picking.type'].search(
@@ -612,100 +614,15 @@ class TransferControllerBI(models.Model):
                                         raise UserError("Order not found." + rec.tosegmentsectioncode if rec.tosegmentsectioncode else rec.fromsegmentsectioncode + rec.buyselldisplaytext)
                 
                                 elif rec.frominternalcompany in companies and rec.tointernalcompany in companies and (rec.fromtypeenum!='Trade' and rec.totypeenum!='Trade'):
-                                    companies = []
-                                    all_companies = self.env['res.company'].search([])
-                                    for company in all_companies:
-                                        companies.append(company.name)
-                                    company = self.env['res.company'].search([('name', '=', rec.frominternalcompany)],
-                                                                             limit=1)
-                                    if not company:
-                                        company = self.env['res.company'].search([('name', '=', rec.tointernalcompany)],
-                                                                                 limit=1)
-                                        if not company:
-                                            pt = self.env['transfer.controller.bi'].search([('itineraryid', '=', rec.itineraryid),('tointernalcompany', 'in', (companies))],
-                                                                                 limit=1)
-                                            if not pt:
-                                                pt = self.env['transfer.controller.bi'].search(
-                                                    [('itineraryid', '=', rec.itineraryid),
-                                                     ('frominternalcompany', '!=', False)],
-                                                    limit=1)
-                                            company = self.env['res.company'].search([('name', '=', pt.tointernalcompany if pt.tointernalcompany else pt.frominternalcompany)],
-                                                                             limit=1)
-                                    product = self.env['fusion.sync.history'].validate_product(rec.fromcommoditycode,
-                                                                                               rec.frommaterialcode,
-                                                                                               rec.fromactualqtyuomcode)
-                                    lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid if rec.itineraryid else rec.deliveryid, product.id,
-                                                                                       company.id)
-                                  
-                                    in_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
-                                                                                                   company)
-                                    in_location = self.env['stock.location'].search(
-                                        [('warehouse_id', '=', in_warehouse.id),('name', '=', 'Stock')], limit=1)
-                                    picking_type = self.env['stock.picking.type'].search(
-                                        [('code', '=', 'internal'), ('warehouse_id', '=', in_warehouse.id)], limit=1)
-                                    
-                                    out_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.tomotcode,
-                                                                                                      company)
-                                    out_location = self.env['stock.location'].search(
-                                        [('warehouse_id', '=', out_warehouse.id),('name', '=', 'Stock')], limit=1)
-                                    
-                                    
-                                    stock_move = sms.search([('id', '=', 0)])
-                                    
-                                    exists = sms.search(
-                                        [('fusion_delivery_id', '=', rec.deliveryid)],
-                                        limit=1)
-                                    if exists:
-                                        exists.fusion_delivery_id = rec.deliveryid
-                                        exists.fusion_last_modify = self.parse_datetime(rec.lastmodifydate)
-                                        exists = sms.search([('id', '=', exists.id)])
-                                        picking = exists.picking_id
-                                        if picking.state in ('done', 'waiting', 'confirmed', 'cancel'):
-                                            picking.set_stock_move_to_draft()
-                                            picking.action_confirm()
-                                        self.update_existing_lines(exists, exists.product_id, rec, company,
-                                                                   picking.location_id, picking.location_dest_id)
-                                        self.confirm_picking(picking)
-                                        continue
-                                    else:
-                                        if product.uom_id.rounding != 0.001:
-                                            product.uom_id.rounding = 0.001
-                                        picking_vals = {
-                                            'picking_type_id': picking_type.id,
-                                            'location_id': in_location.id,
-                                            'location_dest_id': out_location.id,
-                                            'move_type': 'direct',
-                                            'fusion_delivery_id': rec.deliveryid,
-                                        }
-                                        picking = self.env['stock.picking'].create(picking_vals)
-                                        quantity = self.get_quantity_from_controller(rec,product)
-                                        
-                                        move_vals = {
-                                            'name': 'Internal Transfer ' + str(rec.frommotcode) + ' - ' + str(
-                                                rec.tomotcode),
-                                            'product_id': product.id,
-                                            'product_uom_qty': quantity,
-                                            'fusion_delivery_id': rec.deliveryid,  #
-                                            'product_uom': product.uom_id.id,
-                                            'picking_id': picking.id,
-                                            'location_id': in_location.id,
-                                            'location_dest_id': out_location.id,
-                                        }
-                                        stock_move = sms.create(move_vals)
-                                        stock_move.move_line_ids.lot_id=lot.id
-                                        stock_move.move_line_ids.fusion_delivery_id = rec.deliveryid,  #
-                                        self.update_existing_lines(stock_move, product, rec, company,
-                                                                   in_location,out_location)
-                                        picking.action_confirm()
-                                        picking.action_assign()
-                                        self.confirm_picking(picking)
-
-                                        
-                        else:
-                            cancelled_entry = self.env['stock.move'].search(
-                                [('fusion_delivery_id', '=', rec.deliveryid)])
-                            if cancelled_entry:
-                                cancelled_entry.picking_id.set_stock_move_to_draft()
+                                    rec.create_internal_transfer(rec, sms)
+                        elif rec.buyselldisplaytext==False and rec.frominternalcompany in companies and rec.tointernalcompany in companies and (rec.fromtypeenum!='Trade' and rec.totypeenum!='Trade'):
+                            rec.create_internal_transfer(rec, sms)
+                            
+                    else:
+                        cancelled_entry = self.env['stock.move'].search(
+                            [('fusion_delivery_id', '=', rec.deliveryid)])
+                        if cancelled_entry:
+                            cancelled_entry.picking_id.set_stock_move_to_draft()
                 self.env.cr.commit()
             # except Exception as e:
             #     log_error = self.env['fusion.sync.history.errors'].log_error('TransferController', rec.fromsegmentid,
@@ -726,7 +643,95 @@ class TransferControllerBI(models.Model):
                 #             if len(picking_ids):
                 #                 a=True
                 #
+    def create_internal_transfer(self, rec,sms):
+        companies = []
+        all_companies = self.env['res.company'].search([])
+        for company in all_companies:
+            companies.append(company.name)
+        company = self.env['res.company'].search([('name', '=', rec.frominternalcompany)],
+                                                 limit=1)
+        if not company:
+            company = self.env['res.company'].search([('name', '=', rec.tointernalcompany)],
+                                                     limit=1)
+            if not company:
+                pt = self.env['transfer.controller.bi'].search(
+                    [('itineraryid', '=', rec.itineraryid), ('tointernalcompany', 'in', (companies))],
+                    limit=1)
+                if not pt:
+                    pt = self.env['transfer.controller.bi'].search(
+                        [('itineraryid', '=', rec.itineraryid),
+                         ('frominternalcompany', '!=', False)],
+                        limit=1)
+                company = self.env['res.company'].search(
+                    [('name', '=', pt.tointernalcompany if pt.tointernalcompany else pt.frominternalcompany)],
+                    limit=1)
+        product = self.env['fusion.sync.history'].validate_product(rec.fromcommoditycode,
+                                                                   rec.frommaterialcode,
+                                                                   rec.fromactualqtyuomcode)
+        lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid if rec.itineraryid else rec.deliveryid,
+                                                           product.id,
+                                                           company.id)
         
+        in_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
+                                                                          company)
+        in_location = self.env['stock.location'].search(
+            [('warehouse_id', '=', in_warehouse.id), ('name', '=', 'Stock')], limit=1)
+        picking_type = self.env['stock.picking.type'].search(
+            [('code', '=', 'internal'), ('warehouse_id', '=', in_warehouse.id)], limit=1)
+        
+        out_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.tomotcode,
+                                                                           company)
+        out_location = self.env['stock.location'].search(
+            [('warehouse_id', '=', out_warehouse.id), ('name', '=', 'Stock')], limit=1)
+        
+        stock_move = sms.search([('id', '=', 0)])
+        
+        exists = sms.search(
+            [('fusion_delivery_id', '=', rec.deliveryid)],
+            limit=1)
+        if exists:
+            exists.fusion_delivery_id = rec.deliveryid
+            exists.fusion_last_modify = self.parse_datetime(rec.lastmodifydate)
+            exists = sms.search([('id', '=', exists.id)])
+            picking = exists.picking_id
+            if picking.state in ('done', 'waiting', 'confirmed', 'cancel'):
+                picking.set_stock_move_to_draft()
+                picking.action_confirm()
+            self.update_existing_lines(exists, exists.product_id, rec, company,
+                                       picking.location_id, picking.location_dest_id)
+            self.confirm_picking(picking)
+        else:
+            if product.uom_id.rounding != 0.001:
+                product.uom_id.rounding = 0.001
+            picking_vals = {
+                'picking_type_id': picking_type.id,
+                'location_id': in_location.id,
+                'location_dest_id': out_location.id,
+                'move_type': 'direct',
+                'fusion_delivery_id': rec.deliveryid,
+            }
+            picking = self.env['stock.picking'].create(picking_vals)
+            quantity = self.get_quantity_from_controller(rec, product)
+            
+            move_vals = {
+                'name': 'Internal Transfer ' + str(rec.frommotcode) + ' - ' + str(
+                    rec.tomotcode),
+                'product_id': product.id,
+                'product_uom_qty': quantity,
+                'fusion_delivery_id': rec.deliveryid,  #
+                'product_uom': product.uom_id.id,
+                'picking_id': picking.id,
+                'location_id': in_location.id,
+                'location_dest_id': out_location.id,
+            }
+            stock_move = sms.create(move_vals)
+            stock_move.move_line_ids.lot_id = lot.id
+            stock_move.move_line_ids.fusion_delivery_id = rec.deliveryid,  #
+            self.update_existing_lines(stock_move, product, rec, company,
+                                       in_location, out_location)
+            picking.action_confirm()
+            picking.action_assign()
+            self.confirm_picking(picking)
     def confirm_picking(self,picking):
         a=1
         picking.button_validate()
