@@ -411,18 +411,15 @@ class TransferControllerBI(models.Model):
         for record in self:
             # try:
                 random_string = self.env['fusion.sync.history'].generate_random_string()
-                all_transfers = self.env['transfer.controller.bi'].search([('itineraryid', '=', record.itineraryid)])
+                all_transfers = self.env['transfer.controller.bi'].search([('itineraryid', '=', record.itineraryid)]) if record.itineraryid else record
                 sms = self.env['stock.move'].search([])
                 pickings = self.env['stock.picking'].search([])
                 for rec in all_transfers:
                     
                     
-                    if (rec.frominternalcompany if rec.frominternalcompany else rec.tointernalcompany) == self.env.company.name:
+                    if (rec.buyselldisplaytext=='Buy' and rec.frominternalcompany == self.env.company.name) or (rec.buyselldisplaytext=='Sell' and rec.tointernalcompany == self.env.company.name):
                         if rec.deliveryactivestatusdisplayname=="Active":
-                            company = self.env['res.company'].search([('name', '=', rec.frominternalcompany)], limit=1)
-                            if not company:
-                                company = self.env['res.company'].search([('name', '=', rec.tointernalcompany)],
-                                                                         limit=1)
+                            company = self.env['res.company'].search([('name', '=', rec.frominternalcompany if rec.buyselldisplaytext=='Buy' else rec.tointernalcompany)], limit=1)
                             if rec.deliverystatusenum in ('Actual','Scheduled'):
                                 pol = self.env['purchase.order.line'].search([('fusion_segment_code', '=', rec.fromsegmentsectioncode if rec.fromsegmentsectioncode else '100')], limit=1)
                                 po = self.env['purchase.order'].search([('id', '=', pol.order_id.id)])
