@@ -439,8 +439,8 @@ class TransferControllerBI(models.Model):
                                                                                                          company.id)
                                 warehouse = self.env['stock.warehouse'].search([('id', '=', '0')], limit=1)
                                 existing_distribution=[]
-                                
-                                if rec.totypeenum == 'Trade' or rec.fromtypeenum == 'Trade':
+                                companies = self.env['res.company'].search([]).mapped('name')
+                                if (rec.totypeenum == 'Trade' or rec.fromtypeenum == 'Trade') and rec.frominternalcompany in companies and rec.tointernalcompany in companies:
                                     exists = sms.search(
                                         [('fusion_delivery_id', '=', rec.deliveryid)], limit=1)
                                     if exists:
@@ -554,7 +554,7 @@ class TransferControllerBI(models.Model):
                                                                 'picking_id': picking.id,
                                                                 'location_id': out_location.id,
                                                                 'location_dest_id': picking.location_dest_id.id,
-                                                                'sale_line_id': sol.id
+                                                                'sale_line_id': sol.id,
                                                             }
                                                             stock_move = sms.create(move_vals)
                                                             picking.sale_id=so.id
@@ -609,7 +609,8 @@ class TransferControllerBI(models.Model):
                                                                                                      'SO Line not found',
                                                                                                      rec.tointernalcompany)
                                         raise UserError("Order not found." + rec.tosegmentsectioncode if rec.tosegmentsectioncode else rec.fromsegmentsectioncode + rec.buyselldisplaytext)
-                                elif rec.fromcommoditycode!='Coal' and rec.tocommoditycode!='Coal' and (rec.fromtypeenum!='Trade' and rec.totypeenum!='Trade'):
+                
+                                elif rec.frominternalcompany in companies and rec.tointernalcompany in companies and (rec.fromtypeenum!='Trade' and rec.totypeenum!='Trade'):
                                     companies = []
                                     all_companies = self.env['res.company'].search([])
                                     for company in all_companies:
@@ -638,14 +639,14 @@ class TransferControllerBI(models.Model):
                                     in_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
                                                                                                    company)
                                     in_location = self.env['stock.location'].search(
-                                        [('warehouse_id', '=', in_warehouse.id)], limit=1)
+                                        [('warehouse_id', '=', in_warehouse.id),('name', '=', 'Stock')], limit=1)
                                     picking_type = self.env['stock.picking.type'].search(
                                         [('code', '=', 'internal'), ('warehouse_id', '=', in_warehouse.id)], limit=1)
                                     
                                     out_warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.tomotcode,
                                                                                                       company)
                                     out_location = self.env['stock.location'].search(
-                                        [('warehouse_id', '=', out_warehouse.id)], limit=1)
+                                        [('warehouse_id', '=', out_warehouse.id),('name', '=', 'Stock')], limit=1)
                                     
                                     
                                     stock_move = sms.search([('id', '=', 0)])
@@ -653,7 +654,19 @@ class TransferControllerBI(models.Model):
                                     exists = sms.search(
                                         [('fusion_delivery_id', '=', rec.deliveryid)],
                                         limit=1)
-                                    if not exists:
+                                    if exists:
+                                        exists.fusion_delivery_id = rec.deliveryid
+                                        exists.fusion_last_modify = self.parse_datetime(rec.lastmodifydate)
+                                        exists = sms.search([('id', '=', exists.id)])
+                                        picking = exists.picking_id
+                                        if picking.state in ('done', 'waiting', 'confirmed', 'cancel'):
+                                            picking.set_stock_move_to_draft()
+                                            picking.action_confirm()
+                                        self.update_existing_lines(exists, exists.product_id, rec, company,
+                                                                   picking.location_id, picking.location_dest_id)
+                                        self.confirm_picking(picking)
+                                        continue
+                                    else:
                                         if product.uom_id.rounding != 0.001:
                                             product.uom_id.rounding = 0.001
                                         picking_vals = {
@@ -680,6 +693,8 @@ class TransferControllerBI(models.Model):
                                         stock_move = sms.create(move_vals)
                                         stock_move.move_line_ids.lot_id=lot
                                         stock_move.move_line_ids.fusion_delivery_id = rec.deliveryid,  #
+                                        self.update_existing_lines(stock_move, product, rec, company,
+                                                                   in_location,out_location)
                                         picking.action_confirm()
                                         picking.action_assign()
                                         self.confirm_picking(picking)
