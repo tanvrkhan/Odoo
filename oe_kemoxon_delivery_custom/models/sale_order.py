@@ -30,6 +30,7 @@ class SaleOrder(models.Model):
     show_vat_ids = fields.Boolean('Show VAT ID')
     en_plus = fields.Boolean('EN Plus')
     show_hs_code = fields.Boolean('Show HS Code')
+    show_product_origin = fields.Boolean('Show Product Origin')
     company_bank_account_id = fields.Many2one(
         'res.partner.bank',
         string='Company Bank Account',
@@ -49,6 +50,7 @@ class SaleOrderLine(models.Model):
     tolerance_type = fields.Selection([('min_max', 'Min/Max'), ('max', 'Max'), ('min', 'Min')],
                                       string='Tolerance Type')
     tolerance_percentage = fields.Float("Tolerance Percentage")
+    product_origin = fields.Char("Product Origin")
 
     @api.model
     def create(self, vals):
