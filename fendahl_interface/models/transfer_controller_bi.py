@@ -450,7 +450,6 @@ class TransferControllerBI(models.Model):
                                         if exists.fusion_last_modify == self.parse_datetime(rec.lastmodifydate) and exists.state=='done':
                                             continue
                                         else:
-                                            exists.fusion_delivery_id = rec.deliveryid
                                             exists.fusion_last_modify = self.parse_datetime(rec.lastmodifydate)
                                             exists = sms.search([('id', '=', exists.id)])
                                             picking = exists.picking_id

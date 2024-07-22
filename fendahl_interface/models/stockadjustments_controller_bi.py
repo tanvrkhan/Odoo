@@ -176,6 +176,7 @@ class StorageInspectorBuildDrawDataBI(models.Model):
                     if company:
                         balancing_warehouse =  self.env['fusion.sync.history'].validate_warehouse('Stock Adjustments',company)
                         warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.storage,company)
+                        self.env.cr.commit()
                         if balancing_warehouse and warehouse:
                             rec.create_picking(rec,balancing_warehouse,warehouse,company)
                 else:
@@ -202,7 +203,7 @@ class StorageInspectorBuildDrawDataBI(models.Model):
             picking_type = self.env['stock.picking.type'].search(
                 [('sequence_code', '=', 'INT'), ('warehouse_id', '=', warehouse.id)], limit=1)
             warehouse_location = self.env['stock.location'].search([('warehouse_id', '=', warehouse.id),('name','=','Stock')], limit=1)
-            balancing_warehouse_location = self.env['stock.location'].search([('warehouse_id', '=', balancing_warehouse.id),('name','=','Stock')], limit=1)
+            balancing_warehouse_location = self.env['stock.location'].search([('warehouse_id', '=', balancing_warehouse.id),('name','=','Stock'),('company_id','=',company.id)], limit=1)
             if 'Coal' in rec.material or 'Wood' in rec.material:
                 product_templ = self.env['product.template'].search(
                     [('name', '=', rec.material)],
