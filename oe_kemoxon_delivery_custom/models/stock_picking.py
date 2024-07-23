@@ -526,7 +526,10 @@ class StockPicking(models.Model):
                     elif valuation.quantity<0:
                         valuation.warehouse_id = rec.location_id.warehouse_id.id
                 
- 
+    def remove_fusion_delivery_id(self):
+        for rec in self:
+            if rec.state!='done':
+                rec.move_ids.fusion_delivery_id = False
    
         
     
