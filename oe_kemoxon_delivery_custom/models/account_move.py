@@ -548,6 +548,11 @@ class AccountMove(models.Model):
     def fix_decimal_accuracy(self):
         for rec in self:
             rec.with_context(check_move_validity=False).amount_residual = self.custom_round(rec.amount_residual, 2)
+            for ae in rec.line_ids:
+                ae.remove_move_reconcile()
+            self.env.cr.commit()
+            rec.with_context(check_move_validity=False).state = 'draft'
+            self.env.cr.commit()
             for line in rec.line_ids:
                 if line.display_type != 'line_note':
                     
@@ -563,8 +568,8 @@ class AccountMove(models.Model):
                     line.with_context(check_move_validity=False).amount_currency = self.custom_round(line.amount_currency, 2)
                     line.with_context(check_move_validity=False).price_subtotal = self.custom_round(line.price_subtotal, 2)
                     line.with_context(check_move_validity=False).price_total = self.custom_round(line.price_total, 2)
-            self.env.cr.commit()
-            rec.with_context(check_move_validity=False).state='draft'
+            
+            
                     
                     # line.with_context(check_move_validity=False).balance = rec.custom_round(line.balance, 2)
                     # line.debit
