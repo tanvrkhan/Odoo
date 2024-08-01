@@ -45,7 +45,7 @@ class SaleOrder(models.Model):
     
     def cancel_bulk(self):
         for record in self:
-            record.action_cancel()
+            record.state = 'cancel'
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
