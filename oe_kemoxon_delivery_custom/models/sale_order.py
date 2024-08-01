@@ -42,7 +42,10 @@ class SaleOrder(models.Model):
         res = super(SaleOrder, self)._prepare_invoice()
         res['deal_ref'] = self.deal_ref
         return res
-
+    
+    def cancel_bulk(self):
+        for record in self:
+            record.action_cancel()
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
