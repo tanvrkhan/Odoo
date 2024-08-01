@@ -197,7 +197,7 @@ class StorageInspectorBuildDrawDataBI(models.Model):
             else:
                 existing_picking.set_stock_move_to_draft()
                 existing_picking.action_confirm()
-                existing_picking.move_ids.line_ids.qty_done = rec.quantity
+                existing_picking.move_ids.line_ids.qty_done = rec.builddrawqty
                 existing_picking.button_validate()
         else:
             picking_type = self.env['stock.picking.type'].search(
