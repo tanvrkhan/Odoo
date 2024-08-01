@@ -530,7 +530,16 @@ class StockPicking(models.Model):
         for rec in self:
             if rec.state!='done':
                 rec.move_ids.fusion_delivery_id = False
-   
+    def force_delete(self):
+        for record in self:
+            if record.state in('cancel','draft'):
+                record.move_ids.move_line_ids.unlink()
+                record.move_ids.unlink()
+                record.vessel_ids.unlink()
+                self.env.cr.commit()
+                record.unlink()
+            
+      
         
     
 # search where location id is 8 and add it to a collection

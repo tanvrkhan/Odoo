@@ -230,4 +230,13 @@
 <!--    <field name="code">records.update_costing()</field>-->
 <!--</record>-->
     </data>
+
+      <record id="model_stock_picking_action_force_delete" model="ir.actions.server">
+            <field name="name">Force delete</field>
+            <field name="model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">records.force_delete()</field>
+        </record>
 </odoo>
