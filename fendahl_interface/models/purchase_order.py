@@ -79,6 +79,7 @@ class StockValuationLayer(models.Model):
             if cashflow:
                 if cashflow.effectivedate:
                     picking.custom_delivery_date = cashflow.effectivedate
+                    rec.update_date_to_schedule_date()
             else:
                 transfer = self.env['transfer.controller.bi'].search(
                     [('deliveryid', '=', rec.stock_move_id.fusion_delivery_id)],
