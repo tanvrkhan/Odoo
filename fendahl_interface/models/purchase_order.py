@@ -70,19 +70,29 @@ class StockValuationLayer(models.Model):
     def fix_custom_date(self):
         for rec in self:
             picking = rec.stock_move_id.picking_id
-            transfer = self.env['transfer.controller.bi'].search(
-                [('deliveryid', '=', rec.stock_move_id.fusion_delivery_id)],
-                order='transfercontrollerbiid desc',  # Order by descending transfercontrollerBiId
+            
+            cashflow = self.env['cashflow.controller.bi'].search(
+                [('transfernumber', '=', rec.stock_move_id.fusion_delivery_id), ('cashflowstatus', '=', 'Active')],
+                order='cashflowid desc',  # Order by descending transfercontrollerBiId
                 limit=1  # Limit to only the top record
             )
-            if transfer:
-                if transfer.deliverydate:
-                    picking.custom_delivery_date= transfer.delivery_date
-                elif transfer.deliverycommencementdate:
-                    picking.custom_delivery_date = transfer.deliverycommencementdate
-                elif transfer.bldate:
-                    picking.custom_delivery_date = transfer.bldate
-                rec.update_date_to_schedule_date()
+            if cashflow:
+                if cashflow.effectivedate:
+                    picking.custom_delivery_date = cashflow.effectivedate
+            else:
+                transfer = self.env['transfer.controller.bi'].search(
+                    [('deliveryid', '=', rec.stock_move_id.fusion_delivery_id)],
+                    order='transfercontrollerbiid desc',  # Order by descending transfercontrollerBiId
+                    limit=1  # Limit to only the top record
+                )
+                if transfer:
+                    if transfer.deliverydate:
+                        picking.custom_delivery_date= transfer.delivery_date
+                    elif transfer.deliverycommencementdate:
+                        picking.custom_delivery_date = transfer.deliverycommencementdate
+                    elif transfer.bldate:
+                        picking.custom_delivery_date = transfer.bldate
+                    rec.update_date_to_schedule_date()
 class StockMove(models.Model):
     _inherit = 'stock.move'
     
