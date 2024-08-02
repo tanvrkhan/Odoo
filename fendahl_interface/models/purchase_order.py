@@ -64,6 +64,25 @@ class StockPicking(models.Model):
     fusion_segment_code = fields.Char('Fusion Section Code')
     fusion_itinerary_id = fields.Char('Nomination No.')
     fusion_build_draw = fields.Integer("Build Draw No.")
+    
+class StockValuationLayer(models.Model):
+    _inherit = 'stock.valuation.layer'
+    def fix_custom_date(self):
+        for rec in self:
+            picking = rec.stock_move_id.picking_id
+            transfer = self.env['transfer.controller.bi'].search(
+                [('deliveryid', '=', rec.stock_move_id.fusion_delivery_id)],
+                order='transfercontrollerbiid desc',  # Order by descending transfercontrollerBiId
+                limit=1  # Limit to only the top record
+            )
+            if transfer:
+                if transfer.deliverydate:
+                    picking.custom_delivery_date= transfer.delivery_date
+                elif transfer.deliverycommencementdate:
+                    picking.custom_delivery_date = transfer.deliverycommencementdate
+                elif transfer.bldate:
+                    picking.custom_delivery_date = transfer.bldate
+                rec.update_date_to_schedule_date()
 class StockMove(models.Model):
     _inherit = 'stock.move'
     

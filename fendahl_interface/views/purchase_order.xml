@@ -34,6 +34,15 @@
     <field name="state">code</field>
     <field name="code">records.fetch_from_controller()</field>
     </record>
+
+          <record id="model_stock_valuation_update_delivery_date" model="ir.actions.server">
+    <field name="name">Fetch Fusion delivery date</field>
+            <field name="model_id" ref="stock_account.model_stock_valuation_layer"/>
+            <field name="binding_model_id" ref="stock_account.model_stock_valuation_layer"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">records.fix_custom_date()</field>
+        </record>
 <!--         <record id="model_fusion_sync_history_action_trigger_sync_nomination" model="ir.actions.server">-->
 <!--            <field name="name">ICancel PO</field>-->
 <!--            <field name="model_id" ref="model_purchase_order"/>-->
