@@ -313,7 +313,7 @@
                                         </td>
                                         <td colspan="99" class="is-subtotal text-end">
                                             <span style="text-align:right;" class="m-0"
-                                                  t-esc="round(line.balance * -1, 2)"
+                                                  t-esc="round(o.amount_tax, 2)"
                                                   t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
                                         </td>
                                     </tr>
