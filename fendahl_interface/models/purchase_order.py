@@ -74,6 +74,7 @@ class StockValuationLayer(models.Model):
                 stockadjustment = self.env['stockadjustments.controller.bi'].search([('builddrawnum','=',picking.fusion_build_draw)]).effectivedate
                 if stockadjustment:
                     picking.custom_delivery_date = self.env['stockadjustments.controller.bi'].search([('builddrawnum','=',picking.fusion_build_draw)]).effectivedate
+                    rec.update_date_to_schedule_date()
             else:
                 cashflow = self.env['cashflow.controller.bi'].search(
                     [('transfernumber', '=', rec.stock_move_id.fusion_delivery_id), ('cashflowstatus', '=', 'Active')],
