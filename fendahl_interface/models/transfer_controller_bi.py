@@ -574,14 +574,11 @@ class TransferControllerBI(models.Model):
                                                 if stock_move.state in('done','waiting','confirmed','assigned'):
                                                     stock_move.picking_id.set_stock_move_to_draft()
                                                 # stock_move.picking_id.deal_ref = 'moved_to_Draft'
-                                                picking.custom_delivery_date = self.parse_datetime(
-                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate if rec.bldate else rec.titledeliverydate)
-                                                picking.date_done = self.parse_datetime(
-                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate if rec.bldate else rec.titledeliverydate)
-                                                picking.scheduled_date = self.parse_datetime(
-                                                    rec.deliverycompletiondate if rec.deliverycompletiondate else rec.bldate if rec.bldate else rec.titledeliverydate)
-                                                stock_move.date = self.parse_datetime(rec.deliverycompletiondate  if rec.deliverycompletiondate else rec.bldate if rec.bldate else rec.titledeliverydate)
                                                 
+                                                picking.custom_delivery_date = rec.get_custom_date()
+                                                picking.date_done = rec.get_custom_date()
+                                                picking.scheduled_date = rec.get_custom_date()
+                                                stock_move.date = rec.get_custom_date()
                                                 if rec.buyselldisplaytext == "Buy":
                                                     picking_type = self.env['stock.picking.type'].search(
                                                         [('code', '=', 'incoming'), ('warehouse_id', '=', warehouse.id)], limit=1)
@@ -642,6 +639,31 @@ class TransferControllerBI(models.Model):
                 #             if len(picking_ids):
                 #                 a=True
                 #
+    
+    def get_custom_date(self):
+        for rec in self:
+            cashflow = self.env['cashflow.controller.bi'].search(
+                [('transfernumber', '=', rec.deliveryid), ('cashflowstatus', '=', 'Active')],
+                order='cashflowid desc',  # Order by descending transfercontrollerBiId
+                limit=1  # Limit to only the top record
+            )
+            if cashflow:
+                if cashflow.effectivedate:
+                    return self.parse_datetime(cashflow.effectivedate)
+            else:
+                transfer = self.env['transfer.controller.bi'].search(
+                    [('deliveryid', '=', rec.deliveryid)],
+                    order='transfercontrollerbiid desc',  # Order by descending transfercontrollerBiId
+                    limit=1  # Limit to only the top record
+                )
+                if transfer:
+                    if transfer.deliverydate:
+                        return  self.parse_datetime(transfer.delivery_date)
+                    elif transfer.deliverycommencementdate:
+                        return self.parse_datetime(transfer.deliverycommencementdate)
+                    elif transfer.bldate:
+                        return self.parse_datetime(transfer.bldate)
+                    
     def create_internal_transfer(self, rec,sms):
         companies = []
         all_companies = self.env['res.company'].search([])
