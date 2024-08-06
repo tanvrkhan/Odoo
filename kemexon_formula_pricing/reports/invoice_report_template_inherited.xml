@@ -690,7 +690,7 @@
                         </div>
 
 
-                        <div class="col-12 row" t-if="o.partner_id.company_bank_account_id.bank_id.bic">
+                        <div class="col-12 row" t-if="o.company_bank_account_id.bank_id.bic">
                             <div class="col-5" style="padding-left: 4px;">
                                 <strong>Swift Code</strong>
                             </div>
