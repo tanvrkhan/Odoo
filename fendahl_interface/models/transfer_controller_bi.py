@@ -649,7 +649,7 @@ class TransferControllerBI(models.Model):
             )
             if cashflow:
                 if cashflow.effectivedate:
-                    return self.parse_datetime(cashflow.effectivedate)
+                    return cashflow.effectivedate
             else:
                 transfer = self.env['transfer.controller.bi'].search(
                     [('deliveryid', '=', rec.deliveryid)],
