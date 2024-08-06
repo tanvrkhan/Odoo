@@ -376,6 +376,7 @@ class TransferControllerBI(models.Model):
                     line.qty_done = quantity
                     line.location_id = fromlocation.id
                     line.location_dest_id = destlocation.id
+                    
         else:
             line = stock_move.move_line_ids.filtered(lambda ml: ml.product_id == product)
             if line:
@@ -649,7 +650,7 @@ class TransferControllerBI(models.Model):
             )
             if cashflow:
                 if cashflow.effectivedate:
-                    return self.parse_datetime(cashflow.effectivedate)
+                    return cashflow.effectivedate
             else:
                 transfer = self.env['transfer.controller.bi'].search(
                     [('deliveryid', '=', rec.deliveryid)],

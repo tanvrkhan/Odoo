@@ -300,7 +300,7 @@ class StockValuationLayer(models.Model):
                 record.value = applicableamount
                 self.reset_accounting(record)
                 
-            
+            self.env.cr.commit()
             
             
         if wrong > 0:
