@@ -707,7 +707,7 @@
                                 <strong>Intermediary Bank</strong>
                             </div>
                             <div class="col-7" style="padding-left: 0px;">
-                                <t t-if="o.company_bank_account_id.">
+                                <t t-if="o.company_bank_account_id.inter_mediatory_bank_id">
                                     <span class="m-0"
                                           t-field="o.company_bank_account_id.inter_mediatory_bank_id.name"/>
                                 </t>
