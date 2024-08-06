@@ -383,13 +383,12 @@ class TransferControllerBI(models.Model):
                 i = 0
                 for line2 in line:
                     if i == 0:
-                        if quantity:
-                            if line2.qty_done != float(quantity):
-                                line2.qty_done = quantity
-                                line2.fusion_delivery_id = rec.deliveryid
-                                line2.location_id = fromlocation.id
-                                line2.location_dest_id = destlocation.id
-                                i += 1
+                        if line2.qty_done != float(quantity):
+                            line2.qty_done = quantity
+                            line2.fusion_delivery_id = rec.deliveryid
+                            line2.location_id = fromlocation.id
+                            line2.location_dest_id = destlocation.id
+                            i += 1
             else:
                 self.env['stock.move.line'].create({
                     'product_id': product.id,
