@@ -334,12 +334,19 @@ class TransferControllerBI(models.Model):
                     self.env['transfer.controller.bi'].create(data)
                     self.env.cr.commit()
     def get_quantity_from_controller(self,rec,product):
-        if rec.fromcontractqtyuomcode == product.uom_id.name:
-            return rec.fromactualqty if rec.fromactualqty else rec.fromscheduledqty
-        elif rec.toactualqtyuomcode == product.uom_id.name:
-            return rec.toactualqty if rec.toactualqty else rec.toscheduledqty
-        elif rec.fromscheduledqty == rec.fromactualqty and rec.fromscheduledqtyuomcode == product.uom_id.name:
-            return rec.fromactualqty
+        if rec.buyselldisplaytext=="Buy":
+            uom_conversion_factor = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),('name', '=', rec.fromactualqtyuomcode)]).ratio
+            if rec.fromactualqty:
+                return float(rec.fromactualqty) * float(uom_conversion_factor)
+            elif rec.fromscheduledqty:
+                return float(rec.fromscheduledqty) * float(uom_conversion_factor)
+        elif rec.buyselldisplaytext=="Sell":
+            uom_conversion_factor = self.env['uom.uom'].search(
+                [('category_id', '=', product.uom_id.category_id.id), ('name', '=', rec.toactualqtyuomcode)]).ratio
+            if rec.toactualqty:
+                return float(rec.toactualqty) * float(uom_conversion_factor)
+            elif rec.toscheduledqty:
+                return float(rec.toscheduledqty) * float(uom_conversion_factor)
         # else:
         #     uom =''
         #     if rec.toactualqtyuomcode:
@@ -589,7 +596,8 @@ class TransferControllerBI(models.Model):
                                                 stock_move.location_id = picking.location_id,
                                                 stock_move.location_dest_id = picking.location_dest_id,
                                                 self.update_existing_lines(stock_move,product,rec,company,picking.location_id,picking.location_dest_id)
-                                                self.confirm_picking(picking)
+                                                if sum(move.quantity_done for move in picking.move_ids) > 0:
+                                                    self.confirm_picking(picking)
                                                 if rec.buyselldisplaytext == "Sell":
                                                     picking.sale_id=so.id
                                             
