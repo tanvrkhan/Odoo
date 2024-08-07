@@ -690,38 +690,38 @@
                         </div>
 
 
-                        <div class="col-12 row" t-if="o.partner_id.company_bank_account_id.bank_id.bic">
+                        <div class="col-12 row" t-if="o.company_bank_account_id.bank_id.bic">
                             <div class="col-5" style="padding-left: 4px;">
                                 <strong>Swift Code</strong>
                             </div>
                             <div class="col-7" style="padding-left: 0px;">
                                 <t t-if="o.partner_id.company_bank_account_id">
-                                    <span class="m-0" t-field="o.partner_id.company_bank_account_id.bank_id.bic"/>
+                                    <span class="m-0" t-field="o.company_bank_account_id.bank_id.bic"/>
                                 </t>
                             </div>
                         </div>
 
 
-                        <div class="col-12 row" t-if="o.partner_id.company_bank_account_id.inter_mediatory_bank_id">
+                        <div class="col-12 row" t-if="o.company_bank_account_id.inter_mediatory_bank_id">
                             <div class="col-5" style="padding-left: 4px;">
                                 <strong>Intermediary Bank</strong>
                             </div>
                             <div class="col-7" style="padding-left: 0px;">
-                                <t t-if="o.partner_id.company_bank_account_id">
+                                <t t-if="o.company_bank_account_id.inter_mediatory_bank_id">
                                     <span class="m-0"
-                                          t-field="o.partner_id.company_bank_account_id.inter_mediatory_bank_id.name"/>
+                                          t-field="o.company_bank_account_id.inter_mediatory_bank_id.name"/>
                                 </t>
                             </div>
                         </div>
 
-                        <div class="col-12 row" t-if="o.partner_id.company_bank_account_id.inter_mediatory_swift">
+                        <div class="col-12 row" t-if="o.company_bank_account_id.inter_mediatory_swift">
                             <div class="col-5" style="padding-left: 4px;">
                                 <strong>Intermediary Swift</strong>
                             </div>
                             <div class="col-7" style="padding-left: 0px;">
-                                <t t-if="o.partner_id.company_bank_account_id">
+                                <t t-if="o.company_bank_account_id">
                                     <span class="m-0"
-                                          t-field="o.partner_id.company_bank_account_id.inter_mediatory_swift"/>
+                                          t-field="o.company_bank_account_id.inter_mediatory_swift"/>
                                 </t>
                             </div>
                         </div>
