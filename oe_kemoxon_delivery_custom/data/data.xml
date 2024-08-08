@@ -6,7 +6,7 @@
             <field name="name">Freight Charges - CBM</field>
             <field name="default_code">freight_charge</field>
             <field name="type">service</field>
-            <field name="sale_ok" eval="False"/>
+            <field name="sale_ok" eval="Farecalculate_stock_valuelse"/>
             <field name="purchase_ok" eval="False"/>
             <field name="list_price">0.0</field>
         </record>
@@ -35,12 +35,20 @@
             <field name="code">records.delete_valuation_force()</field>
         </record>
          <record id="model_stock_valuation_action_recalculate_value" model="ir.actions.server">
-            <field name="name">Recalculate Product Valuation</field>
+            <field name="name">Recalculate Product Valuation including date</field>
             <field name="model_id" ref="stock_account.model_stock_valuation_layer"/>
             <field name="binding_model_id" ref="stock_account.model_stock_valuation_layer"/>
             <field name="binding_view_types">list,form</field>
             <field name="state">code</field>
-            <field name="code">records.recalculate_stock_value()</field>
+            <field name="code">records.recalculate_stock_value(True)</field>
+        </record>
+          <record id="model_stock_valuation_action_recalculate_value_without_date" model="ir.actions.server">
+            <field name="name">Recalculate Product Valuation without date</field>
+            <field name="model_id" ref="stock_account.model_stock_valuation_layer"/>
+            <field name="binding_model_id" ref="stock_account.model_stock_valuation_layer"/>
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">records.recalculate_stock_value(False)</field>
         </record>
           <record id="model_stock_valuation_action_set_picking_valuation_empty" model="ir.actions.server">
             <field name="name">Set Custom valuation price 0</field>
