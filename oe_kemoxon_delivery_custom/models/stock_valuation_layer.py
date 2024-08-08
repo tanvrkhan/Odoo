@@ -11,7 +11,7 @@ class StockValuationLayer(models.Model):
     _inherit = 'stock.valuation.layer'
     costed_quantity = fields.Float()
     warehouse_balance = fields.Float(compute='_compute_warehouse_balance')
-    
+    warehouse_weighted_average =fields.Float(compute='_compute_warehouse_average')
     def _compute_warehouse_balance(self):
         for record in self:
             domain = [
@@ -29,7 +29,32 @@ class StockValuationLayer(models.Model):
             
             # read_group returns a list of dictionaries, handle the case where no data matches the domain
             total_quantity = valuations[0]['quantity'] if valuations else 0
-            record.warehouse_balance = total_quantity if total_quantity else 0
+            record.warehouse_balance= total_quantity if total_quantity else 0
+    
+    def _compute_warehouse_average(self):
+        for record in self:
+            if record.quantity >0:
+                record.warehouse_weighted_average = record.unit_cost
+            else:
+                domain = [
+                    ('product_id', '=', record.product_id.id),
+                    ('stock_move_id.picking_id.date_done', '<', record.stock_move_id.picking_id.date_done),
+                    ('id', '!=', record.id),
+                    ('company_id', '=', record.company_id.id),
+                    ('warehouse_id', '=', record.warehouse_id.id)
+                ]
+                # Using read_group to calculate the total quantity directly in the database
+                valuations = self.env['stock.valuation.layer'].read_group(
+                    domain,
+                    ['quantity:sum','value:sum'],  # Fields to aggregate
+                    []  # Group by (none in this case, we want the total)
+                )
+                
+          
+                if valuations[0]['quantity'] <= 0:
+                    record.warehouse_weighted_average = 0
+                else:
+                    record.warehouse_weighted_average = float(valuations[0]['value'])/float(valuations[0]['quantity'])
     def update_quantity_from_delivery(self):
         for record in self:
             if record.stock_move_id:
