@@ -200,7 +200,7 @@
 
                                 <td name="td_priceunit" class="text-end">
                                     <t t-if="line.product_id.name != 'Down payment'">
-                                        <span t-field="line.price_unit"/>
+                                        <span t-field="line.price_unit" t-options='{"precision": 2}'/>
                                     </t>
                                     <t t-else="">
                                         <span></span>
@@ -227,7 +227,7 @@
                                               groups="account.group_show_line_subtotals_tax_included"/>
                                     </t>
                                     <t t-else="">
-                                        <span class="text-nowrap" t-field="line.price_unit"/>
+                                        <span class="text-nowrap" t-field="line.price_unit" t-options='{"precision": 2}'/>
                                     </t>
                                 </td>
                             </t>
