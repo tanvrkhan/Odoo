@@ -325,7 +325,7 @@ class StockValuationLayer(models.Model):
             
             
         if wrong > 0:
-            self.recalculate_stock_value()
+            self.recalculate_stock_value(adjustdate)
     
    
                 
