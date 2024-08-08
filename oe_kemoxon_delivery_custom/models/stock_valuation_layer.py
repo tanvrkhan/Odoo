@@ -218,9 +218,10 @@ class StockValuationLayer(models.Model):
                 # self.reset_accounting(record)
         return self
     
-    def recalculate_stock_value(self):
-        self.update_date_without_accounting_date()
-        self.env.cr.commit()
+    def recalculate_stock_value(self,adjustdate):
+        if adjustdate:
+            self.update_date_without_accounting_date()
+            self.env.cr.commit()
         wrong = 0
         sortedself = self.sorted(key=lambda r: r.create_date)
         stock_valuations = self.env['stock.valuation.layer'].search([])
@@ -258,6 +259,7 @@ class StockValuationLayer(models.Model):
                     applicablequantity = record.quantity
                     temprate = total_value / total_quantity
                     applicableamount = applicablequantity * temprate
+
                 #external purchase
                 else:
                     pl= sm.purchase_line_id
@@ -305,6 +307,8 @@ class StockValuationLayer(models.Model):
             
         if wrong > 0:
             self.recalculate_stock_value()
+    
+   
                 
                 
     def reset_accounting(self,record):
