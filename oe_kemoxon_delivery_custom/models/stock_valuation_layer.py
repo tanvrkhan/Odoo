@@ -10,7 +10,26 @@ from datetime import datetime, timedelta
 class StockValuationLayer(models.Model):
     _inherit = 'stock.valuation.layer'
     costed_quantity = fields.Float()
+    warehouse_balance = fields.Float(compute='_compute_warehouse_balance')
     
+    def _compute_warehouse_balance(self):
+        for record in self:
+            domain = [
+                ('product_id', '=', record.product_id.id),
+                ('stock_move_id.picking_id.date_done', '<=', record.stock_move_id.picking_id.date_done),
+                ('company_id', '=', record.company_id.id),
+                ('warehouse_id', '=', record.warehouse_id.id)
+            ]
+            # Using read_group to calculate the total quantity directly in the database
+            valuations = self.env['stock.valuation.layer'].read_group(
+                domain,
+                ['quantity:sum'],  # Fields to aggregate
+                []  # Group by (none in this case, we want the total)
+            )
+            
+            # read_group returns a list of dictionaries, handle the case where no data matches the domain
+            total_quantity = valuations[0]['quantity'] if valuations else 0
+            record.warehouse_balance = total_quantity if total_quantity else 0
     def update_quantity_from_delivery(self):
         for record in self:
             if record.stock_move_id:
@@ -276,7 +295,7 @@ class StockValuationLayer(models.Model):
             elif record.quantity < 0:
                 domain = [
                     ('product_id', '=', record.product_id.id),
-                    ('stock_move_id.date', '<', record.stock_move_id.date),
+                    ('stock_move_id.picking_id.date_done', '<', record.stock_move_id.picking_id.date_done),
                     ('id', '!=', record.id),
                     ('company_id', '=', record.company_id.id)
                 ]
