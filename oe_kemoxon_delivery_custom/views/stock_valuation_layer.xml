@@ -1,0 +1,15 @@
+<odoo>
+    <data>
+        <record id="view_stock_valuation_kx_delivery" model="ir.ui.view">
+            <field name="name">stock.valuation.form</field>
+            <field name="model">stock.valuation.layer</field>
+            <field name="inherit_id" ref="stock_account.stock_valuation_layer_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='unit_cost']"
+                       position="after">
+                    <field name="warehouse_weighted_average" invisible="0"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

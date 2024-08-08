@@ -50,11 +50,13 @@ class StockValuationLayer(models.Model):
                     []  # Group by (none in this case, we want the total)
                 )
                 
-          
-                if valuations[0]['quantity'] <= 0:
-                    record.warehouse_weighted_average = 0
+                if valuations[0]['quantity']:
+                    if float(valuations[0]['quantity']) <= 0:
+                        record.warehouse_weighted_average = 0
+                    else:
+                        record.warehouse_weighted_average = float(valuations[0]['value'])/float(valuations[0]['quantity'])
                 else:
-                    record.warehouse_weighted_average = float(valuations[0]['value'])/float(valuations[0]['quantity'])
+                    record.warehouse_weighted_average = 0
     def update_quantity_from_delivery(self):
         for record in self:
             if record.stock_move_id:
