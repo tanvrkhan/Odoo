@@ -29,7 +29,7 @@ class StockValuationLayer(models.Model):
             
             # read_group returns a list of dictionaries, handle the case where no data matches the domain
             total_quantity = valuations[0]['quantity'] if valuations else 0
-            record.warehouse_balance= total_quantity if total_quantity else 0
+            record.warehouse_balance= round(total_quantity,3) if total_quantity else 0
     
     def _compute_warehouse_average(self):
         for record in self:
@@ -54,7 +54,7 @@ class StockValuationLayer(models.Model):
                     if float(valuations[0]['quantity']) <= 0:
                         record.warehouse_weighted_average = 0
                     else:
-                        record.warehouse_weighted_average = float(valuations[0]['value'])/float(valuations[0]['quantity'])
+                        record.warehouse_weighted_average = round(float(valuations[0]['value'])/float(valuations[0]['quantity']),2)
                 else:
                     record.warehouse_weighted_average = 0
     def update_quantity_from_delivery(self):
@@ -333,7 +333,8 @@ class StockValuationLayer(models.Model):
                     total_quantity = sum(v.quantity for v in all_valuations)
                     total_value = sum(v.value for v in all_valuations)
                     if total_quantity<0:
-                        raise ValidationError("Quantity in the warehouse is not enough for this transaction.")
+                        continue
+                        # raise ValidationError("Quantity in the warehouse is not enough for this transaction.")
                     
                     else:
                         rateusd = round(total_value/total_quantity, 2)

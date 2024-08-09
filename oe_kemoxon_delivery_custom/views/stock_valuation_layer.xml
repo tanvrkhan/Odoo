@@ -7,7 +7,8 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='unit_cost']"
                        position="after">
-                    <field name="warehouse_weighted_average" invisible="0"/>
+                    <field name="warehouse_weighted_average"  decoration-danger="warehouse_weighted_average != unit_cost" invisible="0"/>
+<field name="warehouse_balance" decoration-danger="warehouse_balance &lt; 0" invisible="0"/>
                 </xpath>
             </field>
         </record>
