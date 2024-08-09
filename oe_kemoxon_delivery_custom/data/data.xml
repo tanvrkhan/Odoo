@@ -40,7 +40,7 @@
             <field name="binding_model_id" ref="stock_account.model_stock_valuation_layer"/>
             <field name="binding_view_types">list,form</field>
             <field name="state">code</field>
-            <field name="code">records.recalculate_stock_value(True)</field>
+            <field name="code">records.recalculate_stock_value()</field>
         </record>
           <record id="model_stock_valuation_action_recalculate_value_without_date" model="ir.actions.server">
             <field name="name">Recalculate Product Valuation without date</field>

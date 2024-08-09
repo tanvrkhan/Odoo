@@ -264,7 +264,7 @@ class StockValuationLayer(models.Model):
                 # self.reset_accounting(record)
         return self
     
-    def recalculate_stock_value(self,adjustdate):
+    def recalculate_stock_value(self,adjustdate=True):
         if adjustdate:
             self.update_date_without_accounting_date()
             self.env.cr.commit()
@@ -300,6 +300,7 @@ class StockValuationLayer(models.Model):
                         ('stock_move_id', '=', sm.id),
                         ('quantity', '=', record.quantity * -1)
                     ])
+                    all_valuations.recalculate_stock_value(adjustdate)
                     total_quantity = sum(v.quantity for v in all_valuations)
                     total_value = sum(v.value for v in all_valuations)
                     applicablequantity = record.quantity
