@@ -33,8 +33,23 @@ class StockValuationLayer(models.Model):
     
     def _compute_warehouse_average(self):
         for record in self:
-            if record.quantity >0:
-                record.warehouse_weighted_average = record.unit_cost
+            if record.stock_move_id.picking_id.picking_type_id.code == 'incoming':
+                pl = record.stock_move_id.purchase_line_id
+                base_currency = record.company_id.currency_id
+                rateusd = round(pl.order_id.currency_id._convert(
+                    pl.price_unit,
+                    base_currency, record.company_id, record.stock_move_id.date, True), 2)
+                record.warehouse_weighted_average = round(rateusd,2)
+            elif record.stock_move_id.picking_id.picking_type_id.code == 'internal' and record.quantity>0:
+                all_valuations = self.env['stock.valuation.layer'].search(
+                    [
+                        ('stock_move_id', '=', record.stock_move_id.id),
+                        ('quantity', '=', record.quantity * -1)
+                    ])
+                total_quantity = sum(v.quantity for v in all_valuations)
+                total_value = sum(v.value for v in all_valuations)
+                temprate = total_value / total_quantity
+                record.warehouse_weighted_average = round(temprate,2)
             else:
                 domain = [
                     ('product_id', '=', record.product_id.id),
@@ -292,9 +307,9 @@ class StockValuationLayer(models.Model):
                 self.reset_accounting(record)
                 continue
             #purchase transaction
-            elif record.quantity > 0:
+            elif record.stock_move_id.picking_id.picking_type_id.code == 'internal':
                 #internal transfer
-                if sm.location_id.usage == 'internal' and sm.location_dest_id.usage == 'internal':
+                if sm.picking_id.picking_type_id.code == 'internal' and sm.quantity_done > 0:
                     all_valuations = stock_valuations.search(
                     [
                         ('stock_move_id', '=', sm.id),
@@ -308,19 +323,18 @@ class StockValuationLayer(models.Model):
                     applicableamount = applicablequantity * temprate
 
                 #external purchase
-                else:
-                    pl= sm.purchase_line_id
-                    base_currency = record.company_id.currency_id
-                    applicablequantity = record.quantity
-                    rate=round(pl.price_unit,2)
-                    rateusd = round(pl.order_id.currency_id._convert(
-                        pl.price_unit,
-                        base_currency, record.company_id, sm.date, True),2)
-                    applicableamount += (rateusd * record.quantity)
-
+            elif record.stock_move_id.picking_id.picking_type_id.code == 'incoming':
+                pl= sm.purchase_line_id
+                base_currency = record.company_id.currency_id
+                applicablequantity = record.quantity
+                rate=round(pl.price_unit,2)
+                rateusd = round(pl.order_id.currency_id._convert(
+                    pl.price_unit,
+                    base_currency, record.company_id, sm.date, True),2)
+                applicableamount += (rateusd * record.quantity)
                 
             #sales transaction
-            elif record.quantity < 0:
+            elif record.stock_move_id.picking_id.picking_type_id.code == 'outgoing':
                 domain = [
                     ('product_id', '=', record.product_id.id),
                     ('stock_move_id.picking_id.date_done', '<', record.stock_move_id.picking_id.date_done),
