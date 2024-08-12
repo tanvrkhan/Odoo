@@ -307,13 +307,14 @@ class StockValuationLayer(models.Model):
                 self.reset_accounting(record)
                 continue
             #purchase transaction
-            elif record.stock_move_id.picking_id.picking_type_id.code == 'internal':
+            elif sm.picking_id.picking_type_id.code == 'internal':
                 #internal transfer
-                if sm.picking_id.picking_type_id.code == 'internal' and sm.quantity_done > 0:
+                 if record.quantity > 0:
                     all_valuations = stock_valuations.search(
                     [
                         ('stock_move_id', '=', sm.id),
-                        ('quantity', '=', record.quantity * -1)
+                        ('quantity', '=', record.quantity * -1),
+                        ('id', '!=', record.id )
                     ])
                     all_valuations.recalculate_stock_value(adjustdate)
                     total_quantity = sum(v.quantity for v in all_valuations)
