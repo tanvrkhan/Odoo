@@ -307,21 +307,19 @@ class StockValuationLayer(models.Model):
                 self.reset_accounting(record)
                 continue
             #purchase transaction
-            elif sm.picking_id.picking_type_id.code == 'internal':
-                #internal transfer
-                 if record.quantity > 0:
-                    all_valuations = stock_valuations.search(
-                    [
-                        ('stock_move_id', '=', sm.id),
-                        ('quantity', '=', record.quantity * -1),
-                        ('id', '!=', record.id )
-                    ])
-                    all_valuations.recalculate_stock_value(adjustdate)
-                    total_quantity = sum(v.quantity for v in all_valuations)
-                    total_value = sum(v.value for v in all_valuations)
-                    applicablequantity = record.quantity
-                    temprate = total_value / total_quantity
-                    applicableamount = applicablequantity * temprate
+            elif sm.picking_id.picking_type_id.code == 'internal' and record.quantity > 0:
+                all_valuations = stock_valuations.search(
+                [
+                    ('stock_move_id', '=', sm.id),
+                    ('quantity', '=', record.quantity * -1),
+                    ('id', '!=', record.id )
+                ])
+                all_valuations.recalculate_stock_value(adjustdate)
+                total_quantity = sum(v.quantity for v in all_valuations)
+                total_value = sum(v.value for v in all_valuations)
+                applicablequantity = record.quantity
+                temprate = total_value / total_quantity
+                applicableamount = applicablequantity * temprate
 
                 #external purchase
             elif record.stock_move_id.picking_id.picking_type_id.code == 'incoming':
@@ -335,7 +333,7 @@ class StockValuationLayer(models.Model):
                 applicableamount += (rateusd * record.quantity)
                 
             #sales transaction
-            elif record.stock_move_id.picking_id.picking_type_id.code == 'outgoing':
+            elif record.stock_move_id.picking_id.picking_type_id.code == 'outgoing' or (record.stock_move_id.picking_id.picking_type_id.code == 'internal' and record.quantity<0):
                 domain = [
                     ('product_id', '=', record.product_id.id),
                     ('stock_move_id.picking_id.date_done', '<', record.stock_move_id.picking_id.date_done),
