@@ -174,11 +174,15 @@ class StorageInspectorBuildDrawDataBI(models.Model):
                 if rec.internalcompany:
                     company = self.env['res.company'].search([('name', '=', rec.internalcompany)], limit=1)
                     if company:
-                        balancing_warehouse =  self.env['fusion.sync.history'].validate_warehouse('Stock Adjustments',company)
-                        warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.storage,company)
-                        self.env.cr.commit()
-                        if balancing_warehouse and warehouse:
-                            rec.create_picking(rec,balancing_warehouse,warehouse,company)
+                        if rec.builddrawtype=="Stock Adjustments":
+                            balancing_warehouse =  self.env['fusion.sync.history'].validate_warehouse('Stock Adjustments',company)
+                            warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.storage,company)
+                            self.env.cr.commit()
+                            if balancing_warehouse and warehouse:
+                                rec.create_picking(rec,balancing_warehouse,warehouse,company)
+                        elif rec.builddrawtype == "Build Draw Gain Loss":
+                            rec.handle_build_draw_gain_loss()
+                            self.env.cr.commit()
                 else:
                     raise UserError("Company is not selected on storage level in Fusion.")
             else:
@@ -188,7 +192,19 @@ class StorageInspectorBuildDrawDataBI(models.Model):
                     exists.action_cancel()
                     
 
-    
+    def handle_build_draw_gain_loss(self):
+        am = self.env['stock.move'].search([('fusion_delivery_id', '=', self.transfernumber),('state','=','done'),('picking_id.fusion_build_draw','!=',self.builddrawnum)])
+        if am:
+            if am.product_uom.name== self.quantityuom or (self.quantityuom in ('MT (Vac)','MT') and am.product_uom.name in ('MT (Vac)','MT')):
+                # am.picking_id.set_stock_move_to_draft()
+                
+                lot_ids = [line.lot_id for line in am.move_line_ids if line.lot_id]
+                first_lot_id = lot_ids[0] if lot_ids else None
+                am.quantity_done = am.quantity_done+self.builddrawqty
+                am.move_line_ids.lot_id = first_lot_id
+                am.picking_id.fusion_build_draw =  self.builddrawnum
+                # am.picking_id.button_validate()
+            
     def create_picking(self,rec,balancing_warehouse,warehouse,company):
         existing_picking = self.env['stock.picking'].search([('fusion_build_draw', '=', self.builddrawnum)])
         if existing_picking:

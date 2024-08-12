@@ -281,7 +281,7 @@ class InvoiceControllerBI(models.Model):
         existing_line.price_unit = cf.price * multiplier
         existing_line.purchase_line_id = pol.id
         existing_line.analytic_distribution = pol.analytic_distribution
-        existing_line.taxes_id = [(6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
+        existing_line.tax_ids = [(6, 0, [tax_rate_record.id])] if tax_rate_record else existing_line.tax_ids if existing_line.tax_ids else [(6, 0, [])]
         
         
     def create_product_line_existing_invoice(self, existing_invoice, cf, product, uom, pol, tax_rate_record, multiplier, company):
@@ -357,8 +357,9 @@ class InvoiceControllerBI(models.Model):
             existing_line.price_unit = float(cf.extendedamount) * -1
             existing_line.purchase_line_id = pol.id
             existing_line.analytic_distribution = pol.analytic_distribution
-            existing_line.taxes_id = [
-                (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
+            existing_line.tax_ids = [(6, 0, [
+                tax_rate_record.id])] if tax_rate_record else existing_line.tax_ids if existing_line.tax_ids else [
+                (6, 0, [])]
         else:
             cost = self.env['fusion.sync.history'].validate_cost(cf.costtype)
             existing_line.name = pol.product_id.name
@@ -367,8 +368,10 @@ class InvoiceControllerBI(models.Model):
             existing_line.price_unit = float(cf.price) * -1
             existing_line.purchase_line_id = pol.id
             existing_line.analytic_distribution = pol.analytic_distribution
-            existing_line.taxes_id = [
-                (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
+            existing_line.tax_ids = [(6, 0, [
+                tax_rate_record.id])] if tax_rate_record else existing_line.tax_ids if existing_line.tax_ids else [
+                (6, 0, [])]
+    
     def build_product_invoice_vals(self, pol, po, company, rec,partner):
        
         return {
@@ -807,6 +810,7 @@ class InvoiceControllerBI(models.Model):
             pol = self.env['purchase.order.line'].search([('fusion_segment_code','=', cashflow_id['sectionno'])],limit=1)
         
         tax_rate_record = self.get_tax_rate_record(cashflow_id, company)
+        existing_tax = existing_line.tax_ids
         multiplier = 1
         if existing_line.move_id.move_type == 'in_refund':
             if cashflow_id['payablereceivable'] == 'Payable':
@@ -834,7 +838,11 @@ class InvoiceControllerBI(models.Model):
                 if existing_analytic:
                     for aa in existing_analytic:
                         existing_line.analytic_distribution[aa] = 100
-                existing_line.tax_ids = [(6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
+                if tax_rate_record:
+                    existing_line.tax_ids = [(6, 0, [tax_rate_record.id])]
+                else:
+                    existing_line.tax_ids = existing_tax
+                
             else:
                 log_error = self.env['fusion.sync.history.errors'].log_error('InvoiceControllerBI',
                                                                          cashflow_id.invoicenumber,
@@ -857,9 +865,11 @@ class InvoiceControllerBI(models.Model):
                 if existing_analytic:
                     for aa in existing_analytic:
                         existing_line.analytic_distribution[aa] = 100
-                
-            existing_line.tax_ids = [
-                (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
+            
+            if tax_rate_record:
+                existing_line.tax_ids = [(6, 0, [tax_rate_record.id])]
+            else:
+                existing_line.tax_ids = existing_tax
         elif cf['costtype'] in ('Pre-payment_Rev',  'Provisional Payment_Rev'):
             existing_line.product_id = 312,
             existing_line.name = 'Downpayment reversal',
@@ -875,8 +885,10 @@ class InvoiceControllerBI(models.Model):
                     for aa in existing_analytic:
                         existing_line.analytic_distribution[aa] = 100
             
-            existing_line.tax_ids = [
-                (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
+            if tax_rate_record:
+                existing_line.tax_ids = [(6, 0, [tax_rate_record.id])]
+            else:
+                existing_line.tax_ids = existing_tax
         else:
             cost = self.env['fusion.sync.history'].validate_cost(cf['costtype'])
             existing_line.name = pol.product_id.name if pol else cost.name
@@ -891,11 +903,13 @@ class InvoiceControllerBI(models.Model):
                 if existing_analytic:
                     for aa in existing_analytic:
                         existing_line.analytic_distribution[aa] = 100
-            existing_line.tax_ids = [
-                (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
-            
-                            
-                        # primary_cashflows = self.get_cashflow(rec.invoicenumber)
+            if tax_rate_record:
+                existing_line.tax_ids = [(6, 0, [tax_rate_record.id])]
+            else:
+                existing_line.tax_ids = existing_tax
+                
+                
+                # primary_cashflows = self.get_cashflow(rec.invoicenumber)
                         # for cf in primary_cashflows:
                         #     self.update_existing_product_invoice(existing_invoice, cf, po, pol, company)
                         # else:
@@ -928,6 +942,7 @@ class InvoiceControllerBI(models.Model):
         ], limit=1)
         sol = self.env['sale.order.line'].search([('fusion_segment_code', '=', cashflow_id['sectionno'])])
         tax_rate_record = self.get_tax_rate_record(cashflow_id, company)
+        existing_tax = existing_line.tax_ids
         multiplier = 1
         if existing_line.move_id.move_type == 'out_refund':
             if cashflow_id['payablereceivable'] == 'Payable':
@@ -957,7 +972,11 @@ class InvoiceControllerBI(models.Model):
                     for aa in existing_analytic:
                         existing_line.analytic_distribution[aa] = 100
                 existing_line.sale_line_ids = [(4, sol.id)]
-                existing_line.tax_ids = [(6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
+                if tax_rate_record:
+                    existing_line.tax_ids = [(6, 0, [tax_rate_record.id])]
+                else:
+                    existing_line.tax_ids = existing_tax
+                
             else:
                 log_error = self.env['fusion.sync.history.errors'].log_error('InvoiceControllerBI',
                                                                              cashflow_id.invoicenumber,
@@ -975,8 +994,10 @@ class InvoiceControllerBI(models.Model):
             existing_line.quantity = float(1.00)
             existing_line.price_unit = float(cf['extendedamount']  * multiplier)
             existing_analytic = existing_line.analytic_distribution
-            existing_line.tax_ids = [
-                (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
+            if tax_rate_record:
+                existing_line.tax_ids = [(6, 0, [tax_rate_record.id])]
+            else:
+                existing_line.tax_ids = existing_tax
             if sol:
                 if sol.product_id != existing_line.product_id:
                     existing_line.sale_line_ids = [(6, 0, [])]
@@ -992,8 +1013,10 @@ class InvoiceControllerBI(models.Model):
             existing_line.quantity = float(1.00)
             existing_line.price_unit = float(cf['extendedamount'])*multiplier
             existing_analytic = existing_line.analytic_distribution
-            existing_line.tax_ids = [
-                (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
+            if tax_rate_record:
+                existing_line.tax_ids = [(6, 0, [tax_rate_record.id])]
+            else:
+                existing_line.tax_ids = existing_tax
             if sol:
                 if sol.product_id != existing_line.product_id:
                     existing_line.sale_line_ids = [(6, 0, [])]
@@ -1011,8 +1034,10 @@ class InvoiceControllerBI(models.Model):
             existing_line.quantity = (float(cf['quantity']) if cf['quantity'] else 1) * quantity_multiplier
             existing_line.price_unit = float(cf['price'])
             existing_analytic = existing_line.analytic_distribution
-            existing_line.tax_ids = [
-                (6, 0, [tax_rate_record.id])] if tax_rate_record else [(6, 0, [])]
+            if tax_rate_record:
+                existing_line.tax_ids = [(6, 0, [tax_rate_record.id])]
+            else:
+                existing_line.tax_ids = existing_tax
             if sol:
                 if sol.product_id != existing_line.product_id:
                     existing_line.sale_line_ids = [(6, 0, [])]
