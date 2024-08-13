@@ -575,6 +575,17 @@ class InvoiceControllerBI(models.Model):
                                                 self.update_existing_line(same_product_lines,company,cfline,quantity_multiplier,cashflow_lines_all,rec.invoicenumber)
                                             elif float(round(cfline['price'], 2)) == round(same_product_lines.price_unit, 2) and ((same_product_lines.balance<0 and (cfline['extendedamount']*-1)<0) or (same_product_lines.balance>0 and (cfline['extendedamount']*-1)>0)):
                                                     self.update_existing_line(same_product_lines,company,cfline,quantity_multiplier,cashflow_lines_all,rec.invoicenumber)
+                                            elif cfline['costtype'] != 'Primary Settlement' and float(
+                                                    round(cfline['extendedamount'], 2)) == round(
+                                                    same_product_lines.price_unit, 2) and ((
+                                                                                                   same_product_lines.balance > 0 and
+                                                                                                   cfline[
+                                                                                                       'extendedamount'] < 0) or (
+                                                                                                   same_product_lines.balance < 0 and
+                                                                                                   cfline[
+                                                                                                       'extendedamount'] > 0)):
+                                                self.update_existing_si_line(same_product_lines, company, cfline,
+                                                                             quantity_multiplier, rec.invoicenumber)
                                             else:
                                                 line_to_update = existing_invoice.line_ids.filtered(lambda r: r.product_id.name == (cfline['material'] if cfline['costtype'] == 'Primary Settlement' else cfline['costtype']) and r.display_type=='product')
                                                 if len(line_to_update) == 1:
@@ -659,7 +670,7 @@ class InvoiceControllerBI(models.Model):
                                 cashflow_lines = self.env['cashflow.controller.bi'].read_group(
                                     domain=[('invoicenumber', '=', rec.invoicenumber),
                                             ('cashflowstatus', '!=', 'Defunct'),
-                                            ('buysell', '=', 'Sell')],
+                                            ('costrevenue', '=', 'Revenue')],
                                     fields=['payablereceivable', 'costtype', 'commodity',
                                             'material', 'quantityuom', 'quantity', 'price', 'extendedamount'],
                                     # Fields to load
@@ -940,7 +951,9 @@ class InvoiceControllerBI(models.Model):
             ('price', '=', cf['price']),
             ('quantityuom', '=', cf['quantityuom'])
         ], limit=1)
-        sol = self.env['sale.order.line'].search([('fusion_segment_code', '=', cashflow_id['sectionno'])])
+        sol =  self.env['sale.order.line']
+        if cashflow_id['sectionno']:
+            sol = self.env['sale.order.line'].search([('fusion_segment_code', '=', cashflow_id['sectionno'])])
         tax_rate_record = self.get_tax_rate_record(cashflow_id, company)
         existing_tax = existing_line.tax_ids
         multiplier = 1
@@ -959,7 +972,7 @@ class InvoiceControllerBI(models.Model):
             
             
             if sol:
-                existing_analytic = existing_line.analytic_distribution
+                
                 
                 existing_line.name = sol.product_id.name
                 existing_line.product_id = sol.product_id.id
@@ -968,6 +981,7 @@ class InvoiceControllerBI(models.Model):
                 existing_line.price_unit = cf['price']
                 # existing_line.purchase_line_id = sol.id
                 existing_line.analytic_distribution = sol.analytic_distribution
+                existing_analytic = existing_line.analytic_distribution
                 if existing_analytic:
                     for aa in existing_analytic:
                         existing_line.analytic_distribution[aa] = 100
@@ -1028,6 +1042,9 @@ class InvoiceControllerBI(models.Model):
 
             
         else:
+            if not sol:
+                if cashflow_id['sectionno']:
+                    sol = self.env['purchase.order.line'].search([('fusion_segment_code', '=', cashflow_id['sectionno'])])
             cost = self.env['fusion.sync.history'].validate_cost(cf['costtype'])
             existing_line.name = sol.product_id.name if sol else cost.name
             existing_line.product_id = cost.id
