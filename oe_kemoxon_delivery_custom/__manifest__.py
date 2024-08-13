@@ -35,7 +35,8 @@ OdooERP Sales
         'views/legal_entity_views.xml',
         'wizard/message.xml',
         'views/stock_move_line.xml',
-        'views/stock_valuation_layer.xml'
+        'views/stock_valuation_layer.xml',
+        'views/account_move_line_views.xml'
         # 'report/invoice_report_template_dry.xml',
         # menu_items
         # 'views/menu_items.xml',

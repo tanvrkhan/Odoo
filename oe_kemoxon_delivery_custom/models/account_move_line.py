@@ -13,7 +13,15 @@ class UpdateInvoiceCosting(models.Model):
         for rec in self:
             rec.move_id.button_draft()
             rec.move_id.button_cancel()
-
+    
+    def update_accounts_from_product(self):
+        for rec in self:
+            if rec.product_id.name=="Down payment" and "sale" in rec.account_id.name and rec.display_type=="product":
+                if rec.move_id.move_type=="in_invoice" or rec.move_id.move_type=="out_refund":
+                    rec.account_id = rec.product_id.property_account_expense_id
+                elif rec.move_id.move_type=="out_invoice" or rec.move_id.move_type=="in_refund":
+                    rec.account_id = rec.product_id.property_account_income_id
+        
 
         
         # warehouse = False
