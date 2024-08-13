@@ -307,13 +307,9 @@ class TransferControllerBI(models.Model):
                 for data in json_data:
                     exists = all.search([('deliveryid', '=', data['deliveryid'])])
                     if exists:
-                        return
-                        # if exists:
-                        #     return
-                        # else:
-                        #     self.env['cashflow.controller.bi'].search([('cashflowid', '=', data['cashflowid'])]).unlink()
-                        #     self.env['cashflow.controller.bi'].create(data)
-                        #     self.env.cr.commit()
+                        all.search([('deliveryid', '=', data['deliveryid'])]).unlink()
+                        self.env['transfer.controller.bi'].create(data)
+                        self.env.cr.commit()
                     else:
                         self.env['transfer.controller.bi'].create(data)
                         self.env.cr.commit()
