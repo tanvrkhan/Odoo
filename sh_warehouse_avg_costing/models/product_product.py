@@ -23,6 +23,8 @@ class ProductTmpl(models.Model):
                 lambda x: x.warehouse_id.id == warehouse).cost
             if not price:
                 price = self.get_price_from_valuations(warehouse)
+            if not price:
+                price = self.standard_price
         else:
             price = self.get_price_from_valuations(warehouse)
             # price = self.standard_price

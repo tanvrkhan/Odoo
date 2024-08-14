@@ -521,7 +521,7 @@ class InvoiceControllerBI(models.Model):
                 if rec.invoiceopenstatus == 'Send To Accounting':
                     company = self.env['res.company'].search([('name', '=', rec.internalcompany)], limit=1)
                     cashflow_lines_all =  self.env['cashflow.controller.bi'].search([('invoicenumber', '=', rec.invoicenumber),('cashflowstatus', '!=', 'Defunct')])
-                    if (rec.payablereceivable == 'Payable' and '-CN-' not in rec.theirinvoiceref) or (rec.payablereceivable=='Receivable' and '-DN-' in rec.theirinvoiceref):
+                    if (rec.payablereceivable == 'Payable' and '-CN-' not in rec.custominvoicenumber) or (rec.payablereceivable=='Receivable' and '-DN-' in rec.custominvoicenumber):
                         existing_invoice = self.check_existing_invoice(rec.invoicenumber)
                         if existing_invoice:
                             invoice_reconciled_lines = self.get_reconciled_lines(existing_invoice)
@@ -637,7 +637,7 @@ class InvoiceControllerBI(models.Model):
                             # raise UserError('Invoice doesnt exist in Odoo.')
                     
                     
-                    if (rec.payablereceivable == 'Receivable' and '-DN-' not in rec.theirinvoiceref) or (rec.payablereceivable=='Payable' and '-CN-' in rec.theirinvoiceref):
+                    if (rec.payablereceivable == 'Receivable' and '-DN-' not in rec.custominvoicenumber) or (rec.payablereceivable=='Payable' and '-CN-' in rec.custominvoicenumber):
                         sol = self.env['sale.order.line'].search([('id','=',0)])
                         so = self.env['sale.order'].search([('id','=',0)])
                        
@@ -823,7 +823,7 @@ class InvoiceControllerBI(models.Model):
         tax_rate_record = self.get_tax_rate_record(cashflow_id, company)
         existing_tax = existing_line.tax_ids
         multiplier = 1
-        if existing_line.move_id.move_type == 'in_refund':
+        if existing_line.move_id.move_type != 'in_refund':
             if cashflow_id['payablereceivable'] == 'Payable':
                 multiplier=-1
         # if existing_line.move_id.move_type == 'in_refund':

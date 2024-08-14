@@ -57,7 +57,9 @@ class WarehouseAccountMoveLine(models.Model):
             if total_quantity!=0:
                 avg_price= round(total_amount/total_quantity,2)
         else:
-             avg_price= round(self.product_id.with_company(self.company_id)._stock_account_get_anglo_saxon_price_unit(uom=self.product_uom_id),2)
+             result= self.product_id.with_company(self.company_id)._stock_account_get_anglo_saxon_price_unit(uom=self.product_uom_id)
+             if result :
+                 avg_price= round(result,2)
 
 
 
