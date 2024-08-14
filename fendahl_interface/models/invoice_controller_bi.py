@@ -521,7 +521,9 @@ class InvoiceControllerBI(models.Model):
                 if rec.invoiceopenstatus == 'Send To Accounting':
                     company = self.env['res.company'].search([('name', '=', rec.internalcompany)], limit=1)
                     cashflow_lines_all =  self.env['cashflow.controller.bi'].search([('invoicenumber', '=', rec.invoicenumber),('cashflowstatus', '!=', 'Defunct')])
-                    if (rec.payablereceivable == 'Payable' and '-CN-' not in rec.custominvoicenumber) or (rec.payablereceivable=='Receivable' and '-DN-' in rec.custominvoicenumber):
+                    cashflowlinefirst = cashflow_lines_all[0]
+                    buysell =   cashflowlinefirst.buysell
+                    if buysell=="Buy":
                         existing_invoice = self.check_existing_invoice(rec.invoicenumber)
                         if existing_invoice:
                             invoice_reconciled_lines = self.get_reconciled_lines(existing_invoice)
@@ -636,8 +638,7 @@ class InvoiceControllerBI(models.Model):
                             
                             # raise UserError('Invoice doesnt exist in Odoo.')
                     
-                    
-                    if (rec.payablereceivable == 'Receivable' and '-DN-' not in rec.custominvoicenumber) or (rec.payablereceivable=='Payable' and '-CN-' in rec.custominvoicenumber):
+                    elif buysell=="Sell":
                         sol = self.env['sale.order.line'].search([('id','=',0)])
                         so = self.env['sale.order'].search([('id','=',0)])
                        
@@ -670,7 +671,7 @@ class InvoiceControllerBI(models.Model):
                                 cashflow_lines = self.env['cashflow.controller.bi'].read_group(
                                     domain=[('invoicenumber', '=', rec.invoicenumber),
                                             ('cashflowstatus', '!=', 'Defunct'),
-                                            ('costrevenue', '=', 'Revenue')],
+                                            ('buysell', '=', 'Sell')],
                                     fields=['payablereceivable', 'costtype', 'commodity',
                                             'material', 'quantityuom', 'quantity', 'price', 'extendedamount'],
                                     # Fields to load
@@ -902,7 +903,7 @@ class InvoiceControllerBI(models.Model):
                 existing_line.tax_ids = existing_tax
         else:
             cost = self.env['fusion.sync.history'].validate_cost(cf['costtype'])
-            existing_line.name = pol.product_id.name if pol else cost.name
+            existing_line.name =  cost.name
             existing_line.product_id = cost.id
             existing_line.quantity = float(cf['quantity']) if cf['quantity'] else 1 * quantity_multiplier
             existing_line.price_unit = float(cf['price'])
