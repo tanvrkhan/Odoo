@@ -216,8 +216,6 @@ class StockValuationLayer(models.Model):
             datetouse=datetocheck
             if datetouse:
                 datetouse=self.verify_picking_date(record,datetocheck)
-                
-                
                 # next_number = next_number[-5:]
                 year = datetouse.year
                 month = datetouse.month
@@ -229,7 +227,7 @@ class StockValuationLayer(models.Model):
                 record.stock_move_id.picking_id.date_done = datetouse
                 record.stock_move_id.date = datetouse
                 
-                self.reset_accounting(record)
+                self.reset_accounting(record,datetouse)
         return self
     def verify_picking_date(self, record,datetocheck):
         result=datetime.combine(datetocheck, datetime.min.time())
@@ -372,15 +370,18 @@ class StockValuationLayer(models.Model):
    
                 
                 
-    def reset_accounting(self,record):
+    def reset_accounting(self,record,date=None):
         am =record.account_move_id
         am.line_ids.remove_move_reconcile()
         for ae in am.line_ids:
             ae.remove_move_reconcile()
         am.button_draft()
         am.button_cancel()
+        am.button_draft()
+        if date:
+            am.date = date
         self.env.cr.commit()
-        record._validate_accounting_entries()
+        am.action_post()
         
     def repost(self):
         for rec in self:
