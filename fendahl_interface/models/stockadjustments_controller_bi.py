@@ -174,7 +174,7 @@ class StorageInspectorBuildDrawDataBI(models.Model):
                 if rec.internalcompany:
                     company = self.env['res.company'].search([('name', '=', rec.internalcompany)], limit=1)
                     if company:
-                        if rec.builddrawtype=="Stock Adjustments":
+                        if rec.builddrawtype=="Stock Adjustment":
                             balancing_warehouse =  self.env['fusion.sync.history'].validate_warehouse('Stock Adjustments',company)
                             warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.storage,company)
                             self.env.cr.commit()
