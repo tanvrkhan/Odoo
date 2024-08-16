@@ -329,16 +329,35 @@ class TransferControllerBI(models.Model):
                 else:
                     self.env['transfer.controller.bi'].create(data)
                     self.env.cr.commit()
-    def get_quantity_from_controller(self,rec,product):
+    def get_quantity_from_controller(self,rec,product,sm=None):
+        uom_conversion_factor = 1
         if rec.buyselldisplaytext=="Buy":
-            uom_conversion_factor = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),('name', '=', rec.fromactualqtyuomcode)]).ratio
+            if sm:
+                if sm.purchase_line_id:
+                    if sm.purchase_line_id.product_uom.name == rec.fromactualqtyuomcode:
+                        uom_conversion_factor=1
+                    else:
+                        conversionfactor1 = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),('name', '=', sm.purchase_line_id.product_uom.name)]).ratio
+                        conversionfactor2 = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),('name', '=', rec.fromactualqtyuomcode)]).ratio
+                        uom_conversion_factor=conversionfactor1/conversionfactor2
+                else:
+                    uom_conversion_factor = 1
             if rec.fromactualqty:
                 return float(rec.fromactualqty) * float(uom_conversion_factor)
             elif rec.fromscheduledqty:
                 return float(rec.fromscheduledqty) * float(uom_conversion_factor)
         elif rec.buyselldisplaytext=="Sell":
-            uom_conversion_factor = self.env['uom.uom'].search(
-                [('category_id', '=', product.uom_id.category_id.id), ('name', '=', rec.toactualqtyuomcode)]).ratio
+            if sm:
+                if sm.sale_line_id:
+                    if sm.sale_line_id.product_uom.name == rec.toactualqtyuomcode:
+                        uom_conversion_factor = 1
+                    else:
+                        conversionfactor1 = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),('name', '=', sm.sale_line_id.product_uom.name)]).ratio
+                        conversionfactor2 = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),
+                                                                        ('name', '=', rec.toactualqtyuomcode)]).ratio
+                        uom_conversion_factor = conversionfactor1/conversionfactor2
+                else:
+                    uom_conversion_factor = 1
             if rec.toactualqty:
                 return float(rec.toactualqty) * float(uom_conversion_factor)
             elif rec.toscheduledqty:
@@ -370,7 +389,7 @@ class TransferControllerBI(models.Model):
         lot = self.env['fusion.sync.history'].validate_lot(rec.itineraryid if rec.itineraryid else rec.deliveryid, product.id,
                                                            company.id)
         
-        quantity = self.get_quantity_from_controller(rec,product)
+        quantity = self.get_quantity_from_controller(rec,product,stock_move)
         existing_line = stock_move.move_line_ids.filtered(
             lambda ml: ml.fusion_delivery_id == rec.deliveryid)
         if existing_line:
