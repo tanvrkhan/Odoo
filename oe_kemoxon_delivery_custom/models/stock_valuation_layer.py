@@ -360,7 +360,7 @@ class StockValuationLayer(models.Model):
                 record.unit_cost = rateusd
                 
                 record.value = applicableamount
-                self.reset_accounting(record)
+                self.reset_accounting(record,record.stock_move_id.picking_id.custom_delivery_date)
                 
             self.env.cr.commit()
             
@@ -378,12 +378,23 @@ class StockValuationLayer(models.Model):
             ae.remove_move_reconcile()
         am.button_draft()
         am.button_cancel()
-        am.button_draft()
+        # am.button_draft()
         record._validate_accounting_entries()
+        am = record.account_move_id
+        # am.button_draft()
+        # if record.stock_move_id.picking_id.custom_delivery_date:
+        #     datetocheck = record.stock_move_id.picking_id.custom_delivery_date
+        # else:
+        #     datetocheck = record.stock_move_id.picking_id.scheduled_date
+        # datetouse = datetocheck
         if date:
             am.date = date
+        # if date:
+        #     am.date = date
+
+
+        # am.action_post()
         self.env.cr.commit()
-        am.action_post()
         
     def repost(self):
         for rec in self:
