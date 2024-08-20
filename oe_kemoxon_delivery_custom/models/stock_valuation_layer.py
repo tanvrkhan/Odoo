@@ -279,7 +279,7 @@ class StockValuationLayer(models.Model):
     
     def recalculate_stock_value(self,adjustdate=True):
         if adjustdate:
-            self.update_date_without_accounting_date()
+            self.update_date_to_schedule_date()
             self.env.cr.commit()
         wrong = 0
         sortedself = self.sorted(key=lambda r: r.create_date)
