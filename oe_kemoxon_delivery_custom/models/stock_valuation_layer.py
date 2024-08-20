@@ -358,6 +358,7 @@ class StockValuationLayer(models.Model):
                 if round(record.unit_cost,2)!=round(rateusd,2):
                     wrong+= 1
                 record.unit_cost = rateusd
+                
                 record.value = applicableamount
                 self.reset_accounting(record)
                 
@@ -378,6 +379,7 @@ class StockValuationLayer(models.Model):
         am.button_draft()
         am.button_cancel()
         am.button_draft()
+        record._validate_accounting_entries()
         if date:
             am.date = date
         self.env.cr.commit()
