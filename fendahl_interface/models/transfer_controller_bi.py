@@ -332,36 +332,49 @@ class TransferControllerBI(models.Model):
     def get_quantity_from_controller(self,rec,product,sm=None):
         uom_conversion_factor = 1
         if rec.buyselldisplaytext=="Buy":
-            if sm:
-                if sm.purchase_line_id:
-                    if sm.purchase_line_id.product_uom.name == rec.fromactualqtyuomcode:
-                        uom_conversion_factor=1
-                    else:
-                        conversionfactor1 = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),('name', '=', sm.purchase_line_id.product_uom.name)]).ratio
-                        conversionfactor2 = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),('name', '=', rec.fromactualqtyuomcode)]).ratio
-                        uom_conversion_factor=conversionfactor1/conversionfactor2
-                else:
-                    uom_conversion_factor = 1
+            # if sm:
+                # if sm.purchase_line_id:
+                #     if sm.purchase_line_id.product_uom.name == rec.fromactualqtyuomcode:
+                #         uom_conversion_factor=1
+                #     else:
+                #         conversionfactor1 = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),('name', '=', sm.purchase_line_id.product_uom.name)]).ratio
+                #         conversionfactor2 = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),('name', '=', rec.fromactualqtyuomcode)]).ratio
+                #         uom_conversion_factor=conversionfactor1/conversionfactor2
+                # else:
+                #     uom_conversion_factor = 1
             if rec.fromactualqty:
+                sm.product_uom = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),('name', '=', rec.fromactualqtyuomcode)]).id
                 return float(rec.fromactualqty) * float(uom_conversion_factor)
+            
             elif rec.fromscheduledqty:
+                sm.product_uom = self.env['uom.uom'].search(
+                    [('category_id', '=', product.uom_id.category_id.id), ('name', '=', rec.fromscheduledqtyuomcode)]).id
                 return float(rec.fromscheduledqty) * float(uom_conversion_factor)
         elif rec.buyselldisplaytext=="Sell":
-            if sm:
-                if sm.sale_line_id:
-                    if sm.sale_line_id.product_uom.name == rec.toactualqtyuomcode:
-                        uom_conversion_factor = 1
-                    else:
-                        conversionfactor1 = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),('name', '=', sm.sale_line_id.product_uom.name)]).ratio
-                        conversionfactor2 = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),
-                                                                        ('name', '=', rec.toactualqtyuomcode)]).ratio
-                        uom_conversion_factor = conversionfactor1/conversionfactor2
-                else:
-                    uom_conversion_factor = 1
+            # if sm:
+                # if sm.sale_line_id:
+                #     if sm.sale_line_id.product_uom.name == rec.toactualqtyuomcode:
+                #         uom_conversion_factor = 1
+                #     else:
+                #         conversionfactor1 = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),('name', '=', sm.sale_line_id.product_uom.name)]).ratio
+                #         conversionfactor2 = self.env['uom.uom'].search([('category_id', '=', product.uom_id.category_id.id),
+                #                                                         ('name', '=', rec.toactualqtyuomcode)]).ratio
+                #         uom_conversion_factor = conversionfactor1/conversionfactor2
+                # else:
+                #     uom_conversion_factor = 1
             if rec.toactualqty:
+                sm.product_uom = self.env['uom.uom'].search(
+                    [('category_id', '=', product.uom_id.category_id.id), ('name', '=', rec.toactualqtyuomcode)]).id
                 return float(rec.toactualqty) * float(uom_conversion_factor)
             elif rec.toscheduledqty:
+                sm.product_uom = self.env['uom.uom'].search(
+                    [('category_id', '=', product.uom_id.category_id.id), ('name', '=', rec.toscheduledqtyuomcode)]).id
                 return float(rec.toscheduledqty) * float(uom_conversion_factor)
+        else:
+            if sm:
+                sm.product_uom = self.env['uom.uom'].search(
+                    [('category_id', '=', product.uom_id.category_id.id), ('name', '=', rec.toactualqtyuomcode)]).id
+            return float(rec.toactualqty)
         # else:
         #     uom =''
         #     if rec.toactualqtyuomcode:
