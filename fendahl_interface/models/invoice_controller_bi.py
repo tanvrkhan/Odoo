@@ -545,6 +545,7 @@ class InvoiceControllerBI(models.Model):
                                             else:
                                                 invoice_origins = invoice_origins + ', ' + pol.order_id.name
                             existing_invoice.write({'invoice_origin': invoice_origins}) if invoice_origins else None
+                            existing_invoice.ref = rec.theirinvoiceref
                             if existing_invoice.line_ids:
                                 cashflow_lines = cashflow_lines_all.read_group(
                                 domain=[('invoicenumber', '=', rec.invoicenumber),('cashflowstatus', '!=', 'Defunct')],
