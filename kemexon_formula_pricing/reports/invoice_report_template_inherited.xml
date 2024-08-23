@@ -214,7 +214,8 @@
 
                                 <td t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
                                     <t t-if="line.product_id.name != 'Down payment'">
-                                        <span class="text-nowrap" t-field="line.price_unit" t-options='{"precision": 2}'/>
+                                        <span class="text-nowrap" t-field="line.price_unit"
+                                              t-options='{"precision": 2}'/>
                                     </t>
                                     <t t-else="">
                                         <span></span>
@@ -683,8 +684,9 @@
                             </div>
                             <div class="col-7" style="padding-left: 0px;">
                                 <t t-if="o.company_bank_account_id">
-                                    <span style="text-align:left;" class="m-0"
-                                          t-field="o.company_bank_account_id.acc_number"/>
+                                    <span style="text-align:left;" class="m-0">
+                                        <t t-esc="o.company_bank_account_id.acc_number.replace(' ', '')"/>
+                                    </span>
                                 </t>
                             </div>
                         </div>

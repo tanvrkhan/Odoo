@@ -227,7 +227,8 @@
                                               groups="account.group_show_line_subtotals_tax_included"/>
                                     </t>
                                     <t t-else="">
-                                        <span class="text-nowrap" t-field="line.price_unit" t-options='{"precision": 2}'/>
+                                        <span class="text-nowrap" t-field="line.price_unit"
+                                              t-options='{"precision": 2}'/>
                                     </t>
                                 </td>
                             </t>
@@ -424,8 +425,9 @@
                                 </div>
                                 <div class="col-7" style="padding-left: 0px;">
                                     <t t-if="doc.partner_id.company_bank_account_id">
-                                        <span style="text-align:left;" class="m-0"
-                                              t-field="doc.partner_id.company_bank_account_id.acc_number"/>
+                                        <span style="text-align:left;" class="m-0">
+                                            <t t-esc="doc.partner_id.company_bank_account_id.acc_number.replace(' ', '')"/>
+                                        </span>
                                     </t>
                                 </div>
                             </div>
