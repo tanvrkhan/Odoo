@@ -520,6 +520,14 @@ class InvoiceControllerBI(models.Model):
                                                                     ('Primary Settlement', 'VAT', 'Tax'))
                                                               ])
     
+    def getinvoiceref(self,ref):
+        exists = self.env['account.move'].search([('ref', '=', ref)])
+        if exists:
+            ref = self.getinvoiceref(ref+'.')
+            return ref
+        else:
+            return ref
+            
     def create_bill(self):
         for rec in self:
             if rec.invoicestatus == 'Active':
@@ -552,7 +560,9 @@ class InvoiceControllerBI(models.Model):
                                             else:
                                                 invoice_origins = invoice_origins + ', ' + pol.order_id.name
                             existing_invoice.write({'invoice_origin': invoice_origins}) if invoice_origins else None
-                            existing_invoice.ref = rec.theirinvoiceref
+                            for invoice in existing_invoice:
+                                invoice.ref = self.getinvoiceref(rec.theirinvoiceref)
+                            self.env.cr.commit()
                             if existing_invoice.line_ids:
                                 cashflow_lines = cashflow_lines_all.read_group(
                                     domain=[('invoicenumber', '=', rec.invoicenumber),
