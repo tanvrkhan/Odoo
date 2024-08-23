@@ -535,7 +535,8 @@ class InvoiceControllerBI(models.Model):
                     company = self.env['res.company'].search([('name', '=', rec.internalcompany)], limit=1)
                     cashflow_lines_all = self.env['cashflow.controller.bi'].search(
                         [('invoicenumber', '=', rec.invoicenumber), ('cashflowstatus', '!=', 'Defunct')])
-                    cashflowlinefirst = cashflow_lines_all[0]
+                    cashflowlinefirst = cashflow_lines_all.filtered(
+                                            lambda r: r.buysell !=False)[0]
                     buysell = cashflowlinefirst.buysell
                     if buysell == "Buy":
                         existing_invoice = self.check_existing_invoice(rec.invoicenumber)
@@ -579,14 +580,27 @@ class InvoiceControllerBI(models.Model):
                                 payables = sum(r['extendedamount'] for r in cashflow_lines if
                                                r['payablereceivable'] == 'Payable') * -1
                                 
-                                if payables == 0 and receivables > 0:
-                                    existing_invoice.move_type = 'in_refund'
-                                elif payables < receivables:
-                                    quantity_multiplier = -1
-                                    existing_invoice.move_type = 'in_refund'
-                                else:
-                                    existing_invoice.move_type = 'in_invoice'
                                 
+                                if len(cashflow_lines)==1:
+                                    if receivables > payables:
+                                        existing_invoice.move_type = 'in_refund'
+                                    else:
+                                        existing_invoice.move_type = 'out_invoice'
+                                elif len(cashflow_lines)>1:
+                                    if receivables > payables:
+                                        quantity_multiplier = -1
+                                        existing_invoice.move_type = 'in_refund'
+                                    else:
+                                        existing_invoice.move_type = 'in_invoice'
+                                        
+                                # if payables == 0 and receivables > 0:
+                                #     existing_invoice.move_type = 'in_refund'
+                                # elif payables < receivables:
+                                #     quantity_multiplier = -1
+                                #     existing_invoice.move_type = 'in_refund'
+                                # else:
+                                #     existing_invoice.move_type = 'in_invoice'
+                                #
                                 if cashflow_lines:
                                     for cfline in cashflow_lines:
                                         same_product_lines = existing_invoice.line_ids.filtered(
