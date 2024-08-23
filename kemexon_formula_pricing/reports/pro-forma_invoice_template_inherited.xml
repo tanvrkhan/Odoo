@@ -426,7 +426,7 @@
                                 <div class="col-7" style="padding-left: 0px;">
                                     <t t-if="doc.partner_id.company_bank_account_id">
                                         <span style="text-align:left;" class="m-0">
-                                            <t t-esc="doc.company_bank_account_id.acc_number.replace(' ', '')"/>
+                                            <t t-esc="doc.partner_id.company_bank_account_id.acc_number.replace(' ', '')"/>
                                         </span>
                                     </t>
                                 </div>
