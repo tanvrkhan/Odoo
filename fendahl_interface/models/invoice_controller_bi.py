@@ -585,7 +585,7 @@ class InvoiceControllerBI(models.Model):
                                     if receivables > payables:
                                         existing_invoice.move_type = 'in_refund'
                                     else:
-                                        existing_invoice.move_type = 'out_invoice'
+                                        existing_invoice.move_type = 'in_invoice'
                                 elif len(cashflow_lines)>1:
                                     if receivables > payables:
                                         quantity_multiplier = -1
