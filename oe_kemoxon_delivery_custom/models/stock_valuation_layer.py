@@ -322,11 +322,16 @@ class StockValuationLayer(models.Model):
                 #external purchase
             elif record.stock_move_id.picking_id.picking_type_id.code == 'incoming':
                 pl= sm.purchase_line_id
+                rate = 0
+                if sm.purchase_line_id.product_uom== sm.product_uom:
+                    rate = round(pl.price_unit, 2)
+                else:
+                    rate = sm.purchase_line_id.product_uom._compute_price(pl.price_unit, sm.product_uom)
                 base_currency = record.company_id.currency_id
                 applicablequantity = record.quantity
-                rate=round(pl.price_unit,2)
+                
                 rateusd = round(pl.order_id.currency_id._convert(
-                    pl.price_unit,
+                    rate,
                     base_currency, record.company_id, sm.date, True),2)
                 applicableamount += (rateusd * record.quantity)
                 
