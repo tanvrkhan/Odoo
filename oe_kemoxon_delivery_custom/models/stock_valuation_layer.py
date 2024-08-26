@@ -35,9 +35,14 @@ class StockValuationLayer(models.Model):
         for record in self:
             if record.stock_move_id.picking_id.picking_type_id.code == 'incoming':
                 pl = record.stock_move_id.purchase_line_id
+                rate = 0
+                if record.stock_move_id.purchase_line_id.product_uom == record.stock_move_id.product_uom:
+                    rate = round(pl.price_unit, 2)
+                else:
+                    rate = record.stock_move_id.purchase_line_id.product_uom._compute_price(pl.price_unit, record.stock_move_id.product_uom)
                 base_currency = record.company_id.currency_id
                 rateusd = round(pl.order_id.currency_id._convert(
-                    pl.price_unit,
+                    rate,
                     base_currency, record.company_id, record.stock_move_id.date, True), 2)
                 record.warehouse_weighted_average = round(rateusd,2)
             elif record.stock_move_id.picking_id.picking_type_id.code == 'internal' and record.quantity>0:
