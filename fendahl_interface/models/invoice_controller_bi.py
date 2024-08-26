@@ -746,7 +746,7 @@ class InvoiceControllerBI(models.Model):
                             existing_invoice.write({'invoice_origin': invoice_origins}) if invoice_origins else None
                             if existing_invoice:
                                 for invoice in existing_invoice:
-                                    invoice.ref = self.getinvoiceref(rec.theirinvoiceref)
+                                    invoice.deal_ref = self.getinvoiceref(rec.theirinvoiceref)
                                     if invoice.company_id.id in (1, 2):
                                         costtypes = cashflow_lines_all.read_group(
                                             domain=[('invoicenumber', '=', rec.invoicenumber),
