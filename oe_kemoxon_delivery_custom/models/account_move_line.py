@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 # Part of Softhealer Technologies.
-from odoo import models
+from odoo import models,fields
 
 
 class UpdateInvoiceCosting(models.Model):
     _inherit = 'account.move.line'
 
-    
-        
+    stock_picking_id = fields.Many2one(
+        related='move_id.stock_move_id.picking_id',
+        string='Stock Picking',
+        readonly=True
+    )
        
     def reset_to_draft(self) :
         for rec in self:
