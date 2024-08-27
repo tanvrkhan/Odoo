@@ -9,6 +9,7 @@ class truck_transport_details(models.Model):
     _sql_constraints = [
         ('checkPrices', 'CHECK(nominated >= 0 AND loaded >=0 AND offloaded>=0 )', 'Quantities cannot be less than 0')
     ]
+    
 
     transporter = fields.Many2one("res.partner", "Transporter")
     truck = fields.Char("Truck", required=True)
