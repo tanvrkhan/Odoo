@@ -8,6 +8,8 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='account_id']" position="after">
                     <field name="stock_picking_id" widget="open_transfer_widget"/>
+                    <field name="origin_order"/>
+
                 </xpath>
             </field>
         </record>
@@ -21,15 +23,17 @@
             <field name="code">records.update_accounts_from_product()</field>
         </record>
 
-        <!--        <record id="view_move_form_account_payment" model="ir.ui.view">-->
-        <!--            <field name="name">account.payment.form</field>-->
-        <!--            <field name="model">account.payment</field>-->
-        <!--            <field name="inherit_id" ref="account.view_account_payment_form"/>-->
-        <!--            <field name="arch" type="xml">-->
-        <!--                <xpath expr="//field[@name='partner_id']" position="attributes">-->
-        <!--                    <attribute name="options">{'no_quick_create':True,'no_create_edit':True,'no_open': True,}</attribute>-->
-        <!--                </xpath>-->
-        <!--            </field>-->
-        <!--        </record>-->
+        <record id="view_account_move_search_custom_order" model="ir.ui.view">
+            <field name="name">account.move.select.inherit.origin_order</field>
+            <field name="model">account.move.line</field>
+            <field name="inherit_id" ref="account.view_account_move_line_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[last()]" position="after">
+                    <filter string="Origin Order" name="group_by_origin_order" domain="[]"
+                            context="{'group_by':'origin_order'}"/>
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </odoo>

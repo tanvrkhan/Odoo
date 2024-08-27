@@ -11,7 +11,22 @@ class UpdateInvoiceCosting(models.Model):
         string='Stock Picking',
         readonly=True
     )
-       
+    origin_order = fields.Char("Order", compute='_compute_order', store=True)
+    def _compute_order(self):
+        for record in self:
+            record.origin_order = ''
+            if record.move_id.move_type in ['in_invoice', 'in_refund','out_invoice', 'out_refund']:
+                if record.move_id.invoice_origin:
+                    record.origin_order =record.move_id.invoice_origin
+                else:
+                    record.origin_order =''
+            else:
+                if record.move_id.stock_move_id.purchase_line_id:
+                    record.origin_order = record.move_id.stock_move_id.purchase_line_id.order_id.name
+                elif record.move_id.stock_move_id.sale_line_id:
+                    record.origin_order = record.move_id.stock_move_id.sale_line_id.order_id.name
+                
+        
     def reset_to_draft(self) :
         for rec in self:
             rec.move_id.button_draft()
