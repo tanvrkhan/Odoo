@@ -680,7 +680,7 @@
 
                         <div class="col-12 row" t-if="o.company_bank_account_id.acc_number">
                             <div class="col-5" style="padding-left: 4px;">
-                                <strong>A/C No</strong>
+                                <strong>A/C No. / IBAN</strong>
                             </div>
                             <div class="col-7" style="padding-left: 0px;">
                                 <t t-if="o.company_bank_account_id">
