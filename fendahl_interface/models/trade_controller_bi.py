@@ -289,7 +289,7 @@ class TradeControllerBI(models.Model):
     def process_odoo_transaction_action(self):
         interface = self.env['fusion.sync.history']
         last_processing_date = interface.get_last_processing('trade')
-        trades_to_process =  self.env['trade.controller.bi'].search([('lastmodifydate','>=',last_processing_date)])
+        trades_to_process =  self.env['trade.controller.bi'].search([('lastmodifydate','>=',last_processing_date),('counterpartcompany','!=','Marex')])
         for rec in trades_to_process:
             if rec.internalcompany == 'KEMEXON LTD' or  rec.internalcompany == 'KEMEXON SA':
                 rec.create_order()

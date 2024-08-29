@@ -10,7 +10,7 @@ class ProductTmpl(models.Model):
 
     warehouse_cost_lines = fields.One2many('sh.warehouse.cost', 'product_id')
 
-    def _stock_account_get_anglo_saxon_price_unit(self, uom=False, warehouse=False):
+    def _stock_account_get_anglo_saxon_price_unit(self, uom=False, warehouse=False,date=False,quantity=False):
         # * Softhealer code Start *
 
         # Added warehouse in the argument and setting price based on warehouse
@@ -19,46 +19,49 @@ class ProductTmpl(models.Model):
 
         price = 0.0
         if warehouse:
-            price = self.warehouse_cost_lines.filtered(
-                lambda x: x.warehouse_id.id == warehouse).cost
+            price = self.get_price_from_valuations(warehouse,date,quantity)
             if not price:
-                price = self.get_price_from_valuations(warehouse)
+                price =self.warehouse_cost_lines.filtered(
+                    lambda x: x.warehouse_id.id == warehouse).cost
             if not price:
                 price = self.standard_price
         else:
-            price = self.get_price_from_valuations(warehouse)
+            price = self.get_price_from_valuations(warehouse,date,quantity)
             # price = self.standard_price
         if not self or not uom or self.uom_id.id == uom.id:
             return price or 0.0
         return self.uom_id._compute_price(price, uom)
-    def get_price_from_valuations(self,warehouse):
+    def get_price_from_valuations(self,warehouse,date=False,quantity=False):
+        domain = [
+            ('product_id', '=', self.product_variant_id.id),
+            ('company_id', '=', self.env.company.id),
+            ('stock_move_id.picking_id.date_done', '<=', date)
+        ]
         if warehouse:
-            valuations = self.env['stock.valuation.layer'].read_group(
-            domain=[('product_id', '=', self.product_variant_id.id),
-                    ('company_id', '=', self.env.company.id),
-                    ('warehouse_id', '=', warehouse.id)
-                    ],
+            domain.append(('warehouse_id', '=', warehouse.id))
+        valuations = self.env['stock.valuation.layer'].read_group(
+            domain=domain,
             fields=['warehouse_id', 'quantity', 'value'],
             # Fields to load
             groupby=['warehouse_id'],
             lazy=False  # Get results for each partner directly
         )
-        else:
+        quantity_left = sum(v['quantity'] for v in valuations)
+        if quantity_left<quantity:
+            domain.append(('quantity', '>', 0))
             valuations = self.env['stock.valuation.layer'].read_group(
-                domain=[('product_id', '=', self.product_variant_id.id),
-                        ('company_id', '=', self.env.company.id)
-                        ],
+                domain=domain,
                 fields=['warehouse_id', 'quantity', 'value'],
                 # Fields to load
                 groupby=['warehouse_id'],
                 lazy=False  # Get results for each partner directly
             )
-        if valuations:
-            for valuation in valuations:
-                if valuation['quantity'] > 0:
-                    return valuation['value'] / valuation['quantity']
         
-    def _prepare_out_svl_vals(self, quantity, company, warehouse=False):
+        if valuations:
+            if sum(v['quantity'] for v in valuations) > 0:
+                return sum(v['value'] for v in valuations) / sum(v['quantity'] for v in valuations)
+        
+    def _prepare_out_svl_vals(self, quantity, company, warehouse=False,date=False):
         """Prepare the values for a stock valuation layer created by a delivery.
 
         :param quantity: the quantity to value, expressed in `self.uom_id`
@@ -100,7 +103,7 @@ class ProductTmpl(models.Model):
                         'unit_cost': price
                     })
                 else:
-                    price = self.get_price_from_valuations(warehouse)
+                    price = self.get_price_from_valuations(warehouse,date,quantity)
                     if price:
                         vals.update({
                             'value': quantity * price,

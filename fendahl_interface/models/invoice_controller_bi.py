@@ -598,17 +598,23 @@ class InvoiceControllerBI(models.Model):
                                         invoice.posted_before = False
                                         invoice.sequence_number = 0
                                         if "Primary Settlement" in costtype_list:
-                                            invoice.journal_id = self.env['account.journal'].search(
+                                            expected_journal = self.env['account.journal'].search(
                                                 [('name', '=', 'Purchases'),
                                                  ('company_id', '=', invoice.company_id.id)]).id
+                                            if invoice.journal_id != expected_journal:
+                                                invoice.journal_id=expected_journal
                                         elif 'Pre-payment_Rev' in costtype_list or 'Provisional Payment_Rev' in costtype_list or 'Pre-payment' in costtype_list or 'Provisional Payment' in costtype_list:
-                                            invoice.journal_id = self.env['account.journal'].search(
+                                             expected_journal =  self.env['account.journal'].search(
                                                 [('name', '=', 'Provisional Purchases'),
                                                  ('company_id', '=', invoice.company_id.id)]).id
+                                             if invoice.journal_id != expected_journal:
+                                                 invoice.journal_id = expected_journal
                                         else:
-                                            invoice.journal_id = self.env['account.journal'].search(
+                                            expected_journal = self.env['account.journal'].search(
                                             [('name', '=', 'Purchases'),
                                              ('company_id', '=', invoice.company_id.id)]).id
+                                            if invoice.journal_id != expected_journal:
+                                                invoice.journal_id = expected_journal
                                         
                             
                             self.env.cr.commit()
@@ -775,20 +781,31 @@ class InvoiceControllerBI(models.Model):
                                             groupby=['costtype'],
                                             lazy=False)
                                         costtype_list = [ct['costtype'] for ct in costtypes]
-                                        invoice.posted_before = False
-                                        invoice.sequence_number = 0
+                                      
                                         if "Primary Settlement" in costtype_list:
-                                            invoice.journal_id = self.env['account.journal'].search(
+                                            expected_journal = self.env['account.journal'].search(
                                                 [('name', '=', 'Purchases'),
-                                                 ('company_id', '=', invoice.company_id.id)]).id
+                                                 ('company_id', '=', invoice.company_id.id)])
+                                            if invoice.journal_id != expected_journal:
+                                                invoice.posted_before = False
+                                                invoice.sequence_number = 0
+                                                invoice.journal_id=expected_journal.id
                                         elif 'Pre-payment_Rev' in costtype_list or 'Provisional Payment_Rev' in costtype_list or 'Pre-payment' in costtype_list or 'Provisional Payment' in costtype_list:
-                                            invoice.journal_id = self.env['account.journal'].search(
+                                            expected_journal = self.env['account.journal'].search(
                                                 [('name', '=', 'Provisional Purchases'),
-                                                 ('company_id', '=', invoice.company_id.id)]).id
+                                                 ('company_id', '=', invoice.company_id.id)])
+                                            if invoice.journal_id != expected_journal:
+                                                invoice.posted_before = False
+                                                invoice.sequence_number = 0
+                                                invoice.journal_id=expected_journal.id
                                         else:
-                                            invoice.journal_id = self.env['account.journal'].search(
+                                            expected_journal  = self.env['account.journal'].search(
                                                 [('name', '=', 'Purchases'),
-                                                 ('company_id', '=', invoice.company_id.id)]).id
+                                                 ('company_id', '=', invoice.company_id.id)])
+                                            if invoice.journal_id != expected_journal:
+                                                invoice.posted_before = False
+                                                invoice.sequence_number = 0
+                                                invoice.journal_id=expected_journal.id
                                 
                             
                             # existing_invoice.write({'sale_line_id': so.id}) if so else None
