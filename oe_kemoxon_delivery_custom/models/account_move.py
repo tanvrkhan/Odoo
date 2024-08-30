@@ -95,14 +95,31 @@ class AccountMove(models.Model):
         for record in self:
             record.company_bank_account_id= record.partner_id.company_bank_account_id
     
+    def update_all_due_dates(self):
+        records = self.env['account.move'].search([('company_id', '=', self.company_id.id)])
+        for rec in records:
+            if rec.move_type in ('in_invoice', 'in_refund', 'out_invoice', 'out_refund'):
+                for line in rec.line_ids:
+                    if line.display_type == 'payment_term':
+                        if line.date_maturity!=rec.invoice_date_due:
+                            line.with_context(check_move_validity=False).date_maturity = rec.invoice_date_due
+    
+    # @api.on_change('invoice_date_due')
+    # def update_date_maturity(self):
+    
+    
     def action_post(self):
         for rec in self:
+            
             if rec.move_type == 'out_invoice':
                 if not rec.partner_id.company_bank_account_id:
                     raise UserError(
                         _("Bank is not selected for this customer. Please select a bank for the customer before posting the invoice."))
+            if rec.move_type in ('in_invoice', 'in_refund','out_invoice','out_refund'):
+                for line in rec.line_ids:
+                    if line.display_type=='payment_term':
+                        line.date_maturity = rec.invoice_date_due
             return super(AccountMove, rec).action_post()
-
     @api.depends('invoice_line_ids.sale_line_ids.move_ids.picking_id')
     def _compute_picking_id2(self):
         for invoice in self:
