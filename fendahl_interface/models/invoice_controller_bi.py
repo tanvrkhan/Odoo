@@ -563,7 +563,9 @@ class InvoiceControllerBI(models.Model):
                     
                     if buysell == "Buy":
                         existing_invoice = self.check_existing_invoice(rec.invoicenumber)
+                        
                         if existing_invoice:
+                            previousstatus = existing_invoice.state
                             invoice_reconciled_lines = self.get_reconciled_lines(existing_invoice)
                             existing_invoice.button_draft()
                             # existing_invoice.write({'purchase_id': po.id}) if po else None
@@ -731,9 +733,11 @@ class InvoiceControllerBI(models.Model):
                                     'Invoice has no lines in Odoo.',
                                     rec.internalcompany)
                                 raise UserError('Invoice has no lines in Odoo')
-                            existing_invoice.action_post()
-                            if invoice_reconciled_lines:
-                                self.reconcile_entries(invoice_reconciled_lines, existing_invoice)
+                            
+                            if previousstatus == 'posted':
+                                existing_invoice.action_post()
+                                if invoice_reconciled_lines:
+                                    self.reconcile_entries(invoice_reconciled_lines, existing_invoice)
                         else:
                             log_error = self.env['fusion.sync.history.errors'].log_error(
                                 'InvoiceControllerBI',
@@ -772,6 +776,7 @@ class InvoiceControllerBI(models.Model):
                             existing_invoice.write({'invoice_origin': invoice_origins}) if invoice_origins else None
                             if existing_invoice:
                                 for invoice in existing_invoice:
+                                    previousstatus = existing_invoice.state
                                     invoice.deal_ref = self.getinvoiceref(rec.theirinvoiceref)
                                     if invoice.company_id.id in (1, 2):
                                         costtypes = cashflow_lines_all.read_group(
@@ -903,9 +908,10 @@ class InvoiceControllerBI(models.Model):
                                     raise UserError(
                                         'Cashflow Lines not found in Odoo')
                                 self.env.cr.commit()
-                                existing_invoice.action_post()
-                                if invoice_reconciled_lines:
-                                    self.reconcile_entries(invoice_reconciled_lines, existing_invoice)
+                                if previousstatus == 'posted':
+                                    existing_invoice.action_post()
+                                    if invoice_reconciled_lines:
+                                        self.reconcile_entries(invoice_reconciled_lines, existing_invoice)
                             else:
                                 log_error = self.env['fusion.sync.history.errors'].log_error(
                                     'InvoiceControllerBI',
