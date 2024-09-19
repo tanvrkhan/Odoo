@@ -130,7 +130,7 @@ class StockValuationLayer(models.Model):
                                 self.update_valuation(avco, record)
                             else:
                                 self.calculate_costing_from_later_dates(record)
-    
+
     def update_valuation(self, cost, valuation):
         amount_to_post = cost * valuation.quantity
         valuation.unit_cost = amount_to_post / valuation.quantity
