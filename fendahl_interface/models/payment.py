@@ -211,6 +211,12 @@ class PostReconciledPayments(models.Model):
                         "Accounting_System_Payment_ID": record.credit_move_id.id,
                         "Internal_Company_Code": company,
                         "is_delete": True,
+                        "Payment_Allocations": [
+                            {
+                                "Invoice_Master_ID": record.emptyFalse(invoiceid),
+                                "Allocated_Amount": 0,
+                            }
+                        ],
                     }
                     response = requests.post(url, data=json.dumps(json_data), headers=headers)
                     if (response.status_code == 200):
@@ -226,7 +232,12 @@ class PostReconciledPayments(models.Model):
                         "Accounting_System_Payment_ID": record.debit_move_id.id,
                         "Internal_Company_Code": company,
                         "is_delete": True,
-                        
+                        "Payment_Allocations": [
+                            {
+                                "Invoice_Master_ID": record.emptyFalse(invoiceid),
+                                "Allocated_Amount": 0,
+                            }
+                        ],
                         
                     }
                     response = requests.post(url, data=json.dumps(json_data), headers=headers)
