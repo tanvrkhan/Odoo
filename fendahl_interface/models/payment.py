@@ -182,6 +182,62 @@ class PostReconciledPayments(models.Model):
                     b = 1
                 else:
                     raise ValidationError("Invoice doesn't have fusion reference")
+                
+    def action_unpost_payment_UAT(self):
+        headers = {"Content-Type": "application/json", "Accept": "application/json", "Catch-Control": "no-cache",
+                   "Apikey": "17e994a0-543b-4384-b173-250b297153ea"}
+        url = "https://kemexonuat.fendahl.in:9002/kemexon/Integration/api/Pyament/CreatePayment"
+        # params = {
+        #     "api_key": "268d72e6-5013-4687-8cfa-66d2b633b115",
+        #     # Add other parameters if required by the API
+        # }
+        
+        for record in self:
+            company = ""
+            match record.debit_move_id.company_id.id:
+                case 1:
+                    company = "KEMEXON LTD"
+                case 2:
+                    company = "KEMEXON SA"
+                case 4:
+                    company = "KEMEXON BRUSSELS SRL"
+                case 5:
+                    company = "KEMEXON UK LIMITED"
+            
+            if (record.debit_move_id.move_id.move_type == "out_invoice"):
+                if record.debit_move_id.move_id.fusion_reference:
+                    invoiceid = record.debit_move_id.move_id.fusion_reference.split(",")[0]
+                    json_data = {
+                        "Accounting_System_Payment_ID": record.credit_move_id.id,
+                        "Internal_Company_Code": company,
+                        "is_delete": True,
+                    }
+                    response = requests.post(url, data=json.dumps(json_data), headers=headers)
+                    if (response.status_code == 200):
+                        record.sent_to_fendahl_uat = True
+                    else:
+                        raise ValidationError(response.text)
+                else:
+                    raise ValidationError("Invoice doesn't have fusion reference")
+            elif (self.credit_move_id.move_id.move_type == "in_invoice"):
+                if record.credit_move_id.move_id.fusion_reference:
+                    invoiceid = record.credit_move_id.move_id.fusion_reference.split(",")[0]
+                    json_data = {
+                        "Accounting_System_Payment_ID": record.debit_move_id.id,
+                        "Internal_Company_Code": company,
+                        "is_delete": True,
+                        
+                        
+                    }
+                    response = requests.post(url, data=json.dumps(json_data), headers=headers)
+                    if (response.status_code == 200):
+                        record.sent_to_fendahl_uat = True
+                    else:
+                        raise ValidationError(response.text)
+                    b = 1
+                else:
+                    raise ValidationError("Invoice doesn't have fusion reference")
+        
     def action_post_payments_Prod(self):
         headers = {"Content-Type": "application/json", "Accept": "application/json", "Catch-Control": "no-cache",
                    "Apikey": "51a029bb-2e98-4f85-a9e0-194e315f39f7"}
