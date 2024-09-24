@@ -1117,9 +1117,7 @@ class InvoiceControllerBI(models.Model):
         existing_tax = existing_line.tax_ids
         
         if cf['costtype'] == 'Primary Settlement':
-            product = self.env['fusion.sync.history'].validate_product(cf['commodity'],
-                                                                       cf['material'],
-                                                                       cf['quantityuom'])
+           
             uom = self.env['fusion.sync.history'].validate_uom(sol.product_id,
                                                                cf['quantityuom']
                                                                )
