@@ -22,13 +22,13 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
-        # 'views/bank_financing_limits_views.xml',
-        # 'views/fi_lc_views.xml',
-        # 'views/fi_lc_lines_views.xml',
-        # 'views/purchase_order_inherited_view.xml',
-        # 'views/res_bank_inherited_view.xml',
-        # 'views/sale_order_inherited_view.xml',
+        'security/ir.model.access.csv',
+        'views/bank_financing_limits_views.xml',
+        'views/fi_lc_views.xml',
+        'views/fi_lc_lines_views.xml',
+        'views/purchase_order_inherited_view.xml',
+        'views/res_bank_inherited_view.xml',
+        'views/sale_order_inherited_view.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
