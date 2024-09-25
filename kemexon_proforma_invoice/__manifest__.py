@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['account', 'base', 'sale', 'sale_management', 'stock', 'sale_stock', 'purchase','hr', 'oe_kemoxon_delivery_custom', 'kemexon_formula_pricing'],
+    'depends': ['account', 'base', 'sale', 'sale_management', 'stock', 'sale_stock', 'purchase','hr', 'oe_kemoxon_delivery_custom', 'kemexon_formula_pricing','kemexon_financial_instruments'],
 
     # always loaded
     'data': [
