@@ -20,7 +20,7 @@
                 <field name="amount_total"/>
                 <field name="analytic_account_id"/>
                 <field name="analytic_accounts_summary"/>
-                <field name="fi_lc_ids"/>
+                <field name="fi_lc_id"/>
                 <field name="currency_id"/>
                 <field name="effective_date"/>
                 <field name="pricelist_id"/>
@@ -48,7 +48,7 @@
                     <group name="proforma_invoice_group">
                         <group>
                             <field name="partner_id"/>
-                            <field name="fi_lc_ids"/>
+                            <field name="fi_lc_id"/>
                             <field name="analytic_accounts_summary"/>
                             <field name="incoterm"/>
                             <field name="incoterm_location_custom"/>

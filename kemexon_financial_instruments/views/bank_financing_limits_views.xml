@@ -19,10 +19,10 @@
             <form>
                 <sheet>
                     <group>
-                        <field name="limit_name" invisible="1"/>
                         <field name="limit_name"/>
                         <field name="amount" widget="monetary"/>
                         <field name="currency_id" invisible="1"/>
+                        <field name="bank_id" widget="many2one" />
                     </group>
                 </sheet>
             </form>

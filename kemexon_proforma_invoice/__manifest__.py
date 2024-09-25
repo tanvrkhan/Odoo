@@ -24,11 +24,11 @@
 
     # always loaded
     'data': [
-        'security/ir.model.access.csv',
-        'views/proforma_invoice_view.xml',
-        'views/proforma_invoice_line_view.xml',
-        'views/sale_order_inherit_view.xml',
-        'report/proforma_invoice_screen_template.xml',
+        # 'security/ir.model.access.csv',
+        # 'views/proforma_invoice_view.xml',
+        # 'views/proforma_invoice_line_view.xml',
+        # 'views/sale_order_inherit_view.xml',
+        # 'report/proforma_invoice_screen_template.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

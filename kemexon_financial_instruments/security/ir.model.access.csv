@@ -1,5 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access.fi.lc,access_fi_lc,kemexon_financial_instruments.model_fi_lc,base.group_user,1,1,1,1
-access.lc.lines,access_lc_lines,kemexon_financial_instruments.model_lc_lines,base.group_user,1,1,1,1
+access.fi.lc.lines,access_fi_lc_lines,kemexon_financial_instruments.model_fi_lc_lines,base.group_user,1,1,1,1
 access.bank.financing.limits,access_bank_financing_limits,kemexon_financial_instruments.model_bank_financing_limits,base.group_user,1,1,1,1
 

@@ -8,7 +8,6 @@
                 <field name="ref_no"/>
                 <field name="type"/>
                 <field name="lc_type"/>
-                <field name="sub_limit"/>
                 <field name="issuance_date"/>
                 <field name="expiry_date"/>
                 <field name="beneficiary"/>
@@ -48,6 +47,7 @@
                             <field name="beneficiary"/>
                             <field name="beneficiary_bank"/>
                             <field name="beneficiary_bank_reference"/>
+                            <field name="sub_limit"/>
                             <field name="applicant"/>
                             <field name="applicant_bank"/>
                             <field name="applicant_bank_reference"/>
@@ -56,8 +56,8 @@
 
                     </group>
                     <notebook>
-                        <page name="lc_lines_view" string="LC Lines">
-                            <field name="lc_lines_ids"/>
+                        <page name="fi_lc_lines_view" string="LC Lines">
+                            <field name="fi_lc_line_ids"/>
                             <group name="note_group" col="6" class="mt-2 mt-md-0">
                                 <group colspan="4">
                                     <field colspan="2" name="notes" nolabel="1" placeholder="Terms and conditions..."/>

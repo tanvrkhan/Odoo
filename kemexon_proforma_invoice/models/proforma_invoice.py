@@ -10,7 +10,7 @@ class ProformaInvoice(models.Model):
     sale_order_id = fields.Many2one('sale.order', string='Sale Order')
     name = fields.Char(related='sale_order_id.name', string='Number', placeholder='New')
     partner_id = fields.Many2one(related='sale_order_id.partner_id', string='Customer')
-    fi_lc_ids = fields.Many2one(related='sale_order_id.fi_lc_ids', string='Financial Instrument')
+    fi_lc_id = fields.Many2one(related='sale_order_id.fi_lc_id', string='Financial Instrument')
     analytic_accounts_summary = fields.Char(related='sale_order_id.analytic_accounts_summary',
                                             string='Analytic Accounts')
     incoterm = fields.Many2one(related='sale_order_id.incoterm', string='Incoterm')

@@ -11,8 +11,8 @@ class FiLc(models.Model):
     ref_no = fields.Char('Reference', required=True)
     type = fields.Selection([('sblc', 'SBLC'), ('lc', 'LC')], string="Type")
     lc_type = fields.Selection([('import', 'Import(Purchase)'), ('export', 'Export(Sale)')], string="LC Type")
-    sub_limit = fields.Selection(
-        [('backtoback', 'Back To Back'), ('fronttoback', 'Front To Back'), ('intank', 'Intank')], string="Sub Limit")
+    sub_limit = fields.Many2one('bank.financing.limits', string='Sub limit')
+
     issuance_date = fields.Date(string='Issuance Date')
     expiry_date = fields.Date(string='Expiry Date')
     is_active = fields.Boolean(string='Is Active')
@@ -25,20 +25,21 @@ class FiLc(models.Model):
     advising_confirming_bank = fields.Many2one('res.bank', string='Advising/Confirming Bank')
     notes = fields.Html(string='Notes')
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.company.currency_id)
-    lc_lines_ids = fields.One2many("lc.lines", 'fi_lc_ids', string="LC Lines")
-    total_quantity = fields.Float(compute='_compute_total_quantity', string='Total Quantity')
-    total_amount = fields.Monetary(compute='_compute_total_amount', string='Total Amount', currency_field='currency_id')
+    fi_lc_line_ids = fields.One2many("fi.lc.lines", 'fi_lc_id', string="LC Lines")
+    total_quantity = fields.Float(compute='_compute_total_quantity', string='Total Quantity',stored=True)
+    total_amount = fields.Monetary(compute='_compute_total_amount', string='Total Amount', currency_field='currency_id',stored=True)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
 
-    @api.depends('lc_lines_ids.quantity')
+    @api.depends('fi_lc_line_ids.quantity')
     def _compute_total_quantity(self):
         for record in self:
-            record.total_quantity = sum(line.quantity for line in record.lc_lines_ids)
-
-    @api.depends('lc_lines_ids.amount')
+            record.total_quantity = sum(line.quantity for line in record.fi_lc_line_ids)
+    
+    
+    @api.depends('fi_lc_line_ids.amount')
     def _compute_total_amount(self):
         for record in self:
-            record.total_amount = sum(line.amount for line in record.lc_lines_ids)
+            record.total_amount = sum(line.amount for line in record.fi_lc_line_ids)
 
     @api.constrains('expiry_date')
     def _check_expiry_date(self):
