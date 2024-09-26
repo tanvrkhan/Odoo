@@ -486,39 +486,36 @@
                 <br/>
                 <!--                <span class="m-0" t-field="o.narration"/>-->
                 <ul style="font-size:18px;">
+                    <li>Kemexon follows a detailed process as per the company policy for informing any change in bank
+                        account/remittance process. We request you to not rely on any isolated email communication
+                        informing the change of bank account etc. If you do so, the same shall be at your risk and
+                        consequences.
+                    </li>
                     <t t-if="doc.legal_entity">
-                        <li>Kemexon follows a detailed process as per the company policy for informing any change
-                            in
-                            bank account/ remittance process. We request you to not rely on any isolated email
-                            communication
-                            informing the change of bank account etc. If you do so, the same shall be at your risk and
-                            consequences.
+                        <li>Fiscal representation of KEMEXON SA in France: RM BOULANGER SA (17A rue du Vertuquet, 59960
+                            Neuville-en-Ferrain, no SIREN:321252827)
                         </li>
-                        <li>Fiscal representation of KEMEXON SA in France: RM BOULANGER SA (17A rue du
-                            Vertuquet, 59960 Neuville-en-Ferrain, no SIREN: 321252827)
-                        </li>
-                        <t t-if="doc.payment_term_id.name == 'Pre' or doc.payment_term_id.name == 'Prepayment'">
-                            <li>If payment is not received within 48 hours from the PFI date, the seller reserves the
-                                right to adjust the prices according to market conditions.
-                            </li>
-                        </t>
-                        <li>Kemexon terms and conditions apply.</li>
                     </t>
-                    <t t-else="">
-                        <li>Kemexon follows a detailed process as per the company policy for informing any change
-                            in
-                            bank account/ remittance process. We request you to not rely on any isolated email
-                            communication
-                            informing the change of bank account etc. If you do so, the same shall be at your risk and
-                            consequences.
+                    <t t-if="doc.payment_term_id.name == 'Pre' or doc.payment_term_id.name == 'Prepayment'">
+                        <li>If payment is not received within 48 hours from the PFI date, the seller reserves the
+                            right to adjust the prices according to market conditions.
                         </li>
-                        <t t-if="doc.payment_term_id.name == 'Pre' or doc.payment_term_id.name == 'Prepayment'">
-                            <li>If payment is not received within 48 hours from the PFI date, the seller reserves the
-                                right to adjust the prices according to market conditions.
-                            </li>
-                        </t>
-                        <li>Kemexon terms and conditions apply.</li>
                     </t>
+                    <t t-if="doc.company_id.id == 2">
+                        <li>
+                            Disclaimer: Kemexon SA engages in complex trading activities during which the company may
+                            perform hedging or other associated risk management transactions as a result of this
+                            commitment. In the event the Buyer fails to lift product within the agreed delivery dates,
+                            seller has the right to terminate this agreement, claim any and all resulting costs, losses,
+                            expenses or damages, including but not limited to any storage and hedging costs.
+                        </li>
+                        <li>
+                            Other terms and conditions: All other terms and conditions, if any, to be discussed and
+                            mutually agreed. All volumes to be delivered within the prescribed delivery period.
+                        </li>
+
+                    </t>
+                    <li>Kemexon terms and conditions apply.</li>
                 </ul>
                 <br/>
                 <!--                <center>-->
