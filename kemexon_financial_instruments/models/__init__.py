@@ -5,7 +5,8 @@ from . import fi_lc_lines
 from . import bank_financing_limits
 from . import sale_order
 from . import purchase_order
-
+from . import account_journal
+from . import account_payment
 
 
 
