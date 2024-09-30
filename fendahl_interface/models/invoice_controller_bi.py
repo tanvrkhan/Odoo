@@ -206,8 +206,7 @@ class InvoiceControllerBI(models.Model):
         trades_to_process = self.env['invoice.controller.bi'].search([('lastmodifydate', '>=', last_processing_date)])
         for rec in trades_to_process:
             if rec.internalcompany == 'KEMEXON LTD':
-                rec.create_receipt()
-            rec.create_bill(False)
+                rec.create_bill(False)
         interface.update_processing_date('invoice')
     
     def sync_invoice(self):
