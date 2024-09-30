@@ -569,6 +569,7 @@ class InvoiceControllerBI(models.Model):
                             if existing_invoice:
                                 previousstatus = existing_invoice.state
                                 invoice_reconciled_lines = self.get_reconciled_lines(existing_invoice)
+                                previousname = existing_invoice.name
                                 existing_invoice.button_draft()
                                 # existing_invoice.write({'purchase_id': po.id}) if po else None
                                 cashflow_lines_po = cashflow_lines_all.read_group(
@@ -723,6 +724,7 @@ class InvoiceControllerBI(models.Model):
                                 
                                 if previousstatus == 'posted':
                                     existing_invoice.action_post()
+                                    existing_invoice.name =previousname
                                     if invoice_reconciled_lines:
                                         self.reconcile_entries(invoice_reconciled_lines, existing_invoice)
                             else:
@@ -744,6 +746,7 @@ class InvoiceControllerBI(models.Model):
                             if existing_invoice:
                                 previousstatus = existing_invoice.state
                                 invoice_reconciled_lines = self.get_reconciled_lines(existing_invoice)
+                                previousname = existing_invoice.name
                                 existing_invoice.button_draft()
                                 cashflow_lines_so = self.env['cashflow.controller.bi'].read_group(
                                     domain=[('invoicenumber', '=', rec.invoicenumber), ('cashflowstatus', '!=', 'Defunct')],
@@ -889,6 +892,7 @@ class InvoiceControllerBI(models.Model):
                                     self.env.cr.commit()
                                     if previousstatus == 'posted':
                                         existing_invoice.action_post()
+                                        existing_invoice.name = previousname
                                         if invoice_reconciled_lines:
                                             self.reconcile_entries(invoice_reconciled_lines, existing_invoice)
                                 else:
