@@ -29,6 +29,8 @@
         'views/purchase_order_inherited_view.xml',
         'views/res_bank_inherited_view.xml',
         'views/sale_order_inherited_view.xml',
+        'views/account_journal_view_inherited.xml',
+        'views/account_payment_view_inherited.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
