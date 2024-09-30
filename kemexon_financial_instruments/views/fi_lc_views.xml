@@ -47,7 +47,6 @@
                             <field name="beneficiary"/>
                             <field name="beneficiary_bank"/>
                             <field name="beneficiary_bank_reference"/>
-                            <field name="sub_limit"/>
                             <field name="applicant"/>
                             <field name="applicant_bank"/>
                             <field name="applicant_bank_reference"/>
