@@ -624,9 +624,16 @@ class InvoiceControllerBI(models.Model):
                                 
                                 self.env.cr.commit()
                                 if existing_invoice.line_ids:
-                                    cashflow_lines = self.env['cashflow.controller.bi'].search(
-                                        [('invoicenumber', '=', rec.invoicenumber),
-                                         ('cashflowstatus', '!=', 'Defunct')])
+                                    cashflow_lines = cashflow_lines_all.read_group(
+                                        domain=[('invoicenumber', '=', rec.invoicenumber),
+                                                ('cashflowstatus', '!=', 'Defunct')],
+                                        fields=['payablereceivable', 'costtype', 'commodity', 'material', 'quantityuom',
+                                                'quantity', 'price', 'extendedamount'],  # Fields to load
+                                        groupby=['erptaxcode', 'costtype', 'price', 'quantityuom', 'payablereceivable',
+                                                 'commodity', 'material'],
+                                        lazy=False  # Get results for each partner directly
+                                    )
+                                    
                                     receivables = sum(r['extendedamount'] for r in cashflow_lines if
                                                       r['payablereceivable'] == 'Receivable')
                                     payables = sum(r['extendedamount'] for r in cashflow_lines if
@@ -809,9 +816,16 @@ class InvoiceControllerBI(models.Model):
                                 if existing_invoice.line_ids:
                                     # cashflow_line = self.env['cashflow.controller.bi'].search(
                                     #     [('invoicenumber', '=', rec.invoicenumber)])
-                                    cashflow_lines = self.env['cashflow.controller.bi'].search([('invoicenumber', '=', rec.invoicenumber),
-                                                ('cashflowstatus', '!=', 'Defunct')])
-                                   
+                                    cashflow_lines = cashflow_lines_all.read_group(
+                                        domain=[('invoicenumber', '=', rec.invoicenumber),
+                                                ('cashflowstatus', '!=', 'Defunct')],
+                                        fields=['payablereceivable', 'costtype', 'commodity', 'material', 'quantityuom',
+                                                'quantity', 'price', 'extendedamount'],  # Fields to load
+                                        groupby=['erptaxcode', 'costtype', 'price', 'quantityuom', 'payablereceivable',
+                                                 'commodity', 'material'],
+                                        lazy=False  # Get results for each partner directly
+                                    )
+                                    
                                     receivables = sum(r['extendedamount'] for r in cashflow_lines if
                                                       r['payablereceivable'] == 'Receivable')
                                     payables = sum(r['extendedamount'] for r in cashflow_lines if
