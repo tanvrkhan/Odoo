@@ -814,6 +814,7 @@ class InvoiceControllerBI(models.Model):
                                 # existing_invoice.write({'sale_line_id': so.id}) if so else None
                                 existing_invoice.write({'invoice_origin': so.name}) if so else None
                                 if existing_invoice.line_ids:
+                                    
                                     # cashflow_line = self.env['cashflow.controller.bi'].search(
                                     #     [('invoicenumber', '=', rec.invoicenumber)])
                                     cashflow_lines = cashflow_lines_all.read_group(
