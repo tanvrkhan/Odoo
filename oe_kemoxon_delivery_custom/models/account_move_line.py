@@ -11,6 +11,12 @@ class UpdateInvoiceCosting(models.Model):
         string='Stock Picking',
         readonly=True
     )
+    fusion_reference = fields.Char(
+        related='move_id.fusion_reference',
+        string='Fusion Reference',
+        store=True,
+    )
+
     origin_order = fields.Char("Order", compute='_compute_order', store=True)
     def _compute_order(self):
         for record in self:
