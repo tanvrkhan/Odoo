@@ -649,15 +649,16 @@ class InvoiceControllerBI(models.Model):
     
                                     if cashflow_lines:
                                         for cfline in cashflow_lines:
+                                            down_payment_types =['Pre-payment_Rev', 'Provisional Payment_Rev',
+                                                                      'Pre-payment',
+                                                                      'Provisional Payment']
                                             product_linez = existing_invoice.line_ids.filtered(
                                                 lambda r: r.display_type == 'product')
                                             for product_lines in product_linez:
                                                 if ((cfline['costtype'] == 'Primary Settlement' and cfline[
                                                     'material'] == product_lines.product_id.name) or (
                                                         product_lines.product_id.name == "Down payment" and cfline[
-                                                    'costtype'] in (
-                                                                'Pre-payment_Rev', 'Provisional Payment_Rev', 'Pre-payment',
-                                                                'Provisional Payment')) and (
+                                                    'costtype'] in down_payment_types) and (
                                                         float(round(cfline['price'], 2)) == round(
                                                     product_lines.price_unit, 2))
                                                         and ((product_lines.balance < 0 and (
@@ -670,10 +671,7 @@ class InvoiceControllerBI(models.Model):
                                                 elif ((cfline['costtype'] == 'Primary Settlement' and cfline[
                                                     'material'] == product_lines.product_id.name) or (
                                                               product_lines.product_id.name == "Down payment" and cfline[
-                                                          'costtype'] in (
-                                                                      'Pre-payment_Rev', 'Provisional Payment_Rev',
-                                                                      'Pre-payment',
-                                                                      'Provisional Payment')) and cfline[
+                                                          'costtype'] in down_payment_types) and cfline[
                                                           'costtype'] != 'Primary Settlement'
                                                       and float(round(cfline['extendedamount'], 2)) == round(
                                                             product_lines.price_unit, 2) and ((product_lines.balance > 0 >
@@ -683,13 +681,19 @@ class InvoiceControllerBI(models.Model):
                                                                                                                  'extendedamount']))):
                                                     self.update_existing_line(product_lines, company, cfline,
                                                                                  extended_multiplier, cashflow_lines_all, rec.invoicenumber)
+                                                    
+                                                elif (cfline['costtype'] != 'Primary Settlement'
+                                                      and ((cfline['material'] == product_lines.product_id.name) or (
+                                                              product_lines.product_id.name == "Down payment"
+                                                              and cfline['costtype'] in down_payment_types)
+                                                      and float(round(cfline['extendedamount'], 2)) == round(
+                                                            product_lines.balance, 2))):
+                                                    self.update_existing_line(product_lines, company, cfline,
+                                                                                 extended_multiplier, cashflow_lines_all, rec.invoicenumber)
                                                 elif ((cfline['costtype'] == 'Primary Settlement' and cfline[
                                                     'material'] == product_lines.product_id.name) or (
                                                               product_lines.product_id.name == "Down payment" and cfline[
-                                                          'costtype'] in (
-                                                                      'Pre-payment_Rev', 'Provisional Payment_Rev',
-                                                                      'Pre-payment',
-                                                                      'Provisional Payment'))
+                                                          'costtype'] in down_payment_types)
                                                       and (float(round(cfline['extendedamount'], 2)) == round(
                                                             product_lines.balance, 2) * -1) or float(
                                                             round(cfline['extendedamount'], 2)) == round(
