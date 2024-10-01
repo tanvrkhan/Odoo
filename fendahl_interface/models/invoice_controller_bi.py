@@ -686,7 +686,7 @@ class InvoiceControllerBI(models.Model):
                                                       and ((cfline['material'] == product_lines.product_id.name) or (
                                                               product_lines.product_id.name == "Down payment"
                                                               and cfline['costtype'] in down_payment_types)
-                                                      and float(round(cfline['extendedamount'], 2)) == round(
+                                                      and float(round(cfline['price'], 2)) == round(
                                                             product_lines.balance, 2))):
                                                     self.update_existing_line(product_lines, company, cfline,
                                                                                  extended_multiplier, cashflow_lines_all, rec.invoicenumber)
