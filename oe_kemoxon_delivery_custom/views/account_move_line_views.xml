@@ -9,11 +9,25 @@
                 <xpath expr="//field[@name='account_id']" position="after">
                     <field name="stock_picking_id" widget="open_transfer_widget"/>
                     <field name="origin_order"/>
-
+                    <field name="fusion_reference"/> <!-- added related field -->
                 </xpath>
             </field>
         </record>
-
+        <!-- Inherit the account move line search view to add fusion_reference -->
+        <record id="view_account_move_line_filter_inherit" model="ir.ui.view">
+            <field name="name">account.move.line.search.inherit</field>
+            <field name="model">account.move.line</field>
+            <field name="inherit_id" ref="account.view_account_move_line_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='pl_accounts']" position="after">
+                    <filter string="Fusion Ref Set" name="fusion_reference_set_line"
+                            domain="[('fusion_reference', '!=', False)]"/>
+                </xpath>
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="fusion_reference" string="Fusion Reference"/>
+                </xpath>
+            </field>
+        </record>
         <record id="model_account_move_line_action_fix_downpayment_account" model="ir.actions.server">
             <field name="name">Fix Downpayment account</field>
             <field name="model_id" ref="account.model_account_move_line"/>
