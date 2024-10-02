@@ -50,5 +50,24 @@ class FiLc(models.Model):
     @api.constrains('ref_no')
     def _check_unique_ref_no(self):
         for record in self:
-            if record.search([('ref_no', '=', record.ref_no), ('id', '!=', record.id)]):
+            # Check for uniqueness only for records that do not end with "(Copy)"
+            if not record.ref_no.endswith('(copy)') and record.search([
+                ('ref_no', '=', record.ref_no),
+                ('id', '!=', record.id)
+            ]):
                 raise ValidationError('Reference must be unique!')
+
+    def copy(self, default=None):
+        """Override the copy method to append (Copy) to ref_no the first time,
+        and subsequent copies of 'Test (Copy)' remain the same."""
+        default = dict(default or {})
+
+        # Check if the current ref_no already has "(Copy)" appended
+        if "(copy)" not in self.ref_no:
+            # If not, append "(Copy)" to the original ref_no
+            default['ref_no'] = f"{self.ref_no} (copy)"
+        else:
+            # If it already contains "(Copy)", keep it the same
+            default['ref_no'] = self.ref_no
+
+        return super(FiLc, self).copy(default)
