@@ -611,15 +611,15 @@ class InvoiceControllerBI(models.Model):
                                             elif 'Pre-payment_Rev' in costtype_list or 'Provisional Payment_Rev' in costtype_list or 'Pre-payment' in costtype_list or 'Provisional Payment' in costtype_list:
                                                  expected_journal =  self.env['account.journal'].search(
                                                     [('name', '=', 'Provisional Purchases'),
-                                                     ('company_id', '=', invoice.company_id.id)]).id
+                                                     ('company_id', '=', invoice.company_id.id)])
                                                  if invoice.journal_id != expected_journal:
-                                                     invoice.journal_id = expected_journal
+                                                     invoice.journal_id = expected_journal.id
                                             else:
                                                 expected_journal = self.env['account.journal'].search(
                                                 [('name', '=', 'Purchases'),
-                                                 ('company_id', '=', invoice.company_id.id)]).id
+                                                 ('company_id', '=', invoice.company_id.id)])
                                                 if invoice.journal_id != expected_journal:
-                                                    invoice.journal_id = expected_journal
+                                                    invoice.journal_id = expected_journal.id
                                             
                                 
                                 self.env.cr.commit()
