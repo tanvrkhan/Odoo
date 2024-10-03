@@ -206,7 +206,11 @@ class InvoiceControllerBI(models.Model):
         trades_to_process = self.env['invoice.controller.bi'].search([('lastmodifydate', '>=', last_processing_date)])
         for rec in trades_to_process:
             if rec.internalcompany in ('KEMEXON LTD','KEMEXON SA'):
-                rec.create_bill()
+                try:
+                    rec.create_bill(showExceptionsUI=False)
+                except Exception as exc:
+                    continue
+                    
         interface.update_processing_date('invoice')
     
     def sync_invoice(self):
@@ -527,7 +531,7 @@ class InvoiceControllerBI(models.Model):
         else:
             return ref
     
-    def create_bill(self):
+    def create_bill(self,showExceptionsUI = True):
         for rec in self:
             try:
                 if rec.invoicestatus == 'Active':
@@ -607,7 +611,7 @@ class InvoiceControllerBI(models.Model):
                                                     [('name', '=', 'Purchases'),
                                                      ('company_id', '=', invoice.company_id.id)]).id
                                                 if invoice.journal_id != expected_journal:
-                                                    invoice.journal_id=expected_journal
+                                                    invoice.journal_id=expected_journal.id
                                             elif 'Pre-payment_Rev' in costtype_list or 'Provisional Payment_Rev' in costtype_list or 'Pre-payment' in costtype_list or 'Provisional Payment' in costtype_list:
                                                  expected_journal =  self.env['account.journal'].search(
                                                     [('name', '=', 'Provisional Purchases'),
@@ -646,7 +650,7 @@ class InvoiceControllerBI(models.Model):
                                         existing_invoice.move_type = 'in_refund'
                                         extended_multiplier = +1
                                     
-    
+                                            
                                     if cashflow_lines:
                                         for cfline in cashflow_lines:
                                             down_payment_types =['Pre-payment_Rev', 'Provisional Payment_Rev',
@@ -667,7 +671,7 @@ class InvoiceControllerBI(models.Model):
                                                                      cfline['extendedamount'] * -1) > 0))):
                                                     self.update_existing_line(product_lines, company, cfline
                                                                               ,extended_multiplier, cashflow_lines_all,
-                                                                              rec.invoicenumber)
+                                                                              rec.invoicenumber,showExceptionsUI)
                                                 elif ((cfline['costtype'] == 'Primary Settlement' and cfline[
                                                     'material'] == product_lines.product_id.name) or (
                                                               product_lines.product_id.name == "Down payment" and cfline[
@@ -680,7 +684,7 @@ class InvoiceControllerBI(models.Model):
                                                                                                       cfline[
                                                                                                                  'extendedamount']))):
                                                     self.update_existing_line(product_lines, company, cfline,
-                                                                                 extended_multiplier, cashflow_lines_all, rec.invoicenumber)
+                                                                                 extended_multiplier, cashflow_lines_all, rec.invoicenumber,showExceptionsUI)
                                                     
                                                 elif (cfline['costtype'] != 'Primary Settlement'
                                                       and ((cfline['material'] == product_lines.product_id.name) or (
@@ -689,7 +693,7 @@ class InvoiceControllerBI(models.Model):
                                                       and float(round(cfline['price'], 2)) == round(
                                                             product_lines.balance, 2))):
                                                     self.update_existing_line(product_lines, company, cfline,
-                                                                                 extended_multiplier, cashflow_lines_all, rec.invoicenumber)
+                                                                                 extended_multiplier, cashflow_lines_all, rec.invoicenumber,showExceptionsUI)
                                                 elif ((cfline['costtype'] == 'Primary Settlement' and cfline[
                                                     'material'] == product_lines.product_id.name) or (
                                                               product_lines.product_id.name == "Down payment" and cfline[
@@ -699,20 +703,21 @@ class InvoiceControllerBI(models.Model):
                                                             round(cfline['extendedamount'], 2)) == round(
                                                             product_lines.balance, 2)):
                                                     self.update_existing_line(product_lines, company, cfline,
-                                                                                 extended_multiplier, cashflow_lines_all, rec.invoicenumber)
+                                                                                 extended_multiplier, cashflow_lines_all, rec.invoicenumber,showExceptionsUI)
                                                 elif cfline['costtype'] != "Primary Settlement" and (
                                                         cfline['quantity'] == product_lines.quantity or cfline[
-                                                    'quantity'] * -1 == product_lines.quantity) and (
+                                                    'quantity'] * -1 == product_lines.quantity or cfline[
+                                                    'quantity'] == 0) and (
                                                         round(cfline['price'], 2) == product_lines.price_unit or round(
                                                         cfline['price'], 2) * -1 == product_lines.price_unit):
                                                     self.update_existing_line(product_lines, company, cfline,
-                                                                                 extended_multiplier, cashflow_lines_all, rec.invoicenumber)
+                                                                                 extended_multiplier, cashflow_lines_all, rec.invoicenumber,showExceptionsUI)
                                                 elif (cfline['costtype'] != "Primary Settlement"
                                                       and (product_lines.quantity == 1 or product_lines.quantity == -1)
                                                       and (round(cfline['extendedamount'], 2) == product_lines.price_unit
                                                            or round(cfline['extendedamount'], 2) * -1 == product_lines.price_unit)):
                                                     self.update_existing_line(product_lines, company, cfline,
-                                                                                 extended_multiplier, cashflow_lines_all, rec.invoicenumber)
+                                                                                 extended_multiplier, cashflow_lines_all, rec.invoicenumber,showExceptionsUI)
                                                 
                                     
                                     
@@ -722,7 +727,8 @@ class InvoiceControllerBI(models.Model):
                                             rec.invoicenumber,
                                             'Cashflow lines not found in Odoo',
                                             rec.internalcompany)
-                                        continue
+                                        if showExceptionsUI:
+                                            raise UserError('Cashflow lines not found in Odoo')
                                 
                                 
                                 else:
@@ -731,7 +737,9 @@ class InvoiceControllerBI(models.Model):
                                         rec.invoicenumber,
                                         'Invoice has no lines in Odoo.',
                                         rec.internalcompany)
-                                    continue
+                                    
+                                    if showExceptionsUI:
+                                        raise UserError('Invoice has no lines in Odoo.')
                                 
                                 if previousstatus == 'posted':
                                     existing_invoice.action_post()
@@ -744,9 +752,10 @@ class InvoiceControllerBI(models.Model):
                                     rec.invoicenumber,
                                     'Invoice not yet sent to Odoo. Please update the status of invoice to be SEND TO ACCOUNTING',
                                     rec.internalcompany)
-                                continue
+                                if showExceptionsUI:
+                                    raise UserError('Invoice doesnt exist in Odoo.')
                                 
-                                # raise UserError('Invoice doesnt exist in Odoo.')
+                                
                         
                         elif buysell == "Sell":
                             sol = self.env['sale.order.line'].search([('id', '=', 0)])
@@ -861,7 +870,7 @@ class InvoiceControllerBI(models.Model):
                                                         (product_lines.balance > 0 and cfline['extendedamount'] < 0) or (
                                                         product_lines.balance < 0 and cfline['extendedamount'] > 0)):
                                                     self.update_existing_si_line(product_lines, company, cfline,
-                                                                                 extended_multiplier, rec.invoicenumber)
+                                                                                 extended_multiplier, rec.invoicenumber,showExceptionsUI)
                                                 elif ((cfline['costtype'] == 'Primary Settlement' and cfline[
                                                     'material'] == product_lines.product_id.name) or (
                                                               product_lines.product_id.name == "Down payment" and cfline[
@@ -878,7 +887,7 @@ class InvoiceControllerBI(models.Model):
                                                                                                       cfline[
                                                                                                           'extendedamount'] > 0))):
                                                     self.update_existing_si_line(product_lines, company, cfline,
-                                                                                 extended_multiplier, rec.invoicenumber)
+                                                                                 extended_multiplier, rec.invoicenumber,showExceptionsUI)
                                                 elif ((cfline['costtype'] == 'Primary Settlement' and cfline[
                                                     'material'] == product_lines.product_id.name) or (
                                                               product_lines.product_id.name == "Down payment" and cfline[
@@ -894,20 +903,22 @@ class InvoiceControllerBI(models.Model):
                                                                                  extended_multiplier, rec.invoicenumber)
                                                 elif cfline['costtype'] != "Primary Settlement" and (cfline['quantity'] == product_lines.quantity or cfline['quantity']*-1 == product_lines.quantity) and (round(cfline['price'],2)== product_lines.price_unit or round(cfline['price'],2) *-1== product_lines.price_unit):
                                                         self.update_existing_si_line(product_lines, company, cfline,
-                                                                                     extended_multiplier, rec.invoicenumber)
+                                                                                     extended_multiplier, rec.invoicenumber,showExceptionsUI)
                                                 elif (cfline['costtype'] != "Primary Settlement"
                                                       and (product_lines.quantity == 1 or product_lines.quantity == -1)
                                                       and (round(cfline['extendedamount'], 2) == product_lines.price_unit
                                                            or round(cfline['extendedamount'], 2) * -1 == product_lines.price_unit)):
                                                     self.update_existing_si_line(product_lines, company, cfline,
-                                                                                 extended_multiplier, rec.invoicenumber)
+                                                                                 extended_multiplier, rec.invoicenumber,showExceptionsUI)
                                     else:
                                         log_error = self.env['fusion.sync.history.errors'].log_error(
                                             'InvoiceControllerBI',
                                             rec.invoicenumber,
                                             'Cashflow Lines not found in Odoo',
                                             rec.internalcompany)
-                                        continue
+                                        
+                                        if showExceptionsUI:
+                                            raise UserError('Cashflow Lines not found in Odoo')
                                     self.env.cr.commit()
                                     if previousstatus == 'posted':
                                         existing_invoice.action_post()
@@ -920,14 +931,16 @@ class InvoiceControllerBI(models.Model):
                                         rec.invoicenumber,
                                         'Invoice Lines not found in Odoo',
                                         rec.internalcompany)
-                                    continue
+                                    if showExceptionsUI:
+                                        raise UserError('Invoice Lines not found in Odoo')
                             else:
                                 log_error = self.env['fusion.sync.history.errors'].log_error(
                                     'InvoiceControllerBI',
                                     rec.invoicenumber,
                                     'Invoice is not yet synced to Odoo',
                                     rec.internalcompany)
-                                continue
+                                if showExceptionsUI:
+                                    raise UserError('Invoice is not yet synced to Odoo')
                 elif rec.invoicestatus != 'Active':
                     existing_invoice = self.check_existing_invoice(rec.invoicenumber)
                     if existing_invoice:
@@ -937,9 +950,11 @@ class InvoiceControllerBI(models.Model):
                 log_error = self.env['fusion.sync.history.errors'].log_error(
                     'InvoiceControllerBI',
                     rec.invoicenumber,
-                    'Invoice is not yet synced to Odoo',
+                    exc.name,
                     rec.internalcompany)
-                continue
+                
+                if showExceptionsUI:
+                    raise UserError(exc.name)
     
     def reconcile_entries(self, invoice_reconciled_lines, existing_invoice):
         reconcile_obj = self.pool.get('account.partial.reconcile')
@@ -994,7 +1009,7 @@ class InvoiceControllerBI(models.Model):
         if tax_rate_record:
             return tax_rate_record
     
-    def update_existing_line(self, existing_line, company, cf,extended_multiplier, cashflow_lines_all, invoicenumber):
+    def update_existing_line(self, existing_line, company, cf,extended_multiplier, cashflow_lines_all, invoicenumber,showExceptionsUI):
         
         cashflow_id = cashflow_lines_all.search([
             ('invoicenumber', '=', invoicenumber),
@@ -1047,6 +1062,9 @@ class InvoiceControllerBI(models.Model):
                                                                              cashflow_id.invoicenumber,
                                                                              'Purchase order line not found for Primary settlement line',
                                                                              cashflow_id.internalcompany)
+                
+                if showExceptionsUI:
+                    raise UserError('Purchase order line not found for Primary settlement line')
                 
         
         elif cf['costtype'] in ('Pre-payment', 'Provisional Payment',):
@@ -1107,7 +1125,7 @@ class InvoiceControllerBI(models.Model):
             else:
                 existing_line.tax_ids = existing_tax
                 
-    def update_existing_si_line(self, existing_line, company, cf, extended_multiplier, invoicenumber):
+    def update_existing_si_line(self, existing_line, company, cf, extended_multiplier, invoicenumber,showExceptionsUI):
         cashflow_id = self.env['cashflow.controller.bi'].search([
             ('invoicenumber', '=', invoicenumber),
             ('payablereceivable', '=', cf['payablereceivable']),
@@ -1155,7 +1173,9 @@ class InvoiceControllerBI(models.Model):
                                                                              cashflow_id.invoicenumber,
                                                                              'Sale order line not found for Primary settlement line',
                                                                              cashflow_id.internalcompany)
-                
+
+                if showExceptionsUI:
+                    raise UserError('Sale order line not found for Primary settlement line')
         
         
         elif cf['costtype'] in ('Pre-payment', 'Provisional Payment'):
