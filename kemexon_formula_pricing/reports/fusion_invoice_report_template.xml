@@ -151,7 +151,7 @@
                             </t>
                             <th name="th_priceunit"
                                 t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
-                                <span>Rate</span>
+                                <span>Price</span>
                             </th>
                             <th name="th_price_unit" t-if="display_discount"
                                 t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
