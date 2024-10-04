@@ -126,7 +126,16 @@ class AccountMove(models.Model):
     custom_section_no = fields.Char('Depricated')
     fusion_segment_code = fields.Char('Fusion Section Code')
     custom_section_number = fields.Char('Fusion Custom Section Number')
+    fusion_invoice_number = fields.Char(string="Fusion Invoice Number", compute="_compute_fusion_prefix", store=True)
     
+    @api.depends('fusion_reference')
+    def _compute_fusion_prefix(self):
+        for record in self:
+            if record.fusion_reference:
+                # Split by comma and store the first part as the prefix
+                record.fusion_invoice_number = record.fusion_reference.split(',')[0]
+            else:
+                record.fusion_invoice_number = ''
 
 
 class AccountMoveLine(models.Model):

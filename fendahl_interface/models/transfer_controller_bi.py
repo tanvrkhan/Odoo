@@ -452,211 +452,223 @@ class TransferControllerBI(models.Model):
                 all_transfers =  record
                 sms = self.env['stock.move'].search([])
                 pickings = self.env['stock.picking'].search([])
-                for rec in all_transfers:
-                    
-                    if rec.deliveryactivestatusdisplayname == "Active":
-                        companies = self.env['res.company'].search([]).mapped('name')
-                        stock_move = self.env['stock.move'].search([('id', '=', '0')])
-                        product = self.env['product.product'].search([('id', '=', '0')], limit=1)
-                        
-                        pol = self.env['purchase.order.line'].search([('fusion_segment_code', '=',
-                                                                       rec.fromsegmentsectioncode if rec.fromsegmentsectioncode else '100')],
-                                                                     limit=1)
-                        po = self.env['purchase.order'].search([('id', '=', pol.order_id.id)])
-                        sol = self.env['sale.order.line'].search(
-                            [('fusion_segment_code', '=',
-                              rec.tosegmentsectioncode if rec.tosegmentsectioncode else '100')], limit=1)
-                        so = self.env['sale.order'].search([('id', '=', sol.order_id.id)])
-                        if (rec.buyselldisplaytext=='Buy' and rec.frominternalcompany == self.env.company.name) or (rec.buyselldisplaytext=='Sell' and rec.tointernalcompany == self.env.company.name):
-                            company = self.env['res.company'].search([('name', '=', rec.frominternalcompany if rec.buyselldisplaytext=='Buy' else rec.tointernalcompany)], limit=1)
-                            if rec.deliverystatusenum in ('Actual','Scheduled'):
-                                cf = self.env['cashflow.controller.bi'].search([('transfernumber', '=', rec.deliveryid),('costtype', '=', 'Primary Settlement')],limit=1)
-                                exists = self.env['stock.move'].search([('id', '=', '0')])
-
-                                nomination_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Nomination',
-                                                                                                         rec.itineraryid if rec.itineraryid else rec.deliveryid,
-                                                                                                         company.id)
-                                warehouse = self.env['stock.warehouse'].search([('id', '=', '0')], limit=1)
-                                existing_distribution=[]
-                                
-                                if (rec.totypeenum == 'Trade' or rec.fromtypeenum == 'Trade') and (rec.frominternalcompany in companies or rec.frominternalcompany == False) and (rec.tointernalcompany in companies or rec.tointernalcompany == False):
-                                    exists = sms.search(
-                                        [('fusion_delivery_id', '=', rec.deliveryid)], limit=1)
-                                    if exists:
-                                        if exists.fusion_last_modify == self.parse_datetime(rec.lastmodifydate) and exists.state=='done':
-                                            continue
-                                        else:
-                                            exists.fusion_last_modify = self.parse_datetime(rec.lastmodifydate)
-                                            exists = sms.search([('id', '=', exists.id)])
-                                            picking = exists.picking_id
-                                            if picking.state  in ('done','waiting','confirmed','cancel'):
-                                                picking.set_stock_move_to_draft()
-                                                picking.action_confirm()
-                                            self.update_existing_lines(exists, exists.product_id, rec, company,picking.location_id,picking.location_dest_id)
-                                            self.confirm_picking(picking)
-                                            continue
-                                            
-                                    else:
-                                        if rec.buyselldisplaytext=="Buy":
-                                            if po:
-                                                if pol:
-                                                    if not po.state == 'purchase':
-                                                        po.button_confirm()
-                                                        # self.env.cr.commit()
-                                                    product = pol.product_id
-                                                    storage_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Deal Reference',
-                                                                                                                          rec.tomotcode,
-                                                                                                                          company.id)
-                                                  
-                                                    
-                                                    
-                                                    warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.tomotcode,
-                                                                                                                   company)
-                                                    
-                                                    existing_distribution = pol.analytic_distribution
-                                                    existing_distribution[str(nomination_link.id)] = 100
-                                                    existing_distribution[str(storage_link.id)] = 100
-                                                    pol['analytic_distribution'] = existing_distribution
-                                                    exists = sms.search(
-                                                        [('fusion_delivery_id', '=', rec.deliveryid), ('purchase_line_id', '=', pol.id)],
-                                                        limit=1)
-                                                    if exists:
-                                                        stock_move = sms.search([('id', '=', exists.id)])
-                                                    else:
-                                                        stock_move = sms.search(
-                                                            [('purchase_line_id', '=', pol.id), ('state', 'in', ('assigned','waiting','confirmed','draft'))], limit=1)
-                                                        if not stock_move:
-                                                            stock_move_posted = sms.search(
-                                                                [('purchase_line_id', '=', pol.id), ('state', '=', 'done')], limit=1)
-                                                            if stock_move_posted:
-                                                                stock_move = stock_move_posted.copy()
-                                                        if not stock_move:
-                                                            res = pol.order_id._prepare_picking()
-                                                            picking = self.env['stock.picking'].create(res)
-                                                            stock_move = pol._create_stock_moves(picking[0])
-                                                            
-                                                
-                                                    
-                                        elif rec.tobuyselldisplaytext=="Sell":
-                                            if so:
-                                                if sol:
-                                                    warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
-                                                                                                                   company)
-                                                    so.warehouse_id = warehouse
-                                                    if not so.state == 'sale':
-                                                        so.action_confirm()
-                                                        # self.env.cr.commit()
-                                                    product = sol.product_id
-                                                    storage_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Deal Reference',
-                                                                                                                          rec.frommotcode,
-                                                                                                                          company.id)
-                                                    existing_distribution = sol.analytic_distribution
-                                                    existing_distribution[str(nomination_link.id)] = 100
-                                                    existing_distribution[str(storage_link.id)] = 100
-                                                    sol['analytic_distribution'] = existing_distribution
-                                                    picking_type = self.env['stock.picking.type'].search(
-                                                        [('code', '=', 'outgoing'),
-                                                         ('warehouse_id', '=', warehouse.id)], limit=1)
-                                                    out_location = self.env['stock.location'].search(
-                                                        [('warehouse_id', '=', warehouse.id)], limit=1)
-                                                    exists = sms.search(
-                                                        [('fusion_delivery_id', '=', rec.deliveryid), ('sale_line_id', '=', sol.id)],
-                                                        limit=1)
-                                                    if exists:
-                                                        stock_move = sms.search([('id', '=', exists.id)])
-                                                    else:
-                                                        stock_move = sms.search(
-                                                            [('sale_line_id', '=', sol.id), ('state', 'in', ('assigned', 'waiting', 'confirmed', 'draft'))], limit=1)
-                                                        if not stock_move:
-                                                            stock_move_posted = sms.search(
-                                                                [('sale_line_id', '=', sol.id), ('state', '=', 'done')], limit=1)
-                                                            if stock_move_posted:
-                                                                stock_move = stock_move_posted.copy()
-                                                        if not stock_move:
-                                                            picking = {
-                                                                'partner_id': so.partner_id.id,
-                                                                'picking_type_id': picking_type.id,
-                                                                'location_id': out_location.id,
-                                                                'move_type': 'direct',
-                                                                'company_id': company.id,
-                                                                'sale_id': so.id,
-                                                                'origin': so.name
-                                                            }
-                                                            
-                                                            picking = self.env['stock.picking'].create(picking)
-                                                            move_vals = {
-                                                                'name': product.name,
-                                                                'product_id': product.id,
-                                                                'fusion_delivery_id': rec.deliveryid,
-                                                                'product_uom': product.uom_id.id,
-                                                                'picking_id': picking.id,
-                                                                'location_id': out_location.id,
-                                                                'location_dest_id': picking.location_dest_id.id,
-                                                                'sale_line_id': sol.id,
-                                                            }
-                                                            stock_move = sms.create(move_vals)
-                                                            picking.sale_id=so.id
-                                    if po or so:
-                                        if stock_move and (stock_move.fusion_last_modify != self.parse_datetime(rec.lastmodifydate) or stock_move.state!='done'):
-                                            picking = stock_move.picking_id
-                                            stock_move.fusion_last_modify = self.parse_datetime(rec.lastmodifydate)
-                                            if product.uom_id.rounding != 0.001:
-                                                product.uom_id.rounding = 0.001
-                                            picking.fusion_segment_code = pol.fusion_segment_code
-                                            picking.fusion_itinerary_id = rec.itineraryid
-                                            stock_move.fusion_delivery_id = rec.deliveryid
-                                            stock_move.fusion_segment_code = pol.fusion_segment_code
-                                            if rec.deliverycompletiondate or rec.bldate or rec.titledeliverydate:
-                                                if stock_move.state in('done','waiting','confirmed','assigned'):
-                                                    stock_move.picking_id.set_stock_move_to_draft()
-                                                # stock_move.picking_id.deal_ref = 'moved_to_Draft'
-                                                
-                                                picking.custom_delivery_date = rec.get_custom_date()
-                                                picking.date_done = rec.get_custom_date()
-                                                picking.scheduled_date = rec.get_custom_date()
-                                                stock_move.date = rec.get_custom_date()
-                                                if rec.buyselldisplaytext == "Buy":
-                                                    picking_type = self.env['stock.picking.type'].search(
-                                                        [('code', '=', 'incoming'), ('warehouse_id', '=', warehouse.id)], limit=1)
-                                                if not picking_type:
-                                                    picking_type=picking.picking_type_id
-                                                picking.picking_type_id = picking_type
-                                                stock_move.location_id = picking.location_id,
-                                                stock_move.location_dest_id = picking.location_dest_id,
-                                                self.update_existing_lines(stock_move,product,rec,company,picking.location_id,picking.location_dest_id)
-                                                if sum(move.quantity_done for move in picking.move_ids) > 0:
-                                                    self.confirm_picking(picking)
-                                                if rec.buyselldisplaytext == "Sell":
-                                                    picking.sale_id=so.id
-                                            
-                                                    
-                                            # self.fix_valuation_warehouse(picking,stock_move)
-                                            # self.env.cr.commit()
-                                            # stock_move.stock_valuation_layer_ids.recalculate_stock_value()
-                                    else:
-                                        if rec.frombuyselldisplaytext == "Buy":
-                                            log_error = self.env['fusion.sync.history.errors'].log_error('TransferController',
-                                                                                                         rec.fromsegmentid,
-                                                                                                         'PO Line not found',
-                                                                                                         rec.frominternalcompany)
-                                        else:
-                                            log_error = self.env['fusion.sync.history.errors'].log_error('TransferController',
-                                                                                                     rec.tosegmentid,
-                                                                                                     'SO Line not found',
-                                                                                                     rec.tointernalcompany)
-                                        raise UserError("Order not found." + rec.tosegmentsectioncode if rec.tosegmentsectioncode else rec.fromsegmentsectioncode + rec.buyselldisplaytext)
                 
-                                elif rec.frominternalcompany in companies and rec.tointernalcompany in companies and (rec.fromtypeenum!='Trade' and rec.totypeenum!='Trade'):
-                                    rec.create_internal_transfer(rec, sms)
-                        elif rec.buyselldisplaytext==False and rec.frominternalcompany in companies and rec.tointernalcompany in companies and (rec.fromtypeenum!='Trade' and rec.totypeenum!='Trade'):
-                            rec.create_internal_transfer(rec, sms)
+                for rec in all_transfers:
+                    company = self.env['res.company'].search([('name', '=',
+                                                               rec.frominternalcompany if rec.buyselldisplaytext == 'Buy' else rec.tointernalcompany)],
+                                                             limit=1)
+                    rec_date = rec.get_custom_date()
+                    lock_date = company.fiscalyear_lock_date
+                    if not lock_date or rec_date > lock_date:
+                        if rec.deliveryactivestatusdisplayname == "Active":
+                            companies = self.env['res.company'].search([]).mapped('name')
+                            stock_move = self.env['stock.move'].search([('id', '=', '0')])
+                            product = self.env['product.product'].search([('id', '=', '0')], limit=1)
                             
+                            pol = self.env['purchase.order.line'].search([('fusion_segment_code', '=',
+                                                                           rec.fromsegmentsectioncode if rec.fromsegmentsectioncode else '100')],
+                                                                         limit=1)
+                            po = self.env['purchase.order'].search([('id', '=', pol.order_id.id)])
+                            sol = self.env['sale.order.line'].search(
+                                [('fusion_segment_code', '=',
+                                  rec.tosegmentsectioncode if rec.tosegmentsectioncode else '100')], limit=1)
+                            so = self.env['sale.order'].search([('id', '=', sol.order_id.id)])
+                            if (rec.buyselldisplaytext=='Buy' and rec.frominternalcompany == self.env.company.name) or (rec.buyselldisplaytext=='Sell' and rec.tointernalcompany == self.env.company.name):
+                                company = self.env['res.company'].search([('name', '=', rec.frominternalcompany if rec.buyselldisplaytext=='Buy' else rec.tointernalcompany)], limit=1)
+                                if rec.deliverystatusenum in ('Actual','Scheduled'):
+                                    cf = self.env['cashflow.controller.bi'].search([('transfernumber', '=', rec.deliveryid),('costtype', '=', 'Primary Settlement')],limit=1)
+                                    exists = self.env['stock.move'].search([('id', '=', '0')])
+    
+                                    nomination_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Nomination',
+                                                                                                             rec.itineraryid if rec.itineraryid else rec.deliveryid,
+                                                                                                             company.id)
+                                    warehouse = self.env['stock.warehouse'].search([('id', '=', '0')], limit=1)
+                                    existing_distribution=[]
+                                    
+                                    if (rec.totypeenum == 'Trade' or rec.fromtypeenum == 'Trade') and (rec.frominternalcompany in companies or rec.frominternalcompany == False) and (rec.tointernalcompany in companies or rec.tointernalcompany == False):
+                                        exists = sms.search(
+                                            [('fusion_delivery_id', '=', rec.deliveryid)], limit=1)
+                                        if exists:
+                                            if not lock_date or exists.picking_id.date_done.date() > lock_date:
+                                                if exists.fusion_last_modify == self.parse_datetime(rec.lastmodifydate) and exists.state=='done':
+                                                    continue
+                                                else:
+                                                    exists.fusion_last_modify = self.parse_datetime(rec.lastmodifydate)
+                                                    exists = sms.search([('id', '=', exists.id)])
+                                                    picking = exists.picking_id
+                                                    if picking.state  in ('done','waiting','confirmed','cancel'):
+                                                        picking.set_stock_move_to_draft()
+                                                        picking.action_confirm()
+                                                    self.update_existing_lines(exists, exists.product_id, rec, company,picking.location_id,picking.location_dest_id)
+                                                    self.confirm_picking(picking)
+                                                    continue
+                                                
+                                        else:
+                                            if rec.buyselldisplaytext=="Buy":
+                                                if po:
+                                                    if pol:
+                                                        if not po.state == 'purchase':
+                                                            po.button_confirm()
+                                                            # self.env.cr.commit()
+                                                        product = pol.product_id
+                                                        storage_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Deal Reference',
+                                                                                                                              rec.tomotcode,
+                                                                                                                              company.id)
+                                                      
+                                                        
+                                                        
+                                                        warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.tomotcode,
+                                                                                                                       company)
+                                                        
+                                                        existing_distribution = pol.analytic_distribution
+                                                        existing_distribution[str(nomination_link.id)] = 100
+                                                        existing_distribution[str(storage_link.id)] = 100
+                                                        pol['analytic_distribution'] = existing_distribution
+                                                        exists = sms.search(
+                                                            [('fusion_delivery_id', '=', rec.deliveryid), ('purchase_line_id', '=', pol.id)],
+                                                            limit=1)
+                                                        if exists:
+                                                            stock_move = sms.search([('id', '=', exists.id)])
+                                                        else:
+                                                            stock_move = sms.search(
+                                                                [('purchase_line_id', '=', pol.id), ('state', 'in', ('assigned','waiting','confirmed','draft'))], limit=1)
+                                                            if not stock_move:
+                                                                stock_move_posted = sms.search(
+                                                                    [('purchase_line_id', '=', pol.id), ('state', '=', 'done')], limit=1)
+                                                                if stock_move_posted:
+                                                                    stock_move = stock_move_posted.copy()
+                                                            if not stock_move:
+                                                                res = pol.order_id._prepare_picking()
+                                                                picking = self.env['stock.picking'].create(res)
+                                                                stock_move = pol._create_stock_moves(picking[0])
+                                                                
+                                                    
+                                                        
+                                            elif rec.tobuyselldisplaytext=="Sell":
+                                                if so:
+                                                    if sol:
+                                                        warehouse = self.env['fusion.sync.history'].validate_warehouse(rec.frommotcode,
+                                                                                                                       company)
+                                                        so.warehouse_id = warehouse
+                                                        if not so.state == 'sale':
+                                                            so.action_confirm()
+                                                            # self.env.cr.commit()
+                                                        product = sol.product_id
+                                                        storage_link = self.env['fusion.sync.history'].checkAndDefineAnalytic('Deal Reference',
+                                                                                                                              rec.frommotcode,
+                                                                                                                              company.id)
+                                                        existing_distribution = sol.analytic_distribution
+                                                        existing_distribution[str(nomination_link.id)] = 100
+                                                        existing_distribution[str(storage_link.id)] = 100
+                                                        sol['analytic_distribution'] = existing_distribution
+                                                        picking_type = self.env['stock.picking.type'].search(
+                                                            [('code', '=', 'outgoing'),
+                                                             ('warehouse_id', '=', warehouse.id)], limit=1)
+                                                        out_location = self.env['stock.location'].search(
+                                                            [('warehouse_id', '=', warehouse.id)], limit=1)
+                                                        exists = sms.search(
+                                                            [('fusion_delivery_id', '=', rec.deliveryid), ('sale_line_id', '=', sol.id)],
+                                                            limit=1)
+                                                        if exists:
+                                                            stock_move = sms.search([('id', '=', exists.id)])
+                                                        else:
+                                                            stock_move = sms.search(
+                                                                [('sale_line_id', '=', sol.id), ('state', 'in', ('assigned', 'waiting', 'confirmed', 'draft'))], limit=1)
+                                                            if not stock_move:
+                                                                stock_move_posted = sms.search(
+                                                                    [('sale_line_id', '=', sol.id), ('state', '=', 'done')], limit=1)
+                                                                if stock_move_posted:
+                                                                    stock_move = stock_move_posted.copy()
+                                                            if not stock_move:
+                                                                picking = {
+                                                                    'partner_id': so.partner_id.id,
+                                                                    'picking_type_id': picking_type.id,
+                                                                    'location_id': out_location.id,
+                                                                    'move_type': 'direct',
+                                                                    'company_id': company.id,
+                                                                    'sale_id': so.id,
+                                                                    'origin': so.name
+                                                                }
+                                                                
+                                                                picking = self.env['stock.picking'].create(picking)
+                                                                move_vals = {
+                                                                    'name': product.name,
+                                                                    'product_id': product.id,
+                                                                    'fusion_delivery_id': rec.deliveryid,
+                                                                    'product_uom': product.uom_id.id,
+                                                                    'picking_id': picking.id,
+                                                                    'location_id': out_location.id,
+                                                                    'location_dest_id': picking.location_dest_id.id,
+                                                                    'sale_line_id': sol.id,
+                                                                }
+                                                                stock_move = sms.create(move_vals)
+                                                                picking.sale_id=so.id
+                                        if po or so:
+                                            if stock_move and (stock_move.fusion_last_modify != self.parse_datetime(rec.lastmodifydate) or stock_move.state!='done'):
+                                                picking = stock_move.picking_id
+                                                stock_move.fusion_last_modify = self.parse_datetime(rec.lastmodifydate)
+                                                if product.uom_id.rounding != 0.001:
+                                                    product.uom_id.rounding = 0.001
+                                                picking.fusion_segment_code = pol.fusion_segment_code
+                                                picking.fusion_itinerary_id = rec.itineraryid
+                                                stock_move.fusion_delivery_id = rec.deliveryid
+                                                stock_move.fusion_segment_code = pol.fusion_segment_code
+                                                if rec.deliverycompletiondate or rec.bldate or rec.titledeliverydate:
+                                                    if stock_move.state in('done','waiting','confirmed','assigned'):
+                                                        stock_move.picking_id.set_stock_move_to_draft()
+                                                    # stock_move.picking_id.deal_ref = 'moved_to_Draft'
+                                                    
+                                                    picking.custom_delivery_date = rec.get_custom_date()
+                                                    picking.date_done = rec.get_custom_date()
+                                                    picking.scheduled_date = rec.get_custom_date()
+                                                    stock_move.date = rec.get_custom_date()
+                                                    if rec.buyselldisplaytext == "Buy":
+                                                        picking_type = self.env['stock.picking.type'].search(
+                                                            [('code', '=', 'incoming'), ('warehouse_id', '=', warehouse.id)], limit=1)
+                                                    if not picking_type:
+                                                        picking_type=picking.picking_type_id
+                                                    picking.picking_type_id = picking_type
+                                                    stock_move.location_id = picking.location_id,
+                                                    stock_move.location_dest_id = picking.location_dest_id,
+                                                    self.update_existing_lines(stock_move,product,rec,company,picking.location_id,picking.location_dest_id)
+                                                    if sum(move.quantity_done for move in picking.move_ids) > 0:
+                                                        self.confirm_picking(picking)
+                                                    if rec.buyselldisplaytext == "Sell":
+                                                        picking.sale_id=so.id
+                                                
+                                                        
+                                                # self.fix_valuation_warehouse(picking,stock_move)
+                                                # self.env.cr.commit()
+                                                # stock_move.stock_valuation_layer_ids.recalculate_stock_value()
+                                        else:
+                                            if rec.frombuyselldisplaytext == "Buy":
+                                                log_error = self.env['fusion.sync.history.errors'].log_error('TransferController',
+                                                                                                             rec.fromsegmentid,
+                                                                                                             'PO Line not found',
+                                                                                                             rec.frominternalcompany)
+                                            else:
+                                                log_error = self.env['fusion.sync.history.errors'].log_error('TransferController',
+                                                                                                         rec.tosegmentid,
+                                                                                                         'SO Line not found',
+                                                                                                         rec.tointernalcompany)
+                                            raise UserError("Order not found." + rec.tosegmentsectioncode if rec.tosegmentsectioncode else rec.fromsegmentsectioncode + rec.buyselldisplaytext)
+                    
+                                    elif rec.frominternalcompany in companies and rec.tointernalcompany in companies and (rec.fromtypeenum!='Trade' and rec.totypeenum!='Trade'):
+                                        rec.create_internal_transfer(rec, sms)
+                            elif rec.buyselldisplaytext==False and rec.frominternalcompany in companies and rec.tointernalcompany in companies and (rec.fromtypeenum!='Trade' and rec.totypeenum!='Trade'):
+                                rec.create_internal_transfer(rec, sms)
+                            self.env.cr.commit()
+                        else:
+                            cancelled_entry = self.env['stock.move'].search(
+                                [('fusion_delivery_id', '=', rec.deliveryid)])
+                            if cancelled_entry:
+                                cancelled_entry.picking_id.set_stock_move_to_draft()
                     else:
-                        cancelled_entry = self.env['stock.move'].search(
-                            [('fusion_delivery_id', '=', rec.deliveryid)])
-                        if cancelled_entry:
-                            cancelled_entry.picking_id.set_stock_move_to_draft()
-                self.env.cr.commit()
+                        log_error = self.env['fusion.sync.history.errors'].log_error('TransferController',
+                                                                                     rec.tosegmentid,
+                                                                                     'Transaction before closing date',
+                                                                                     rec.tointernalcompany)
+                    
             # except Exception as e:
             #     log_error = self.env['fusion.sync.history.errors'].log_error('TransferController', rec.fromsegmentid,
             #                                                                  str(e),
