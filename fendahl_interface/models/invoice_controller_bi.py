@@ -654,10 +654,11 @@ class InvoiceControllerBI(models.Model):
                                         
                                             
                                         if cashflow_lines:
+                                            down_payment_types = ['Pre-payment_Rev', 'Provisional Payment_Rev',
+                                                                  'Pre-payment',
+                                                                  'Provisional Payment']
                                             for cfline in cashflow_lines:
-                                                down_payment_types =['Pre-payment_Rev', 'Provisional Payment_Rev',
-                                                                          'Pre-payment',
-                                                                          'Provisional Payment']
+                                                
                                                 if cfline['costtype'] != 'VAT':
                                                     product_linez = existing_invoice.line_ids.filtered(
                                                         lambda r: r.display_type == 'product')
@@ -895,6 +896,9 @@ class InvoiceControllerBI(models.Model):
                                             extended_multiplier = -1
         
                                         if cashflow_lines:
+                                            down_payment_types = ['Pre-payment_Rev', 'Provisional Payment_Rev',
+                                                                  'Pre-payment',
+                                                                  'Provisional Payment']
                                             for cfline in cashflow_lines:
                                                 if cfline['costtype']!='VAT':
                                                     product_linez = existing_invoice.line_ids.filtered(
@@ -1037,7 +1041,7 @@ class InvoiceControllerBI(models.Model):
                     rec.internalcompany)
                 
                 if showExceptionsUI:
-                    raise UserError(exc.name)
+                    raise UserError(exc.args[0])
     
     def reconcile_entries(self, invoice_reconciled_lines, existing_invoice):
         reconcile_obj = self.pool.get('account.partial.reconcile')
