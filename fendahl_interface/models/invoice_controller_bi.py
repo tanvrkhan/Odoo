@@ -1,3 +1,5 @@
+import datetime
+
 from odoo import models, fields
 import requests
 import logging
@@ -630,15 +632,32 @@ class InvoiceControllerBI(models.Model):
                                     
                                     self.env.cr.commit()
                                     if existing_invoice.line_ids:
-                                        cashflow_lines = cashflow_lines_all.read_group(
-                                            domain=[('invoicenumber', '=', rec.invoicenumber),
-                                                    ('cashflowstatus', '!=', 'Defunct')],
-                                            fields=['payablereceivable', 'costtype', 'commodity', 'material', 'quantityuom',
-                                                    'quantity', 'price', 'extendedamount'],  # Fields to load
-                                            groupby=['erptaxcode', 'costtype', 'price', 'quantityuom', 'payablereceivable',
-                                                     'commodity', 'material'],
-                                            lazy=False  # Get results for each partner directly
-                                        )
+                                        if (rec.parse_datetime(rec.invoicecreationdate)).date() >= datetime.date(2024,10,10):
+                                            cashflow_lines = self.env['cashflow.controller.bi'].search(
+                                                [('invoicenumber', '=', rec.invoicenumber)])
+                                            cashflow_lines = cashflow_lines_all.read_group(
+                                                domain=[('invoicenumber', '=', rec.invoicenumber),
+                                                        ('cashflowstatus', '!=', 'Defunct')],
+                                                fields=['payablereceivable', 'costtype', 'commodity', 'material',
+                                                        'quantityuom',
+                                                        'quantity', 'price', 'extendedamount'],  # Fields to load
+                                                groupby=['erptaxcode', 'costtype', 'price', 'quantityuom',
+                                                         'payablereceivable',
+                                                         'commodity', 'material', 'id'],
+                                                lazy=False  # Get results for each partner directly
+                                            )
+                                        else:
+                                            cashflow_lines = cashflow_lines_all.read_group(
+                                                domain=[('invoicenumber', '=', rec.invoicenumber),
+                                                        ('cashflowstatus', '!=', 'Defunct')],
+                                                fields=['payablereceivable', 'costtype', 'commodity', 'material',
+                                                        'quantityuom',
+                                                        'quantity', 'price', 'extendedamount'],  # Fields to load
+                                                groupby=['erptaxcode', 'costtype', 'price', 'quantityuom',
+                                                         'payablereceivable',
+                                                         'commodity', 'material'],
+                                                lazy=False  # Get results for each partner directly
+                                            )
                                         
                                         receivables = sum(r['extendedamount'] for r in cashflow_lines if
                                                           r['payablereceivable'] == 'Receivable')
@@ -867,19 +886,29 @@ class InvoiceControllerBI(models.Model):
                                     # existing_invoice.write({'sale_line_id': so.id}) if so else None
                                     existing_invoice.write({'invoice_origin': so.name}) if so else None
                                     if existing_invoice.line_ids:
-                                        
-                                        # cashflow_line = self.env['cashflow.controller.bi'].search(
-                                        #     [('invoicenumber', '=', rec.invoicenumber)])
-                                        cashflow_lines = cashflow_lines_all.read_group(
-                                            domain=[('invoicenumber', '=', rec.invoicenumber),
-                                                    ('cashflowstatus', '!=', 'Defunct')],
-                                            fields=['payablereceivable', 'costtype', 'commodity', 'material', 'quantityuom',
-                                                    'quantity', 'price', 'extendedamount'],  # Fields to load
-                                            groupby=['erptaxcode', 'costtype', 'price', 'quantityuom', 'payablereceivable',
-                                                     'commodity', 'material'],
-                                            lazy=False  # Get results for each partner directly
-                                        )
-                                        
+                                        if (rec.parse_datetime(rec.invoicecreationdate)).date() >= datetime.date(2024, 10, 10):
+                                            cashflow_lines = cashflow_lines_all.read_group(
+                                                domain=[('invoicenumber', '=', rec.invoicenumber),
+                                                        ('cashflowstatus', '!=', 'Defunct')],
+                                                fields=['payablereceivable', 'costtype', 'commodity', 'material',
+                                                        'quantityuom',
+                                                        'quantity', 'price', 'extendedamount'],  # Fields to load
+                                                groupby=['erptaxcode', 'costtype', 'price', 'quantityuom',
+                                                         'payablereceivable',
+                                                         'commodity', 'material','id'],
+                                                lazy=False  # Get results for each partner directly
+                                            )
+                                        else:
+                                            cashflow_lines = cashflow_lines_all.read_group(
+                                                domain=[('invoicenumber', '=', rec.invoicenumber),
+                                                        ('cashflowstatus', '!=', 'Defunct')],
+                                                fields=['payablereceivable', 'costtype', 'commodity', 'material', 'quantityuom',
+                                                        'quantity', 'price', 'extendedamount'],  # Fields to load
+                                                groupby=['erptaxcode', 'costtype', 'price', 'quantityuom', 'payablereceivable',
+                                                         'commodity', 'material'],
+                                                lazy=False  # Get results for each partner directly
+                                            )
+                                            
                                         receivables = sum(r['extendedamount'] for r in cashflow_lines if
                                                           r['payablereceivable'] == 'Receivable')
                                         payables = sum(r['extendedamount'] for r in cashflow_lines if
@@ -1371,3 +1400,10 @@ class InvoiceControllerBI(models.Model):
             self.create_product_line_existing_invoice(existing_invoice, cf, product, uom, pol, tax_rate_record,
                                                       multiplier, company)
         existing_invoice.action_post()
+    def parse_datetime(self,time_str):
+        try:
+            # First try parsing with fractional seconds
+            return datetime.datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S.%f')
+        except ValueError:
+            # If it fails, try parsing without fractional seconds
+            return datetime.datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')
