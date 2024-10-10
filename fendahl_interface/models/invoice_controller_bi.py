@@ -684,8 +684,9 @@ class InvoiceControllerBI(models.Model):
                                                     
                                                     for product_lines in product_linez:
                                                         if cfline['costtype'] == 'Primary Settlement':
-                                                            if cfline['material'] == product_lines.product_id.name and (cfline['quantity'] == product_lines.quantity or cfline[
-                                                            'quantity'] * -1 == product_lines.quantity) and ((float(round(cfline['extendedamount'], 2)) == round(
+                                                            if cfline['material'] == product_lines.product_id.name and (float(round(cfline[
+                                                            'quantity'],2)) == float(round(product_lines.quantity,2)) or float(round(cfline[
+                                                            'quantity'],2)) * -1 == float(round(product_lines.quantity,2))) and ((float(round(cfline['extendedamount'], 2)) == round(
                                                                     product_lines.balance, 2) * -1) or float(
                                                                     round(cfline['extendedamount'], 2)) == round(
                                                                     product_lines.balance, 2)):
@@ -699,17 +700,19 @@ class InvoiceControllerBI(models.Model):
                                                             #downpayment check
                                                             if (product_lines.product_id.name == "Down payment" or product_lines.product_id.name == cfline[
                                                             'material']) and cfline[
-                                                            'costtype'] in down_payment_types and (cfline['quantity'] == product_lines.quantity or cfline[
-                                                            'quantity'] * -1 == product_lines.quantity or ((cfline[
-                                                            'quantity'] == 0 or product_lines.quantity==1) and cfline['extendedamount'] == product_lines.price_unit)):
+                                                            'costtype'] in down_payment_types and (float(round(cfline[
+                                                            'quantity'],2)) == float(round(product_lines.quantity,2)) or float(round(cfline[
+                                                            'quantity'],2)) * -1 == float(round(product_lines.quantity,2)) or ((float(round(cfline[
+                                                            'quantity'],2)) == 0 or float(round(product_lines.quantity,2))==1) and cfline['extendedamount'] == product_lines.price_unit)):
                                                                 self.update_existing_line(product_lines, company, cfline,
                                                                                           extended_multiplier,
                                                                                           cashflow_lines_all, rec.invoicenumber,
                                                                                           showExceptionsUI)
                                                             #handling other costs
-                                                            elif cfline['costtype'] == product_lines.product_id.name and (cfline['quantity'] == product_lines.quantity or cfline[
-                                                            'quantity'] * -1 == product_lines.quantity or ((cfline[
-                                                            'quantity'] == 0 or product_lines.quantity==1) and (cfline['extendedamount'] == product_lines.price_unit or cfline['extendedamount'] == product_lines.price_unit*-1))):
+                                                            elif cfline['costtype'] == product_lines.product_id.name and (float(round(cfline[
+                                                            'quantity'],2)) == float(round(product_lines.quantity,2)) or float(round(cfline[
+                                                            'quantity'],2)) * -1 == float(round(product_lines.quantity,2)) or ((float(round(cfline[
+                                                            'quantity'],2)) == 0 or float(round(product_lines.quantity,2))==1) and (cfline['extendedamount'] == product_lines.price_unit or cfline['extendedamount'] == product_lines.price_unit*-1))):
                                                                 self.update_existing_line(product_lines, company, cfline,
                                                                                           extended_multiplier,
                                                                                           cashflow_lines_all, rec.invoicenumber,
@@ -935,8 +938,7 @@ class InvoiceControllerBI(models.Model):
                                                     for product_lines in product_linez:
                                                         if cfline['costtype'] == 'Primary Settlement':
                                                             if cfline['material'] == product_lines.product_id.name and (
-                                                                    cfline['quantity'] == product_lines.quantity or cfline[
-                                                                'quantity'] * -1 == product_lines.quantity) and (
+                                                                    float(round(cfline['quantity'],2)) == float(round(product_lines.quantity,2)) or float(round(cfline['quantity'],2)) * -1 == float(round(product_lines.quantity,2))) and (
                                                                     (float(round(cfline['price'], 2)) == round(
                                                                         product_lines.price_unit, 2) * -1) or float(
                                                                 round(cfline['price'], 2)) == round(
@@ -950,17 +952,19 @@ class InvoiceControllerBI(models.Model):
                                                                     cfline[
                                                                         'material']) and cfline[
                                                                 'costtype'] in down_payment_types and (
-                                                                    cfline['quantity'] == product_lines.quantity or cfline[
-                                                                'quantity'] * -1 == product_lines.quantity or ((cfline[
+                                                                    float(round(cfline[
+                                                                                    'quantity'], 2)) == float(round(product_lines.quantity,2)) or float(round(cfline[
+                                                                'quantity'],2)) * -1 == float(round(product_lines.quantity,2)) or ((cfline[
                                                                                                                     'quantity'] == 0 or product_lines.quantity == 1) and
                                                                                                                cfline[
                                                                                                                    'extendedamount'] == product_lines.price_unit)):
                                                                 self.update_existing_si_line(product_lines, company, cfline,extended_multiplier, rec.invoicenumber,showExceptionsUI)
                                                             # handling other costs
                                                             elif cfline['costtype'] == product_lines.product_id.name and (
-                                                                    cfline['quantity'] == product_lines.quantity or cfline[
-                                                                'quantity'] * -1 == product_lines.quantity or ((cfline[
-                                                                                                                    'quantity'] == 0 or product_lines.quantity == 1) and (
+                                                                    float(round(cfline[
+                                                                                    'quantity'], 2)) == float(round(product_lines.quantity,2)) or float(round(cfline[
+                                                                'quantity'],2)) * -1 == float(round(product_lines.quantity,2)) or ((cfline[
+                                                                                                                    'quantity'] == 0 or float(round(product_lines.quantity,2)) == 1) and (
                                                                                                                        cfline[
                                                                                                                            'extendedamount'] == product_lines.price_unit or
                                                                                                                        cfline[
