@@ -18,10 +18,12 @@ class UpdateInvoiceCosting(models.Model):
     )
 
     origin_order = fields.Char("Order", compute='_compute_order', store=True)
+    
+
     def _compute_order(self):
         for record in self:
             record.origin_order = ''
-            if record.move_id.move_type in ['in_invoice', 'in_refund','out_invoice', 'out_refund']:
+            if record.move_id.move_type in ('in_invoice', 'in_refund','out_invoice', 'out_refund'):
                 if record.move_id.invoice_origin:
                     record.origin_order =record.move_id.invoice_origin
                 else:
