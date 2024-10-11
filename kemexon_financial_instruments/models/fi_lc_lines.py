@@ -25,7 +25,7 @@ class LcLines(models.Model):
     issuance_date = fields.Date(related='fi_lc_id.issuance_date', string='Issuance Date', store=True)
     expiry_date = fields.Date(related='fi_lc_id.expiry_date', string='Expiry Date', store=True)
     is_active = fields.Boolean(related='fi_lc_id.is_active', string='Is Active', store=True)
-    beneficiary = fields.Many2one(related='fi_lc_id.beneficiary', string='Beneficiary')
+    beneficiary = fields.Many2one(related='fi_lc_id.beneficiary', string='Beneficiary', store=True)
     beneficiary_bank = fields.Many2one(related='fi_lc_id.beneficiary_bank', string='Beneficiary Bank')
     beneficiary_bank_reference = fields.Char(related='fi_lc_id.beneficiary_bank_reference',
                                              string='Beneficiary Bank Reference')
