@@ -47,6 +47,37 @@
             </p>
         </field>
     </record>
+        <record id="view_fi_lc_lines_search" model="ir.ui.view">
+        <field name="name">fi.lc.lines.filter.search</field>
+        <field name="model">fi.lc.lines</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter string="Reference" name="filter_ref_no" domain="[('ref_no', '!=', False)]"/>
+                <filter string="Active" name="filter_active" domain="[('is_active', '!=', False)]"/>
+                <filter string="Beneficiary" name="filter_ref_no" domain="[('beneficiary', '!=', False)]"/>
+                <filter string="Applicant" name="filter_ref_no" domain="[('applicant', '!=', False)]"/>
+                <field name="ref_no"/>
+                <field name="product"/>
+                <field name="product_family"/>
+                <field name="quantity"/>
+                <field name="type"/>
+                <field name="lc_type"/>
+                <field name="issuance_date"/>
+                <field name="expiry_date"/>
+                <field name="beneficiary"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Reference" name="group_by_lc_type" context="{'group_by': 'ref_no'}"/>
+                    <filter string="LC Type" name="group_by_lc_type" context="{'group_by': 'lc_type'}"/>
+                    <filter string="Product" name="group_by_product" context="{'group_by': 'product'}"/>
+                    <filter string="Beneficiary" name="group_by_beneficiary" context="{'group_by': 'beneficiary'}"/>
+                    <filter string="Issuance Date" name="group_by_issuance_date" context="{'group_by': 'issuance_date'}"/>
+                    <filter string="Expiry Date" name="group_by_expiry_date" context="{'group_by': 'expiry_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <menuitem id="menu_fi_lc_Lines"
               name="Financial Instruments Lines"
               action="action_fi_lc_lines"

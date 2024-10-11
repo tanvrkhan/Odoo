@@ -18,7 +18,7 @@ class LcLines(models.Model):
     amount = fields.Monetary(string='Amount', readonly=True, currency_field='currency_id', compute='_compute_amount')
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.company.currency_id)
     fi_lc_id = fields.Many2one('fi.lc', string="LC Lines")
-    ref_no = fields.Char(related='fi_lc_id.ref_no', string='Reference')
+    ref_no = fields.Char(related='fi_lc_id.ref_no', string='Reference', store=True)
     type = fields.Selection(related='fi_lc_id.type', string='Type', store=True)
     lc_type = fields.Selection(related='fi_lc_id.lc_type', string='LC Type', store=True)
     sub_limit = fields.Many2one('bank.financing.limits',related='fi_lc_id.sub_limit', string='Sub Limit', store=True)

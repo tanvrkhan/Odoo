@@ -94,8 +94,8 @@
         <field name="arch" type="xml">
             <search>
                 <filter string="Reference" name="filter_ref_no" domain="[('ref_no', '!=', False)]"/>
-                <filter string="Beneficiary Bank Reference" name="filter_ref_no" domain="[('beneficiary_bank_reference', '!=', False)]"/>
-                <filter string="Applicant Bank Reference" name="filter_ref_no" domain="[('applicant_bank_reference', '!=', False)]"/>
+                <filter string="Beneficiary" name="filter_ref_no" domain="[('beneficiary', '!=', False)]"/>
+                <filter string="Applicant" name="filter_ref_no" domain="[('applicant', '!=', False)]"/>
                 <field name="ref_no"/>
                 <field name="type"/>
                 <field name="lc_type"/>
