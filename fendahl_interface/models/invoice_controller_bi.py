@@ -643,7 +643,7 @@ class InvoiceControllerBI(models.Model):
                                                         'quantity', 'price', 'extendedamount'],  # Fields to load
                                                 groupby=['erptaxcode', 'costtype', 'price', 'quantityuom',
                                                          'payablereceivable',
-                                                         'commodity', 'material', 'id'],
+                                                         'commodity', 'material', 'cashflowid'],
                                                 lazy=False  # Get results for each partner directly
                                             )
                                         else:
@@ -898,7 +898,7 @@ class InvoiceControllerBI(models.Model):
                                                         'quantity', 'price', 'extendedamount'],  # Fields to load
                                                 groupby=['erptaxcode', 'costtype', 'price', 'quantityuom',
                                                          'payablereceivable',
-                                                         'commodity', 'material','id'],
+                                                         'commodity', 'material','cashflowid'],
                                                 lazy=False  # Get results for each partner directly
                                             )
                                         else:
