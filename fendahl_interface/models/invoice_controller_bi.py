@@ -939,11 +939,10 @@ class InvoiceControllerBI(models.Model):
                                                         lambda r: r.display_type == 'product')
                                                     for product_lines in product_linez:
                                                         if cfline['costtype'] == 'Primary Settlement':
-                                                            if cfline['material'] == product_lines.product_id.name and (
-                                                                    float(round(cfline['quantity'],2)) == float(round(product_lines.quantity,2)) or float(round(cfline['quantity'],2)) * -1 == float(round(product_lines.quantity,2))) and (cfline[
-                                                                             'price'] == product_lines.price_unit or
-                                                                                 cfline[
-                                                                                     'price'] == product_lines.price_unit * -1):
+                                                            if (cfline['material'] == product_lines.product_id.name and (
+                                                                    float(round(cfline['quantity'],2)) == float(round(product_lines.quantity,2)) or float(round(cfline['quantity'],2)) * -1 == float(round(product_lines.quantity,2)))
+                                                                    and (float(round(cfline['price'],2)) == float(round(product_lines.price_unit,2)) or
+                                                                                 float(round(cfline['price'],2)) == float(round(product_lines.price_unit,2)) * -1)):
                                                                 self.update_existing_si_line(product_lines, company, cfline,extended_multiplier, rec.invoicenumber,showExceptionsUI)
                                                         
                                                         else:
