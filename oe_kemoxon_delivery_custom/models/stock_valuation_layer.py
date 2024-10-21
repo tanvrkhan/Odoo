@@ -59,7 +59,7 @@ class StockValuationLayer(models.Model):
                 domain = [
                     ('product_id', '=', record.product_id.id),
                     ('stock_move_id.picking_id.date_done', '<', record.stock_move_id.picking_id.date_done),
-                    ('id', '!=', record.id),
+                    ('stock_move_id', '!=', record.stock_move_id.id),
                     ('company_id', '=', record.company_id.id),
                     ('warehouse_id', '=', record.warehouse_id.id)
                 ]
