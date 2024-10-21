@@ -1172,7 +1172,8 @@ class InvoiceControllerBI(models.Model):
                 existing_line.name = pol.product_id.name
                 existing_line.product_id = product.id
                 existing_line.product_uom_id = uom.id
-                existing_line.quantity = float(cf['quantity']) * extended_multiplier if cf['payablereceivable']=='Receivable' else float(cf['quantity'])
+                existing_line.quantity = float(cf['quantity']) if (float(cf['extendedamount']) / float(
+                    cf['quantity']) * extended_multiplier) >= 0 else float(cf['quantity']) * -1
                 existing_line.price_unit = float(cf['extendedamount']) / float(cf['quantity']) if float(cf['extendedamount'])>0 else float(cf['extendedamount']) *-1/ float(cf['quantity'])
                 if existing_analytic:
                     for aa in existing_analytic:
@@ -1279,7 +1280,7 @@ class InvoiceControllerBI(models.Model):
                 existing_line.name = sol.product_id.name
                 existing_line.product_id = sol.product_id.id
                 existing_line.product_uom_id = uom.id
-                existing_line.quantity = float(cf['quantity']) * extended_multiplier if cf['payablereceivable']=='Receivable' else float(cf['quantity'])
+                existing_line.quantity = float(cf['quantity']) if (float(cf['extendedamount'])/ float(cf['quantity'])*extended_multiplier) >= 0 else float(cf['quantity']) *-1
                 existing_line.price_unit = float(cf['extendedamount'])/ float(cf['quantity']) if float(cf['extendedamount']) >0 else float(cf['extendedamount'])*-1/ float(cf['quantity'])
                 # existing_line.purchase_line_id = sol.id
                 existing_line.analytic_distribution = sol.analytic_distribution
