@@ -43,8 +43,8 @@
             <field name="inherit_id" ref="account.view_account_move_line_filter"/>
             <field name="arch" type="xml">
                 <xpath expr="//filter[last()]" position="after">
-                    <filter string="Origin Order" name="group_by_origin_order" domain="[]"
-                            context="{'group_by':'origin_order'}"/>
+                    <filter string="Origin Order" name="group_by_origin_order_stored" domain="[]"
+                            context="{'group_by':'origin_order_stored'}"/>
                 </xpath>
             </field>
         </record>
