@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Softhealer Technologies.
 from odoo import models,fields
+from odoo.odoo import api
 
 
 class UpdateInvoiceCosting(models.Model):
@@ -16,18 +17,22 @@ class UpdateInvoiceCosting(models.Model):
         string='Fusion Reference',
         store=True,
     )
+    origin_order_stored = fields.Char(
+        related='origin_order',
+        string='Origin Order Stored',
+        store=True,
+    )
 
-    origin_order = fields.Char("Order", compute='_compute_order', store=True)
-    
+    origin_order = fields.Char("Order", compute='_compute_order')
 
     def _compute_order(self):
         for record in self:
             record.origin_order = ''
-            if record.move_id.move_type in ('in_invoice', 'in_refund','out_invoice', 'out_refund'):
+            if record.move_id.move_type in ('in_invoice', 'in_refund', 'out_invoice', 'out_refund'):
                 if record.move_id.invoice_origin:
-                    record.origin_order =record.move_id.invoice_origin
+                    record.origin_order = record.move_id.invoice_origin
                 else:
-                    record.origin_order =''
+                    record.origin_order = ''
             else:
                 if record.move_id.stock_move_id.purchase_line_id:
                     record.origin_order = record.move_id.stock_move_id.purchase_line_id.order_id.name
