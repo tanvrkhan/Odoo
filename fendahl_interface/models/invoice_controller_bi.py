@@ -632,7 +632,7 @@ class InvoiceControllerBI(models.Model):
                                     
                                     self.env.cr.commit()
                                     if existing_invoice.line_ids:
-                                        if (rec.parse_datetime(rec.invoicecreationdate)).date() >= datetime.date(2024,10,10):
+                                        if (rec.create_date).date() >= datetime.date(2024,10,10):
                                             cashflow_lines = self.env['cashflow.controller.bi'].search(
                                                 [('invoicenumber', '=', rec.invoicenumber)])
                                             cashflow_lines = cashflow_lines_all.read_group(
@@ -891,7 +891,7 @@ class InvoiceControllerBI(models.Model):
                                     # existing_invoice.write({'sale_line_id': so.id}) if so else None
                                     existing_invoice.write({'invoice_origin': so.name}) if so else None
                                     if existing_invoice.line_ids:
-                                        if (rec.parse_datetime(rec.invoicecreationdate)).date() >= datetime.date(2024, 10, 10):
+                                        if rec.create_date.date() >= datetime.date(2024, 10, 10):
                                             cashflow_lines = cashflow_lines_all.read_group(
                                                 domain=[('invoicenumber', '=', rec.invoicenumber),
                                                         ('cashflowstatus', '!=', 'Defunct')],
